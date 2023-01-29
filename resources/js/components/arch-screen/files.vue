@@ -17,8 +17,8 @@
                             <h6>{{ file.data_type_value.length > 0 ? file.data_type_value[0].value : 'File' }}
                                 ({{ file.id }})</h6>
                             <span :class="[allActive.includes(file.id) ? 'checked-circle active-circle border' : '' ]">
-                <i v-if="allActive.includes(file.id)" class="fa fa-check"/>
-              </span>
+                                <i v-if="allActive.includes(file.id)" class="fa fa-check"/>
+                            </span>
                         </div>
                         <div><span class="text-danger">*</span> validated</div>
                         <div>{{ formatDate(file.created_at) }}</div>
@@ -26,8 +26,8 @@
                             <a v-if="file.favourite == false" @click="favorite(file.id)">
                                 <i class="far fa-star" style="color: rgb(218 218 218)"></i>
                             </a>
-                            <a v-if="file.favourite == true" @click="favorite(file.id)">
-                                <i class="far fa-star-sharp" style="color: rgb(254 204 0)"></i>
+                            <a v-else @click="favorite(file.id)">
+                                <i class="fa fa-star" style="color: rgb(254 204 0)"></i>
                             </a>
                         </div>
                     </div>
@@ -98,14 +98,17 @@ export default {
                 user_id,
                 admin_id,
             }).then((res) => {
+                let archive = this.archiveFiles.find((e) => id == e.id);
                     setTimeout(() => {
                         Swal.fire({
                             icon: "success",
-                            text: `${this.$t("general.Editsuccessfully")}`,
+                            text: `${archive.favourite==true ? this.$t("general.AddedToFavoritesSuccessfully") : this.$t("general.DeletedFromFavoritesSuccessfully")}`,
                             showConfirmButton: false,
                             timer: 1500,
                         });
                     }, 500);
+
+                archive.favourite =! archive.favourite;
                 })
                 .catch((err) => {
                     if (err.response.data) {
@@ -116,9 +119,6 @@ export default {
                         });
                     }
                 })
-                // .finally(() => {
-                //     this.isLoader = false;
-                // });
         }
     }
 };

@@ -16,9 +16,10 @@ class ArchiveFileResource extends JsonResource
     public function toArray($request)
     {
         $favourite = null;
-        $user_id = request()->user_id;
-        $admin_id = request()->admin_id;
-        if ($user_id) {
+        $user_id = request()->header('user_id');
+        $admin_id = request()->header('admin_id');
+
+        if ($user_id != null && $user_id != "null") {
             $favourite = $this->favourites()->where("user_id", $user_id)->first();
         } elseif ($admin_id) {
             $favourite = $this->favourites()->where("admin_id", $admin_id)->first();

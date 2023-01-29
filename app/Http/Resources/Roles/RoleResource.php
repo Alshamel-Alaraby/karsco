@@ -3,7 +3,7 @@
 namespace App\Http\Resources\Roles;
 
 use App\Http\Resources\RoleTypes\RoleTypeResource;
-use App\Http\Resources\RoleWorkflow\RoleWorkflowResource;
+use App\Http\Resources\RoleWorkflow\RoleWorkflowRelResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoleResource extends JsonResource
@@ -21,7 +21,7 @@ class RoleResource extends JsonResource
             'name' => $this->name,
             'name_e' => $this->name_e,
             'roletype' => new RoleTypeResource($this->roleType),
-            "work_flow" => RoleWorkflowResource::collection($this->workflows),
+            "work_flow" => RoleWorkflowRelResource::collection($this->workflows),
         ];
     }
 }

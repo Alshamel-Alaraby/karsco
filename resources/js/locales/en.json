@@ -882,6 +882,8 @@
         "DocumentDepartmentTable": "Document Department Table",
         "DocumentType": "Document",
         "DocumentTable": "Document Table",
-        "send": "Send"
+        "send": "Send",
+        "AddedToFavoritesSuccessfully": "Added to favorites successfully",
+        "DeletedFromFavoritesSuccessfully":"Deleted from favorites successfully"
     }
 }

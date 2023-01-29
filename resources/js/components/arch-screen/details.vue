@@ -429,6 +429,3 @@ export default {
     color: #3eafd9;
 }
 </style>
-
-
-

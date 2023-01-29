@@ -95,7 +95,11 @@ export const mutations = {
     editType(state,type){
         state.type = type;
         localStorage.setItem('type',JSON.stringify(type));
-    }
+    },
+    editUser(state,user){
+        state.user = user;
+        localStorage.setItem('user',JSON.stringify(user));
+    },
 };
 
 // actions

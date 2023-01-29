@@ -89,21 +89,13 @@ export default {
                     })
                         .then(async (res) => {
                             let l = res.data.data;
-                            console.log(l)
-                            // this.$store.commit("auth/editToken", l.token);
-                            // this.$store.commit("auth/editPartner", l.partner);
-                            // this.$store.commit("auth/editCompanies", l.partner.companies);
-                            // this.isSuccess = true;
-                            //
-                            // if (l.partner.companies.length > 1 && l.partner.companies) {
-                            //     this.$router.push({name: "company"});
-                            // } else if (l.partner.companies.length == 1) {
-                            //     this.$store.commit("auth/editCompanyId", l.partner.companies[0].id);
-                            //     await this.companyId(l.partner.companies[0].id);
-                            //     this.$router.push({name: "home"});
-                            // } else {
-                            //     this.submitted = false;
-                            // }
+                            console.log(l.user)
+                            this.$store.commit("auth/editToken", l.token);
+                            this.$store.commit("auth/editUser", l.user);
+                            this.$store.commit("auth/editType", "user");
+                            this.isSuccess = true;
+                            await this.workflowUser(l.user.roles);
+                            this.$router.push({name: "home"});
                         })
                         .catch((err) => {
                             this.isError = true;
@@ -151,6 +143,18 @@ export default {
                         text: `${this.$t("general.Thereisanerrorinthesystem")}`,
                     });
                 });
+        },
+        async workflowUser(roles) {
+            let workflowTree = [];
+            await roles.forEach((role_work_flow) => {
+                if (role_work_flow.work_flow.length > 0) {
+                    role_work_flow.work_flow.forEach((flow_name) => {
+                        workflowTree.push(flow_name.workflow_name);
+                    });
+                }
+            });
+            this.$store.commit('auth/editWorkFlowTrees', ["home", ...workflowTree]);
+
         }
     },
 };

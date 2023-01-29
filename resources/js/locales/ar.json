@@ -867,6 +867,8 @@
         "DocumentDepartmentTable": "جدول قسم المستندات",
         "DocumentType": "الملفات",
         "DocumentTable": "جدول الملفات",
-        "send": "ارسال"
+        "send": "ارسال",
+        "AddedToFavoritesSuccessfully": "تمت الاضافة الى المفضلة بنجاح",
+        "DeletedFromFavoritesSuccessfully": "تم  الحذف من المفضلة بنجاح"
     }
 }
