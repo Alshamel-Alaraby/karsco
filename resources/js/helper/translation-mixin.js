@@ -27,7 +27,7 @@ export default {
           let workflows = this.$store.state.auth.work_flow_trees;
           let keys = {};
           for (let key in res.data.translations) {
-            if (workflows.includes(res.data.translations[key].screen)) {
+            if (workflows.includes(res.data.translations[key].screen) || this.$store.state.auth.user.type == 'super_admin') {
               keys[key] = res.data.translations[key];
             }
           }

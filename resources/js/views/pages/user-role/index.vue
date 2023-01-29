@@ -42,7 +42,7 @@ export default {
         });
         return vm.$router.push({ name: "home" });
       }
-      if (vm.$store.state.auth.work_flow_trees.includes('role') || vm.$store.state.auth.work_flow_trees.includes("role user")) {
+      if (vm.$store.state.auth.work_flow_trees.includes('role') || vm.$store.state.auth.work_flow_trees.includes("role user") || vm.$store.state.auth.user.type == 'super_admin') {
         return true;
       } else {
         return vm.$router.push({ name: "home" });

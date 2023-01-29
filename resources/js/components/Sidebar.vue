@@ -300,7 +300,7 @@ export default {
             <li class="menu-title" v-if="item.isTitle" :key="item.id">
               {{ $t(item.label) }}
             </li>
-            <li v-if="!item.isTitle && !item.isLayout && workFlowTree.includes(item.name)" :key="item.id">
+            <li v-if="!item.isTitle && !item.isLayout && (workFlowTree.includes(item.name)||$store.state.auth.user.type == 'super_admin')" :key="item.id">
               <a
                 v-if="hasItems(item)"
                 href="javascript:void(0);"
@@ -344,7 +344,7 @@ export default {
                   aria-expanded="false"
                 >
                   <template v-for="(subitem, index) of item.subItems">
-                      <li :key="index" v-if="workFlowTree.includes(item.name)">
+                      <li :key="index" v-if="workFlowTree.includes(item.name) || $store.state.auth.user.type == 'super_admin'">
                           <router-link
                               :to="subitem.link"
                               v-if="!hasItems(subitem)"

@@ -44,7 +44,7 @@ export default {
       }
 
 
-            if (vm.$store.state.auth.work_flow_trees.includes('installment payment plan') || vm.$store.state.auth.work_flow_trees.includes('receivable payable')) {
+            if (vm.$store.state.auth.work_flow_trees.includes('installment payment plan') || vm.$store.state.auth.work_flow_trees.includes('receivable payable') || vm.$store.state.auth.user.type == 'super_admin') {
             return true;
             } else {
                 return vm.$router.push({ name: "home" });

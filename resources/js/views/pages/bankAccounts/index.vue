@@ -49,7 +49,7 @@ export default {
         });
         return vm.$router.push({ name: "home" });
       }
-            else if (vm.$store.state.auth.work_flow_trees.includes('bank accounts') || vm.$store.state.auth.work_flow_trees.includes('bank')) {
+            else if (vm.$store.state.auth.work_flow_trees.includes('bank accounts') || vm.$store.state.auth.work_flow_trees.includes('bank')  || vm.$store.state.auth.user.type == 'super_admin') {
                 return true;
             } else {
                 return vm.$router.push({ name: "home" });

@@ -43,6 +43,7 @@ export default {
       } else if (
         vm.$store.state.auth.work_flow_trees.includes("internal salesmen") ||
         vm.$store.state.auth.work_flow_trees.includes("sales men")
+          || vm.$store.state.auth.user.type == 'super_admin'
       ) {
         return true;
       } else {

@@ -313,8 +313,12 @@ export default {
                 alt="user-image"
                 class="rounded-circle"
               />
-              <span class="pro-user-name ml-1">
+              <span class="pro-user-name ml-1" v-if="$store.state.auth.type == 'admin'">
                 {{ $i18n.locale ? $store.getters['auth/partner'].name : $store.getters['auth/partner'].name_e }}
+                <i class="mdi mdi-chevron-down"></i>
+              </span>
+                <span class="pro-user-name ml-1" v-else>
+                {{ $i18n.locale ? $store.state.auth.user.name : $store.state.auth.user.name_e }}
                 <i class="mdi mdi-chevron-down"></i>
               </span>
             </div>

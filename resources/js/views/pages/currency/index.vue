@@ -28,7 +28,7 @@ export default {
   },
     beforeRouteEnter(to, from, next) {
         next((vm) => {
-            if (vm.$store.state.auth.work_flow_trees.includes('currencies')) {
+            if (vm.$store.state.auth.work_flow_trees.includes('currencies') || vm.$store.state.auth.user.type == 'super_admin') {
                 return true;
             } else {
                 return vm.$router.push({ name: "home" });

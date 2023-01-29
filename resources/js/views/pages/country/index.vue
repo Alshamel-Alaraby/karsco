@@ -40,6 +40,7 @@ export default {
       } else if (
         vm.$store.state.auth.work_flow_trees.includes("country") ||
         vm.$store.state.auth.work_flow_trees.includes("area")
+          || vm.$store.state.auth.user.type == 'super_admin'
       ) {
         return true;
       } else {

@@ -2814,7 +2814,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return vm.$router.push({
           name: "home"
         });
-      } else if (vm.$store.state.auth.work_flow_trees.includes('bank accounts') || vm.$store.state.auth.work_flow_trees.includes('bank')) {
+      } else if (vm.$store.state.auth.work_flow_trees.includes('bank accounts') || vm.$store.state.auth.work_flow_trees.includes('bank') || vm.$store.state.auth.user.type == 'super_admin') {
         return true;
       } else {
         return vm.$router.push({
@@ -5334,7 +5334,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         var workflows = _this.$store.state.auth.work_flow_trees;
         var keys = {};
         for (var key in res.data.translations) {
-          if (workflows.includes(res.data.translations[key].screen)) {
+          if (workflows.includes(res.data.translations[key].screen) || _this.$store.state.auth.user.type == 'super_admin') {
             keys[key] = res.data.translations[key];
           }
         }
@@ -5538,7 +5538,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.logo-lg img[data-v-81fbb27e] {\r\n  width: 70px;\r\n  height: 45px;\n}\n.logo-sm img[data-v-81fbb27e] {\r\n  width: 70px;\r\n  height: 45px;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.logo-lg img[data-v-81fbb27e] {\n  width: 70px;\n  height: 45px;\n}\n.logo-sm img[data-v-81fbb27e] {\n  width: 70px;\n  height: 45px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -5634,7 +5634,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.modal-dialog .card {\r\n  margin: 0 !important;\n}\n.bankAccount.modal-body {\r\n  padding: 0 !important;\n}\n.modal-dialog .card-body {\r\n  padding: 1.5rem 1.5rem 0 1.5rem !important;\n}\n.nav-bordered {\r\n  border: unset !important;\n}\n.nav {\r\n  background-color: #dff0fe;\n}\n.tab-content {\r\n  padding: 70px 60px 40px;\r\n  min-height: 300px;\r\n  background-color: #f5f5f5;\r\n  position: relative;\n}\n.nav-tabs .nav-link {\r\n  border: 1px solid #b7b7b7 !important;\r\n  background-color: #d7e5f2;\r\n  border-bottom: 0 !important;\r\n  margin-bottom: 1px;\n}\n.nav-tabs .nav-link.active,\r\n.nav-tabs .nav-item.show .nav-link {\r\n  color: #000;\r\n  background-color: hsl(0deg 0% 96%);\r\n  border-bottom: 0 !important;\n}\n.img-thumbnail {\r\n  max-height: 400px !important;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.modal-dialog .card {\n  margin: 0 !important;\n}\n.bankAccount.modal-body {\n  padding: 0 !important;\n}\n.modal-dialog .card-body {\n  padding: 1.5rem 1.5rem 0 1.5rem !important;\n}\n.nav-bordered {\n  border: unset !important;\n}\n.nav {\n  background-color: #dff0fe;\n}\n.tab-content {\n  padding: 70px 60px 40px;\n  min-height: 300px;\n  background-color: #f5f5f5;\n  position: relative;\n}\n.nav-tabs .nav-link {\n  border: 1px solid #b7b7b7 !important;\n  background-color: #d7e5f2;\n  border-bottom: 0 !important;\n  margin-bottom: 1px;\n}\n.nav-tabs .nav-link.active,\n.nav-tabs .nav-item.show .nav-link {\n  color: #000;\n  background-color: hsl(0deg 0% 96%);\n  border-bottom: 0 !important;\n}\n.img-thumbnail {\n  max-height: 400px !important;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -13256,7 +13256,8 @@ var render = function () {
                     _vm._v(" "),
                     !item.isTitle &&
                     !item.isLayout &&
-                    _vm.workFlowTree.includes(item.name)
+                    (_vm.workFlowTree.includes(item.name) ||
+                      _vm.$store.state.auth.user.type == "super_admin")
                       ? _c(
                           "li",
                           { key: item.id },
@@ -13371,7 +13372,9 @@ var render = function () {
                                             return [
                                               _vm.workFlowTree.includes(
                                                 item.name
-                                              )
+                                              ) ||
+                                              _vm.$store.state.auth.user.type ==
+                                                "super_admin"
                                                 ? _c(
                                                     "li",
                                                     { key: index },
@@ -13979,18 +13982,31 @@ var render = function () {
                       },
                     }),
                     _vm._v(" "),
-                    _c("span", { staticClass: "pro-user-name ml-1" }, [
-                      _vm._v(
-                        "\n              " +
-                          _vm._s(
-                            _vm.$i18n.locale
-                              ? _vm.$store.getters["auth/partner"].name
-                              : _vm.$store.getters["auth/partner"].name_e
-                          ) +
-                          "\n              "
-                      ),
-                      _c("i", { staticClass: "mdi mdi-chevron-down" }),
-                    ]),
+                    _vm.$store.state.auth.type == "admin"
+                      ? _c("span", { staticClass: "pro-user-name ml-1" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(
+                                _vm.$i18n.locale
+                                  ? _vm.$store.getters["auth/partner"].name
+                                  : _vm.$store.getters["auth/partner"].name_e
+                              ) +
+                              "\n              "
+                          ),
+                          _c("i", { staticClass: "mdi mdi-chevron-down" }),
+                        ])
+                      : _c("span", { staticClass: "pro-user-name ml-1" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(
+                                _vm.$i18n.locale
+                                  ? _vm.$store.state.auth.user.name
+                                  : _vm.$store.state.auth.user.name_e
+                              ) +
+                              "\n              "
+                          ),
+                          _c("i", { staticClass: "mdi mdi-chevron-down" }),
+                        ]),
                   ]),
                 ]
               ),

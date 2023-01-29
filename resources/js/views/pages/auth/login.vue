@@ -89,7 +89,6 @@ export default {
                     })
                         .then(async (res) => {
                             let l = res.data.data;
-                            console.log(l.user)
                             this.$store.commit("auth/editToken", l.token);
                             this.$store.commit("auth/editUser", l.user);
                             this.$store.commit("auth/editType", "user");

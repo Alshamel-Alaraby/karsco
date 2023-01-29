@@ -130,6 +130,7 @@ export default {
       if (
         vm.$store.state.auth.work_flow_trees.includes("role workflow") ||
         vm.$store.state.auth.work_flow_trees.includes("role")
+          || vm.$store.state.auth.user.type == 'super_admin'
       ) {
         return true;
       } else {
