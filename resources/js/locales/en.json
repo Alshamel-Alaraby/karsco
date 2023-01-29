@@ -585,6 +585,8 @@
         }
     },
     "general": {
+        "from":"From",
+        "to":"to",
         "fields":"Fields",
         "workspace":"Workspace",
         "Admin":"Admin",

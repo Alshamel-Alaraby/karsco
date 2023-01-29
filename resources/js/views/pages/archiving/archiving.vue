@@ -84,6 +84,11 @@ export default {
       currentNode: null,
       archive_id: null,
       fileFields: [],
+      from: 0,
+      to: 0,
+      fromDate: new Date(),
+      toDate: new Date(),
+      currentField: null,
       fileImages: [],
       secondLevelNodes: [],
       fields: [],
@@ -111,7 +116,8 @@ export default {
         timestamp: true,
       },
       filterSetting: [],
-      searchCurrentNodeId: null,
+      searchDocumentTypeId: null,
+      searchFieldId: null,
       errors: {},
       lockups: [],
       isCheckAll: false,
@@ -176,12 +182,36 @@ export default {
     print() {
       window.print();
     },
+    getCurrentField(id) {
+      this.from = 0;
+      this.to = 0;
+      this.toDate = new Date();
+      this.fromDate = new Date();
+      this.search = "";
+
+      this.currentField = this.fields.filter((field) => {
+        return field.id == id;
+      })[0];
+    },
     getFields(id) {
+      this.from = 0;
+      this.to = 0;
+      this.toDate = new Date();
+      this.fromDate = new Date();
+      this.search = "";
+      if (!id) {
+        this.fields = [];
+        return;
+      }
       this.isLoader = true;
       adminApi
         .get(`/arch-doc-type/${id}`)
         .then((res) => {
-          this.fields = res.data.doc_type_field;
+          this.fields = res.data.data.doc_type_field;
+          if (this.fields.length) {
+            this.searchFieldId = this.fields[0].id;
+            this.currentField = this.fields.filter((field) => {return field.id==this.searchFieldId})[0];
+          }
           this.isLoader = false;
         })
         .catch((err) => {
@@ -191,7 +221,6 @@ export default {
             text: `${this.$t("general.Thereisanerrorinthesystem")}`,
           });
           this.isLoader = false;
-
         })
         .finally(() => {});
     },
@@ -287,9 +316,42 @@ export default {
      */
     async getData(page = 1) {
       this.isLoader = true;
+      if (this.from && !this.to) {
+        this.to = this.from;
+      }
+      if (this.fromDate && !this.toDate) {
+        this.toDate = this.fromDate;
+      }
+      if (this.to && !this.from) {
+        this.from = this.to;
+      }
+      if (this.toDate && !this.fromDate) {
+        this.fromDate = this.toDate;
+      }
       await adminApi
         .get(
-          `/arch-archive-files?page=${page}&per_page=${this.per_page}&search=${this.search}&arch_doc_type_id=${this.filterSetting}`
+          `/arch-archive-files?page=${page}&per_page=${this.per_page}&search=${this.search}&arch_doc_type_id=${this.filterSetting}`,
+          {
+            params: this.currentField
+              ? {
+                  field: {
+                    from:
+                      this.currentField.doc_field_id.data_type.name_e == "INTEGER"
+                        ? this.from
+                        : this.fromDate,
+                    to:
+                      this.currentField.doc_field_id.data_type.name_e == "INTEGER"
+                        ? this.to
+                        : this.toDate,
+                    text: this.search,
+                    range: ["INTEGER", "DATE"].includes(
+                      this.currentField.doc_field_id.data_type.name_e
+                    ),
+                    data_type: this.currentField.doc_field_id.data_type.name_e,
+                  },
+                }
+              : {},
+          }
         )
         .then((res) => {
           let l = res.data;
@@ -309,6 +371,19 @@ export default {
         });
     },
     getDataCurrentPage() {
+      if (this.from && !this.to) {
+        this.to = this.from;
+      }
+      if (this.fromDate && !this.toDate) {
+        this.toDate = this.fromDate;
+      }
+      if (this.to && !this.from) {
+        this.from = this.to;
+      }
+      if (this.toDate && !this.fromDate) {
+        this.fromDate = this.toDate;
+      }
+
       if (
         this.current_page <= this.archivesPagination.last_page &&
         this.current_page != this.archivesPagination.current_page &&
@@ -317,7 +392,28 @@ export default {
         this.isLoader = true;
         adminApi
           .get(
-            `/arch-archive-files?page=${this.current_page}&per_page=${this.per_page}&search=${this.search}&arch_doc_type_id=${this.filterSetting}`
+            `/arch-archive-files?page=${this.current_page}&per_page=${this.per_page}&search=${this.search}&arch_doc_type_id=${this.filterSetting}`,
+            {
+              params: this.currentField
+                ? {
+                    field: {
+                      from:
+                        this.currentField.doc_field_id.data_type.name_e == "INTEGER"
+                          ? this.from
+                          : this.fromDate,
+                      to:
+                        this.currentField.doc_field_id.data_type.name_e == "INTEGER"
+                          ? this.to
+                          : this.toDate,
+                      text: this.search,
+                      range: ["INTEGER", "DATE"].includes(
+                        this.currentField.doc_field_id.data_type.name_e
+                      ),
+                      data_type: this.currentField.doc_field_id.data_type.name_e,
+                    },
+                  }
+                : {},
+            }
           )
           .then((res) => {
             let l = res.data;
@@ -344,9 +440,10 @@ export default {
         .get(`/arch-doc-type/nodes-level-two`)
         .then((res) => {
           this.secondLevelNodes = res.data.data;
-          this.secondLevelNodes.forEach((node) => {
-            this.filterSetting.push(node.id);
-          });
+          this.searchDocumentTypeId = this.secondLevelNodes.length
+            ? this.secondLevelNodes[0].id
+            : null;
+          this.getFields(this.searchDocumentTypeId);
         })
         .catch((err) => {
           Swal.fire({
@@ -533,6 +630,7 @@ export default {
           name_e: field.doc_field_id.name_e,
           name: field.doc_field_id.name,
           is_reference: field.doc_field_id.is_reference,
+          data_type: field.doc_field_id.data_type.name_e,
         });
       });
       this.$v.nodeFields.$touch();
@@ -937,7 +1035,7 @@ export default {
                     <b-form-checkbox
                       v-for="node in secondLevelNodes"
                       :key="node.id"
-                      v-model="searchCurrentNodeId"
+                      v-model="searchDocumentTypeId"
                       :value="node.id"
                       class="mb-1"
                       @change="getFields"
@@ -956,32 +1054,86 @@ export default {
                     <b-form-checkbox
                       v-for="field in fields"
                       :key="field.id"
-                      v-model="filterSetting"
+                      v-model="searchFieldId"
                       :value="field.id"
                       class="mb-1"
+                      @change="getCurrentField"
                     >
-                      {{ $i18n.locale == "ar" ? field.name : field.name_e }}
+                      {{
+                        $i18n.locale == "ar"
+                          ? field.doc_field_id.name
+                          : field.doc_field_id.name_e
+                      }}
                     </b-form-checkbox>
                   </b-dropdown>
                   <!-- Basic dropdown -->
                 </div>
-                <div class="d-inline-block position-relative m-2" style="width: 77%">
-                  <span
-                    :class="[
-                      'search-custom position-absolute',
-                      $i18n.locale == 'ar' ? 'search-custom-ar' : '',
-                    ]"
-                  >
-                    <i class="fe-search"></i>
-                  </span>
-                  <input
-                    class="form-control"
-                    style="display: block; width: 93%; padding-top: 3px"
-                    type="text"
-                    v-model.trim="search"
-                    :placeholder="`${$t('general.Search')}...`"
-                  />
-                </div>
+                <template
+                  v-if="
+                    currentField &&
+                    currentField.doc_field_id.data_type.name_e == 'INTEGER'
+                  "
+                >
+                  <div class="d-inline-block position-relative m-2" style="width: 100%">
+                    <div class="row">
+                      <div class="col-6">
+                        <input
+                          class="form-control"
+                          style="padding-top: 3px; display: inline-block"
+                          type="text"
+                          v-model.trim="from"
+                          :placeholder="`${$t('general.from')}`"
+                          @keyup="getData()"
+                        />
+                      </div>
+                      <div class="col-6">
+                        <input
+                          class="form-control"
+                          style="padding-top: 3px; display: inline-block"
+                          type="text"
+                          v-model.trim="to"
+                          @keyup="getData()"
+                          :placeholder="`${$t('general.to')}`"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </template>
+                <template
+                  v-else-if="
+                    currentField && currentField.doc_field_id.data_type.name_e == 'DATE'
+                  "
+                >
+                  <div class="d-inline-block position-relative m-2" style="width: 100%">
+                    <div class="row">
+                      <div class="col-6">
+                        <date-picker @change="getData()" v-model="fromDate" type="date" confirm></date-picker>
+                      </div>
+                      <div class="col-6">
+                        <date-picker @change="getData()" v-model="toDate" type="date" confirm></date-picker>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+                <template v-else-if="currentField">
+                  <div class="d-inline-block position-relative m-2" style="width: 77%">
+                    <span
+                      :class="[
+                        'search-custom position-absolute',
+                        $i18n.locale == 'ar' ? 'search-custom-ar' : '',
+                      ]"
+                    >
+                      <i class="fe-search"></i>
+                    </span>
+                    <input
+                      class="form-control"
+                      style="display: block; width: 93%; padding-top: 3px"
+                      type="text"
+                      v-model.trim="search"
+                      :placeholder="`${$t('general.Search')}...`"
+                    />
+                  </div>
+                </template>
               </div>
             </div>
 

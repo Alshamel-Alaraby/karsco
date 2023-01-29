@@ -32,39 +32,66 @@ class ArchiveFileController extends Controller
 
         return responseJson(200, 'success', new ArchiveFileResource($model));
     }
-
     public function all(AllRequest $request)
     {
         $models = $this->model->with("media")->where(function ($q) {
-            $arch_doc_type_id=is_array(request()->arch_doc_type_id)?request()->arch_doc_type_id:[request()->arch_doc_type_id];
+            $arch_doc_type_id = is_array(request()->arch_doc_type_id) ? request()->arch_doc_type_id : [request()->arch_doc_type_id];
             if (request()->arch_doc_type_id) {
                 $q->whereIn("arch_doc_type_id", $arch_doc_type_id);
             }
         })->filter($request)->orderBy($request->order ? $request->order : 'updated_at', $request->sort ? $request->sort : 'DESC');
-        if ($request->search) {
-            $search = "\"value\":\"$request->search\"";
-            $models = $models->where('data_type_value', 'like', '%"is_reference":1%')->where('data_type_value', 'like', "%$search%");
+        $field = $request->field;
+        $field = json_decode ($field,true);
+
+
+        if ($field){
+
+            if ($field['range'] == true){
+                $res = $models->get();
+                $res = $res->map(function ($item) use ($field) {
+                    $q = collect($item->data_type_value);
+                    $q = $q->whereBetween ('value',[$field['from'],$field['to']])->where ('data_type',$field['data_type']);
+                    if (count ($q) > 0){
+                        return $item->id;
+                    }
+                })
+                ->reject(function ($i){
+                    return $i == null;
+                });
+            }
+            else{
+                $res = $models->get();
+                $res = $res->map(function ($item) use ($field) {
+                    $q = collect($item->data_type_value);
+                    $q = $q->where ('value',$field['text'])->where ('data_type',$field['data_type']);
+                    if (count ($q) > 0){
+                        return $item->id;
+                    }
+                })->reject(function ($i) {
+                    return $i == null;
+                });
+
+            }
+            $ids = $res->values();
+            if ( @count ($ids) > 0){
+                $models = $models->whereIn('id',$ids);
+            }
         }
-
-
-
-        
         if ($request->per_page) {
             $models = ['data' => $models->paginate($request->per_page), 'paginate' => true];
+
         } else {
             $models = ['data' => $models->get(), 'paginate' => false];
         }
 
         return responseJson(200, 'success', ArchiveFileResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
-
     public function create(ArchiveFileRequest $request)
     {
         $model = $this->model->create($request->validated());
         $model->refresh();
         return responseJson(200, 'created', new ArchiveFileResource($model));
     }
-
     public function update($id, UpdateArchiveFileRequest $request)
     {
         $model = $this->model->find($id);
@@ -202,7 +229,5 @@ class ArchiveFileController extends Controller
             ]);
             return responseJson(200, 'added to favourites');
         }
-
     }
-
 }
