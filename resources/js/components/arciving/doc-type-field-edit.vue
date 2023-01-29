@@ -1,0 +1,630 @@
+<script>
+import Layout from "../../views/layouts/main";
+import adminApi from "../../api/adminAxios";
+import {required, minLength, maxLength, integer} from "vuelidate/lib/validators";
+import Swal from "sweetalert2";
+import ErrorMessage from "../../components/widgets/errorMessage";
+import loader from "../../components/loader";
+import {dynamicSortString} from "../../helper/tableSort";
+import Multiselect from "vue-multiselect";
+import ArchDoc from "../../components/create/arch/gen-arch-doc-type";
+import DocField from "../../components/create/arch/doc-field";
+import translation from "../../helper/translation-mixin";
+
+/**
+ * Advanced Table component
+ */
+export default {
+    page: {
+        title: "Arch Doc Type Field",
+        meta: [{name: "description", content: "Arch Doc Type Field"}],
+    },
+    props: ["arch_doc_type_id", "doc_type_field"],
+    mixins: [translation],
+    components: {
+        Layout,
+        ErrorMessage,
+        loader,
+        Multiselect,
+        ArchDoc,
+        DocField,
+    },
+    beforeRouteEnter(to, from, next) {
+        next((vm) => {
+            if (vm.$store.state.auth.work_flow_trees.includes("arch doc type fields") || vm.$store.state.auth.work_flow_trees.includes("archiving")) {
+                return true;
+            } else {
+                return vm.$router.push({name: "home"});
+            }
+        });
+    },
+    updated() {
+        $(".englishInput").keypress(function (event) {
+            var ew = event.which;
+            if (ew == 32) return true;
+            if (48 <= ew && ew <= 57) return true;
+            if (65 <= ew && ew <= 90) return true;
+            if (97 <= ew && ew <= 122) return true;
+            return false;
+        });
+        $(".arabicInput").keypress(function (event) {
+            var ew = event.which;
+            if (ew == 32) return true;
+            if (48 <= ew && ew <= 57) return false;
+            if (65 <= ew && ew <= 90) return false;
+            if (97 <= ew && ew <= 122) return false;
+            return true;
+        });
+    },
+    data() {
+        return {
+            per_page: 50,
+            search: "", //Search table column
+            debounce: {},
+            dataTablePaginations: {},
+            storedData: [],
+            genArchDocData: [],
+            archDocFieldData: [],
+            enabled3: true,
+            isLoader: false,
+            edit: [], //edit form
+            allOrder: [],
+            filterSetting: [
+                "gen_doc_type_id",
+                "doc_field_id",
+            ],
+            errors: {}, //Server Side Validation Errors
+            isCheckAll: false,
+            checkAll: [],
+            is_disabled: false,
+            current_page: 1,
+        };
+    },
+    validations: {
+        edit: {
+            required,
+            $each: {
+                doc_field_id: {required},
+                field_order: {required, integer},
+                is_required: {required},
+                field_characters: {required},
+            }
+        }
+    },
+    watch: {
+        /**
+         * watch check All table
+         */
+        isCheckAll(after, befour) {
+            if (after) {
+                this.storedData.forEach((el) => {
+                    if (!this.checkAll.includes(el.id)) {
+                        this.checkAll.push(el.id);
+                    }
+                });
+            } else {
+                this.checkAll = [];
+            }
+        },
+    },
+    async mounted() {
+        await this.getArchDocType();
+    },
+    methods: {
+        /**
+         *  get Data document field
+         */
+        addNewField() {
+            this.edit.push({
+                doc_type_id: this.arch_doc_type_id,
+                doc_field_id: null,
+                field_order: null,
+                is_required: 1,
+                field_characters: null,
+            });
+            this.allOrder.push({order: true});
+        },
+        removeNewField(index) {
+            if (this.edit.length > 1) {
+                this.edit.splice(index, 1);
+                this.allOrder.splice(index, 1);
+            }
+        },
+        /**
+         *  get gen doc type data
+         */
+        async getGenDocType() {
+            await adminApi
+                .get(`/gen-arch-doc-type`)
+                .then((res) => {
+                    let l = res.data.data;
+                    l.unshift({
+                        id: 0,
+                        name: "Add Gen Arch Doc Type",
+                        name_e: "Add Gen Arch Doc Type",
+                    });
+                    this.genArchDocData = l;
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: `${this.$t("general.Error")}`,
+                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                    });
+                });
+        },
+
+        /**
+         *  get arch doc field data
+         */
+        async getArchDocType() {
+            await adminApi
+                .get(`/document-field`)
+                .then((res) => {
+                    let l = res.data.data;
+                    l.unshift({id: 0, name: "Add Document Field", name_e: "Add Document Field"});
+                    this.archDocFieldData = l;
+                    setTimeout(() => {
+                        if (this.doc_type_field.length > 0 && this.edit.length == 0)
+                        {
+                            this.resetModalEdit(this.arch_doc_type_id);
+                        }else if(this.doc_type_field.length == 0) {
+                            this.allOrder.push({order: true});
+                            this.edit.push({
+                                doc_type_id: null,
+                                doc_field_id: null,
+                                field_order: null,
+                                is_required: 1,
+                                field_characters: null,
+                            });
+                        }
+                    },100)
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: `${this.$t("general.Error")}`,
+                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                    });
+                });
+        },
+
+        /**
+         *  hidden Modal (edit)
+         */
+        async resetModal() {
+            // call api
+            await this.getGenDocType();
+            await this.getArchDocType();
+            this.edit = {
+                gen_doc_type_id: "",
+                doc_field_id: "",
+                field_order: "",
+                is_required: 1,
+                field_characters: "",
+            };
+            this.is_disabled = false;
+            this.$nextTick(() => {
+                this.$v.$reset();
+            });
+            this.errors = {};
+        },
+        /**
+         *  add document field
+         */
+        AddSubmit() {
+            let isTrue = this.allOrder.some(el => el.order == false);
+            this.$v.edit.$touch();
+            if (this.$v.edit.$invalid || isTrue ) {
+                return;
+            } else {
+                this.edit.map(el => {
+                    return el.doc_type_id = this.arch_doc_type_id;
+                });
+                this.isLoader = true;
+                this.errors = {};
+                adminApi
+                    .post(`/arch-doc-type-field/bulk-update`, this.edit)
+                    .then((res) => {
+                        this.$nextTick(() => {
+                            this.$v.$reset();
+                        });
+                        setTimeout(() => {
+                            Swal.fire({
+                                icon: "success",
+                                text: `${this.$t("general.Editsuccessfully")}`,
+                                showConfirmButton: false,
+                                timer: 1500,
+                            });
+                        }, 500);
+                        this.$emit("update-doc-type-field");
+                    })
+                    .catch((err) => {
+                        if (err.response.data) {
+                            this.errors = err.response.data.errors;
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: `${this.$t("general.Error")}`,
+                                text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                            });
+                        }
+                    })
+                    .finally(() => {
+                        this.isLoader = false;
+                    });
+            }
+        },
+        /**
+         *   show Modal (edit)
+         */
+        async resetModalEdit(id) {
+            let editGenDocType = this.doc_type_field;
+            editGenDocType.forEach((el) => {
+                this.allOrder.push({order: true});
+                this.edit.push({
+                    doc_type_id: this.arch_doc_type_id,
+                    doc_field_id: el.doc_field,
+                    field_order: el.field_order,
+                    is_required: el.is_required,
+                    field_characters: el.field_characters,
+                });
+            });
+            this.errors = {};
+        },
+        /**
+         *  hidden Modal (edit)
+         */
+        resetModalHiddenEdit(id) {
+            this.errors = {};
+            this.edit = {
+                gen_doc_type_id: "",
+                doc_field_id: "",
+                field_order: "",
+                is_required: 1,
+                field_characters: "",
+            };
+        },
+
+        /**
+         *  start  dynamicSortString
+         */
+        sortString(value) {
+            return dynamicSortString(value);
+        },
+        checkRow(id) {
+            if (!this.checkAll.includes(id)) {
+                this.checkAll.push(id);
+            } else {
+                let index = this.checkAll.indexOf(id);
+                this.checkAll.splice(index, 1);
+            }
+        },
+        showDocFieldModalEdit(index) {
+            if (this.edit[index].doc_field_id == 0) {
+                this.$bvModal.show("create-doc-field");
+                this.edit.doc_field_id = null;
+            }else {
+                if(
+                    this.archDocFieldData.find(el => el.id == this.edit[index].doc_field_id)
+                        .data_type.name_e == 'DATE'
+                ){
+                    this.edit[index].field_characters = 'dd-mm-yyyy';
+                }
+            }
+        },
+
+        /**
+         *   Export Excel
+         */
+        ExportExcel(type, fn, dl) {
+            this.enabled3 = false;
+            setTimeout(() => {
+                let elt = this.$refs.exportable_table;
+                let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+                if (dl) {
+                    XLSX.write(wb, {bookType: type, bookSST: true, type: "base64"});
+                } else {
+                    XLSX.writeFile(
+                        wb,
+                        fn ||
+                        ("Arch Doc Type Field" + "." || "SheetJSTableExport.") + (type || "xlsx")
+                    );
+                }
+                this.enabled3 = true;
+            }, 100);
+        },
+        orderChange(index){
+            let fill = this.edit.filter((el,ind) => index != ind && el.field_order == this.edit[index].field_order)
+            if(fill.length > 0){
+                this.allOrder.forEach(el => {el.order = false});
+            }else {
+                this.allOrder.forEach(el => {el.order = true});
+            }
+
+        }
+    },
+};
+</script>
+
+<template>
+
+    <div class="row">
+        <DocField @create="getArchDocType"/>
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3 d-flex justify-content-between">
+                            <!-- Start Add New Record Button -->
+                            <b-button
+                                @click.prevent="addNewField"
+                                style="background-color: rgb(218 220 222);color: #000"
+                                type="button"
+                                :class="['font-weight-bold px-2', is_disabled ? 'mx-2' : '']"
+                            >
+                                + {{ $t("general.AddNewRecord") }}
+                            </b-button>
+
+                            <b-button
+                                variant="success"
+                                type="button"
+                                v-if="!isLoader"
+                                @click.prevent="AddSubmit"
+                            >
+                                {{ $t("general.Edit") }}
+                            </b-button>
+                            <b-button variant="success" class="mx-1" disabled v-else>
+                                <b-spinner small></b-spinner>
+                                <span class="sr-only">{{ $t("login.Loading") }}...</span>
+                            </b-button>
+                            <!-- End Cancel Button Modal -->
+                        </div>
+                        <template v-for="(item,index) in edit">
+                            <div class="row">
+                                <div class="col-md-3 mb-2">
+                                    <div class="form-group">
+                                        <label>
+                                            {{ getCompanyKey("arch_doc_field") }}
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <multiselect
+                                            @input="showDocFieldModalEdit(index)"
+                                            v-model="$v.edit.$each[index].doc_field_id.$model"
+                                            :options="archDocFieldData.map((type) => type.id)"
+                                            :custom-label="
+                                                  (opt) =>
+                                                    $i18n.locale
+                                                      ? archDocFieldData.find((x) => x.id == opt).name
+                                                      : archDocFieldData.find((x) => x.id == opt).name_e
+                                                "
+                                        >
+                                        </multiselect>
+
+                                        <template v-if="errors.doc_field_id">
+                                            <ErrorMessage
+                                                v-for="(errorMessage, index) in errors.doc_field_id"
+                                                :key="index"
+                                            >{{ errorMessage }}
+                                            </ErrorMessage>
+                                        </template>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <div class="form-group">
+                                        <label for="field-1" class="control-label">
+                                            {{ getCompanyKey("arch_doc_field_order") }}
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            @input="orderChange(index)"
+                                            class="form-control englishInput"
+                                            v-model="$v.edit.$each[index].field_order.$model"
+                                            :class="{
+                                                  'is-invalid':
+                                                    $v.edit.$each[index].field_order.$error || errors.field_order || !allOrder[index].order,
+                                                  'is-valid':
+                                                    !$v.edit.$each[index].field_order.$invalid && !errors.field_order && allOrder[index].order,
+                                                }"
+                                            id="field-1"
+                                        />
+                                        <div v-if="!$v.edit.$each[index].field_order.integer"
+                                             class="invalid-feedback">
+                                            {{ $t("general.numericValidation") }}
+                                        </div>
+                                        <template v-if="errors.field_order">
+                                            <ErrorMessage
+                                                v-for="(errorMessage, index) in errors.field_order"
+                                                :key="index"
+                                            >{{ errorMessage }}
+                                            </ErrorMessage>
+                                        </template>
+                                    </div>
+                                </div>
+                                <template v-if="archDocFieldData && edit[index].doc_field_id != 0">
+                                    <div
+                                        v-if="
+                                           archDocFieldData.find(el => el.id == edit[index].doc_field_id)
+                                        "
+                                        class="col-md-3 mb-2"
+                                    >
+                                        <div class="form-group">
+                                            <label class="control-label">
+                                                {{ getCompanyKey("arch_doc_field_character") }}
+                                                <span class="text-danger">*</span>
+                                            </label><br />
+                                            <span
+                                                :style="{'font-size': '10px'}"
+                                                v-if="archDocFieldData.find(el => el.id == edit[index].doc_field_id).data_type"
+                                                class="text-danger"
+                                            >
+                                                    {{
+                                                    $i18n.locale == 'ar'? archDocFieldData.find(el => el.id == edit[index].doc_field_id)
+                                                        .data_type.placeholder : archDocFieldData.find(el => el.id == edit[index].doc_field_id)
+                                                        .data_type.placeholder_e
+                                                }}
+                                                </span>
+                                            <input
+                                                v-if="
+                                                        archDocFieldData.find(el => el.id == edit[index].doc_field_id)
+                                                        .data_type.name_e == 'DATE'
+                                                    "
+                                                type="text"
+                                                disabled
+                                                class="form-control"
+                                                v-model="$v.edit.$each[index].field_characters.$model"
+                                                :class="{
+                                                  'is-invalid':
+                                                    $v.edit.$each[index].field_characters.$error || errors.field_characters,
+                                                  'is-valid':
+                                                    !$v.edit.$each[index].field_characters.$invalid &&
+                                                    !errors.field_characters,
+                                                }"
+                                            />
+                                            <input
+                                                v-if="
+                                                        archDocFieldData.find(el => el.id == edit[index].doc_field_id)
+                                                        .data_type.name_e == 'INTEGER'
+                                                    "
+                                                type="number"
+                                                class="form-control"
+                                                v-model="$v.edit.$each[index].field_characters.$model"
+                                                :class="{
+                                                  'is-invalid':
+                                                    $v.edit.$each[index].field_characters.$error || errors.field_characters,
+                                                  'is-valid':
+                                                    !$v.edit.$each[index].field_characters.$invalid &&
+                                                    !errors.field_characters,
+                                                }"
+                                            />
+                                            <input
+                                                v-if="
+                                                        archDocFieldData.find(el => el.id == edit[index].doc_field_id)
+                                                        .data_type.name_e == 'FLOAT' ||
+                                                        archDocFieldData.find(el => el.id == edit[index].doc_field_id)
+                                                        .data_type.name_e == 'DOUBLE'
+                                                    "
+                                                type="number"
+                                                step="0.1"
+                                                class="form-control"
+                                                v-model="$v.edit.$each[index].field_characters.$model"
+                                                :class="{
+                                                  'is-invalid':
+                                                    $v.edit.$each[index].field_characters.$error || errors.field_characters,
+                                                  'is-valid':
+                                                    !$v.edit.$each[index].field_characters.$invalid &&
+                                                    !errors.field_characters,
+                                                }"
+                                            />
+                                            <input
+                                                v-if="
+                                                        archDocFieldData.find(el => el.id == edit[index].doc_field_id)
+                                                        .data_type.name_e == 'Lookup (table)'
+                                                    "
+                                                type="number"
+                                                class="form-control"
+                                                v-model="$v.edit.$each[index].field_characters.$model"
+                                                :class="{
+                                                  'is-invalid':
+                                                    $v.edit.$each[index].field_characters.$error || errors.field_characters,
+                                                  'is-valid':
+                                                    !$v.edit.$each[index].field_characters.$invalid &&
+                                                    !errors.field_characters,
+                                                }"
+                                            />
+                                            <div
+                                                v-if="!$v.edit.$each[index].field_characters.integer"
+                                                class="invalid-feedback"
+                                            >
+                                                {{ $t("general.numericValidation") }}
+                                            </div>
+                                            <template v-if="errors.field_characters">
+                                                <ErrorMessage
+                                                    v-for="(errorMessage, index) in errors.field_characters"
+                                                    :key="index"
+                                                >{{ errorMessage }}
+                                                </ErrorMessage>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                                <div class="col-md-2 mb-2">
+                                    <div class="form-group">
+                                        <label class="mr-2">
+                                            {{ getCompanyKey("is_required") }}
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <b-form-group
+                                            :class="{
+                                                  'is-invalid':
+                                                    $v.edit.$each[index].is_required.$error || errors.is_required,
+                                                  'is-valid':
+                                                    !$v.edit.$each[index].is_required.$invalid && !errors.is_required,
+                                                }"
+                                        >
+                                            <b-form-radio
+                                                class="d-inline-block"
+                                                v-model="$v.edit.$each[index].is_required.$model"
+                                                value="1"
+                                            >{{ $t("general.isReferenceYes") }}
+                                            </b-form-radio>
+                                            <b-form-radio
+                                                class="d-inline-block m-1"
+                                                v-model="$v.edit.$each[index].is_required.$model"
+                                                value="0"
+                                            >{{ $t("general.isReferenceNo") }}
+                                            </b-form-radio>
+                                        </b-form-group>
+                                        <template v-if="errors.is_required">
+                                            <ErrorMessage
+                                                v-for="(errorMessage, index) in errors.is_required"
+                                                :key="index"
+                                            >{{ errorMessage }}
+                                            </ErrorMessage>
+                                        </template>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 mb-2 pt-3" v-if="edit.length > 1">
+                                    <button
+                                        type="button"
+                                        @click.prevent="removeNewField(index)"
+                                        class="closeField"
+                                    >
+                                        x
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style scoped>
+@media print {
+    .do-not-print {
+        display: none;
+    }
+
+    .arrow-sort {
+        display: none;
+    }
+}
+
+.closeField {
+    font-size: 48px !important;
+    width: 38px !important;
+    padding: 0 0 11px 0 !important;
+    height: 36px !important;
+    text-align: center;
+    line-height: 7px !important;
+    background-color: hsl(210deg 6% 86%);
+    color: red;
+    border: none;
+}
+</style>
