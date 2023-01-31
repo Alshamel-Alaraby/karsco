@@ -32,7 +32,6 @@ class User extends Authenticatable implements HasMedia
         "type",
         "company_id"
     ];
-    protected $table = 'general_users';
 
     protected $hidden = [
         'password',
