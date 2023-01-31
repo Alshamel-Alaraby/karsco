@@ -26,7 +26,7 @@ export default {
     PageHeader,
     Switches,
     ErrorMessage,
-    loader,
+    loader
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -56,6 +56,7 @@ export default {
       countriesPagination: {},
       countries: [],
       isLoader: false,
+      company_id:null,
       create: {
         name: "",
         name_e: "",
@@ -182,6 +183,7 @@ export default {
     },
   },
   mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
   updated() {
@@ -474,7 +476,7 @@ export default {
         this.errors = {};
 
         adminApi
-          .post(`/countries`, this.create)
+          .post(`/countries`, {...this.create,company_id:this.company_id})
           .then((res) => {
             this.country_id = res.data.data.id;
             setTimeout(() => {

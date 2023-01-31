@@ -30,7 +30,7 @@ export default {
     ErrorMessage,
     loader,
     Multiselect,
-    User
+    User,
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -42,7 +42,11 @@ export default {
         });
         return vm.$router.push({ name: "home" });
       }
-      if (vm.$store.state.auth.work_flow_trees.includes('role') || vm.$store.state.auth.work_flow_trees.includes("role user") || vm.$store.state.auth.user.type == 'super_admin') {
+      if (
+        vm.$store.state.auth.work_flow_trees.includes("role") ||
+        vm.$store.state.auth.work_flow_trees.includes("role user") ||
+        vm.$store.state.auth.user.type == "super_admin"
+      ) {
         return true;
       } else {
         return vm.$router.push({ name: "home" });
@@ -78,7 +82,7 @@ export default {
       checkAll: [],
       is_disabled: false,
       current_page: 1,
-      company_id: 48,
+      company_id: null,
       Tooltip: "",
       mouseEnter: null,
     };
@@ -127,10 +131,10 @@ export default {
   async mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
-    console.log(this.$store.state.auth.allworkflow)
+    console.log(this.$store.state.auth.allworkflow);
   },
   methods: {
-     showRoleModal() {
+    showRoleModal() {
       if (this.create.role_id == 0) {
         this.$bvModal.show("role-create");
         this.create.role_id = null;
@@ -142,7 +146,7 @@ export default {
         this.edit.role_id = null;
       }
     },
-   showUserModal() {
+    showUserModal() {
       if (this.create.user_id == 0) {
         this.$bvModal.show("user-create");
         this.create.user_id = null;
@@ -375,13 +379,16 @@ export default {
       if (this.$v.create.$invalid) {
         this.$v.create.$touch();
         return;
-      }
-       else {
+      } else {
         this.isLoader = true;
         this.errors = {};
         this.is_disabled = false;
         adminApi
-          .post(`/user-role`, { role: this.create.role_id, users: this.create.user_id })
+          .post(`/user-role`, {
+            role: this.create.role_id,
+            users: this.create.user_id,
+            company_id: this.company_id,
+          })
           .then((res) => {
             this.getData();
             this.is_disabled = true;
@@ -786,7 +793,7 @@ export default {
                     <div class="form-group">
                       <label class="my-1 mr-2">{{ getCompanyKey("role") }}</label>
                       <multiselect
-                      @input="showRoleModal"
+                        @input="showRoleModal"
                         v-model="create.role_id"
                         :options="roles.map((type) => type.id)"
                         :custom-label="
@@ -817,8 +824,7 @@ export default {
                     <div class="form-group">
                       <label class="my-1 mr-2">{{ getCompanyKey("user") }}</label>
                       <multiselect
-                      @input="showUserModal"
-
+                        @input="showUserModal"
                         :multiple="true"
                         v-model="create.user_id"
                         :options="users.map((type) => type.id)"
@@ -1033,8 +1039,7 @@ export default {
                                   getCompanyKey("role")
                                 }}</label>
                                 <multiselect
-                      @input="showRoleModalEdit"
-
+                                  @input="showRoleModalEdit"
                                   v-model="edit.role_id"
                                   :options="roles.map((type) => type.id)"
                                   :custom-label="
@@ -1072,8 +1077,7 @@ export default {
                                 }}</label>
                                 <multiselect
                                   v-model="edit.user_id"
-                      @input="showUserModalEdit"
-
+                                  @input="showUserModalEdit"
                                   :options="users.map((type) => type.id)"
                                   :custom-label="
                                     (opt) =>

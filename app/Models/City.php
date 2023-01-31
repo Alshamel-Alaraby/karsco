@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class City extends Model
 {
-    use HasFactory, LogTrait,ConnTrait;
+    use HasFactory, LogTrait;
+    protected $table = 'general_cities';
+
 
     protected $guarded = ['id'];
 

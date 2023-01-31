@@ -11,8 +11,8 @@ use Spatie\Activitylog\LogOptions;
 
 class ExternalSalesmen extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
-    protected $table = 'external_salesmen';
+    use HasFactory, SoftDeletes, LogTrait;
+    protected $table = 'general_external_salesmen';
 
     protected $fillable = [
         'phone',
@@ -22,6 +22,7 @@ class ExternalSalesmen extends Model
         'is_active',
         'national_id',
         'country_id',
+        "company_id"
     ];
 
     public function country()

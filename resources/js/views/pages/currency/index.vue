@@ -51,6 +51,7 @@ export default {
       currenciesPagination: {},
       currencies: [],
       isLoader: false,
+      company_id:null,
       create: {
         name: "",
         name_e: "",
@@ -170,6 +171,7 @@ export default {
     },
   },
   mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
   updated() {
@@ -470,7 +472,7 @@ export default {
         this.errors = {};
 
         adminApi
-          .post(`/currencies`, this.create)
+          .post(`/currencies`, {...this.create,company_id:this.company_id})
           .then((res) => {
             this.is_disabled = true;
             this.getData();
@@ -2189,3 +2191,6 @@ export default {
     </div>
   </Layout>
 </template>
+
+
+

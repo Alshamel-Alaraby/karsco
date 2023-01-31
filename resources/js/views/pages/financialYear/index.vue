@@ -68,6 +68,7 @@ export default {
       is_disabled: false,
       filterSetting: ["name", "name_e"],
       Tooltip: "",
+      company_id:null,
       mouseEnter: null,
     };
   },
@@ -117,6 +118,7 @@ export default {
     },
   },
   mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
   updated() {
@@ -393,7 +395,7 @@ export default {
         this.errors = {};
         const { name, name_e, start_date, end_date } = this.create;
         adminApi
-          .post(`/financial-years`, { name, name_e, start_date, end_date })
+          .post(`/financial-years`, { name, name_e, start_date, end_date,company_id:this.company_id })
           .then((res) => {
             this.is_disabled = true;
             this.getData();

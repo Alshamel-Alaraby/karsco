@@ -26,8 +26,8 @@ class StoreSalesmanRequest extends FormRequest
         return [
             "name" => "required|string|max:100",
             "name_e" => "required|string|max:100",
-            "salesman_type_id" => "required|exists:salesmen_types,id",
-
+            // "salesman_type_id" => "required|exists:salesmen_types,id",
+            "salesman_type_id" => "required",
         ];
     }
 

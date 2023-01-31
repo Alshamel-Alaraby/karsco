@@ -589,6 +589,8 @@
         }
     },
     "general": {
+        "from":"من",
+        "to":"الى",
         "fields":"الحقول",
         "workspace":"الملفات",
         "loginAs":"تسجيل الدخول ك",
@@ -869,6 +871,12 @@
         "DocumentTable": "جدول الملفات",
         "send": "ارسال",
         "AddedToFavoritesSuccessfully": "تمت الاضافة الى المفضلة بنجاح",
-        "DeletedFromFavoritesSuccessfully": "تم  الحذف من المفضلة بنجاح"
+        "DeletedFromFavoritesSuccessfully": "تم  الحذف من المفضلة بنجاح",
+        "favorite": "المفضلة",
+        "Showfavorite": "عرض المفضلة",
+        "DocumentName": "اسم المستند",
+        "thisFieldIsUniq": "هذا الحقل متكرر",
+        "true": "صحيح",
+        "false": "غير صحيح"
     }
 }

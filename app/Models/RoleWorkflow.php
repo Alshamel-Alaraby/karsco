@@ -11,7 +11,10 @@ use Spatie\Activitylog\LogOptions;
 
 class RoleWorkflow extends Model
 {
-    use HasFactory, LogTrait,ConnTrait;
+    use HasFactory, LogTrait;
+
+    protected $table = 'role_workflows';
+
     protected $guarded = ['id'];
 
     public function tapActivity(Activity $activity, string $eventName)

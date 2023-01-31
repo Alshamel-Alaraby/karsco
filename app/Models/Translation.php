@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Translation extends Model
 {
-    use HasFactory,ConnTrait;
+    use HasFactory;
+    protected $table="general_translations";
     protected $guarded = ['id'];
 }

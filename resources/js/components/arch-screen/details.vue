@@ -89,16 +89,21 @@
           </b-modal>
           <b-modal
               id="show-notify"
-              title="Send Email"
+              title="Show Notify"
               title-class="font-18"
               body-class="p-4 "
               :hide-footer="true"
+              @show="getUsersAll"
               @hidden="resetSendNotify"
           >
               <div class="d-flex justify-content-end">
-                  <button type="button" class="btn btn-info">
+                  <button type="button" v-if="!isLoader" @click.prevent="sendNotifyFun" class="btn btn-success">
                       {{ $t('general.send') }}
                   </button>
+                  <b-button variant="success" class="mx-1" disabled v-else>
+                      <b-spinner small></b-spinner>
+                      <span class="sr-only">{{ $t("login.Loading") }}...</span>
+                  </b-button>
               </div>
               <form>
                   <div
@@ -113,7 +118,9 @@
                                   </label>
                                   <input
                                       type="text"
+                                      v-model="$v.sendNotify.title.$model"
                                       class="form-control"
+                                      :class="{'is-invalid': $v.sendNotify.title.$error,'is-valid':!$v.sendNotify.title.$invalid,}"
                                       data-create="9"
                                   />
                               </div>
@@ -123,10 +130,18 @@
                                   <label class="control-label">
                                       User
                                   </label>
-                                  <select>
-                                      <option>1</option>
-                                      <option>2</option>
-                                  </select>
+                                  <multiselect
+                                      multiple
+                                      v-model="$v.sendNotify.users.$model"
+                                      :options="getUsers.map((type) => type.id)"
+                                      :custom-label="
+                                          (opt) =>
+                                            $i18n.locale
+                                              ? getUsers.find((x) => x.id == opt).name
+                                              : getUsers.find((x) => x.id == opt).name_e
+                                        "
+                                  >
+                                  </multiselect>
                               </div>
                           </div>
                           <div class="col-md-12">
@@ -153,7 +168,10 @@
                   <div class="d-flex justify-content-between">
                       <div class="col-8">
                           <a class="btn-action-cutom"
-                             v-if="$store.state.archiving.objectActive.media"
+                             v-if="
+                                 $store.state.archiving.objectActive.media &&
+                                 $store.state.archiving.objectActive.media.length > 0
+                             "
                              :href="$store.state.archiving.objectActive.media[$store.state.archiving.objectActive.media.length -1].url"
                              download
                           >
@@ -231,7 +249,6 @@ import translation from "../../helper/translation-mixin";
 import adminApi from "../../api/adminAxios";
 import Swal from "sweetalert2";
 import {integer, maxLength, minLength, required,email} from "vuelidate/lib/validators";
-
 export default {
     mixins: [translation],
     props: ['currentNode'],
@@ -243,6 +260,14 @@ export default {
           sendEmail:{
               email: '',
           },
+          sendNotify: {
+              title: '',
+              users: [],
+              id: null,
+              sender: {}
+          },
+          isLoader: false,
+          getUsers: []
       }
     },
     components: {
@@ -256,6 +281,10 @@ export default {
         },
         sendEmail: {
             email: {required,email},
+        },
+        sendNotify: {
+            title: {required,minLength: minLength(3),maxLength:maxLength(200)},
+            users: {required}
         },
     },
     methods: {
@@ -370,7 +399,73 @@ export default {
             });
         },
         resetSendNotify(){
+            this.sendNotify =  {
+                    title: '',
+                    users: [],
+                    id: null,
+                    sender: {}
+            };
+            this.$nextTick(() => {
+                this.$v.$reset();
+            });
+            this.$bvModal.hide('show-notify');
+        },
+        sendNotifyFun(){
+            this.sendNotify.id = this.$store.state.archiving.objectActive.id;
+            this.sendNotify.sender =
+                this.$store.state.auth.type == 'admin' ?
+                this.$store.state.auth.partner : this.$store.state.auth.user;
 
+            this.$v.sendNotify.$touch();
+            if (this.$v.sendNotify.$invalid) {
+                return;
+            } else {
+                this.isLoader = true;
+                adminApi
+                    .post(`/arch-archive-files/file-notify`,this.sendNotify)
+                    .then((res) => {
+                        this.resetSendNotify();
+                        setTimeout(() => {
+                            Swal.fire({
+                                icon: "success",
+                                text: `${this.$t("general.Addedsuccessfully")}`,
+                                showConfirmButton: false,
+                                timer: 1500,
+                            });
+                        }, 200);
+                    })
+                    .catch((err) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: `${this.$t("general.Error")}`,
+                            text: `${this.$t("general.CantDeleteRelation")}`,
+                        });
+                    })
+                   .finally(() => {
+                        this.isLoader = false;
+                    });
+            }
+        },
+        async getUsersAll(){
+            this.isLoader = true;
+            await adminApi
+                .get(
+                    `/users?company_id=${this.$store.state.auth.company_id}`
+                )
+                .then((res) => {
+                    let l = res.data;
+                    this.getUsers = l.data;
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: `${this.$t("general.Error")}`,
+                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                    });
+                })
+                .finally(() => {
+                    this.isLoader = false;
+                });
         }
     }
 }

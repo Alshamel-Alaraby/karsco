@@ -11,12 +11,15 @@ use Spatie\Activitylog\LogOptions;
 
 class PaymentType extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
+    use HasFactory, SoftDeletes, LogTrait;
+
+    protected $table = 'general_payment_types';
 
     protected $fillable = [
         'name',
         'name_e',
         'is_default',
+        "company_id"
     ];
 
     protected $casts = [

@@ -29,7 +29,7 @@ class UpdateStoreRequest extends FormRequest
             'name' => 'string|max:255',
             'name_e' => 'string|max:255',
             'company_id' => 'integer',
-            'branch_id' => 'integer|exists:branches,id',
+            'branch_id' => 'integer',
             'is_active' => 'nullable|in:active,inactive',
 
         ];

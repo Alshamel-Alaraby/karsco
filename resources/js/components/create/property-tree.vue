@@ -16,7 +16,10 @@ export default {
   components: {
     Switches,
     ErrorMessage,
-    Multiselect
+    Multiselect,
+  },
+  mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
   },
   updated() {
     $(".englishInput").keypress(function (event) {
@@ -38,6 +41,7 @@ export default {
   },
   data() {
     return {
+      company_id: null,
       rootNodes: [],
       childNodes: [],
       isLoader: false,
@@ -109,6 +113,7 @@ export default {
           .post(`/tree-properties`, {
             ...this.create,
             required: this.create.required == "active" ? 1 : 0,
+            company_id: this.company_id,
           })
           .then((res) => {
             this.$emit("created");
@@ -438,7 +443,11 @@ export default {
             <span class="sr-only">{{ $t("login.Loading") }}...</span>
           </b-button>
         </template>
-        <b-button @click.prevent="$bvModal.hide(`property-create`)" variant="danger" type="button">
+        <b-button
+          @click.prevent="$bvModal.hide(`property-create`)"
+          variant="danger"
+          type="button"
+        >
           {{ $t("general.Cancel") }}
         </b-button>
       </div>

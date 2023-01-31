@@ -90,7 +90,6 @@ class TranslationSeeder extends Seeder
                 "new_en" => "",
                 "company_id" => 0,
                 "screen" => "realEstate unit status"
-
             ],
             [
                 "key" => "unitstatus_name_en",
@@ -2829,15 +2828,15 @@ class TranslationSeeder extends Seeder
                 "company_id" => 0,
                 "screen" => "payment plan installment"
             ],
-            [
-                "key" => "screen",
-                "default_en" => "Screen name",
-                "default_ar" => "اسم الشاشة",
-                "new_ar" => "",
-                "new_en" => "",
-                "company_id" => 0,
-                "screen" => "payment plan installment"
-            ],
+            // [
+            //     "key" => "screen",
+            //     "default_en" => "Screen name",
+            //     "default_ar" => "اسم الشاشة",
+            //     "new_ar" => "",
+            //     "new_en" => "",
+            //     "company_id" => 0,
+            //     "screen" => "payment plan installment"
+            // ],
             [
                 "key" => "ref_id",
                 "default_en" => "Ref ID",
@@ -3313,6 +3312,15 @@ class TranslationSeeder extends Seeder
                 "screen" => "document field"
             ],
             [
+                "key" => "property",
+                "default_en" => "Property name",
+                "default_ar" => "اسم الخاصية",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "document field"
+            ],
+            [
                 "key" => "documentFieldEdit",
                 "default_en" => "Edit Document Field",
                 "default_ar" => "نموذج تعديل المستند",
@@ -3420,7 +3428,7 @@ class TranslationSeeder extends Seeder
 
             [
                 "key" => "arch_doc_field_order",
-                "default_en" => "Archiving document field order",
+                "default_en" => "Archiving document Sort field",
                 "default_ar" => "ترتيب حقل الملف",
                 "new_ar" => "",
                 "new_en" => "",
@@ -3575,16 +3583,16 @@ class TranslationSeeder extends Seeder
                 "screen" => "properties",
 
             ],
-            [
-                "key" => "screen",
-                "default_en" => "Screen Name",
-                "default_ar" => "اسم الشاشة",
-                "new_ar" => "",
-                "new_en" => "",
-                "company_id" => 0,
-                "screen" => "properties",
+            // [
+            //     "key" => "screen",
+            //     "default_en" => "Screen Name",
+            //     "default_ar" => "اسم الشاشة",
+            //     "new_ar" => "",
+            //     "new_en" => "",
+            //     "company_id" => 0,
+            //     "screen" => "properties",
 
-            ],
+            // ],
             [
                 "key" => "property",
                 "default_en" => "Property name",
@@ -5937,7 +5945,7 @@ class TranslationSeeder extends Seeder
 
             [
                 "key" => "arch_doc_field_order",
-                "default_en" => "Archiving document field order",
+                "default_en" => "Archiving document Sort field",
                 "default_ar" => "ترتيب حقل الملف",
                 "new_ar" => "",
                 "new_en" => "",

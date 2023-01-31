@@ -29,7 +29,7 @@ class StoreStoreRequest extends FormRequest
             'name' => 'required|string|max:255',
             'name_e' => 'required|string|max:255',
             'company_id' => 'required|integer',
-            'branch_id' => 'required|integer|exists:branches,id',
+            'branch_id' => 'required|integer',
             'is_active' => 'nullable|in:active,inactive',
         ];
     }

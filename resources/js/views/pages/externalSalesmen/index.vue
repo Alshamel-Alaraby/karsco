@@ -22,24 +22,26 @@ export default {
     meta: [{ name: "description", content: "External Salesmen" }],
   },
   mixins: [translation],
-    beforeRouteEnter(to, from, next) {
-        next((vm) => {
-
-          if(vm.$store.state.auth.work_flow_trees.includes('sales men-e')){
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      if (vm.$store.state.auth.work_flow_trees.includes("sales men-e")) {
         Swal.fire({
-                    icon: "error",
-                    title: `${vm.$t("general.Error")}`,
-                    text: `${vm.$t("general.ModuleExpired")}`,
-                  });
+          icon: "error",
+          title: `${vm.$t("general.Error")}`,
+          text: `${vm.$t("general.ModuleExpired")}`,
+        });
+        return vm.$router.push({ name: "home" });
+      } else if (
+        vm.$store.state.auth.work_flow_trees.includes("external salesmen") ||
+        vm.$store.state.auth.work_flow_trees.includes("sales men") ||
+        vm.$store.state.auth.user.type == "super_admin"
+      ) {
+        return true;
+      } else {
         return vm.$router.push({ name: "home" });
       }
-            else if (vm.$store.state.auth.work_flow_trees.includes('external salesmen') || vm.$store.state.auth.work_flow_trees.includes('sales men') || vm.$store.state.auth.user.type == 'super_admin') {
-                return true;
-            } else {
-                return vm.$router.push({ name: "home" });
-            }
-        });
-    },
+    });
+  },
   components: {
     Layout,
     PageHeader,
@@ -60,7 +62,7 @@ export default {
       Tooltip: "",
       mouseEnter: "",
 
-create: {
+      create: {
         phone: "",
         address: "",
         rp_code: "",
@@ -82,6 +84,7 @@ create: {
       isCheckAll: false,
       checkAll: [],
       current_page: 1,
+      company_id: null,
       setting: {
         phone: true,
         address: true,
@@ -97,7 +100,7 @@ create: {
         "address",
         "email",
         "rp_code",
-        this.$i18n.locale  == 'ar'?'country.name':'country.name_e',
+        this.$i18n.locale == "ar" ? "country.name" : "country.name_e",
         "national_id",
         "is_active",
       ],
@@ -156,10 +159,11 @@ create: {
     },
   },
   mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
   methods: {
-        formatDate(value) {
+    formatDate(value) {
       return formatDateOnly(value);
     },
     log(id) {
@@ -259,7 +263,7 @@ create: {
     /**
      *  start delete countrie
      */
-     deleteExternalSalesmen(id, index) {
+    deleteExternalSalesmen(id, index) {
       if (Array.isArray(id)) {
         Swal.fire({
           title: `${this.$t("general.Areyousure")}`,
@@ -430,7 +434,7 @@ create: {
         this.isLoader = true;
         this.errors = {};
         adminApi
-          .post(`/external-salesmen`, this.create)
+          .post(`/external-salesmen`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.is_disabled = true;
             this.getData();
@@ -624,33 +628,35 @@ create: {
                     }}</b-form-checkbox>
                     <b-form-checkbox
                       v-model="filterSetting"
-                      :value="$i18n.locale  == 'ar'?'country.name':'country.name_e'"
+                      :value="$i18n.locale == 'ar' ? 'country.name' : 'country.name_e'"
                       class="mb-1"
-                      >{{ getCompanyKey('country') }}</b-form-checkbox
+                      >{{ getCompanyKey("country") }}</b-form-checkbox
                     >
                     <b-form-checkbox
                       v-model="filterSetting"
                       value="national_id"
                       class="mb-1"
-                      >{{ getCompanyKey('external_sale_man_national_id') }}</b-form-checkbox
+                      >{{
+                        getCompanyKey("external_sale_man_national_id")
+                      }}</b-form-checkbox
                     >
                     <b-form-checkbox
                       v-model="filterSetting"
                       value="address"
                       class="mb-1"
-                      >{{ getCompanyKey('external_sale_man_address') }}</b-form-checkbox
+                      >{{ getCompanyKey("external_sale_man_address") }}</b-form-checkbox
                     >
                     <b-form-checkbox
                       v-model="filterSetting"
                       value="rp_code"
                       class="mb-1"
-                      >{{getCompanyKey('external_sale_man_code') }}</b-form-checkbox
+                      >{{ getCompanyKey("external_sale_man_code") }}</b-form-checkbox
                     >
                     <b-form-checkbox
                       v-model="filterSetting"
                       value="is_active"
                       class="mb-1"
-                      >{{ getCompanyKey('external_sale_man_status') }}</b-form-checkbox
+                      >{{ getCompanyKey("external_sale_man_status") }}</b-form-checkbox
                     >
                   </b-dropdown>
                   <!-- Basic dropdown -->
@@ -745,25 +751,25 @@ create: {
                       class="dropdown-custom-ali"
                     >
                       <b-form-checkbox v-model="setting.phone" class="mb-1"
-                        >{{ getCompanyKey('external_sale_man_phone') }}
+                        >{{ getCompanyKey("external_sale_man_phone") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.email" class="mb-1">
-                        {{ getCompanyKey('external_sale_man_email') }}
+                        {{ getCompanyKey("external_sale_man_email") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.address" class="mb-1">
-                        {{ getCompanyKey('external_sale_man_address') }}
+                        {{ getCompanyKey("external_sale_man_address") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.national_id" class="mb-1">
-                        {{ getCompanyKey('external_sale_man_national_id') }}
+                        {{ getCompanyKey("external_sale_man_national_id") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.country_id" class="mb-1">
-                        {{ getCompanyKey('country') }}
+                        {{ getCompanyKey("country") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.is_active" class="mb-1">
-                        {{ getCompanyKey('external_sale_man_status') }}
+                        {{ getCompanyKey("external_sale_man_status") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.rp_code" class="mb-1">
-                        {{getCompanyKey('external_sale_man_code') }}
+                        {{ getCompanyKey("external_sale_man_code") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
                         <a href="javascript:void(0)" class="btn btn-primary btn-sm"
@@ -876,7 +882,7 @@ create: {
                   <div class="col-md-6">
                     <div class="form-group position-relative">
                       <label class="control-label">
-                        {{ getCompanyKey('country') }}
+                        {{ getCompanyKey("country") }}
                         <span class="text-danger">*</span>
                       </label>
                       <multiselect
@@ -973,7 +979,7 @@ create: {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="field-4" class="control-label">
-                        {{ getCompanyKey('external_sale_man_national_id') }}
+                        {{ getCompanyKey("external_sale_man_national_id") }}
                         <span class="text-danger">*</span>
                       </label>
                       <input
@@ -1002,7 +1008,7 @@ create: {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="field-7" class="control-label">
-                        {{ getCompanyKey('external_sale_man_address') }}
+                        {{ getCompanyKey("external_sale_man_address") }}
                         <span class="text-danger">*</span>
                       </label>
                       <input
@@ -1039,7 +1045,7 @@ create: {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="field-8" class="control-label">
-                        {{getCompanyKey('external_sale_man_code') }}
+                        {{ getCompanyKey("external_sale_man_code") }}
                         <span class="text-danger">*</span>
                       </label>
                       <input
@@ -1071,7 +1077,7 @@ create: {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label class="mr-2">
-                        {{ getCompanyKey('external_sale_man_status') }}
+                        {{ getCompanyKey("external_sale_man_status") }}
                         <span class="text-danger">*</span>
                       </label>
                       <b-form-group
@@ -1160,7 +1166,7 @@ create: {
                     </th>
                     <th v-if="setting.country_id">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('country') }}</span>
+                        <span>{{ getCompanyKey("country") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1175,7 +1181,7 @@ create: {
                     </th>
                     <th v-if="setting.national_id">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('external_sale_man_national_id') }}</span>
+                        <span>{{ getCompanyKey("external_sale_man_national_id") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1190,17 +1196,17 @@ create: {
                     </th>
                     <th v-if="setting.address">
                       <div class="d-flex justify-content-center">
-                        {{ getCompanyKey('external_sale_man_address') }}
+                        {{ getCompanyKey("external_sale_man_address") }}
                       </div>
                     </th>
                     <th v-if="setting.rp_code">
                       <div class="d-flex justify-content-center">
-                        {{getCompanyKey('external_sale_man_code') }}
+                        {{ getCompanyKey("external_sale_man_code") }}
                       </div>
                     </th>
                     <th v-if="setting.is_active">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('external_sale_man_status') }}</span>
+                        <span>{{ getCompanyKey("external_sale_man_status") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1341,7 +1347,7 @@ create: {
                             <div class="col-md-6">
                               <div class="form-group position-relative">
                                 <label class="control-label">
-                                  {{ getCompanyKey('country') }}
+                                  {{ getCompanyKey("country") }}
                                   <span class="text-danger">*</span>
                                 </label>
                                 <multiselect
@@ -1449,7 +1455,7 @@ create: {
                             <div class="col-md-6">
                               <div class="form-group">
                                 <label class="control-label">
-                                  {{ getCompanyKey('external_sale_man_national_id') }}
+                                  {{ getCompanyKey("external_sale_man_national_id") }}
                                   <span class="text-danger">*</span>
                                 </label>
                                 <input
@@ -1478,7 +1484,7 @@ create: {
                             <div class="col-md-6">
                               <div class="form-group">
                                 <label for="edit-7" class="control-label">
-                                  {{ getCompanyKey('external_sale_man_address') }}
+                                  {{ getCompanyKey("external_sale_man_address") }}
                                   <span class="text-danger">*</span>
                                 </label>
                                 <input
@@ -1523,7 +1529,7 @@ create: {
                             <div class="col-md-6">
                               <div class="form-group">
                                 <label for="edit-8" class="control-label">
-                                  {{getCompanyKey('external_sale_man_code') }}
+                                  {{ getCompanyKey("external_sale_man_code") }}
                                   <span class="text-danger">*</span>
                                 </label>
                                 <input
@@ -1560,7 +1566,7 @@ create: {
                             <div class="col-md-6">
                               <div class="form-group">
                                 <label class="mr-2">
-                                  {{ getCompanyKey('external_sale_man_status') }}
+                                  {{ getCompanyKey("external_sale_man_status") }}
                                   <span class="text-danger">*</span>
                                 </label>
                                 <b-form-group
@@ -1601,7 +1607,7 @@ create: {
                       <!--  /edit   -->
                     </td>
                     <td>
-                        <button
+                      <button
                         @mouseover="log(data.id)"
                         @mousemove="log(data.id)"
                         type="button"
@@ -1612,7 +1618,7 @@ create: {
                       >
                         <i class="fe-info" style="font-size: 22px"></i>
                       </button>
-                      </td>
+                    </td>
                   </tr>
                 </tbody>
                 <tbody v-else>

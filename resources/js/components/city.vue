@@ -220,6 +220,11 @@ export default {
     loader,
   },
   mixins:[translation],
+  
+  mounted(){
+this.company_id=this.$store.getters["auth/company_id"];
+  },
+
   updated() {
     $(function () {
       $(".englishInput").keypress(function (event) {
@@ -374,7 +379,7 @@ export default {
         this.is_disabled = false;
 
         adminApi
-          .post(`/cities`, this.create)
+          .post(`/cities`,  {...this.create,company_id:this.company_id})
           .then((res) => {
             this.is_disabled = true;
             this.$emit('created');
@@ -412,3 +417,6 @@ export default {
   },
 };
 </script>
+
+
+

@@ -52,8 +52,8 @@ export default {
 
       if (
         vm.$store.state.auth.work_flow_trees.includes("archiving screen") ||
-        vm.$store.state.auth.work_flow_trees.includes("archiving")
-          || vm.$store.state.auth.user.type == 'super_admin'
+        vm.$store.state.auth.work_flow_trees.includes("archiving") ||
+        vm.$store.state.auth.user.type == "super_admin"
       ) {
         return true;
       } else {
@@ -74,6 +74,7 @@ export default {
       root: [],
       per_page: 6,
       search: "",
+      favourite: false,
       debounce: {},
       archivesPagination: {},
       archives: [],
@@ -84,9 +85,15 @@ export default {
       currentNode: null,
       archive_id: null,
       fileFields: [],
+      from: 0,
+      to: 0,
+      fromDate: new Date(),
+      toDate: new Date(),
+      currentField: null,
       fileImages: [],
       secondLevelNodes: [],
       fields: [],
+      properties: [],
       create: {
         timestamp: null,
         job_file_number: null,
@@ -111,7 +118,8 @@ export default {
         timestamp: true,
       },
       filterSetting: [],
-      searchCurrentNodeId: null,
+      searchDocumentTypeId: null,
+      searchFieldId: null,
       errors: {},
       lockups: [],
       isCheckAll: false,
@@ -176,12 +184,38 @@ export default {
     print() {
       window.print();
     },
+    getCurrentField(id) {
+      this.from = 0;
+      this.to = 0;
+      this.toDate = new Date();
+      this.fromDate = new Date();
+      this.search = "";
+
+      this.currentField = this.fields.filter((field) => {
+        return field.id == id;
+      })[0];
+    },
     getFields(id) {
+      this.from = 0;
+      this.to = 0;
+      this.toDate = new Date();
+      this.fromDate = new Date();
+      this.search = "";
+      if (!id) {
+        this.fields = [];
+        return;
+      }
       this.isLoader = true;
       adminApi
         .get(`/arch-doc-type/${id}`)
         .then((res) => {
-          this.fields = res.data.doc_type_field;
+          this.fields = res.data.data.doc_type_field;
+          if (this.fields.length) {
+            this.searchFieldId = this.fields[0].id;
+            this.currentField = this.fields.filter((field) => {
+              return field.id == this.searchFieldId;
+            })[0];
+          }
           this.isLoader = false;
         })
         .catch((err) => {
@@ -191,7 +225,6 @@ export default {
             text: `${this.$t("general.Thereisanerrorinthesystem")}`,
           });
           this.isLoader = false;
-
         })
         .finally(() => {});
     },
@@ -204,24 +237,30 @@ export default {
       this.currentNode = node;
       node.doc_type_field.sort((a, b) => (a.field_order > b.field_order ? 1 : -1));
       this.nodeFields = [...node.doc_type_field].map((field) => {
-        // if(field.doc_field_id.data_type.name_e == 'Lookup (table)'){
-        // this.getLookup()
-        // }
+        if (field.doc_field_id.data_type.name_e == "Lookup (table)") {
+          this.getLookup(
+            field.doc_field_id.lookup_table,
+            field.doc_field_id.lookup_table_column,
+            field.doc_field_id.name_e
+          );
+        }
         return {
           ...field,
           value: "",
         };
       });
-      console.log(this.nodeFields);
-
       this.$bvModal.show("create");
     },
-    async getLookup(table, column) {
+    async getLookup(table, column, field_name) {
       await adminApi
         .get(`/document-field/column-data/${table}/${column}`)
         .then((res) => {
           let l = res.data;
-          this.lockups = l.data;
+          this.lockups.push({
+            field_name: field_name,
+            column: column,
+            field_data: l.data,
+          });
         })
         .catch((err) => {
           Swal.fire({
@@ -256,7 +295,19 @@ export default {
       await adminApi
         .get(`/arch-doc-type/tree`)
         .then((res) => {
-          this.root = res.data.data;
+          let root = res.data.data;
+          root.forEach((node) => {
+            if (node.children) {
+              node.children.forEach((child) => {
+                if (child.doc_type_field) {
+                  child.doc_type_field.sort((a, b) =>
+                    a.field_order > b.field_order ? 1 : -1
+                  );
+                }
+              });
+            }
+          });
+          this.root = root;
         })
         .catch((err) => {
           Swal.fire({
@@ -287,9 +338,42 @@ export default {
      */
     async getData(page = 1) {
       this.isLoader = true;
+      if (this.from && !this.to) {
+        this.to = this.from;
+      }
+      if (this.fromDate && !this.toDate) {
+        this.toDate = this.fromDate;
+      }
+      if (this.to && !this.from) {
+        this.from = this.to;
+      }
+      if (this.toDate && !this.fromDate) {
+        this.fromDate = this.toDate;
+      }
       await adminApi
         .get(
-          `/arch-archive-files?page=${page}&per_page=${this.per_page}&search=${this.search}&arch_doc_type_id=${this.filterSetting}`
+          `/arch-archive-files?page=${page}&per_page=${this.per_page}&search=${this.search}&arch_doc_type_id=${this.filterSetting}&favourite=${this.favourite}`,
+          {
+            params: this.currentField
+              ? {
+                  field: {
+                    from:
+                      this.currentField.doc_field_id.data_type.name_e == "INTEGER"
+                        ? this.from
+                        : this.fromDate,
+                    to:
+                      this.currentField.doc_field_id.data_type.name_e == "INTEGER"
+                        ? this.to
+                        : this.toDate,
+                    text: this.search,
+                    range: ["INTEGER", "DATE"].includes(
+                      this.currentField.doc_field_id.data_type.name_e
+                    ),
+                    data_type: this.currentField.doc_field_id.data_type.name_e,
+                  },
+                }
+              : {},
+          }
         )
         .then((res) => {
           let l = res.data;
@@ -309,6 +393,19 @@ export default {
         });
     },
     getDataCurrentPage() {
+      if (this.from && !this.to) {
+        this.to = this.from;
+      }
+      if (this.fromDate && !this.toDate) {
+        this.toDate = this.fromDate;
+      }
+      if (this.to && !this.from) {
+        this.from = this.to;
+      }
+      if (this.toDate && !this.fromDate) {
+        this.fromDate = this.toDate;
+      }
+
       if (
         this.current_page <= this.archivesPagination.last_page &&
         this.current_page != this.archivesPagination.current_page &&
@@ -317,7 +414,28 @@ export default {
         this.isLoader = true;
         adminApi
           .get(
-            `/arch-archive-files?page=${this.current_page}&per_page=${this.per_page}&search=${this.search}&arch_doc_type_id=${this.filterSetting}`
+            `/arch-archive-files?page=${this.current_page}&per_page=${this.per_page}&search=${this.search}&arch_doc_type_id=${this.filterSetting}&favourite=${this.favourite}`,
+            {
+              params: this.currentField
+                ? {
+                    field: {
+                      from:
+                        this.currentField.doc_field_id.data_type.name_e == "INTEGER"
+                          ? this.from
+                          : this.fromDate,
+                      to:
+                        this.currentField.doc_field_id.data_type.name_e == "INTEGER"
+                          ? this.to
+                          : this.toDate,
+                      text: this.search,
+                      range: ["INTEGER", "DATE"].includes(
+                        this.currentField.doc_field_id.data_type.name_e
+                      ),
+                      data_type: this.currentField.doc_field_id.data_type.name_e,
+                    },
+                  }
+                : {},
+            }
           )
           .then((res) => {
             let l = res.data;
@@ -344,9 +462,10 @@ export default {
         .get(`/arch-doc-type/nodes-level-two`)
         .then((res) => {
           this.secondLevelNodes = res.data.data;
-          this.secondLevelNodes.forEach((node) => {
-            this.filterSetting.push(node.id);
-          });
+          this.searchDocumentTypeId = this.secondLevelNodes.length
+            ? this.secondLevelNodes[0].id
+            : null;
+          this.getFields(this.searchDocumentTypeId);
         })
         .catch((err) => {
           Swal.fire({
@@ -490,13 +609,23 @@ export default {
      *  hidden Modal (create)
      */
     async resetModal() {
+      let filterRes = this.fields.filter((field) => {
+        return field.doc_field_id.tree_property_id;
+      });
+      let dropListTreePropId = filterRes.length
+        ? filterRes[0].doc_field_id.tree_property_id
+        : null;
+      if (dropListTreePropId) {
+        adminApi.get(`tree-properties/child-nodes/${dropListTreePropId}`).then((res) => {
+          this.properties = res.data;
+        });
+      }
       this.create = {
         data_type_value: null,
         data_type_id: null,
         media: [],
       };
       this.showPhoto = "/images/img-1.png";
-
       this.is_disabled = false;
       this.$nextTick(() => {
         this.$v.$reset();
@@ -533,6 +662,7 @@ export default {
           name_e: field.doc_field_id.name_e,
           name: field.doc_field_id.name,
           is_reference: field.doc_field_id.is_reference,
+          data_type: field.doc_field_id.data_type.name_e,
         });
       });
       this.$v.nodeFields.$touch();
@@ -913,6 +1043,10 @@ export default {
       await this.getTree();
       await this.getData();
     },
+    async showFavorite() {
+      this.favourite = !this.favourite;
+      await this.getData();
+    },
   },
 };
 </script>
@@ -937,7 +1071,7 @@ export default {
                     <b-form-checkbox
                       v-for="node in secondLevelNodes"
                       :key="node.id"
-                      v-model="searchCurrentNodeId"
+                      v-model="searchDocumentTypeId"
                       :value="node.id"
                       class="mb-1"
                       @change="getFields"
@@ -956,45 +1090,111 @@ export default {
                     <b-form-checkbox
                       v-for="field in fields"
                       :key="field.id"
-                      v-model="filterSetting"
+                      v-model="searchFieldId"
                       :value="field.id"
                       class="mb-1"
+                      @change="getCurrentField"
                     >
-                      {{ $i18n.locale == "ar" ? field.name : field.name_e }}
+                      {{
+                        $i18n.locale == "ar"
+                          ? field.doc_field_id.name
+                          : field.doc_field_id.name_e
+                      }}
                     </b-form-checkbox>
                   </b-dropdown>
                   <!-- Basic dropdown -->
                 </div>
-                <div class="d-inline-block position-relative m-2" style="width: 77%">
-                  <span
-                    :class="[
-                      'search-custom position-absolute',
-                      $i18n.locale == 'ar' ? 'search-custom-ar' : '',
-                    ]"
-                  >
-                    <i class="fe-search"></i>
-                  </span>
-                  <input
-                    class="form-control"
-                    style="display: block; width: 93%; padding-top: 3px"
-                    type="text"
-                    v-model.trim="search"
-                    :placeholder="`${$t('general.Search')}...`"
-                  />
-                </div>
+                <template
+                  v-if="
+                    currentField &&
+                    currentField.doc_field_id.data_type.name_e == 'INTEGER'
+                  "
+                >
+                  <div class="d-inline-block position-relative m-2" style="width: 100%">
+                    <div class="row">
+                      <div class="col-6">
+                        <input
+                          class="form-control"
+                          style="padding-top: 3px; display: inline-block"
+                          type="text"
+                          v-model.trim="from"
+                          :placeholder="`${$t('general.from')}`"
+                          @keyup="getData()"
+                        />
+                      </div>
+                      <div class="col-6">
+                        <input
+                          class="form-control"
+                          style="padding-top: 3px; display: inline-block"
+                          type="text"
+                          v-model.trim="to"
+                          @keyup="getData()"
+                          :placeholder="`${$t('general.to')}`"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </template>
+                <template
+                  v-else-if="
+                    currentField && currentField.doc_field_id.data_type.name_e == 'DATE'
+                  "
+                >
+                  <div class="d-inline-block position-relative m-2" style="width: 100%">
+                    <div class="row">
+                      <div class="col-6">
+                        <date-picker
+                          @change="getData()"
+                          v-model="fromDate"
+                          type="date"
+                          confirm
+                        ></date-picker>
+                      </div>
+                      <div class="col-6">
+                        <date-picker
+                          @change="getData()"
+                          v-model="toDate"
+                          type="date"
+                          confirm
+                        ></date-picker>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+                <template v-else-if="currentField">
+                  <div class="d-inline-block position-relative m-2" style="width: 77%">
+                    <span
+                      :class="[
+                        'search-custom position-absolute',
+                        $i18n.locale == 'ar' ? 'search-custom-ar' : '',
+                      ]"
+                    >
+                      <i class="fe-search"></i>
+                    </span>
+                    <input
+                      class="form-control"
+                      style="display: block; width: 93%; padding-top: 3px"
+                      type="text"
+                      v-model.trim="search"
+                      :placeholder="`${$t('general.Search')}...`"
+                    />
+                  </div>
+                </template>
               </div>
             </div>
 
             <div class="row justify-content-between align-items-center mt-3 mb-2 px-1">
               <div class="col-md-9 d-flex align-items-center mb-1 mb-xl-0">
-                <!--                <b-button-->
-                <!--                  v-b-modal.create-->
-                <!--                  variant="primary"-->
-                <!--                  class="btn-sm mx-1 font-weight-bold"-->
-                <!--                >-->
-                <!--                  {{ $t("general.Clicktoupload") }}-->
-                <!--                  <i class="fas fa-plus"></i>-->
-                <!--                </b-button>-->
+                <b-button
+                  variant="primary"
+                  type="button"
+                  class="btn-sm mx-1 font-weight-bold"
+                  @click.prevent="showFavorite"
+                >
+                  {{ $t("general.favorite") }}
+                  <i v-if="favourite" class="fa fa-star"></i>
+                  <i v-else class="far fa-star"></i>
+                </b-button>
                 <!--                <b-button-->
                 <!--                  v-b-modal.create-->
                 <!--                  variant="primary"-->
@@ -1238,12 +1438,25 @@ export default {
                             >
                             <multiselect
                               v-model="$v.nodeFields.$each[index].value.$model"
-                              :options="lockups.map((type) => type.id)"
-                              :custom-label="
-                                (opt) =>
-                                  $i18n.locale == 'ar'
-                                    ? lockups.find((x) => x.id == opt).name
-                                    : lockups.find((x) => x.id == opt).name_e
+                              :options="
+                                lockups.length > 0 &&
+                                lockups.find(
+                                  (e) => field.doc_field_id.name_e == e.field_name
+                                )
+                                  ? lockups
+                                      .find(
+                                        (e) => field.doc_field_id.name_e == e.field_name
+                                      )
+                                      .field_data.map(
+                                        (type) =>
+                                          type[
+                                            lockups.find(
+                                              (e) =>
+                                                field.doc_field_id.name_e == e.field_name
+                                            ).column
+                                          ]
+                                      )
+                                  : []
                               "
                               :class="{
                                 'is-invalid':
@@ -1255,6 +1468,168 @@ export default {
                               }"
                             >
                             </multiselect>
+                          </div>
+                          <div
+                            v-else-if="
+                              field.doc_field_id.data_type.name_e == 'ENUM (droplist)'
+                            "
+                            class="form-group"
+                          >
+                            <label class="my-1 mr-2">
+                              {{
+                                $i18n.locale == "ar"
+                                  ? field.doc_field_id.name
+                                  : field.doc_field_id.name_e
+                              }}</label
+                            >
+                            <span v-if="field.is_required == 1" class="text-danger"
+                              >*</span
+                            >
+                            <multiselect
+                              v-model="$v.nodeFields.$each[index].value.$model"
+                              :options="properties"
+                              :custom-label="
+                                (opt) => ($i18n.locale == 'ar' ? opt.name : opt.name_e)
+                              "
+                              :class="{
+                                'is-invalid':
+                                  field.is_required == 1 &&
+                                  $v.nodeFields.$each[index].value.$error,
+                                'is-valid':
+                                  field.is_required != 1 ||
+                                  !$v.nodeFields.$each[index].value.$invalid,
+                              }"
+                            >
+                            </multiselect>
+                          </div>
+                          <div
+                            v-else-if="field.doc_field_id.data_type.name_e == 'TIME'"
+                            class="form-group"
+                          >
+                            <label class="control-label">
+                              {{
+                                $i18n.locale == "ar"
+                                  ? field.doc_field_id.name
+                                  : field.doc_field_id.name_e
+                              }}
+                              <span v-if="field.is_required == 1" class="text-danger"
+                                >*</span
+                              >
+                            </label>
+                            <b-form-timepicker v-model="field.value"></b-form-timepicker>
+                          </div>
+                          <div
+                            v-else-if="field.doc_field_id.data_type.name_e == 'TIMESTAMP'"
+                            class="form-group"
+                          >
+                            <label class="control-label">
+                              {{
+                                $i18n.locale == "ar"
+                                  ? field.doc_field_id.name
+                                  : field.doc_field_id.name_e
+                              }}
+                              <span v-if="field.is_required == 1" class="text-danger"
+                                >*</span
+                              >
+                            </label>
+                            <date-picker
+                              v-model="field.value"
+                              confirm
+                              type="datetime"
+                            ></date-picker>
+                          </div>
+                          <div
+                            v-else-if="field.doc_field_id.data_type.name_e == 'INTEGER'"
+                            class="form-group"
+                          >
+                            <label class="control-label">
+                              {{
+                                $i18n.locale == "ar"
+                                  ? field.doc_field_id.name
+                                  : field.doc_field_id.name_e
+                              }}
+                              <span v-if="field.is_required == 1" class="text-danger"
+                                >*</span
+                              >
+                            </label>
+                            <input
+                              type="number"
+                              class="form-control"
+                              data-create="9"
+                              step="1"
+                              v-model="$v.nodeFields.$each[index].value.$model"
+                              :class="{
+                                'is-invalid':
+                                  field.is_required == 1 &&
+                                  $v.nodeFields.$each[index].value.$error,
+                                'is-valid':
+                                  field.is_required != 1 ||
+                                  !$v.nodeFields.$each[index].value.$invalid,
+                              }"
+                            />
+                          </div>
+                          <div
+                            v-else-if="field.doc_field_id.data_type.name_e == 'BOOLEAN'"
+                            class="form-group"
+                          >
+                            <label class="control-label">
+                              {{
+                                $i18n.locale == "ar"
+                                  ? field.doc_field_id.name
+                                  : field.doc_field_id.name_e
+                              }}
+                              <span v-if="field.is_required == 1" class="text-danger"
+                                >*</span
+                              >
+                            </label>
+                            <select
+                              class="form-control"
+                              v-model="$v.nodeFields.$each[index].value.$model"
+                              :class="{
+                                'is-invalid':
+                                  field.is_required == 1 &&
+                                  $v.nodeFields.$each[index].value.$error,
+                                'is-valid':
+                                  field.is_required != 1 ||
+                                  !$v.nodeFields.$each[index].value.$invalid,
+                              }"
+                            >
+                              <option value="true">{{ $t("general.true") }}</option>
+                              <option value="false">{{ $t("general.false") }}</option>
+                            </select>
+                          </div>
+                          <div
+                            v-else-if="
+                              field.doc_field_id.data_type.name_e == 'FLOAT' ||
+                              field.doc_field_id.data_type.name_e == 'DOUBLE'
+                            "
+                            class="form-group"
+                          >
+                            <label class="control-label">
+                              {{
+                                $i18n.locale == "ar"
+                                  ? field.doc_field_id.name
+                                  : field.doc_field_id.name_e
+                              }}
+                              <span v-if="field.is_required == 1" class="text-danger"
+                                >*</span
+                              >
+                            </label>
+                            <input
+                              type="number"
+                              class="form-control"
+                              data-create="9"
+                              step="0.001"
+                              v-model="$v.nodeFields.$each[index].value.$model"
+                              :class="{
+                                'is-invalid':
+                                  field.is_required == 1 &&
+                                  $v.nodeFields.$each[index].value.$error,
+                                'is-valid':
+                                  field.is_required != 1 ||
+                                  !$v.nodeFields.$each[index].value.$invalid,
+                              }"
+                            />
                           </div>
                           <div v-else class="form-group">
                             <label class="control-label">
@@ -1271,8 +1646,6 @@ export default {
                               type="text"
                               class="form-control"
                               data-create="9"
-                              step="0.1"
-                              @keypress.enter="moveInput('select', 'create', 10)"
                               v-model="$v.nodeFields.$each[index].value.$model"
                               :class="{
                                 'is-invalid':
@@ -1452,7 +1825,7 @@ export default {
                         </label>
                         <input
                           readonly
-                          :value="field.value"
+                          :value="typeof field.value === 'object'?($i18n.locale=='ar'?field.value.name:field.value.name_e):field.value "
                           type="text"
                           class="form-control"
                           data-create="9"
@@ -1510,7 +1883,6 @@ export default {
                 </div>
               </form>
             </b-modal>
-            <!--  /create   -->
 
             <div class="row">
               <div class="col-lg-3">

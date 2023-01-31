@@ -33,7 +33,6 @@ class ColorRepository implements ColorInterface
     {
         DB::transaction(function () use ($request) {
             $model = $this->model->create($request->all());
-
             cacheForget("colors");
         });
     }

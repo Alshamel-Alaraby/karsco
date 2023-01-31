@@ -11,6 +11,7 @@ import { dynamicSortString } from "../../../helper/tableSort";
 import Multiselect from "vue-multiselect";
 import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
+import Property from "../../../components/create/property-tree.vue";
 
 /**
  * Advanced Table component
@@ -26,6 +27,7 @@ export default {
     ErrorMessage,
     loader,
     Multiselect,
+    Property,
   },
   mixins: [translation],
   data() {
@@ -41,7 +43,7 @@ export default {
       isLoader: false,
       Tooltip: "",
       mouseEnter: "",
-
+      company_id: null,
       create: {
         screen_id: null,
         property_id: null,
@@ -60,7 +62,6 @@ export default {
       checkAll: [],
       is_disabled: false,
       current_page: 1,
-      company_id: 48,
     };
   },
   validations: {
@@ -105,6 +106,7 @@ export default {
     },
   },
   async mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     await this.getScreens();
     await this.getData();
   },
@@ -349,11 +351,13 @@ export default {
         this.errors = {};
         this.is_disabled = false;
         adminApi
-          .post(`/screen-tree-properties`, this.create)
+          .post(`/screen-tree-properties`, {
+            ...this.create,
+            company_id: this.company_id,
+          })
           .then((res) => {
             this.getData();
             this.is_disabled = true;
-
             setTimeout(() => {
               Swal.fire({
                 icon: "success",
@@ -438,12 +442,26 @@ export default {
           });
         });
     },
+    showPropertyModal() {
+      if (this.create.property_id == 0) {
+        this.$bvModal.show("property-create");
+        this.create.property_id = null;
+      }
+    },
+    showPropertyModalEdit() {
+      if (this.edit.property_id == 0) {
+        this.$bvModal.show("property-create");
+        this.edit.property_id = null;
+      }
+    },
 
     async getProperties() {
       await adminApi
         .get(`/tree-properties`)
         .then((res) => {
-          this.properties = res.data.data;
+          let l = res.data.data;
+          l.unshift({ id: 0, name: "اضف خاصية", name_e: "Add Property" });
+          this.properties = l;
         })
         .catch((err) => {
           Swal.fire({
@@ -490,29 +508,34 @@ export default {
       }
     },
   },
-    beforeRouteEnter(to, from, next) {
-        next((vm) => {
-          if(vm.$store.state.auth.work_flow_trees.includes('properties-e')  || vm.$store.state.auth.user.type == 'super_admin'){
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      if (
+        vm.$store.state.auth.work_flow_trees.includes("properties-e") ||
+        vm.$store.state.auth.user.type == "super_admin"
+      ) {
         Swal.fire({
-                    icon: "error",
-                    title: `${vm.$t("general.Error")}`,
-                    text: `${vm.$t("general.ModuleExpired")}`,
-                  });
+          icon: "error",
+          title: `${vm.$t("general.Error")}`,
+          text: `${vm.$t("general.ModuleExpired")}`,
+        });
+        return vm.$router.push({ name: "home" });
+      } else if (
+        vm.$store.state.auth.work_flow_trees.includes("screen properties") ||
+        vm.$store.state.auth.work_flow_trees.includes("properties")
+      ) {
+        return true;
+      } else {
         return vm.$router.push({ name: "home" });
       }
-            else if (vm.$store.state.auth.work_flow_trees.includes('screen properties') || vm.$store.state.auth.work_flow_trees.includes('properties')) {
-                return true;
-            } else {
-                return vm.$router.push({ name: "home" });
-            }
-        });
-    },
-
+    });
+  },
 };
 </script>
 
 <template>
   <Layout>
+    <Property @created="getProperties" />
     <PageHeader />
     <div class="row">
       <div class="col-12">
@@ -533,13 +556,13 @@ export default {
                       v-model="filterSetting"
                       value="screen_id"
                       class="mb-1"
-                      >{{ $t("general.Screen") }}</b-form-checkbox
+                      >{{ getCompanyKey("screen") }}</b-form-checkbox
                     >
                     <b-form-checkbox
                       v-model="filterSetting"
                       value="property_id"
                       class="mb-1"
-                      >{{ getCompanyKey("screen") }}</b-form-checkbox
+                      >{{ getCompanyKey("property") }}</b-form-checkbox
                     >
                   </b-dropdown>
                   <!-- Basic dropdown -->
@@ -629,10 +652,10 @@ export default {
                     class="dropdown-custom-ali"
                   >
                     <b-form-checkbox v-model="setting.screen_id" class="mb-1"
-                      >{{ $t("general.Screen") }}
+                      >{{ getCompanyKey("screen") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="setting.property_id" class="mb-1">
-                      {{ getCompanyKey("screen") }}
+                      {{ getCompanyKey("property") }}
                     </b-form-checkbox>
                     <div class="d-flex justify-content-end">
                       <a href="javascript:void(0)" class="btn btn-primary btn-sm">{{
@@ -772,6 +795,7 @@ export default {
                     <div class="form-group">
                       <label class="my-1 mr-2">{{ getCompanyKey("property") }}</label>
                       <multiselect
+                        @input="showPropertyModal"
                         v-model="create.property_id"
                         :options="properties.map((type) => type.id)"
                         :custom-label="
@@ -827,7 +851,7 @@ export default {
                     </th>
                     <th v-if="setting.screen_id">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("screen")}}</span>
+                        <span>{{ getCompanyKey("screen") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1000,9 +1024,10 @@ export default {
                             <div class="col-md-12">
                               <div class="form-group">
                                 <label class="my-1 mr-2">{{
-                                  $t("general.Screen")
+                                  getCompanyKey("screen")
                                 }}</label>
                                 <multiselect
+                                  @input="showPropertyModalEdit"
                                   v-model="edit.screen_id"
                                   :options="screens.map((type) => type.id)"
                                   :custom-label="

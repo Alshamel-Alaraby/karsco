@@ -13,9 +13,8 @@ use Spatie\MediaLibrary\HasMedia;
 
 class Country extends Model implements HasMedia
 {
-
-    use HasFactory, MediaTrait, SoftDeletes, LogTrait,ConnTrait;
-
+    use HasFactory, MediaTrait, SoftDeletes, LogTrait;
+    protected $table="general_countries";
     protected $fillable = [
         'name',
         'name_e',
@@ -26,6 +25,7 @@ class Country extends Model implements HasMedia
         "long_name",
         "long_name_e",
         "short_code",
+        "company_id",
     ];
 
     protected $casts = [
@@ -36,7 +36,7 @@ class Country extends Model implements HasMedia
     // relations
     public function governorates()
     {
-        return $this->hasMany(\App\Models\Governorate::class);
+        return $this->hasMany(\App\Models\Governorate::class,"country_id");
     }
 
     public function externalSalesmen()

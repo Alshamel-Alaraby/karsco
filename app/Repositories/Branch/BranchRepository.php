@@ -23,7 +23,7 @@ class BranchRepository implements BranchRepositoryInterface
         }
     }
 
-    public function create(array $data)
+    public function create($data)
     {
         DB::transaction(function () use ($data) {
             $this->model->create($data);

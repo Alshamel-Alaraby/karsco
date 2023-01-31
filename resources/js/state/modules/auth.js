@@ -13,6 +13,7 @@ export const state = {
     allWorkFlow: JSON.parse(localStorage.getItem("allWorkFlow")) || [],
     user: JSON.parse(localStorage.getItem("user")) || {},
     type: JSON.parse(localStorage.getItem("type")) || "",
+    notification: true
 }
 
 // getters
@@ -99,6 +100,10 @@ export const mutations = {
     editUser(state,user){
         state.user = user;
         localStorage.setItem('user',JSON.stringify(user));
+    },
+    editNotification(state,notification){
+        state.notification = notification;
+        localStorage.setItem('notification',JSON.stringify(notification));
     },
 };
 

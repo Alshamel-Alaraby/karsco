@@ -2,7 +2,7 @@
 import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
-import { required, minLength, maxLength } from "vuelidate/lib/validators";
+import { required, requiredIf, minLength, maxLength } from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import Multiselect from "vue-multiselect";
 import ErrorMessage from "../../../components/widgets/errorMessage";
@@ -18,7 +18,7 @@ export default {
     title: "Document Field",
     meta: [{ name: "description", content: "Document Field" }],
   },
-  mixins:[translation],
+  mixins: [translation],
   components: {
     Multiselect,
     Layout,
@@ -27,8 +27,8 @@ export default {
     loader,
   },
   beforeRouteEnter(to, from, next) {
-        next((vm) => {
-                              if (vm.$store.state.auth.work_flow_trees.includes("archiving-e")) {
+    next((vm) => {
+      if (vm.$store.state.auth.work_flow_trees.includes("archiving-e")) {
         Swal.fire({
           icon: "error",
           title: `${vm.$t("general.Error")}`,
@@ -37,13 +37,16 @@ export default {
         return vm.$router.push({ name: "home" });
       }
 
-
-            if (vm.$store.state.auth.work_flow_trees.includes('document field') || vm.$store.state.auth.work_flow_trees.includes('archiving') || vm.$store.state.auth.user.type == 'super_admin') {
-                return true;
-            } else {
-                return vm.$router.push({ name: "home" });
-            }
-        });
+      if (
+        vm.$store.state.auth.work_flow_trees.includes("document field") ||
+        vm.$store.state.auth.work_flow_trees.includes("archiving") ||
+        vm.$store.state.auth.user.type == "super_admin"
+      ) {
+        return true;
+      } else {
+        return vm.$router.push({ name: "home" });
+      }
+    });
   },
   updated() {
     $(".englishInput").keypress(function (event) {
@@ -75,22 +78,25 @@ export default {
       documentFields: [],
       enabled3: false,
       isLoader: false,
-      dataTypes:[],
+      dataTypes: [],
+      properties: [],
       create: {
         name: "",
         name_e: "",
         type: "",
         is_reference: 0,
-        lookup_table: '',
-        lookup_table_column: ''
+        lookup_table: "",
+        lookup_table_column: "",
+        tree_property_id: null,
       }, //Create form
       edit: {
         name: "",
         name_e: "",
         type: "",
         is_reference: 0,
-        lookup_table: '',
-        lookup_table_column: ''
+        lookup_table: "",
+        lookup_table_column: "",
+        tree_property_id: null,
       }, //Edit form
       setting: {
         name: true,
@@ -98,7 +104,7 @@ export default {
         type: true,
         is_reference: true,
         lookup_table: true,
-        lookup_table_column: true
+        lookup_table_column: true,
       }, //Table columns
       filterSetting: ["name", "name_e"],
       errors: {}, //Server Side Validation Errors
@@ -117,9 +123,14 @@ export default {
         maxLength: maxLength(255),
       },
       type: { required },
-      is_reference: {required},
+      is_reference: { required },
       lookup_table: {},
-      lookup_table_column: {}
+      lookup_table_column: {},
+      tree_property_id: {
+        required: requiredIf(function (model) {
+          return this.create.type == 10;
+        }),
+      },
     },
     edit: {
       name: { required, minLength: minLength(3), maxLength: maxLength(255) },
@@ -131,7 +142,12 @@ export default {
       type: { required },
       is_reference: { required },
       lookup_table: {},
-      lookup_table_column: {}
+      lookup_table_column: {},
+      tree_property_id: {
+        required: requiredIf(function (model) {
+          return this.edit.type == 10;
+        }),
+      },
     },
   },
   watch: {
@@ -169,6 +185,23 @@ export default {
     this.getData();
   },
   methods: {
+    async getProperties() {
+      await adminApi
+        .get(`/tree-properties/root-nodes`)
+        .then((res) => {
+          this.properties = res.data;
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: `${this.$t("general.Error")}`,
+            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+          });
+        })
+        .finally(() => {
+          this.isLoader = false;
+        });
+    },
     /**
      *  get Data document field
      */
@@ -201,12 +234,10 @@ export default {
           this.isLoader = false;
         });
     },
-     getDataTypes() {
+    getDataTypes() {
       this.isLoader = true;
       adminApi
-        .get(
-          `/data-types`
-        )
+        .get(`/data-types`)
         .then((res) => {
           this.dataTypes = res.data.data;
         })
@@ -232,7 +263,6 @@ export default {
         for (let i = 0; i > this.filterSetting.length; ++i) {
           filter += `columns[${i}]=${this.filterSetting[i]}&`;
         }
-
         adminApi
           .get(
             `/document-field?page=${this.current_page}&per_page=${this.per_page}&search=${this.search}&${filter}`
@@ -316,8 +346,8 @@ export default {
         if (result.value) {
           this.isLoader = true;
           adminApi
-            .post(`/document-field/bulk-delete`,{
-              ids : id
+            .post(`/document-field/bulk-delete`, {
+              ids: id,
             })
             .then((res) => {
               this.getData();
@@ -347,7 +377,14 @@ export default {
      *  reset Modal (create)
      */
     resetModalHidden() {
-      this.create = { name: "", name_e: "", type: "" , is_reference: 0,lookup_table: '',lookup_table_column: {}};
+      this.create = {
+        name: "",
+        name_e: "",
+        type: "",
+        is_reference: 0,
+        lookup_table: "",
+        lookup_table_column: {},
+      };
       this.$nextTick(() => {
         this.$v.$reset();
       });
@@ -357,9 +394,18 @@ export default {
      *  hidden Modal (create)
      */
     async resetModal() {
+      await this.getProperties();
       await this.getTables();
       this.getDataTypes();
-      this.create = { name: "", name_e: "", type: "" , is_reference: 0, lookup_table:"",lookup_table_column:''};
+      this.create = {
+        name: "",
+        name_e: "",
+        type: "",
+        is_reference: 0,
+        lookup_table: "",
+        lookup_table_column: "",
+        tree_property_id: null,
+      };
       this.is_disabled = false;
       this.$nextTick(() => {
         this.$v.$reset();
@@ -371,7 +417,15 @@ export default {
      */
     async resetForm() {
       await this.getTables();
-      this.create = { name: "", name_e: "", type: "" , is_reference: 0, lookup_table: "",lookup_table_column:''};
+      this.create = {
+        name: "",
+        name_e: "",
+        type: "",
+        is_reference: 0,
+        lookup_table: "",
+        lookup_table_column: "",
+        tree_property_id: null,
+      };
       this.is_disabled = false;
       this.$nextTick(() => {
         this.$v.$reset();
@@ -395,8 +449,8 @@ export default {
         adminApi
           .post(`/document-field`, {
             ...this.create,
-            data_type_id:this.create.type,
-            type:undefined,
+            data_type_id: this.create.type,
+            type: undefined,
             is_reference: this.create.is_reference == "1" ? 1 : 0,
           })
           .then((res) => {
@@ -441,15 +495,24 @@ export default {
       } else {
         this.isLoader = true;
         this.errors = {};
-        let { name, name_e,lookup_table, is_reference, type,lookup_table_column } = this.edit;
+        let {
+          name,
+          name_e,
+          lookup_table,
+          is_reference,
+          type,
+          lookup_table_column,
+          tree_property_id,
+        } = this.edit;
         adminApi
           .put(`/document-field/${id}`, {
             name,
             name_e,
             is_reference: is_reference == "1" ? 1 : 0,
-            data_type_id:type,
+            data_type_id: type,
             lookup_table_column,
-            lookup_table
+            lookup_table,
+            tree_property_id,
           })
           .then((res) => {
             this.$bvModal.hide(`modal-edit-${id}`);
@@ -485,8 +548,9 @@ export default {
     async resetModalEdit(id) {
       let documentField = this.documentFields.find((e) => id == e.id);
       await this.getTables();
-      if(documentField.lookup_table){
-          await this.getColumns(documentField.lookup_table);
+      await this.getProperties();
+      if (documentField.lookup_table) {
+        await this.getColumns(documentField.lookup_table);
       }
       this.getDataTypes();
       this.edit.name = documentField.name;
@@ -494,9 +558,10 @@ export default {
       this.edit.type = documentField.data_type.id;
       this.edit.is_reference = documentField.is_reference;
       this.edit.lookup_table = documentField.lookup_table;
-        if(this.edit.type == 'lookup(Table)'){
-            this.showInput = true;
-        }
+      this.edit.tree_property_id = documentField.tree_property_id;
+      if (this.edit.type == "lookup(Table)") {
+        this.showInput = true;
+      }
       this.edit.lookup_table_column = documentField.lookup_table_column;
       this.errors = {};
     },
@@ -510,8 +575,9 @@ export default {
         name_e: "",
         type: "",
         is_reference: 0,
-        lookup_table: '',
-        lookup_table_column: ''
+        lookup_table: "",
+        lookup_table_column: "",
+        tree_property_id: null,
       };
     },
 
@@ -530,52 +596,52 @@ export default {
       }
     },
     async getTables() {
-          this.isLoader = true;
+      this.isLoader = true;
 
-          await adminApi
-              .get(`/document-field/tables`)
-              .then((res) => {
-                  let l = res.data.data;
-                  this.tables = l;
-              })
-              .catch((err) => {
-                  Swal.fire({
-                      icon: "error",
-                      title: `${this.$t("general.Error")}`,
-                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
-                  });
-              })
-              .finally(() => {
-                  this.isLoader = false;
-              });
-      },
+      await adminApi
+        .get(`/document-field/tables`)
+        .then((res) => {
+          let l = res.data.data;
+          this.tables = l;
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: `${this.$t("general.Error")}`,
+            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+          });
+        })
+        .finally(() => {
+          this.isLoader = false;
+        });
+    },
     async getColumns(table) {
-          this.isLoader = true;
+      this.isLoader = true;
 
-          await adminApi
-              .get(`/document-field/columns/${table}`)
-              .then((res) => {
-                  let l = res.data.data;
-                  this.columns = l;
-              })
-              .catch((err) => {
-                  Swal.fire({
-                      icon: "error",
-                      title: `${this.$t("general.Error")}`,
-                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
-                  });
-              })
-              .finally(() => {
-                  this.isLoader = false;
-              });
-      },
-    lookUpChange(){
-        if(this.create.type == 11 || this.edit.type == 11){
-            this.showInput = true;
-        }else{
-            this.showInput = false;
-        }
-    }
+      await adminApi
+        .get(`/document-field/columns/${table}`)
+        .then((res) => {
+          let l = res.data.data;
+          this.columns = l;
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: `${this.$t("general.Error")}`,
+            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+          });
+        })
+        .finally(() => {
+          this.isLoader = false;
+        });
+    },
+    lookUpChange() {
+      if (this.create.type == 11 || this.edit.type == 11) {
+        this.showInput = true;
+      } else {
+        this.showInput = false;
+      }
+    },
   },
 };
 </script>
@@ -587,7 +653,6 @@ export default {
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-
             <div class="row justify-content-between align-items-center mb-2">
               <h4 class="header-title">{{ $t("DocumentField.DocumentFieldsTable") }}</h4>
               <div class="col-xs-10 col-md-9 col-lg-7" style="font-weight: 500">
@@ -601,12 +666,11 @@ export default {
                     class="btn-block setting-search"
                   >
                     <b-form-checkbox v-model="filterSetting" value="name" class="mb-1">
-                        {{ getCompanyKey('documentFieldName') }}
+                      {{ getCompanyKey("documentFieldName") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="filterSetting" value="name_e" class="mb-1">
-                        {{ getCompanyKey('documentFieldNameE') }}
-                    </b-form-checkbox
-                    >
+                      {{ getCompanyKey("documentFieldNameE") }}
+                    </b-form-checkbox>
                   </b-dropdown>
                   <!-- Basic dropdown -->
                 </div>
@@ -705,22 +769,22 @@ export default {
                     class="dropdown-custom-ali"
                   >
                     <b-form-checkbox v-model="setting.name" class="mb-1"
-                      >{{ getCompanyKey('documentFieldName') }}
+                      >{{ getCompanyKey("documentFieldName") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="setting.name_e" class="mb-1">
-                      {{ getCompanyKey('documentFieldNameE') }}
+                      {{ getCompanyKey("documentFieldNameE") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="setting.type" class="mb-1">
-                      {{ getCompanyKey('document-field-type') }}
+                      {{ getCompanyKey("document-field-type") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="setting.is_reference" class="mb-1">
-                      {{ getCompanyKey('document-field-reference') }}
+                      {{ getCompanyKey("document-field-reference") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="setting.lookup_table" class="mb-1">
-                         {{ getCompanyKey('document-field-lookup') }}
+                      {{ getCompanyKey("document-field-lookup") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="setting.lookup_table_column" class="mb-1">
-                        {{ getCompanyKey('document-field-lookup_column') }}
+                      {{ getCompanyKey("document-field-lookup_column") }}
                     </b-form-checkbox>
                     <div class="d-flex justify-content-end">
                       <a href="javascript:void(0)" class="btn btn-primary btn-sm">{{
@@ -732,7 +796,8 @@ export default {
                   <!-- start Pagination -->
                   <div class="d-inline-flex align-items-center pagination-custom">
                     <div class="d-inline-block" style="font-size: 15px">
-                      {{ documentFieldPagination.from }}-{{ documentFieldPagination.to }} /
+                      {{ documentFieldPagination.from }}-{{ documentFieldPagination.to }}
+                      /
                       {{ documentFieldPagination.total }}
                     </div>
                     <div class="d-inline-block">
@@ -825,10 +890,10 @@ export default {
                   <!-- End Cancel Button Modal -->
                 </div>
                 <div class="row">
-                    <div class="col-md-6 direction" dir="rtl">
+                  <div class="col-md-6 direction" dir="rtl">
                     <div class="form-group">
                       <label for="field-1" class="control-label">
-                        {{ getCompanyKey('documentFieldName') }}
+                        {{ getCompanyKey("documentFieldName") }}
                         <span class="text-danger">*</span>
                       </label>
                       <input
@@ -860,10 +925,10 @@ export default {
                       </template>
                     </div>
                   </div>
-                    <div class="col-md-6 direction-ltr" dir="ltr">
+                  <div class="col-md-6 direction-ltr" dir="ltr">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
-                        {{ getCompanyKey('documentFieldNameE') }}
+                        {{ getCompanyKey("documentFieldNameE") }}
                         <span class="text-danger">*</span>
                       </label>
                       <input
@@ -895,109 +960,165 @@ export default {
                       </template>
                     </div>
                   </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>
-                                {{ getCompanyKey('document-field-type') }}
-                                <span class="text-danger">*</span>
-                            </label>
-                            <select
-                                class="custom-select"
-                                @change="lookUpChange"
-                                v-model="$v.create.type.$model"
-                                :class="{
-                                      'is-invalid': $v.create.type.$error || errors.type,
-                                      'is-valid':
-                                        !$v.create.type.$invalid && !errors.type,
-                                    }"
-                            >
-                                <option v-for="type in dataTypes" :key="type.id" :value="type.id">{{ $i18n.locale=="ar"?type.name:type.name_e }}...</option>
-                            </select>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>
+                        {{ getCompanyKey("document-field-type") }}
+                        <span class="text-danger">*</span>
+                      </label>
+                      <select
+                        class="custom-select"
+                        @change="lookUpChange"
+                        v-model="$v.create.type.$model"
+                        :class="{
+                          'is-invalid': $v.create.type.$error || errors.type,
+                          'is-valid': !$v.create.type.$invalid && !errors.type,
+                        }"
+                      >
+                        <option v-for="type in dataTypes" :key="type.id" :value="type.id">
+                          {{ $i18n.locale == "ar" ? type.name : type.name_e }}...
+                        </option>
+                      </select>
 
-                            <template v-if="errors.type">
-                                <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.type"
-                                    :key="index"
-                                >{{ errorMessage }}</ErrorMessage
-                                >
-                            </template>
-                        </div>
+                      <template v-if="errors.type">
+                        <ErrorMessage
+                          v-for="(errorMessage, index) in errors.type"
+                          :key="index"
+                          >{{ errorMessage }}</ErrorMessage
+                        >
+                      </template>
                     </div>
-                    <div class="col-md-6" v-show="showInput">
-                        <div class="form-group position-relative">
-                            <label class="control-label">
-                                {{ getCompanyKey("document-field-lookup") }}
-                                <span class="text-danger">*</span>
-                            </label>
-                            <multiselect
-                                @input="getColumns(create.lookup_table)"
-                                v-model="$v.create.lookup_table.$model"
-                                :options="tables"
-                                :custom-label="(opt) => opt"
-                            >
-                            </multiselect>
-                            <div
-                                v-if="$v.create.lookup_table.$error || errors.lookup_table"
-                                class="text-danger"
-                            >
-                                {{ $t("general.fieldIsRequired") }}
-                            </div>
-                            <template v-if="errors.lookup_table">
-                                <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.lookup_table"
-                                    :key="index"
-                                >{{ errorMessage }}
-                                </ErrorMessage>
-                            </template>
-                        </div>
+                  </div>
+                  <div v-if="create.type == 10" class="col-md-6">
+                    <div class="form-group">
+                      <label>
+                        {{ getCompanyKey("property") }}
+                        <span class="text-danger">*</span>
+                      </label>
+                      <select
+                        class="custom-select"
+                        v-model="$v.create.tree_property_id.$model"
+                        :class="{
+                          'is-invalid':
+                            $v.create.tree_property_id.$error || errors.tree_property_id,
+                          'is-valid':
+                            !$v.create.tree_property_id.$invalid &&
+                            !errors.tree_property_id,
+                        }"
+                      >
+                        <option
+                          v-for="property in properties"
+                          :key="property.id"
+                          :value="property.id"
+                        >
+                          {{ $i18n.locale == "ar" ? property.name : property.name_e }}
+                        </option>
+                      </select>
+
+                      <template v-if="errors.type">
+                        <ErrorMessage
+                          v-for="(errorMessage, index) in errors.type"
+                          :key="index"
+                          >{{ errorMessage }}</ErrorMessage
+                        >
+                      </template>
                     </div>
-                    <div class="col-md-6" v-show="create.lookup_table">
-                        <div class="form-group position-relative">
-                            <label class="control-label">
-                                {{ getCompanyKey("document-field-lookup_column") }}
-                                <span class="text-danger">*</span>
-                            </label>
-                            <multiselect
-                                v-model="$v.create.lookup_table_column.$model"
-                                :options="columns"
-                                :custom-label="(opt) => opt"
-                            >
-                            </multiselect>
-                            <div
-                                v-if="$v.create.lookup_table_column.$error || errors.lookup_table_column"
-                                class="text-danger"
-                            >
-                                {{ $t("general.fieldIsRequired") }}
-                            </div>
-                            <template v-if="errors.lookup_table_column">
-                                <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.lookup_table_column"
-                                    :key="index"
-                                >{{ errorMessage }}
-                                </ErrorMessage>
-                            </template>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group">
-                          <label class=" mr-2" >
-                              {{ getCompanyKey('document-field-reference') }}
-                              <span class="text-danger">*</span>
-                          </label>
-                          <b-form-group :class="{
-                          'is-invalid':$v.create.is_reference.$error || errors.is_reference,
-                          'is-valid':!$v.create.is_reference.$invalid && !errors.is_reference
-                      }">
-                          <b-form-radio class="d-inline-block" v-model="$v.create.is_reference.$model" name="some-radios" value="1">{{$t('general.isReferenceYes')}}</b-form-radio>
-                          <b-form-radio class="d-inline-block m-1" v-model="$v.create.is_reference.$model" name="some-radios" value="0">{{$t('general.isReferenceNo')}}</b-form-radio>
-                          </b-form-group>
-                          <template v-if="errors.is_reference">
-                              <ErrorMessage
-                                  v-for="(errorMessage,index) in errors.is_reference"
-                                  :key="index">{{ errorMessage }}
-                              </ErrorMessage>
-                          </template>
+                  </div>
+                  <div class="col-md-6" v-show="showInput">
+                    <div class="form-group position-relative">
+                      <label class="control-label">
+                        {{ getCompanyKey("document-field-lookup") }}
+                        <span class="text-danger">*</span>
+                      </label>
+                      <multiselect
+                        @input="getColumns(create.lookup_table)"
+                        v-model="$v.create.lookup_table.$model"
+                        :options="tables"
+                        :custom-label="(opt) => opt"
+                      >
+                      </multiselect>
+                      <div
+                        v-if="$v.create.lookup_table.$error || errors.lookup_table"
+                        class="text-danger"
+                      >
+                        {{ $t("general.fieldIsRequired") }}
                       </div>
+                      <template v-if="errors.lookup_table">
+                        <ErrorMessage
+                          v-for="(errorMessage, index) in errors.lookup_table"
+                          :key="index"
+                          >{{ errorMessage }}
+                        </ErrorMessage>
+                      </template>
+                    </div>
+                  </div>
+                  <div class="col-md-6" v-show="create.lookup_table">
+                    <div class="form-group position-relative">
+                      <label class="control-label">
+                        {{ getCompanyKey("document-field-lookup_column") }}
+                        <span class="text-danger">*</span>
+                      </label>
+                      <multiselect
+                        v-model="$v.create.lookup_table_column.$model"
+                        :options="columns"
+                        :custom-label="(opt) => opt"
+                      >
+                      </multiselect>
+                      <div
+                        v-if="
+                          $v.create.lookup_table_column.$error ||
+                          errors.lookup_table_column
+                        "
+                        class="text-danger"
+                      >
+                        {{ $t("general.fieldIsRequired") }}
+                      </div>
+                      <template v-if="errors.lookup_table_column">
+                        <ErrorMessage
+                          v-for="(errorMessage, index) in errors.lookup_table_column"
+                          :key="index"
+                          >{{ errorMessage }}
+                        </ErrorMessage>
+                      </template>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="mr-2">
+                        {{ getCompanyKey("document-field-reference") }}
+                        <span class="text-danger">*</span>
+                      </label>
+                      <b-form-group
+                        :class="{
+                          'is-invalid':
+                            $v.create.is_reference.$error || errors.is_reference,
+                          'is-valid':
+                            !$v.create.is_reference.$invalid && !errors.is_reference,
+                        }"
+                      >
+                        <b-form-radio
+                          class="d-inline-block"
+                          v-model="$v.create.is_reference.$model"
+                          name="some-radios"
+                          value="1"
+                          >{{ $t("general.isReferenceYes") }}</b-form-radio
+                        >
+                        <b-form-radio
+                          class="d-inline-block m-1"
+                          v-model="$v.create.is_reference.$model"
+                          name="some-radios"
+                          value="0"
+                          >{{ $t("general.isReferenceNo") }}</b-form-radio
+                        >
+                      </b-form-group>
+                      <template v-if="errors.is_reference">
+                        <ErrorMessage
+                          v-for="(errorMessage, index) in errors.is_reference"
+                          :key="index"
+                          >{{ errorMessage }}
+                        </ErrorMessage>
+                      </template>
+                    </div>
                   </div>
                 </div>
               </form>
@@ -1025,7 +1146,7 @@ export default {
                     </th>
                     <th v-if="setting.name">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('documentFieldName') }}</span>
+                        <span>{{ getCompanyKey("documentFieldName") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1040,7 +1161,7 @@ export default {
                     </th>
                     <th v-if="setting.name_e">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('documentFieldNameE') }}</span>
+                        <span>{{ getCompanyKey("documentFieldNameE") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1055,7 +1176,7 @@ export default {
                     </th>
                     <th v-if="setting.is_reference">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('document-field-reference') }}</span>
+                        <span>{{ getCompanyKey("document-field-reference") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1070,7 +1191,7 @@ export default {
                     </th>
                     <th v-if="setting.type">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('document-field-type') }}</span>
+                        <span>{{ getCompanyKey("document-field-type") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1084,11 +1205,11 @@ export default {
                       </div>
                     </th>
                     <td v-if="setting.lookup_table">
-                          {{ getCompanyKey('document-field-lookup') }}
-                      </td>
+                      {{ getCompanyKey("document-field-lookup") }}
+                    </td>
                     <td v-if="setting.lookup_table_column">
-                          {{ getCompanyKey('document-field-lookup_column') }}
-                      </td>
+                      {{ getCompanyKey("document-field-lookup_column") }}
+                    </td>
                     <th>
                       {{ $t("general.Action") }}
                     </th>
@@ -1135,13 +1256,19 @@ export default {
                       </span>
                     </td>
                     <td v-if="setting.type">
-                      <h5 class="m-0 font-weight-normal">{{$i18n.locale == 'ar' ? data.data_type.name : data.data_type.name_e }}</h5>
+                      <h5 class="m-0 font-weight-normal">
+                        {{
+                          $i18n.locale == "ar"
+                            ? data.data_type.name
+                            : data.data_type.name_e
+                        }}
+                      </h5>
                     </td>
                     <td v-if="setting.lookup_table">
-                        {{ data.lookup_table ? data.lookup_table : '-'}}
+                      {{ data.lookup_table ? data.lookup_table : "-" }}
                     </td>
                     <td v-if="setting.lookup_table_column">
-                        {{ data.lookup_table_column ? data.lookup_table_column : '-' }}
+                      {{ data.lookup_table_column ? data.lookup_table_column : "-" }}
                     </td>
                     <td>
                       <div class="btn-group">
@@ -1224,7 +1351,7 @@ export default {
                             <div class="col-md-6 direction" dir="rtl">
                               <div class="form-group">
                                 <label for="field-u-1" class="control-label">
-                                  {{ getCompanyKey('documentFieldName') }}
+                                  {{ getCompanyKey("documentFieldName") }}
                                   <span class="text-danger">*</span>
                                 </label>
                                 <input
@@ -1266,7 +1393,7 @@ export default {
                             <div class="col-md-6 direction-ltr" dir="ltr">
                               <div class="form-group">
                                 <label for="field-u-2" class="control-label">
-                                  {{ getCompanyKey('documentFieldNameE') }}
+                                  {{ getCompanyKey("documentFieldNameE") }}
                                   <span class="text-danger">*</span>
                                 </label>
                                 <input
@@ -1306,107 +1433,179 @@ export default {
                                 </template>
                               </div>
                             </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                      <label>
-                                          {{ getCompanyKey('document-field-type') }}
-                                          <span class="text-danger">*</span>
-                                      </label>
-                                      <select
-                                          class="custom-select"
-                                          @change="lookUpChange"
-                                          v-model="$v.edit.type.$model"
-                                          :class="{
-                                          'is-invalid': $v.edit.type.$error || errors.type,
-                                          'is-valid':
-                                            !$v.edit.type.$invalid && !errors.type,
-                                        }"
-                                      >
-                                          <option v-for="type in dataTypes" :key="type.id" :value="type.id">{{ $i18n.locale=="ar"?type.name:type.name_e }}...</option>
-                                      </select>
-                                      <template v-if="errors.type">
-                                          <ErrorMessage
-                                              v-for="(errorMessage, index) in errors.type"
-                                              :key="index"
-                                          >{{ errorMessage }}</ErrorMessage
-                                          >
-                                      </template>
-                                  </div>
-                              </div>
-                              <div class="col-md-6" v-show="showInput">
-                                  <div class="form-group position-relative">
-                                      <label class="control-label">
-                                          {{ getCompanyKey("document-field-lookup_column") }}
-                                          <span class="text-danger">*</span>
-                                      </label>
-                                      <multiselect
-                                          @input="getColumns(edit.lookup_table)"
-                                          v-model="$v.edit.lookup_table.$model"
-                                          :options="tables"
-                                          :custom-label="(opt) => opt"
-                                      >
-                                      </multiselect>
-                                      <div
-                                          v-if="$v.edit.lookup_table.$error || errors.lookup_table"
-                                          class="text-danger"
-                                      >
-                                          {{ $t("general.fieldIsRequired") }}
-                                      </div>
-                                      <template v-if="errors.lookup_table">
-                                          <ErrorMessage
-                                              v-for="(errorMessage, index) in errors.lookup_table"
-                                              :key="index"
-                                          >{{ errorMessage }}
-                                          </ErrorMessage>
-                                      </template>
-                                  </div>
-                              </div>
-                              <div class="col-md-6" v-show="edit.lookup_table">
-                                  <div class="form-group position-relative">
-                                      <label class="control-label">
-                                          {{ getCompanyKey("document-field-lookup") }}
-                                          <span class="text-danger">*</span>
-                                      </label>
-                                      <multiselect
-                                          v-model="$v.edit.lookup_table_column.$model"
-                                          :options="columns"
-                                          :custom-label="(opt) => opt"
-                                      >
-                                      </multiselect>
-                                      <div
-                                          v-if="$v.edit.lookup_table_column.$error || errors.lookup_table_column"
-                                          class="text-danger"
-                                      >
-                                          {{ $t("general.fieldIsRequired") }}
-                                      </div>
-                                      <template v-if="errors.lookup_table_column">
-                                          <ErrorMessage
-                                              v-for="(errorMessage, index) in errors.lookup_table_column"
-                                              :key="index"
-                                          >{{ errorMessage }}
-                                          </ErrorMessage>
-                                      </template>
-                                  </div>
-                              </div>
                             <div class="col-md-6">
                               <div class="form-group">
-                                  <label class=" mr-2" >
-                                      {{ getCompanyKey('document-field-reference') }}
-                                      <span class="text-danger">*</span>
-                                  </label>
-                                  <b-form-group :class="{
-                                          'is-invalid':$v.edit.is_reference.$error || errors.is_reference,
-                                          'is-valid':!$v.edit.is_reference.$invalid && !errors.is_reference
-                                      }">
-                                      <b-form-radio class="d-inline-block" v-model="$v.edit.is_reference.$model" name="some-radios" value="1">{{$t('general.isReferenceYes')}}</b-form-radio>
-                                      <b-form-radio class="d-inline-block m-1" v-model="$v.edit.is_reference.$model" name="some-radios" value="0">{{$t('general.isReferenceNo')}}</b-form-radio>
-                                  </b-form-group>
-                                  <template v-if="errors.is_reference">
-                                      <ErrorMessage
-                                          v-for="(errorMessage,index) in errors.is_reference"
-                                          :key="index">{{ errorMessage }}
-                                      </ErrorMessage>
-                                  </template>
+                                <label>
+                                  {{ getCompanyKey("document-field-type") }}
+                                  <span class="text-danger">*</span>
+                                </label>
+                                <select
+                                  class="custom-select"
+                                  @change="lookUpChange"
+                                  v-model="$v.edit.type.$model"
+                                  :class="{
+                                    'is-invalid': $v.edit.type.$error || errors.type,
+                                    'is-valid': !$v.edit.type.$invalid && !errors.type,
+                                  }"
+                                >
+                                  <option
+                                    v-for="type in dataTypes"
+                                    :key="type.id"
+                                    :value="type.id"
+                                  >
+                                    {{
+                                      $i18n.locale == "ar" ? type.name : type.name_e
+                                    }}...
+                                  </option>
+                                </select>
+                                <template v-if="errors.type">
+                                  <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.type"
+                                    :key="index"
+                                    >{{ errorMessage }}</ErrorMessage
+                                  >
+                                </template>
+                              </div>
+                            </div>
+                            <div v-if="edit.type == 10" class="col-md-6">
+                              <div class="form-group">
+                                <label>
+                                  {{ getCompanyKey("property") }}
+                                  <span class="text-danger">*</span>
+                                </label>
+                                <select
+                                  class="custom-select"
+                                  v-model="$v.edit.tree_property_id.$model"
+                                  :class="{
+                                    'is-invalid':
+                                      $v.edit.tree_property_id.$error ||
+                                      errors.tree_property_id,
+                                    'is-valid':
+                                      !$v.edit.tree_property_id.$invalid &&
+                                      !errors.tree_property_id,
+                                  }"
+                                >
+                                  <option
+                                    v-for="property in properties"
+                                    :key="property.id"
+                                    :value="property.id"
+                                  >
+                                    {{
+                                      $i18n.locale == "ar"
+                                        ? property.name
+                                        : property.name_e
+                                    }}
+                                  </option>
+                                </select>
+
+                                <template v-if="errors.type">
+                                  <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.type"
+                                    :key="index"
+                                    >{{ errorMessage }}</ErrorMessage
+                                  >
+                                </template>
+                              </div>
+                            </div>
+                            <div class="col-md-6" v-show="showInput">
+                              <div class="form-group position-relative">
+                                <label class="control-label">
+                                  {{ getCompanyKey("document-field-lookup_column") }}
+                                  <span class="text-danger">*</span>
+                                </label>
+                                <multiselect
+                                  @input="getColumns(edit.lookup_table)"
+                                  v-model="$v.edit.lookup_table.$model"
+                                  :options="tables"
+                                  :custom-label="(opt) => opt"
+                                >
+                                </multiselect>
+                                <div
+                                  v-if="
+                                    $v.edit.lookup_table.$error || errors.lookup_table
+                                  "
+                                  class="text-danger"
+                                >
+                                  {{ $t("general.fieldIsRequired") }}
+                                </div>
+                                <template v-if="errors.lookup_table">
+                                  <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.lookup_table"
+                                    :key="index"
+                                    >{{ errorMessage }}
+                                  </ErrorMessage>
+                                </template>
+                              </div>
+                            </div>
+                            <div class="col-md-6" v-show="edit.lookup_table">
+                              <div class="form-group position-relative">
+                                <label class="control-label">
+                                  {{ getCompanyKey("document-field-lookup") }}
+                                  <span class="text-danger">*</span>
+                                </label>
+                                <multiselect
+                                  v-model="$v.edit.lookup_table_column.$model"
+                                  :options="columns"
+                                  :custom-label="(opt) => opt"
+                                >
+                                </multiselect>
+                                <div
+                                  v-if="
+                                    $v.edit.lookup_table_column.$error ||
+                                    errors.lookup_table_column
+                                  "
+                                  class="text-danger"
+                                >
+                                  {{ $t("general.fieldIsRequired") }}
+                                </div>
+                                <template v-if="errors.lookup_table_column">
+                                  <ErrorMessage
+                                    v-for="(
+                                      errorMessage, index
+                                    ) in errors.lookup_table_column"
+                                    :key="index"
+                                    >{{ errorMessage }}
+                                  </ErrorMessage>
+                                </template>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="mr-2">
+                                  {{ getCompanyKey("document-field-reference") }}
+                                  <span class="text-danger">*</span>
+                                </label>
+                                <b-form-group
+                                  :class="{
+                                    'is-invalid':
+                                      $v.edit.is_reference.$error || errors.is_reference,
+                                    'is-valid':
+                                      !$v.edit.is_reference.$invalid &&
+                                      !errors.is_reference,
+                                  }"
+                                >
+                                  <b-form-radio
+                                    class="d-inline-block"
+                                    v-model="$v.edit.is_reference.$model"
+                                    name="some-radios"
+                                    value="1"
+                                    >{{ $t("general.isReferenceYes") }}</b-form-radio
+                                  >
+                                  <b-form-radio
+                                    class="d-inline-block m-1"
+                                    v-model="$v.edit.is_reference.$model"
+                                    name="some-radios"
+                                    value="0"
+                                    >{{ $t("general.isReferenceNo") }}</b-form-radio
+                                  >
+                                </b-form-group>
+                                <template v-if="errors.is_reference">
+                                  <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.is_reference"
+                                    :key="index"
+                                    >{{ errorMessage }}
+                                  </ErrorMessage>
+                                </template>
                               </div>
                             </div>
                           </div>
@@ -1427,7 +1626,6 @@ export default {
                   </tr>
                 </tbody>
               </table>
-
             </div>
             <!-- end .table-responsive-->
           </div>

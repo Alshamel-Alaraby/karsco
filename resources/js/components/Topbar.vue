@@ -1,6 +1,7 @@
 <script>
 import adminApi from "../api/adminAxios";
 import router from "../router";
+import Notification from "./notification";
 
 /**
  * Topbar component
@@ -28,6 +29,9 @@ export default {
          archiving: ['arch-departments','archiving screen','arch-doc-status','document-fields','gen-arch-doc-types']
       }
     };
+  },
+  components: {
+      Notification
   },
   mounted() {
     this.value = this.languages.find((x) => x.language === this.$i18n.locale);
@@ -115,7 +119,7 @@ export default {
       /**
        *  Logout Dashboard
        */
-     async logout(){
+    async logout(){
         await adminApi.post(`/auth/logout`)
               .then((res) => {
                   this.$store.commit('auth/logoutToken');
@@ -175,130 +179,10 @@ export default {
             />
             <span class="align-middle">{{ entry.title }}</span>
           </b-dropdown-item>
+
         </b-nav-item-dropdown>
-        <b-nav-item-dropdown
-          right
-          class="notification-list"
-          menu-class="dropdown-lg"
-        >
-          <template slot="button-content" class="nav-link dropdown-toggle">
-            <i class="fe-bell noti-icon"></i>
-            <span class="badge badge-danger rounded-circle noti-icon-badge">{{
-              $t("navbar.dropdown.notification.badge")
-            }}</span>
-          </template>
 
-          <a href="#" class="dropdown-item noti-title">
-            <h5 class="m-0">
-              <span class="float-right">
-                <a href class="text-dark">
-                  <small>{{
-                    $t("navbar.dropdown.notification.subtext")
-                  }}</small>
-                </a>
-              </span>
-              {{ $t("navbar.dropdown.notification.text") }}
-            </h5>
-          </a>
-
-          <simplebar style="max-height: 230px">
-            <a
-              href="javascript:void(0);"
-              class="dropdown-item notify-item active"
-            >
-              <div class="notify-icon bg-soft-primary text-primary">
-                <i class="mdi mdi-comment-account-outline"></i>
-              </div>
-              <p class="notify-details">
-                {{ $t("navbar.dropdown.notification.1.title") }}
-                <small class="text-muted">{{
-                  $t("navbar.dropdown.notification.1.text")
-                }}</small>
-              </p>
-            </a>
-
-            <!-- item-->
-            <a href="javascript:void(0);" class="dropdown-item notify-item">
-              <div class="notify-icon">
-                <img
-                  src="../assets/images/users/avatar-2.jpg"
-                  class="img-fluid rounded-circle"
-                  alt
-                />
-              </div>
-              <p class="notify-details">
-                {{ $t("navbar.dropdown.notification.2.title") }}
-              </p>
-              <p class="text-muted mb-0 user-msg">
-                <small>{{ $t("navbar.dropdown.notification.2.text") }}</small>
-              </p>
-            </a>
-
-            <!-- item-->
-            <a href="javascript:void(0);" class="dropdown-item notify-item">
-              <div class="notify-icon">
-                <img
-                  src="../assets/images/users/avatar-4.jpg"
-                  class="img-fluid rounded-circle"
-                  alt
-                />
-              </div>
-              <p class="notify-details">
-                {{ $t("navbar.dropdown.notification.3.title") }}
-              </p>
-              <p class="text-muted mb-0 user-msg">
-                <small>{{ $t("navbar.dropdown.notification.3.text") }}</small>
-              </p>
-            </a>
-
-            <!-- item-->
-            <a href="javascript:void(0);" class="dropdown-item notify-item">
-              <div class="notify-icon bg-soft-warning text-warning">
-                <i class="mdi mdi-account-plus"></i>
-              </div>
-              <p class="notify-details">
-                {{ $t("navbar.dropdown.notification.4.title") }}
-                <small class="text-muted">{{
-                  $t("navbar.dropdown.notification.4.text")
-                }}</small>
-              </p>
-            </a>
-
-            <!-- item-->
-            <a href="javascript:void(0);" class="dropdown-item notify-item">
-              <div class="notify-icon bg-info">
-                <i class="mdi mdi-comment-account-outline"></i>
-              </div>
-              <p class="notify-details">
-                {{ $t("navbar.dropdown.notification.5.title") }}
-                <small class="text-muted">{{
-                  $t("navbar.dropdown.notification.5.text")
-                }}</small>
-              </p>
-            </a>
-
-            <!-- item-->
-            <a href="javascript:void(0);" class="dropdown-item notify-item">
-              <div class="notify-icon bg-secondary">
-                <i class="mdi mdi-heart"></i>
-              </div>
-              <p class="notify-details">
-                {{ $t("navbar.dropdown.notification.6.title") }}
-                <small class="text-muted">{{
-                  $t("navbar.dropdown.notification.6.text")
-                }}</small>
-              </p>
-            </a>
-          </simplebar>
-
-          <a
-            href="javascript:void(0);"
-            class="dropdown-item text-center text-primary notify-item notify-all"
-          >
-            {{ $t("navbar.dropdown.notification.button") }}
-            <i class="fi-arrow-right"></i>
-          </a>
-        </b-nav-item-dropdown>
+        <Notification />
 
         <b-nav-item-dropdown
           right

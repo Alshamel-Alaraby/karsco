@@ -27,11 +27,11 @@ class CreateCityRequest extends FormRequest
     public function rules()
     {
         return [
-            "name" => "required|unique:cities,name",
-            "name_e" => "required|unique:cities,name_e",
-            "country_id" => "required|exists:countries,id",
-            "governorate_id" => "required|exists:governorates,id",
+            "name" => "required|unique:general_cities,name",
+            "name_e" => "required|unique:general_cities,name_e",
+            "country_id" => "required|exists:general_countries,id",
+            "governorate_id" => "required|exists:general_governorates,id",
+            "company_id" => "required"
         ];
     }
-
 }

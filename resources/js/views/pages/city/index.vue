@@ -434,7 +434,7 @@ export default {
         this.is_disabled = false;
 
         adminApi
-          .post(`/cities`, this.create)
+          .post(`/cities`, {...this.create,company_id:this.$store.getters["auth/company_id"]})
           .then((res) => {
             this.getData();
             this.is_disabled = true;

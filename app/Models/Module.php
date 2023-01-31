@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Module extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
+    use HasFactory, SoftDeletes, LogTrait;
+    protected $table = 'general_modules';
 
     protected $fillable = [
         'name',

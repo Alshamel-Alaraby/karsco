@@ -69,7 +69,14 @@ export default [
     ...realEstate,
     ...archiving,
     ...recievablePayable,
-    //**********************************************
+    {
+        path: '/dashboard/notifications',
+        name: 'notifications',
+        meta: {
+            middleware: [auth,checkAuth]
+        },
+        component: () => import('../views/pages/notification')
+    },
     {
         path: '/dashboard/',
         name: 'home',
@@ -78,6 +85,7 @@ export default [
         },
         component: () => import('../views/pages/dashboard/sales/index')
     },
+    //**********************************************
     {
         path: '/dashboard/dashboard/crm',
         name: 'crm-dashboard',

@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             // CountrySeeder::class,
             TranslationSeeder::class,
             DataTypeSeeder::class,
-            UserSeeder::class
+             UserSeeder::class
         //    ArchiveFileSeeder::class
         ]);
 

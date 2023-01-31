@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class GeneralCustomer extends Model
 {
-    use HasFactory,LogTrait,ConnTrait;
+    use HasFactory,LogTrait;
+    protected $table = 'general_customers';
 
     protected $guarded = ['id'];
 }

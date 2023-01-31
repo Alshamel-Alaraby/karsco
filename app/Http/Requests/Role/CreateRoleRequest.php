@@ -19,7 +19,8 @@ class CreateRoleRequest extends FormRequest
         return [
             'name'=>['required'],
             'name_e'=>['required'],
-            'roletype_id'=>['required']
+            'roletype_id'=>['required'],
+            "company_id"=>"required"
         ];
     }
 

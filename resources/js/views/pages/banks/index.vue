@@ -63,6 +63,7 @@ export default {
                 country_id: null,
                 swift_code: "",
             },
+            company_id:null,
             edit: {
                 name: "",
                 name_e: "",
@@ -131,6 +132,7 @@ export default {
         },
     },
     mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
         this.getData();
     },
     updated() {
@@ -399,7 +401,7 @@ export default {
                 this.errors = {};
                 this.is_disabled = false;
                 adminApi
-                    .post(`/banks`, this.create)
+                    .post(`/banks`, {...this.create,company_id:this.company_id})
                     .then((res) => {
                         this.getData();
                         this.is_disabled = true;

@@ -24,7 +24,7 @@ class StoreBankAccountRequest extends FormRequest
     public function rules()
     {
         return [
-            "bank_id" => "required|exists:banks,id",
+            "bank_id" => "required|exists:general_banks,id",
             "account_number" => "required|string|max:255",
             "phone" => "required|string|max:255",
             "address" => "required|string|max:255",

@@ -20,6 +20,9 @@ class DocumentFieldRelationResource extends JsonResource
             'name_e' => $this->name_e,
             "data_type" => $this->dataTye,
             'is_reference' => $this->is_reference,
+            'lookup_table' => $this->lookup_table,
+            'lookup_table_column' => $this->lookup_table_column,
+            'tree_property_id' => $this->tree_property_id,
         ];
     }
 }

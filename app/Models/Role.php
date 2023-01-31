@@ -11,7 +11,9 @@ use Spatie\Activitylog\LogOptions;
 
 class Role extends Model
 {
-    use HasFactory,SoftDeletes, LogTrait,ConnTrait;
+    use HasFactory,SoftDeletes, LogTrait;
+    protected $table = 'general_roles';
+
     protected $guarded = ['id'];
 
     public function roleType()
@@ -21,7 +23,7 @@ class Role extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class,'role_user', 'role_id', 'user_id');
+        return $this->belongsToMany(User::class,'general_role_user', 'role_id', 'user_id');
     }
 
     public function workflows()

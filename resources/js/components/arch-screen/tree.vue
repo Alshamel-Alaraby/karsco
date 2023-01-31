@@ -1,6 +1,7 @@
 <template>
   <draggable class="dragArea" tag="div" :list="nodes">
     <div
+     class="tree-container"
       v-for="(node, index) in nodes"
       :key="index"
       :style="
@@ -107,7 +108,7 @@ export default {
   font-size: 16px;
 }
 .node {
-  font-size: 18px;
+  font-size: 16px;
 }
 .title-tree {
   font-size: 16px;
@@ -186,5 +187,8 @@ i {
 
 .active {
   color: #159a80 !important;
+}
+.tree-container span{
+  font-size:16px !important;
 }
 </style>

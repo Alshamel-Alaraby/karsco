@@ -24,8 +24,9 @@ class StoreWorkflowHotfieldRequest extends FormRequest
     public function rules()
     {
         return [
-            "workflow_id"     => "required|numeric" ,
-            "hotfield_id"   => "required|numeric" ,
+            "workflow_id"     => "required|numeric",
+            "hotfield_id"   => "required|numeric",
+            "company_id" => "required"
             // "workflow_name" => "required|string" ,
         ];
     }

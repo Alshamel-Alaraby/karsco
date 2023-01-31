@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserSettingScreen extends Model
 {
-    use HasFactory,ConnTrait;
+    use HasFactory;
 
     protected $guarded = [];
-    protected $table = "user_setting_screens";
+    protected $table = "general_user_setting_screens";
 
     public function screen()
     {

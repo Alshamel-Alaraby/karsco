@@ -11,7 +11,9 @@ use Spatie\Activitylog\LogOptions;
 
 class TreeProperty extends Model
 {
-    use HasFactory, LogTrait,ConnTrait;
+    use HasFactory, LogTrait;
+
+    protected $table="general_tree_properties";
 
     protected $guarded = ['id'];
     protected $appends = ['haveChildren'];

@@ -585,6 +585,8 @@
         }
     },
     "general": {
+        "from":"From",
+        "to":"to",
         "fields":"Fields",
         "workspace":"Workspace",
         "Admin":"Admin",
@@ -884,6 +886,12 @@
         "DocumentTable": "Document Table",
         "send": "Send",
         "AddedToFavoritesSuccessfully": "Added to favorites successfully",
-        "DeletedFromFavoritesSuccessfully":"Deleted from favorites successfully"
+        "DeletedFromFavoritesSuccessfully":"Deleted from favorites successfully",
+        "favorite": "Favorite",
+        "Showfavorite": "Show Favorite",
+        "DocumentName": "Document name",
+        "thisFieldIsUniq": "this Field Is Unique",
+        "true": "true",
+        "false": "false"
     }
 }

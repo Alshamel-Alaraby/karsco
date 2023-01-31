@@ -15,7 +15,8 @@ import translation from "../../helper/translation-mixin";
  */
 export default {
     props: [
-        "arch_doc_type_id"
+        "arch_doc_type_id",
+        "document_data"
     ],
     page: {
         title: "archiving",
@@ -328,6 +329,9 @@ export default {
 <template>
     <div class="row">
         <DocDepartment @create-arch-department="getDepartment"/>
+        <div class="col-md-12 text-center">
+            <h3>{{$t('general.DocumentName')}} : {{ $i18n.locale == "ar" ? document_data.name : document_data.name_e }}</h3>
+        </div>
         <div class="col-12">
             <div class="card">
                 <div class="card-body">

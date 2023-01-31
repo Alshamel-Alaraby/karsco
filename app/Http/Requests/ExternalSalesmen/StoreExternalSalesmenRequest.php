@@ -24,11 +24,11 @@ class StoreExternalSalesmenRequest extends FormRequest
     public function rules()
     {
         return [
-            "phone" => "max:20|required|unique:external_salesmen,phone",
+            "phone" => "max:20|required|unique:general_external_salesmen,phone",
             "address" => "required|max:255",
-            "rp_code" => "required|unique:external_salesmen,rp_code",
-            "email" => "required|email|unique:external_salesmen,email",
-            "country_id" => "required|exists:countries,id",
+            "rp_code" => "required|unique:general_external_salesmen,rp_code",
+            "email" => "required|email|unique:general_external_salesmen,email",
+            "country_id" => "required|exists:general_countries,id",
             'national_id' => "required|integer",
             'is_active' => 'nullable|in:active,inactive',
         ];

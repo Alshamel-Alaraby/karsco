@@ -122,6 +122,10 @@ export default {
     },
   mixins: [translation],
 
+  mounted(){
+this.company_id=this.$store.getters["auth/company_id"];
+  },
+
     updated(){
         $(function(){
             $(".englishInput").keypress(function(event){
@@ -211,7 +215,7 @@ export default {
             } else {
                 this.isLoader = true;
                 this.errors = {};
-                adminApi.post(`/employees`,this.create)
+                adminApi.post(`/employees`,{...this.create,company_id:this.company_id})
                     .then((res) => {
                         this.is_disabled = true;
                         this.$emit('created');

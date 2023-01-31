@@ -19,6 +19,9 @@ class UserRepository implements UserInterface
     public function all($request)
     {
         $models = $this->model->filter($request)->orderBy($request->order ? $request->order : 'updated_at', $request->sort ? $request->sort : 'DESC');
+        if ($request->company_id) {
+            $models->where('company_id',$request->company_id);
+        }
 
         if ($request->per_page) {
             return ['data' => $models->paginate($request->per_page), 'paginate' => true];

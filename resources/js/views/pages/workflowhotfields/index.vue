@@ -329,7 +329,7 @@ export default {
         this.errors = {};
         this.is_disabled = false;
         adminApi
-          .post(`/workflow-hotfield`, this.create)
+          .post(`/workflow-hotfield`,{...this.create,company_id:this.$store.getters["auth/company_id"]})
           .then((res) => {
             this.getData();
             this.is_disabled = true;

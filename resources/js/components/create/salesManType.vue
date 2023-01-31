@@ -165,6 +165,11 @@ export default {
         loader,
     },
     mixins:[translation],
+    
+  mounted(){
+this.company_id=this.$store.getters["auth/company_id"];
+  },
+
     updated() {
         $(function () {
             $(".englishInput").keypress(function (event) {
@@ -250,7 +255,7 @@ export default {
             } else {
                 this.isLoader = true;
                 this.errors = {};
-                adminApi.post(`/salesmen-types`, this.create)
+                adminApi.post(`/salesmen-types`, {...this.create,company_id:this.company_id})
                     .then((res) => {
                         this.is_disabled = true;
                         this.$emit('created');

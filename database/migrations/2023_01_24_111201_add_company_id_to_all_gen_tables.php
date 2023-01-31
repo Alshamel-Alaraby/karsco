@@ -17,6 +17,9 @@ return new class extends Migration
         Schema::table($pref.'countries', function (Blueprint $table) {
             $table->unsignedBigInteger ('company_id')->nullable ()->default (0);
         });
+        Schema::table($pref.'users', function (Blueprint $table) {
+            $table->unsignedBigInteger ('company_id')->nullable ()->default (0);
+        });
         Schema::table($pref.'cities', function (Blueprint $table) {
             $table->unsignedBigInteger ('company_id')->nullable ()->default (0);
         });
@@ -93,6 +96,7 @@ return new class extends Migration
         Schema::table($pref.'banks', function (Blueprint $table) {
             $table->unsignedBigInteger ('company_id')->nullable ()->default (0);
         });
+        
         Schema::table($pref.'bank_accounts', function (Blueprint $table) {
             $table->unsignedBigInteger ('company_id')->nullable ()->default (0);
         });

@@ -161,7 +161,7 @@ Route::group(['prefix' => 'arch-archive-files'], function () {
         Route::delete('/{id}', 'delete')->name(' archive.files.destroy');
         Route::get('logs/{id}', 'logs');
         Route::post('bulk-delete', 'bulkDelete');
-
+        Route::post('file-notify', 'sendArchvingNotification');
     });
 });
 

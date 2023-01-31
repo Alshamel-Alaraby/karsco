@@ -129,8 +129,8 @@ export default {
 
       if (
         vm.$store.state.auth.work_flow_trees.includes("role workflow") ||
-        vm.$store.state.auth.work_flow_trees.includes("role")
-          || vm.$store.state.auth.user.type == 'super_admin'
+        vm.$store.state.auth.work_flow_trees.includes("role") ||
+        vm.$store.state.auth.user.type == "super_admin"
       ) {
         return true;
       } else {
@@ -320,7 +320,7 @@ export default {
       this.create = {
         role_id: null,
         workflow_id: null,
-          workflow_name: "",
+        workflow_name: "",
       };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -338,7 +338,7 @@ export default {
       this.create = {
         role_id: null,
         workflow_id: null,
-          workflow_name: "",
+        workflow_name: "",
       };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -354,7 +354,7 @@ export default {
       this.create = {
         role_id: null,
         workflow_id: null,
-          workflow_name: "",
+        workflow_name: "",
       };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -369,7 +369,7 @@ export default {
         return;
       }
       await this.getRoleUsersCount(this.create.role_id);
-      let self=this;
+      let self = this;
       let check =
         this.$store.state.auth.allWorkFlow.filter((workflow) => {
           return (
@@ -385,7 +385,7 @@ export default {
           showConfirmButton: false,
           timer: 1500,
         });
-        return ;
+        return;
       } else {
         this.isLoader = true;
         this.errors = {};
@@ -394,7 +394,7 @@ export default {
         let module = this.workflows.find((e) => this.create.workflow_id == e.id);
         this.create.workflow_name = module.name_e;
         adminApi
-          .post(`/role-workflows`, this.create)
+          .post(`/role-workflows`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.is_disabled = true;
             this.getData();
@@ -433,7 +433,7 @@ export default {
       }
       await this.getRoleUsersCount(this.edit.role_id);
 
-            let self=this;
+      let self = this;
       let check =
         this.$store.state.auth.allWorkFlow.filter((workflow) => {
           return (
@@ -449,9 +449,8 @@ export default {
           showConfirmButton: false,
           timer: 1500,
         });
-        return ;
-      }
-      else {
+        return;
+      } else {
         this.isLoader = true;
         this.errors = {};
 

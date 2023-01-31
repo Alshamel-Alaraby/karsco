@@ -18,9 +18,9 @@ use Spatie\MediaLibrary\HasMedia;
 
 class User extends Authenticatable implements HasMedia
 {
+    protected $table="general_users";
     use HasApiTokens, HasFactory, Notifiable, MediaTrait, LogsActivity, CausesActivity, LogTrait;
 
-    protected $table = "general_users";
     protected $fillable = [
         'name',
         'name_e',
@@ -29,7 +29,8 @@ class User extends Authenticatable implements HasMedia
         'password',
         'active',
         "employee_id",
-        "type"
+        "type",
+        "company_id"
     ];
 
     protected $hidden = [
@@ -56,7 +57,7 @@ class User extends Authenticatable implements HasMedia
 
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
+        return $this->belongsToMany(Role::class, 'general_role_user', 'user_id', 'role_id');
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -67,6 +68,11 @@ class User extends Authenticatable implements HasMedia
             ->logAll()
             ->useLogName('User')
             ->setDescriptionForEvent(fn(string $eventName) => "This model has been {$eventName} by ($user)");
+    }
+
+    public function receivesBroadcastNotificationsOn()
+    {
+        return 'App.Models.User.'.$this->id;
     }
 
 }

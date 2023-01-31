@@ -12,9 +12,9 @@ use Spatie\Activitylog\LogOptions;
 
 class WorkflowHotfield extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
+    use HasFactory, SoftDeletes, LogTrait;
 
-    protected $table = 'workflows_hotfields';
+    protected $table = 'general_workflows_hotfields';
 
     protected $guarded = ["id"];
 

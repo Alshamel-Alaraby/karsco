@@ -10,7 +10,9 @@ use Spatie\Activitylog\LogOptions;
 
 class ScreenTreeProperty extends Model
 {
-    use HasFactory, LogTrait,ConnTrait;
+    use HasFactory, LogTrait;
+    
+    protected $table = 'general_screen_tree_properties';
 
     protected $guarded = ['id'];
     public function property()

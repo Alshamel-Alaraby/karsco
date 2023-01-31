@@ -11,12 +11,15 @@ use Spatie\Activitylog\LogOptions;
 
 class Color extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
+    use HasFactory, SoftDeletes, LogTrait;
+    protected $table = 'general_colors';
+
 
     protected $fillable = [
         'name',
         'name_e',
         'is_active',
+        "company_id"
     ];
 
     protected $casts = [

@@ -66,6 +66,7 @@ export default {
       bankAccountsPagination: {},
       bankAccounts: [],
       isLoader: false,
+      company_id:null,
       create: {
         bank_id: null,
         account_number: "",
@@ -180,6 +181,7 @@ export default {
     },
   },
   mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
   updated() {
@@ -468,7 +470,7 @@ export default {
         this.errors = {};
 
         adminApi
-          .post(`/bank-accounts`, this.create)
+          .post(`/bank-accounts`, {...this.create,company_id:this.company_id})
           .then((res) => {
             this.bankAccount_id = res.data.data.id;
             setTimeout(() => {

@@ -150,6 +150,11 @@ export default {
             errors: {},
         }
     },
+    
+  mounted(){
+this.company_id=this.$store.getters["auth/company_id"];
+  },
+
     updated() {
         $(function () {
             $(".englishInput").keypress(function (event) {
@@ -188,7 +193,7 @@ export default {
             } else {
                 this.isLoader = true;
                 this.errors = {};
-                adminApi.post(`/role_types`, this.create)
+                adminApi.post(`/role_types`,{...this.create,company_id:this.company_id})
                     .then((res) => {
                         this.is_disabled = true;
                         this.$emit('created');

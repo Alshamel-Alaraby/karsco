@@ -11,7 +11,10 @@ use Spatie\Activitylog\LogOptions;
 
 class Store extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
+    use HasFactory, SoftDeletes, LogTrait;
+
+    protected $table = 'general_stores';
+
 
     protected $fillable = [
         "name_e",

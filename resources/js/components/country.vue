@@ -552,6 +552,11 @@ export default {
     loader,
   },
   mixins:[translation],
+  
+  mounted(){
+this.company_id=this.$store.getters["auth/company_id"];
+  },
+
   updated() {
     $(function () {
       $(".englishInput").keypress(function (event) {
@@ -711,7 +716,7 @@ export default {
         this.errors = {};
 
         adminApi
-          .post(`/countries`, this.create)
+          .post(`/countries`, {...this.create,company_id:this.company_id})
           .then((res) => {
             this.country_id = res.data.data.id;
             this.$emit("created");

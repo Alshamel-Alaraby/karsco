@@ -18,6 +18,7 @@ class CreateRoleWorkflowRequest extends FormRequest
             'role_id' => ['required', 'exists:general_roles,id'],
             'workflow_id' => ['required'],
             'workflow_name' => ['required'],
+            "company_id"=>["required"]
         ];
     }
 

@@ -6,12 +6,13 @@ use App\Http\Requests\AllRequest;
 use App\Http\Requests\Governorate\StoreGovernorateRequest;
 use App\Http\Requests\Governorate\UpdateGovernorateRequest;
 use App\Http\Resources\Governorate\GovernorateResource;
+use App\Repositories\Governorate\GovernorateInterface;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class GovernorateController extends Controller
 {
-    public function __construct(private \App\Repositories\Governorate\GovernorateInterface$modelInterface)
+    public function __construct(private GovernorateInterface $modelInterface)
     {
         $this->modelInterface = $modelInterface;
     }

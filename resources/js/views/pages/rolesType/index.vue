@@ -78,6 +78,7 @@ export default {
       filterSetting: ["name", "name_e"],
       Tooltip: "",
       mouseEnter: null,
+      company_id:null
     };
   },
   validations: {
@@ -122,6 +123,7 @@ export default {
     },
   },
   mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
   updated() {
@@ -366,7 +368,7 @@ export default {
         this.isLoader = true;
         this.errors = {};
         adminApi
-          .post(`/role_types`, this.create)
+          .post(`/role_types`, {...this.create,company_id:this.company_id})
           .then((res) => {
             this.is_disabled = true;
             this.getData();

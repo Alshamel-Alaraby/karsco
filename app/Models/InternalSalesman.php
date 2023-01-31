@@ -13,9 +13,9 @@ use Spatie\Activitylog\LogOptions;
 
 class InternalSalesman extends Model
 {
-    use HasFactory, LogTrait, SoftDeletes,ConnTrait;
+    use HasFactory, LogTrait, SoftDeletes;
 
-    protected $table = 'internal_salesman';
+    protected $table = 'general_internal_salesman';
 
     protected $guarded = ["id"];
 

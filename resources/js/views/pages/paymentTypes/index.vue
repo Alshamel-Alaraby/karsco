@@ -70,6 +70,7 @@ export default {
         name_e: "",
         is_default: 1,
       },
+      company_id:null,
       errors: {},
       dropDownSenders: [],
       isButton: true,
@@ -131,6 +132,7 @@ export default {
     },
   },
   mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
   updated() {
@@ -375,7 +377,7 @@ export default {
         this.isLoader = true;
         this.errors = {};
         adminApi
-          .post(`/payment-types`, this.create)
+          .post(`/payment-types`, {...this.create,company_id:this.company_id})
           .then((res) => {
             this.is_disabled = true;
             this.getData();

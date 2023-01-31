@@ -83,7 +83,9 @@ class DocumentFieldController extends Controller
         $data = [];
         foreach ($tables as $table) {
             foreach ($table as $key => $value) {
-                array_push($data, $value);
+                if (str_contains($value,'general')){
+                    array_push($data, $value);
+                }
             }
 
         }

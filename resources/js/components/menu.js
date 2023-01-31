@@ -193,18 +193,18 @@ export const menuItems = [
                 label: 'menuitems.dashboard.list.roleWorkflow',
                 link: '/dashboard/role-workflow'
             },
-            {
-                id: 100088,
-                name: 'role workflow button',
-                label: 'menuitems.dashboard.list.roleWorkflowButton',
-                link: '/dashboard/role-workflow-button'
-            },
-            {
-                id: 100134,
-                name: 'role hotfield screen',
-                label: 'menuitems.dashboard.list.RoleHotfieldScreen',
-                link: '/dashboard/role-hotfield-screen'
-            },
+            // {
+            //     id: 100088,
+            //     name: 'role workflow button',
+            //     label: 'menuitems.dashboard.list.roleWorkflowButton',
+            //     link: '/dashboard/role-workflow-button'
+            // },
+            // {
+            //     id: 100134,
+            //     name: 'role hotfield screen',
+            //     label: 'menuitems.dashboard.list.RoleHotfieldScreen',
+            //     link: '/dashboard/role-hotfield-screen'
+            // },
         ]
     },
     {

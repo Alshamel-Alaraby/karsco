@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Currency extends Model
 {
-    use HasFactory, LogTrait,ConnTrait;
+    use HasFactory, LogTrait;
+    protected $table = 'general_currencies';
+
 
     protected $guarded = ['id'];
 

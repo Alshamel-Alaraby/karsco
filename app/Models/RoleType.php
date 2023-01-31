@@ -11,7 +11,10 @@ use Spatie\Activitylog\LogOptions;
 
 class RoleType extends Model
 {
-    use HasFactory, LogTrait, SoftDeletes,ConnTrait;
+    use HasFactory, LogTrait, SoftDeletes;
+
+    protected $table = 'role_types';
+
     protected $guarded = ['id'];
 
     public function getActivitylogOptions(): LogOptions

@@ -11,11 +11,13 @@ use Spatie\Activitylog\LogOptions;
 
 class Employee extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
+    use HasFactory, SoftDeletes, LogTrait;
+    protected $table = 'general_employees';
 
     protected $fillable = [
         'name',
         'name_e',
+        "company_id"
     ];
 
     public function user()

@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Governorate extends Model
 {
-    use HasFactory, LogTrait,ConnTrait;
+    use HasFactory, LogTrait;
+    protected $table = 'general_governorates';
+
 
     protected $fillable = [
         'name',
@@ -18,6 +20,7 @@ class Governorate extends Model
         'is_active',
         'is_default',
         "phone_key",
+        "company_id"
     ];
 
     protected $casts = [
@@ -27,7 +30,7 @@ class Governorate extends Model
 
     public function country()
     {
-        return $this->belongsTo(Country::class);
+        return $this->belongsTo(Country::class, "country_id");
     }
 
     public function cities()
@@ -55,7 +58,6 @@ class Governorate extends Model
         return \Spatie\Activitylog\LogOptions::defaults()
             ->logAll()
             ->useLogName('Governorate')
-            ->setDescriptionForEvent(fn(string $eventName) => "This model has been {$eventName} by ($user)");
+            ->setDescriptionForEvent(fn (string $eventName) => "This model has been {$eventName} by ($user)");
     }
-
 }

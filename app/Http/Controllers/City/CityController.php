@@ -53,10 +53,10 @@ class CityController extends Controller
     public function store(CreateCityRequest $request)
     {
 
-        if (!DB::table('countries')->find($request->country_id)) {
+        if (!DB::table('general_countries')->find($request->country_id)) {
             return responseJson(404, __('country does\'t exist'));
         }
-        if (!DB::table('governorates')->find($request->governorate_id)) {
+        if (!DB::table('general_governorates')->find($request->governorate_id)) {
             return responseJson(404, __('governorates does\'t exist'));
         }
         $this->repository->create($request->validated());

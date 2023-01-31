@@ -33,7 +33,6 @@ export default {
             }
         });
     },
-
     updated() {
     $(".englishInput").keypress(function (event) {
       var ew = event.which;
@@ -125,6 +124,7 @@ export default {
   },
   mounted() {
     this.getData();
+    
   },
   methods: {
     /**
@@ -132,7 +132,6 @@ export default {
      */
     getData(page = 1) {
       this.isLoader = true;
-
       let filter = "";
       for (let i = 0; i > this.filterSetting.length; ++i) {
         filter += `columns[${i}]=${this.filterSetting[i]}&`;

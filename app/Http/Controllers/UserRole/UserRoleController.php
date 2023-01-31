@@ -48,6 +48,7 @@ class UserRoleController extends Controller
             $model = $this->model->create([
                 'user_id' => $user,
                 'role_id' => $request->role,
+                "company_id" => $request->company_id
             ]);
             $data[] = new UserRoleResource($model);
         }

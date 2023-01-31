@@ -49,6 +49,7 @@ export default {
       isLoader: false,
       Tooltip: "",
       mouseEnter: null,
+      company_id:null,
       create: {
         name: "",
         name_e: "",
@@ -111,6 +112,7 @@ export default {
     },
   },
   mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
   updated() {
@@ -365,7 +367,7 @@ export default {
         this.isLoader = true;
         this.errors = {};
         adminApi
-          .post(`/employees`, this.create)
+          .post(`/employees`, {...this.create,company_id:this.company_id})
           .then((res) => {
             this.is_disabled = true;
             this.getData();

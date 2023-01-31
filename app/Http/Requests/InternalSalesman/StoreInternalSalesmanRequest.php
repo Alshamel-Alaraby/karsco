@@ -25,6 +25,7 @@ class StoreInternalSalesmanRequest extends FormRequest
     {
         return [
             "employee_id"     => "required|numeric" ,
+            "company_id"     => "required|numeric" ,
             "is_active"       => "in:active,inactive" ,
         ];
     }

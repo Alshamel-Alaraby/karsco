@@ -11,13 +11,16 @@ use Spatie\Activitylog\LogOptions;
 
 class FinancialYear extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
+    use HasFactory, SoftDeletes, LogTrait;
+    protected $table = 'general_financial_years';
+
 
     protected $fillable = [
         'name',
         'name_e',
         'start_date',
         'end_date',
+        "company_id"
     ];
 
     protected $casts = [

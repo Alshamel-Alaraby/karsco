@@ -12,15 +12,16 @@ use Spatie\Activitylog\LogOptions;
 
 class Salesman extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
+    use HasFactory, SoftDeletes, LogTrait;
 
     protected $fillable = [
         'name',
         'name_e',
         'salesman_type_id',
+        "company_id"
     ];
 
-    protected $table = "salesmen";
+    protected $table = "general_salesmen";
 
     // relations
     public function salesmanType()

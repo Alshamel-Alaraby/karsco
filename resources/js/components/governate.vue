@@ -264,6 +264,11 @@ export default {
     Multiselect,
   },
   mixins:[translation],
+  
+  mounted(){
+this.company_id=this.$store.getters["auth/company_id"];
+  },
+
   updated() {
     $(function () {
       $(".englishInput").keypress(function (event) {
@@ -408,7 +413,7 @@ export default {
         this.errors = {};
         this.is_disabled = false;
         adminApi
-          .post(`/governorates`, this.create)
+          .post(`/governorates`, {...this.create,company_id:this.company_id})
           .then((res) => {
             this.is_disabled = true;
             setTimeout(() => {

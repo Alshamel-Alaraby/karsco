@@ -464,6 +464,9 @@ export default {
             media: {}
         },
     },
+      mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
+  },
     updated() {
         $(function () {
             $(".englishInput").keypress(function (event) {
@@ -581,7 +584,7 @@ export default {
                 this.isLoader = true;
                 this.errors = {};
 
-                adminApi.post(`/bank-accounts`, this.create)
+                adminApi.post(`/bank-accounts`, {...this.create,company_id:this.company_id})
                     .then((res) => {
                         this.bankAccount_id = res.data.data.id;
                         setTimeout(() => {

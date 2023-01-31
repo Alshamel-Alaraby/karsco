@@ -12,10 +12,10 @@ use Spatie\Activitylog\LogOptions;
 
 class Unit extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
+    use HasFactory, SoftDeletes, LogTrait;
 
-    protected $table = 'units';
-    protected $fillable = ['name', 'name_e', 'is_active'];
+    protected $table = 'general_units';
+    protected $fillable = ['name', 'name_e', 'is_active','company_id'];
 
     protected $casts = [
         'is_active' => '\App\Enums\IsActive',

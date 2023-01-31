@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,9 +10,9 @@ use Spatie\Activitylog\LogOptions;
 
 class RoleScreenHotfield extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
+    use HasFactory, SoftDeletes, LogTrait;
 
-    protected $table = 'role_screen_hotfields';
+    protected $table = 'general_role_screen_hotfields';
 
     protected $guarded = ["id"];
 

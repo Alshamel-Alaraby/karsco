@@ -127,5 +127,5 @@ class TreePropertyController extends Controller
     public function getChildNodes($parentId){
         return $this->modelInterface->getChildNodes($parentId);
     }
-
+    
 }

@@ -11,13 +11,14 @@ use Spatie\Activitylog\LogOptions;
 
 class SalesmenType extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
-    protected $table = 'salesmen_types';
+    use HasFactory, SoftDeletes, LogTrait;
+    protected $table = 'general_salesmen_types';
 
     protected $fillable = [
         'name',
         'name_e',
         'is_employee',
+        "company_id"
     ];
 
     protected $casts = [

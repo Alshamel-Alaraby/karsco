@@ -10,13 +10,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Bank extends Model
 {
-    use HasFactory, LogTrait, SoftDeletes,ConnTrait;
-
+    use HasFactory, LogTrait, SoftDeletes;
+    protected $table="general_banks";
     protected $fillable = [
         'name',
         'name_e',
         'country_id',
         'swift_code',
+        "company_id"
     ];
 
     public function country()

@@ -35,12 +35,25 @@ Route::controller(\App\Http\Controllers\MainController::class)->group(function (
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    // start Notification
+    Route::controller(\App\Http\Controllers\MainController::class)->group(function () {
+        Route::get('getAllNot','getAllNot');
+        Route::get('getNotNotRead','getNotNotRead');
+        Route::post('clearItem/{id}','clearItem');
+        Route::post('getNotNotRead','clearAll');
+    });
+    // end Notification
+
     Route::group(['prefix' => 'companies'], function () {
         Route::get('', [CompanyController::class, "index"]);
         Route::get('/{id}', [CompanyController::class, "show"]);
         Route::post('', [CompanyController::class, "store"]);
         Route::post('/{id}', [CompanyController::class, "update"]);
         Route::delete('/{id}', [CompanyController::class, "destroy"]);
+    });
+    Route::group (['prefix'=>'users'],function (){
+        Route::get ('profile',[\App\Http\Controllers\User\UserController::class,'profile']);
     });
 });
 

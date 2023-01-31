@@ -1068,18 +1068,21 @@ export default {
                                                 :disabled="!arch_doc_type_id || !create.parent_id"
                                                 :title="$t('menuitems.ArchDocTypeField.text')"
                                             >
-                                                <DocumentTypeField :arch_doc_type_id="arch_doc_type_id"/>
+                                                <DocumentTypeField :arch_doc_type_id="arch_doc_type_id" :document_data="create"/>
                                             </b-tab>
                                             <b-tab
                                                 :disabled="!arch_doc_type_id || !create.parent_id"
                                                 :title="$t('general.DocumentDepartment')"
                                             >
-                                                <DocumentDepartment :arch_doc_type_id="arch_doc_type_id"/>
+                                                <DocumentDepartment :arch_doc_type_id="arch_doc_type_id" :document_data="create"/>
                                             </b-tab>
                                             <b-tab
                                                 :disabled="!arch_doc_type_id || !create.parent_id"
                                                 :title="$t('general.DocumentStatus')"
                                             >
+                                                <div class="col-md-12 text-center">
+                                                    <h3>{{$t('general.DocumentName')}} : {{ $i18n.locale == "ar" ? edit.name : edit.name_e }}</h3>
+                                                </div>
                                                 <div class="col-md-6 mb-4 p-0 position-relative">
                                                     <div class="form-group">
                                                         <label class="my-1 mr-2">{{
@@ -1567,18 +1570,21 @@ export default {
                                                     </form>
                                                 </b-tab>
                                                 <b-tab :disabled="!arch_doc_type_id || !edit.parent_id"  :title="$t('menuitems.ArchDocTypeField.text')" >
-                                                    <DocumentTypeFieldEdit :arch_doc_type_id="arch_doc_type_id" :doc_type_field="doc_type_field" @update-doc-type-field="getData"/>
+                                                    <DocumentTypeFieldEdit :arch_doc_type_id="arch_doc_type_id" :doc_type_field="doc_type_field" @update-doc-type-field="getData" :document_data="edit"/>
                                                 </b-tab>
                                                 <b-tab
                                                     :disabled="!arch_doc_type_id || !edit.parent_id"
                                                     :title="$t('general.DocumentDepartment')"
                                                 >
-                                                    <DocumentDepartment :arch_doc_type_id="arch_doc_type_id"/>
+                                                    <DocumentDepartment :arch_doc_type_id="arch_doc_type_id" :document_data="edit"/>
                                                 </b-tab>
                                                 <b-tab
                                                     :disabled="!arch_doc_type_id || !edit.parent_id"
                                                     :title="$t('general.DocumentStatus')"
                                                 >
+                                                    <div class="col-md-12 text-center">
+                                                        <h3>{{$t('general.DocumentName')}} : {{ $i18n.locale == "ar" ? edit.name : edit.name_e }}</h3>
+                                                    </div>
                                                     <div class="col-md-6 mb-4 p-0 position-relative">
                                                         <div class="form-group">
                                                             <label class="my-1 mr-2">{{

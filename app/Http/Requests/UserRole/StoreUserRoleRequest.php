@@ -28,7 +28,9 @@ class StoreUserRoleRequest extends FormRequest
         return [
             "role" => "required|exists:general_roles,id",
             "users" => "required|array",
-            "users.*" => "required|exists:general_users,id|unique:general_role_user,user_id",
+            "users.*" => "required|",
+            // "users.*" => "required|exists:general_users,id|unique:general_role_user,user_id",
+            "company_id"=>"required"
         ];
     }
 

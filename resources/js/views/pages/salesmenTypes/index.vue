@@ -41,8 +41,8 @@ export default {
         return vm.$router.push({ name: "home" });
       } else if (
         vm.$store.state.auth.work_flow_trees.includes("sales men Type") ||
-        vm.$store.state.auth.work_flow_trees.includes("sales men")
-          || vm.$store.state.auth.user.type == 'super_admin'
+        vm.$store.state.auth.work_flow_trees.includes("sales men") ||
+        vm.$store.state.auth.user.type == "super_admin"
       ) {
         return true;
       } else {
@@ -85,6 +85,7 @@ export default {
       },
       is_disabled: false,
       filterSetting: ["name", "name_e"],
+      company_id: null,
     };
   },
   validations: {
@@ -131,6 +132,7 @@ export default {
     },
   },
   mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
   updated() {
@@ -403,7 +405,7 @@ export default {
         this.isLoader = true;
         this.errors = {};
         adminApi
-          .post(`/salesmen-types`, this.create)
+          .post(`/salesmen-types`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.is_disabled = true;
             this.getData();

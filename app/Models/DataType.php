@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class DataType extends Model
 {
-    use HasFactory, ConnTrait;
+    use HasFactory;
+    protected $table = 'general_data_types';
+
     protected $guarded = ['id'];
 
     public function archiveFiles()

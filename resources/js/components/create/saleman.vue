@@ -39,6 +39,11 @@ export default {
       salesman_type_id: { required },
     },
   },
+  
+  mounted(){
+this.company_id=this.$store.getters["auth/company_id"];
+  },
+
   updated() {
     $(function () {
       $(".englishInput").keypress(function (event) {
@@ -122,7 +127,7 @@ export default {
         this.isLoader = true;
         this.errors = {};
         adminApi
-          .post(`/salesmen`, this.create)
+          .post(`/salesmen`, {...this.create,company_id:this.company_id})
           .then((res) => {
             this.is_disabled = true;
             this.$emit("created");

@@ -29,9 +29,9 @@ class CreateBranchRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ["required", new BranchUniqueCompanyRule($this->company_id)],
-            'name_e' => ["required", new BranchUniqueCompanyRule($this->company_id)],
-            "company_id" => "required|exists:companies,id",
+            'name' => ["required"],
+            'name_e' => ["required"],
+            "company_id" => "required",
         ];
     }
 

@@ -83,6 +83,7 @@ export default {
         employee_id: true,
         is_active: true,
       },
+      company_id:null,
       idDelete: null,
         Tooltip: '',
         mouseEnter: null,
@@ -127,6 +128,7 @@ export default {
   },
 
   mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
   updated() {
@@ -424,7 +426,7 @@ export default {
         this.errors = {};
 
         adminApi
-          .post(`/users`, this.create)
+          .post(`/users`, {...this.create,company_id:this.company_id})
           .then((res) => {
             this.user_id = res.data.data.id;
             setTimeout(() => {

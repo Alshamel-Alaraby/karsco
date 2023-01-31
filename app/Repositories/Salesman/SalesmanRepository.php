@@ -33,7 +33,6 @@ class SalesmanRepository implements SalesmanInterface
     {
         DB::transaction(function () use ($request) {
             $model = $this->model->create($request->all());
-
             cacheForget("salesmen");
         });
     }

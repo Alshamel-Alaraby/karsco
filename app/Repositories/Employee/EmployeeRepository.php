@@ -38,7 +38,6 @@ class EmployeeRepository implements EmployeeInterface
     {
         DB::transaction(function () use ($request) {
             $model = $this->model->create($request->all());
-
             cacheForget("employees");
         });
     }

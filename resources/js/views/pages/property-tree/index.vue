@@ -34,17 +34,20 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
-      if(vm.$store.state.auth.work_flow_trees.includes('properties-e')  || vm.$store.state.auth.user.type == 'super_admin'){
+      if (
+        vm.$store.state.auth.work_flow_trees.includes("properties-e") ||
+        vm.$store.state.auth.user.type == "super_admin"
+      ) {
         Swal.fire({
-                    icon: "error",
-                    title: `${vm.$t("general.Error")}`,
-                    text: `${vm.$t("general.ModuleExpired")}`,
-                  });
+          icon: "error",
+          title: `${vm.$t("general.Error")}`,
+          text: `${vm.$t("general.ModuleExpired")}`,
+        });
         return vm.$router.push({ name: "home" });
-      }
-      else if (vm.$store.state.auth.work_flow_trees.includes("tree property")
-      ||
-       vm.$store.state.auth.work_flow_trees.includes('properties')) {
+      } else if (
+        vm.$store.state.auth.work_flow_trees.includes("tree property") ||
+        vm.$store.state.auth.work_flow_trees.includes("properties")
+      ) {
         return true;
       } else {
         return vm.$router.push({ name: "home" });
@@ -107,6 +110,7 @@ export default {
       checkAll: [],
       is_disabled: false,
       current_page: 1,
+      company_id: null,
     };
   },
   validations: {
@@ -161,8 +165,9 @@ export default {
     },
   },
   mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
-    self=this;
+    self = this;
   },
   methods: {
     formatDate(value) {
@@ -412,6 +417,7 @@ export default {
           .post(`/tree-properties`, {
             ...this.create,
             required: this.create.required == "active" ? 1 : 0,
+            company_id:this.company_id
           })
           .then((res) => {
             this.getData();
@@ -922,7 +928,7 @@ export default {
                       {{ getCompanyKey("required") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="setting.parent" class="mb-1">
-                      {{ getCompanyKey("parent_properties") }}
+                      {{ getCompanyKey("parent") }}
                     </b-form-checkbox>
 
                     <div class="d-flex justify-content-end">
@@ -1362,7 +1368,7 @@ export default {
                     </th>
                     <th v-if="setting.parent">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("parent_properties") }}</span>
+                        <span>{{ getCompanyKey("parent") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1422,7 +1428,7 @@ export default {
                     </td>
                     <td v-if="setting.parent">
                       <template v-if="data.parent">
-                      {{ $i18n.locale == "ar" ? data.parent.name : data.parent.name_e }}
+                        {{ $i18n.locale == "ar" ? data.parent.name : data.parent.name_e }}
                       </template>
                     </td>
                     <td>

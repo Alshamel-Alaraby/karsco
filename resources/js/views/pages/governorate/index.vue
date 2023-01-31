@@ -101,6 +101,7 @@ export default {
         is_default: true,
         is_active: true,
       },
+      company_id:null,
       errors: {},
       dropDownSenders: [],
       isCheckAll: false,
@@ -175,6 +176,7 @@ export default {
     },
   },
   mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
   methods: {
@@ -433,7 +435,7 @@ export default {
         this.errors = {};
         this.is_disabled = false;
         adminApi
-          .post(`/governorates`, this.create)
+          .post(`/governorates`, {...this.create,company_id:this.company_id})
           .then((res) => {
             this.getData();
             this.is_disabled = true;

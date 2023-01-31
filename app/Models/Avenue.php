@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Avenue extends Model
 {
-    use HasFactory, SoftDeletes,LogTrait,ConnTrait;
+    use HasFactory, SoftDeletes,LogTrait;
+    protected $table = 'general_avenues';
 
     protected $fillable = [
         'name',
@@ -19,6 +20,7 @@ class Avenue extends Model
         'country_id',
         'governorate_id',
         'city_id',
+        "company_id"
     ];
 
     protected $casts = [

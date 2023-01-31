@@ -24,13 +24,13 @@ class AllRequest extends FormRequest
     public function rules()
     {
         return [
-            "parent_id" => "nullable|exists:modules,id",
+            "parent_id" => "nullable|exists:general_modules,id",
             "is_active" => "nullable|in:active,inactive",
             "sort" => "nullable|integer",
             "page" => "nullable|integer",
             "per_page" => "nullable|integer",
-            'country_id' =>  "nullable|exists:countries,id",
-            'city_id' =>  "nullable|exists:cities,id",
+            'country_id' =>  "nullable|exists:general_countries,id",
+            'city_id' =>  "nullable|exists:general_cities,id",
             "is_default" => "nullable|in:0,1",
             "is_employee" => "nullable|in:0,1",
             "columns" => "array"

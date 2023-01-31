@@ -30,6 +30,11 @@ class UserController extends Controller
         return responseJson(400, 'invalid credentials');
     }
 
+    public function profile(Request $request){
+        $user = $request->user ();
+        return responseJson(200, 'success',  new UserResource($user));
+    }
+
     public function find($id)
     {
 

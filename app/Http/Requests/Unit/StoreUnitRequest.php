@@ -27,7 +27,7 @@ class StoreUnitRequest extends FormRequest
             'name' => 'required|string|max:255',
             'name_e' => 'required|string|max:255',
             'is_active' => 'nullable|in:active,inactive',
-            "module_id" => "required",
+            // "module_id" => "required",
         ];
     }
 

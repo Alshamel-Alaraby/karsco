@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 class RoleUser extends Model
 {
     use HasFactory, LogTrait;
+
     protected $table = 'general_role_user';
+
     protected $guarded = ['id'];
 
     public function role()
