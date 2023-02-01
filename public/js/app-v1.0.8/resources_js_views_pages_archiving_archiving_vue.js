@@ -1233,6 +1233,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 //
 //
 //
+//
 
 
 
@@ -5460,7 +5461,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.details[data-v-a05e760a] {\r\n    background-color: #f8fcff;\r\n    border-radius: 7px;\r\n    width: 100%;\n}\n.details-img[data-v-a05e760a] {\r\n    height: 150px;\r\n    background: #e8ecee;\r\n    border-radius: 7px;\r\n    margin: 0 0px;\n}\n.icon[data-v-a05e760a] {\r\n    text-align: center;\n}\n.icon[data-v-a05e760a] {\r\n    font-size: 85px;\r\n    color: hsl(6deg, 37%, 60%);\n}\n.btn-action-cutom[data-v-a05e760a]{\r\n    display: inline-block;\r\n    width: 34px;\r\n    line-height: 26px;\r\n    height: 30px;\r\n    color: #fff;\r\n    border-radius: 7px;\r\n    font-size: 17px;\r\n    text-align: center;\r\n    background-color: #3eafd9;\r\n    cursor: pointer;\n}\n.form-control.form-control-custom[data-v-a05e760a]{\r\n    display: inline-block !important;\r\n    width: 70%;\n}\n.chat-icon[data-v-a05e760a] {\r\n    top: 4px;\r\n    right: 4px;\r\n    width: 35px;\r\n    font-size: 20px;\r\n    height: 35px;\r\n    text-align: center;\r\n    border-radius: 50%;\r\n    background-color: #f8fcff;\r\n    cursor: pointer;\n}\n.chat-icon i[data-v-a05e760a] {\r\n    color: #3eafd9;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.details[data-v-a05e760a] {\n    background-color: #f8fcff;\n    border-radius: 7px;\n    width: 100%;\n}\n.details-img[data-v-a05e760a] {\n    height: 150px;\n    background: #e8ecee;\n    border-radius: 7px;\n    margin: 0 0px;\n}\n.icon[data-v-a05e760a] {\n    text-align: center;\n}\n.icon[data-v-a05e760a] {\n    font-size: 85px;\n    color: hsl(6deg, 37%, 60%);\n}\n.btn-action-cutom[data-v-a05e760a]{\n    display: inline-block;\n    width: 34px;\n    line-height: 26px;\n    height: 30px;\n    color: #fff;\n    border-radius: 7px;\n    font-size: 17px;\n    text-align: center;\n    background-color: #3eafd9;\n    cursor: pointer;\n}\n.form-control.form-control-custom[data-v-a05e760a]{\n    display: inline-block !important;\n    width: 70%;\n}\n.chat-icon[data-v-a05e760a] {\n    top: 4px;\n    right: 4px;\n    width: 35px;\n    font-size: 20px;\n    height: 35px;\n    text-align: center;\n    border-radius: 50%;\n    background-color: #f8fcff;\n    cursor: pointer;\n}\n.chat-icon i[data-v-a05e760a] {\n    color: #3eafd9;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -32254,7 +32255,12 @@ var render = function () {
                                 _vm.$store.state.archiving.objectActive.media
                                   .length - 1
                               ].url,
-                              download: "",
+                              download:
+                                _vm.$store.state.archiving.objectActive.media[
+                                  _vm.$store.state.archiving.objectActive.media
+                                    .length - 1
+                                ].url,
+                              target: "_blank",
                             },
                           },
                           [_c("i", { staticClass: "fas fa-upload" })]
@@ -35253,6 +35259,7 @@ var render = function () {
                                     _vm.fileImages.length - 1
                                   ].url,
                                   download: "",
+                                  target: "_blank",
                                 },
                               },
                               [_c("i", { staticClass: "fa fa-file-pdf" })]

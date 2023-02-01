@@ -1804,6 +1804,7 @@ export default {
                     class="custom-btn-dowonload"
                     :href="fileImages[fileImages.length - 1].url"
                     download
+                    target="_blank"
                   >
                     <i class="fa fa-file-pdf"></i>
                   </a>
