@@ -45,7 +45,7 @@ export default {
         });
         return vm.$router.push({ name: "home" });
       } else if (
-        vm.$store.state.auth.work_flow_trees.includes("tree property") ||
+        vm.showScreen("properties", "tree property") &&
         vm.$store.state.auth.work_flow_trees.includes("properties")
       ) {
         return true;
@@ -170,6 +170,14 @@ export default {
     self = this;
   },
   methods: {
+    showScreen(module, screen) {
+      let filterRes = this.$store.state.auth.allWorkFlow.filter(
+        (workflow) => workflow.name_e == module
+      );
+      let _module = filterRes.length ? filterRes[0] : null;
+      if (!_module) return false;
+      return _module.screen ? _module.screen.name_e == screen : true;
+    },
     formatDate(value) {
       return formatDateOnly(value);
     },
@@ -417,7 +425,7 @@ export default {
           .post(`/tree-properties`, {
             ...this.create,
             required: this.create.required == "active" ? 1 : 0,
-            company_id:this.company_id
+            company_id: this.company_id,
           })
           .then((res) => {
             this.getData();

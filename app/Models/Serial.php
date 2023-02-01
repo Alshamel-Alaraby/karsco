@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\CompanyScopeTrait;
 use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +11,7 @@ use Spatie\Activitylog\LogOptions;
 
 class Serial extends Model
 {
-    use HasFactory, LogTrait,ConnTrait;
+    use HasFactory, LogTrait,ConnTrait, CompanyScopeTrait;
 
     protected $guarded = ['id'];
 

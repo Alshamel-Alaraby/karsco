@@ -22,23 +22,26 @@ export default {
     meta: [{ name: "description", content: "Country" }],
   },
   mixins: [translation],
-    beforeRouteEnter(to, from, next) {
-        next((vm) => {
-          if (vm.$store.state.auth.work_flow_trees.includes("area-e")) {
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      if (vm.$store.state.auth.work_flow_trees.includes("area-e")) {
         Swal.fire({
           icon: "error",
           title: `${vm.$t("general.Error")}`,
           text: `${vm.$t("general.ModuleExpired")}`,
         });
         return vm.$router.push({ name: "home" });
+      } else if (
+        (vm.showScreen( "area","governorate") &&
+          vm.$store.state.auth.work_flow_trees.includes("area")) ||
+        vm.$store.state.auth.user.type == "super_admin"
+      ) {
+        return true;
+      } else {
+        return vm.$router.push({ name: "home" });
       }
-            else if (vm.$store.state.auth.work_flow_trees.includes('governorate') || vm.$store.state.auth.work_flow_trees.includes('area')  || vm.$store.state.auth.user.type == 'super_admin') {
-                return true;
-            } else {
-                return vm.$router.push({ name: "home" });
-            }
-        });
-    },
+    });
+  },
   components: {
     Layout,
     PageHeader,
@@ -101,7 +104,7 @@ export default {
         is_default: true,
         is_active: true,
       },
-      company_id:null,
+      company_id: null,
       errors: {},
       dropDownSenders: [],
       isCheckAll: false,
@@ -180,6 +183,14 @@ export default {
     this.getData();
   },
   methods: {
+    showScreen(module, screen) {
+      let filterRes = this.$store.state.auth.allWorkFlow.filter(
+        (workflow) => workflow.name_e == module
+      );
+      let _module = filterRes.length ? filterRes[0] : null;
+      if (!_module) return false;
+      return _module.screen ? _module.screen.name_e == screen : true;
+    },
     showCountryModal() {
       if (this.create.country_id == 0) {
         this.$bvModal.show("country-create");
@@ -435,7 +446,7 @@ export default {
         this.errors = {};
         this.is_disabled = false;
         adminApi
-          .post(`/governorates`, {...this.create,company_id:this.company_id})
+          .post(`/governorates`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.getData();
             this.is_disabled = true;
@@ -611,7 +622,7 @@ export default {
             });
           });
       }
-    }
+    },
   },
 };
 </script>
@@ -747,22 +758,22 @@ export default {
                       class="dropdown-custom-ali"
                     >
                       <b-form-checkbox v-model="setting.name" class="mb-1"
-                        >{{ getCompanyKey('governorate_name_ar') }}
+                        >{{ getCompanyKey("governorate_name_ar") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.name_e" class="mb-1">
-                        {{ getCompanyKey('governorate_name_en') }}
+                        {{ getCompanyKey("governorate_name_en") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.phone_key" class="mb-1">
-                        {{ getCompanyKey('governorate_phone_key') }}
+                        {{ getCompanyKey("governorate_phone_key") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.country_id" class="mb-1">
-                        {{ getCompanyKey('governorate_country') }}
+                        {{ getCompanyKey("governorate_country") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.is_default" class="mb-1">
-                        {{ getCompanyKey('governorate_default')}}
+                        {{ getCompanyKey("governorate_default") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.is_active" class="mb-1">
-                        {{ getCompanyKey('governorate_status')}}
+                        {{ getCompanyKey("governorate_status") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
                         <a href="javascript:void(0)" class="btn btn-primary btn-sm"

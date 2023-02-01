@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\CompanyScopeTrait;
 use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,9 +12,9 @@ use Spatie\Activitylog\LogOptions;
 
 class RoleType extends Model
 {
-    use HasFactory, LogTrait, SoftDeletes;
+    use HasFactory, LogTrait, SoftDeletes, CompanyScopeTrait;
 
-    protected $table = 'role_types';
+    protected $table = 'general_role_types';
 
     protected $guarded = ['id'];
 

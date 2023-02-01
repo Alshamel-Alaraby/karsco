@@ -33,7 +33,7 @@ class RlstUnitRequest extends FormRequest
             'unit_area' => "nullable|numeric",
             'building_id' => "nullable|integer|exists:rlst_buildings,id,deleted_at,null",
             'owner_id' => "nullable|integer|exists:rlst_owners,id,deleted_at,null",
-            'currency_id' => "nullable|integer|exists:currencies,id,deleted_at,null",
+            'currency_id' => "nullable|integer|exists:general_currencies,id,deleted_at,null",
             'wallet_id' => "nullable|integer|exists:rlst_wallets,id,deleted_at,null",
             'unit_status_id' => "nullable|integer",
             'commission_ty' => "nullable|integer",

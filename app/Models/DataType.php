@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\CompanyScopeTrait;
 use App\Traits\ConnTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class DataType extends Model
 {
-    use HasFactory;
+    use HasFactory, CompanyScopeTrait;
     protected $table = 'general_data_types';
 
     protected $guarded = ['id'];

@@ -26,8 +26,8 @@ class UpdatePaymentTypeRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:payment_types,name,' . $this->id,
-            'name_e' => 'required|string|max:255|unique:payment_types,name_e,' . $this->id,
+            'name' => 'required|string|max:255|unique:general_payment_types,name,' . $this->id,
+            'name_e' => 'required|string|max:255|unique:general_payment_types,name_e,' . $this->id,
             'is_default' => 'nullable|in:1,0',
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\CompanyScopeTrait;
 use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use App\Traits\MediaTrait;
@@ -13,7 +14,7 @@ use Spatie\MediaLibrary\HasMedia;
 
 class Country extends Model implements HasMedia
 {
-    use HasFactory, MediaTrait, SoftDeletes, LogTrait;
+    use HasFactory, MediaTrait, SoftDeletes, LogTrait, CompanyScopeTrait;
     protected $table="general_countries";
     protected $fillable = [
         'name',

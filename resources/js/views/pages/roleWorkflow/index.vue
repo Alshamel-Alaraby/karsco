@@ -127,9 +127,9 @@ export default {
         return vm.$router.push({ name: "home" });
       }
 
-      if (
-        vm.$store.state.auth.work_flow_trees.includes("role workflow") ||
-        vm.$store.state.auth.work_flow_trees.includes("role") ||
+    if (
+        (vm.showScreen( "role","role workflow") &&
+          vm.$store.state.auth.work_flow_trees.includes("role")) ||
         vm.$store.state.auth.user.type == "super_admin"
       ) {
         return true;
@@ -139,6 +139,14 @@ export default {
     });
   },
   methods: {
+    showScreen(module, screen) {
+      let filterRes = this.$store.state.auth.allWorkFlow.filter(
+        (workflow) => workflow.name_e == module
+      );
+      let _module = filterRes.length ? filterRes[0] : null;
+      if (!_module) return false;
+      return _module.screen ? _module.screen.name_e == screen : true;
+    },
     /**
      *  start get Data module && pagination
      */

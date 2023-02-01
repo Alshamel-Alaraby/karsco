@@ -179,6 +179,7 @@ this.company_id=this.$store.getters["auth/company_id"];
             };
             this.$nextTick(() => { this.$v.$reset() });
             this.errors = {};
+            this.is_disabled = false;
         },
         /**
          *  hidden Modal (create)

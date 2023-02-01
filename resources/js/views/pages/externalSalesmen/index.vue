@@ -32,8 +32,8 @@ export default {
         });
         return vm.$router.push({ name: "home" });
       } else if (
-        vm.$store.state.auth.work_flow_trees.includes("external salesmen") ||
-        vm.$store.state.auth.work_flow_trees.includes("sales men") ||
+        (vm.showScreen("sales men", " external salesmen") &&
+          vm.$store.state.auth.work_flow_trees.includes("sales men")) ||
         vm.$store.state.auth.user.type == "super_admin"
       ) {
         return true;
@@ -163,6 +163,14 @@ export default {
     this.getData();
   },
   methods: {
+     showScreen(module, screen) {
+      let filterRes = this.$store.state.auth.allWorkFlow.filter(
+        (workflow) => workflow.name_e == module
+      );
+      let _module = filterRes.length ? filterRes[0] : null;
+      if (!_module) return false;
+      return _module.screen ? _module.screen.name_e == screen : true;
+    },
     formatDate(value) {
       return formatDateOnly(value);
     },

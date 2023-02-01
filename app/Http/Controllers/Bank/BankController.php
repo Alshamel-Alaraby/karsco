@@ -32,15 +32,15 @@ class BankController extends Controller
 
     public function all(AllRequest $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('banks');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('banks', $models);
-            }
-        } else {
+//        if (count($_GET) == 0) {
+//            $models = cacheGet('banks');
+//            if (!$models) {
+//                $models = $this->modelInterface->all($request);
+//                cachePut('banks', $models);
+//            }
+//        } else {
             $models = $this->modelInterface->all($request);
-        }
+//        }
 
         return responseJson(200, 'success', BankResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }

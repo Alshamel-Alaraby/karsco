@@ -58,7 +58,7 @@
                     <img src="{{$photo->original_url}}" width="100%" height="100%" />
                 </div>
             @endforeach
-        @endif
+        @endif 
     </div>
 </div>
 </body>

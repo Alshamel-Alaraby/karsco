@@ -1,7 +1,7 @@
 <template>
   <!--  create   -->
   <b-modal
-    id="governate-create"
+    :id="id"
     :title="getCompanyKey('governorate_create_form')"
     title-class="font-18"
     size="lg"
@@ -264,7 +264,12 @@ export default {
     Multiselect,
   },
   mixins:[translation],
-  
+    props:{
+        id:{
+            default:"governate-create"
+        }
+    },
+
   mounted(){
 this.company_id=this.$store.getters["auth/company_id"];
   },
@@ -353,7 +358,7 @@ this.company_id=this.$store.getters["auth/company_id"];
       this.isLoader = true;
 
       await adminApi
-        .get(`/countries`)
+        .get(`/countries?is_active=active`)
         .then((res) => {
           let l = res.data;
           this.countries = l.data;
@@ -416,6 +421,7 @@ this.company_id=this.$store.getters["auth/company_id"];
           .post(`/governorates`, {...this.create,company_id:this.company_id})
           .then((res) => {
             this.is_disabled = true;
+              this.$emit('created');
             setTimeout(() => {
               Swal.fire({
                 icon: "success",

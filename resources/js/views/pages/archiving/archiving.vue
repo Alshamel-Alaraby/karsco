@@ -16,6 +16,7 @@ import rootData from "./root.json";
 import TreeBrowser from "../../../components/arch-screen/tree";
 import Files from "../../../components/arch-screen/files.vue";
 import Details from "../../../components/arch-screen/details.vue";
+import General from "../../../components/create/general";
 import VueHtml2pdf from "vue-html2pdf";
 
 /**
@@ -38,6 +39,7 @@ export default {
     Files,
     Details,
     VueHtml2pdf,
+      General
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -235,6 +237,7 @@ export default {
     },
     showModal(node) {
       this.currentNode = node;
+      this.lockups = [];
       node.doc_type_field.sort((a, b) => (a.field_order > b.field_order ? 1 : -1));
       this.nodeFields = [...node.doc_type_field].map((field) => {
         if (field.doc_field_id.data_type.name_e == "Lookup (table)") {
@@ -256,9 +259,11 @@ export default {
         .get(`/document-field/column-data/${table}/${column}`)
         .then((res) => {
           let l = res.data;
+            l.data.unshift({ id: 0, name: "اضف", name_e: "Add" });
           this.lockups.push({
             field_name: field_name,
             column: column,
+            table: table,
             field_data: l.data,
           });
         })
@@ -273,6 +278,30 @@ export default {
           this.isLoader = false;
         });
     },
+      showComponentModal(chose,table,index) {
+        if (chose=="Add"||chose=="اضف"||chose==0) {
+            if (table == "general_employees"){
+                this.$bvModal.show("employee-create");
+                this.nodeFields[index].value = "";
+            }
+            if (table == "general_customers"){
+                this.$bvModal.show("customer-general-create");
+                this.nodeFields[index].value = "";
+            }
+            if (table == "general_tree_properties"){
+                this.$bvModal.show("property-create");
+                this.nodeFields[index].value = "";
+            }
+            if (table == "general_countries"){
+                this.$bvModal.show("country-create-general");
+                this.nodeFields[index].value = "";
+            }
+            if (table == "general_cities"){
+                this.$bvModal.show("city-create-general");
+                this.nodeFields[index].value = "";
+            }
+          }
+      },
     nodeWasClicked(result) {
       this.currentNode = result;
       this.filterSetting = [this.currentNode.id];
@@ -1053,6 +1082,7 @@ export default {
 <template>
   <Layout>
     <PageHeader />
+      <General :currentNode="currentNode" @created="showModal(currentNode)" />
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -1438,24 +1468,12 @@ export default {
                             >
                             <multiselect
                               v-model="$v.nodeFields.$each[index].value.$model"
+                              @input="showComponentModal($v.nodeFields.$each[index].value.$model,lockups.find((e) => field.doc_field_id.name_e == e.field_name).table,index)"
                               :options="
                                 lockups.length > 0 &&
-                                lockups.find(
-                                  (e) => field.doc_field_id.name_e == e.field_name
-                                )
-                                  ? lockups
-                                      .find(
-                                        (e) => field.doc_field_id.name_e == e.field_name
-                                      )
-                                      .field_data.map(
-                                        (type) =>
-                                          type[
-                                            lockups.find(
-                                              (e) =>
-                                                field.doc_field_id.name_e == e.field_name
-                                            ).column
-                                          ]
-                                      )
+                                lockups.find((e) => field.doc_field_id.name_e == e.field_name)?
+                                lockups.find((e) => field.doc_field_id.name_e == e.field_name)
+                                      .field_data.map((type) =>type[lockups.find((e) => field.doc_field_id.name_e == e.field_name).column ])
                                   : []
                               "
                               :class="{
@@ -1804,7 +1822,6 @@ export default {
                     class="custom-btn-dowonload"
                     :href="fileImages[fileImages.length - 1].url"
                     download
-                    target="_blank"
                   >
                     <i class="fa fa-file-pdf"></i>
                   </a>

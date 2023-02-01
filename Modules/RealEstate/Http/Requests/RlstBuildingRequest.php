@@ -2,6 +2,7 @@
 
 namespace Modules\RealEstate\Http\Requests;
 
+use App\Traits\ValidationTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RlstBuildingRequest extends FormRequest
@@ -31,8 +32,8 @@ class RlstBuildingRequest extends FormRequest
             'land_area' => "nullable",
             'building_area' => ['lt:land_area'],
             'construction_year' => ['gt:2018'],
-            'country_id' => "exists:countries,id,deleted_at,null",
-            'city_id' => "exists:cities,id,deleted_at,null",
+            'country_id' => "exists:general_countries,id,deleted_at,null",
+            'city_id' => "exists:general_cities,id,deleted_at,null",
             'avenue_id' => "exists:avenues,id",
             'lng' => "numeric|required_with:lat",
             'lat' => "numeric|required_with:lng",

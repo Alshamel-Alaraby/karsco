@@ -24,7 +24,7 @@ class UpdateBankAccountRequest extends FormRequest
     {
         return [
 
-            "bank_id" => "nullable|exists:banks,id",
+            "bank_id" => "nullable|exists:general_banks,id",
             "account_number" => "nullable|string|max:255",
             "phone" => "nullable|string|max:255",
             "address" => "nullable|string|max:255",

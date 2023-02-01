@@ -26,7 +26,6 @@ class UpdateUnitRequest extends FormRequest
             'name' => 'string|max:255',
             'name_e' => 'string|max:255',
             'is_active' => 'nullable|in:active,inactive',
-            "module_id" => "required",
         ];
     }
 

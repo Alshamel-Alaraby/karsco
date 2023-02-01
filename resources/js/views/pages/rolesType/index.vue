@@ -22,9 +22,9 @@ export default {
     title: "Roles Type",
     meta: [{ name: "Roles Type", content: "Roles Type" }],
   },
-    beforeRouteEnter(to, from, next) {
-        next((vm) => {
-                    if (vm.$store.state.auth.work_flow_trees.includes("role-e")) {
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      if (vm.$store.state.auth.work_flow_trees.includes("role-e")) {
         Swal.fire({
           icon: "error",
           title: `${vm.$t("general.Error")}`,
@@ -33,13 +33,17 @@ export default {
         return vm.$router.push({ name: "home" });
       }
 
-            if (vm.$store.state.auth.work_flow_trees.includes('role Type') || vm.$store.state.auth.work_flow_trees.includes('role') || vm.$store.state.auth.user.type == 'super_admin') {
-                return true;
-            } else {
-                return vm.$router.push({ name: "home" });
-            }
-        });
-    },
+      if (
+        (vm.showScreen("role","role Type") &&
+          vm.$store.state.auth.work_flow_trees.includes("role")) ||
+        vm.$store.state.auth.user.type == "super_admin"
+      ) {
+        return true;
+      } else {
+        return vm.$router.push({ name: "home" });
+      }
+    });
+  },
   mixins: [translation],
   components: {
     Layout,
@@ -78,7 +82,7 @@ export default {
       filterSetting: ["name", "name_e"],
       Tooltip: "",
       mouseEnter: null,
-      company_id:null
+      company_id: null,
     };
   },
   validations: {
@@ -147,6 +151,14 @@ export default {
     });
   },
   methods: {
+    showScreen(module, screen) {
+      let filterRes = this.$store.state.auth.allWorkFlow.filter(
+        (workflow) => workflow.name_e == module
+      );
+      let _module = filterRes.length ? filterRes[0] : null;
+      if (!_module) return false;
+      return _module.screen ? _module.screen.name_e == screen : true;
+    },
     /**
      *  start get Data module && pagination
      */
@@ -368,7 +380,7 @@ export default {
         this.isLoader = true;
         this.errors = {};
         adminApi
-          .post(`/role_types`, {...this.create,company_id:this.company_id})
+          .post(`/role_types`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.is_disabled = true;
             this.getData();
@@ -544,10 +556,10 @@ export default {
                     class="btn-block setting-search"
                   >
                     <b-form-checkbox v-model="filterSetting" value="name" class="mb-1">
-                      {{ getCompanyKey('role_type_name_ar') }}
+                      {{ getCompanyKey("role_type_name_ar") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="filterSetting" value="name_e" class="mb-1">
-                      {{ getCompanyKey('role_type_name_en') }}
+                      {{ getCompanyKey("role_type_name_en") }}
                     </b-form-checkbox>
                   </b-dropdown>
                   <!-- Basic dropdown -->
@@ -642,10 +654,10 @@ export default {
                       class="dropdown-custom-ali"
                     >
                       <b-form-checkbox v-model="setting.name" class="mb-1"
-                        >{{ getCompanyKey('role_type_name_ar') }}
+                        >{{ getCompanyKey("role_type_name_ar") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.name_e" class="mb-1">
-                        {{ getCompanyKey('role_type_name_en') }}
+                        {{ getCompanyKey("role_type_name_en") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
                         <a href="javascript:void(0)" class="btn btn-primary btn-sm"
@@ -751,7 +763,7 @@ export default {
                   <div class="col-md-12">
                     <div class="form-group">
                       <label for="field-1" class="control-label">
-                        {{ getCompanyKey('role_type_name_ar') }}
+                        {{ getCompanyKey("role_type_name_ar") }}
                         <span class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
@@ -791,7 +803,7 @@ export default {
                   <div class="col-md-12">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
-                        {{ getCompanyKey('role_type_name_en') }}
+                        {{ getCompanyKey("role_type_name_en") }}
                         <span class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
@@ -853,7 +865,7 @@ export default {
                     </th>
                     <th v-if="setting.name">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('role_type_name_ar') }}</span>
+                        <span>{{ getCompanyKey("role_type_name_ar") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -868,7 +880,7 @@ export default {
                     </th>
                     <th v-if="setting.name_e">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('role_type_name_en') }}</span>
+                        <span>{{ getCompanyKey("role_type_name_en") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -993,7 +1005,7 @@ export default {
                             <div class="col-md-12">
                               <div class="form-group">
                                 <label for="field-u-1" class="control-label">
-                                  {{ getCompanyKey('role_type_name_ar') }}
+                                  {{ getCompanyKey("role_type_name_ar") }}
                                   <span class="text-danger">*</span>
                                 </label>
                                 <div dir="rtl">
@@ -1036,7 +1048,7 @@ export default {
                             <div class="col-md-12">
                               <div class="form-group">
                                 <label for="field-u-2" class="control-label">
-                                  {{ getCompanyKey('role_type_name_en') }}
+                                  {{ getCompanyKey("role_type_name_en") }}
                                   <span class="text-danger">*</span>
                                 </label>
                                 <div dir="ltr">

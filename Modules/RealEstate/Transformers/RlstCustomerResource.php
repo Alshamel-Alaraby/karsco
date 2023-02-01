@@ -2,6 +2,8 @@
 
 namespace Modules\RealEstate\Transformers;
 
+use App\Http\Resources\City\CityResource;
+use App\Http\Resources\Country\CountryResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RlstCustomerResource extends JsonResource
@@ -21,9 +23,11 @@ class RlstCustomerResource extends JsonResource
             'phone' => $this->phone,
             'email' => $this->email,
             'country_id' => $this->country_id,
+            "country" => new CountryResource($this->country),
             'city_id' => $this->city_id,
+            "city" => new CityResource($this->city),
             'nationality_id' => $this->nationality_id,
-            'bank_account_id' => $this->bank_account_id,
+            "nationality" => new CountryResource($this->nationality),
             'contact_person' => $this->contact_person,
             'contact_phones' => $this->contact_phones,
             'national_id' => $this->national_id,
@@ -32,6 +36,8 @@ class RlstCustomerResource extends JsonResource
             'note2' => $this->note2,
             'note3' => $this->note3,
             'note4' => $this->note4,
+            'bank_account_id' => $this->bank_account_id,
+            "bank_account" => new \App\Http\Resources\BankAccount\BankAccountResource($this->bankAccount),
             'whatsapp' => $this->whatsapp,
             'categories' => $this->categories,
             "attachments" => $this->attachments,

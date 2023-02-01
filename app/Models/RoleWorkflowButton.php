@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\CompanyScopeTrait;
 use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,7 +12,7 @@ use Spatie\Activitylog\LogOptions;
 
 class RoleWorkflowButton extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait,ConnTrait;
+    use HasFactory, SoftDeletes, LogTrait,ConnTrait, CompanyScopeTrait;
 
     protected $table = 'roles_workflows_buttons';
 

@@ -20,11 +20,11 @@ class UpdateExternalSalesmenRequest extends FormRequest
     {
         $id = $this->id;
         return [
-            "phone" => "max:20|unique:external_salesmen,phone," . $id,
+            "phone" => "max:20|unique:general_external_salesmen,phone," . $id,
             "address" => "max:255",
-            "rp_code" => "unique:external_salesmen,rp_code," . $id,
-            "email" => "email|unique:external_salesmen,email," .$id,
-            "country_id" => "exists:countries,id",
+            "rp_code" => "unique:general_external_salesmen,rp_code," . $id,
+            "email" => "email|unique:general_external_salesmen,email," .$id,
+            "country_id" => "exists:general_countries,id",
             'national_id' => "integer",
             'is_active' => 'nullable|in:active,inactive',
         ];

@@ -2,6 +2,7 @@
 
 namespace Modules\RealEstate\Transformers;
 
+use Modules\RealEstate\Entities\RlstUnitStatus;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RlstUnitResource extends JsonResource
@@ -25,12 +26,12 @@ class RlstUnitResource extends JsonResource
             'status_date' => $this->status_date,
             'unit_area' => $this->unit_area,
             'building_id' => $this->building_id,
-            // "building" => new RlstBuildingResource($this->building),
+            "building" => new RlstBuildingResource($this->building),
             'owner_id' => $this->owner_id,
             'currency_id' => $this->currency_id,
             'wallet_id' => $this->wallet_id,
             'unit_status_id' => $this->unit_status_id,
-            // "unit-status" => new RlstUnitStatus($this->unitStatus),
+            "unit-status" => new RlstUnitStatus($this->unitStatus),
             'commission_ty' => $this->commission_ty,
             'commission_value' => $this->commission_value,
             'price' => $this->price,

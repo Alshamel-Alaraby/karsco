@@ -173,8 +173,7 @@
                                  $store.state.archiving.objectActive.media.length > 0
                              "
                              :href="$store.state.archiving.objectActive.media[$store.state.archiving.objectActive.media.length -1].url"
-                             :download="$store.state.archiving.objectActive.media[$store.state.archiving.objectActive.media.length -1].url"
-                             target="_blank"
+                             download
                           >
                               <i class="fas fa-upload"></i>
                           </a>

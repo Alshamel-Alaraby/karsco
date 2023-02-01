@@ -9,7 +9,8 @@ export default {
   data() {
     return {
       menuItems: menuItems,
-      workFlowTree: []
+      workFlowTree: [],
+      allWorkFlowTree: [],
     };
   },
   props: {
@@ -139,14 +140,23 @@ export default {
       },
     },
   },
-  mounted () {
+  mounted() {
     this.workFlowTree = this.$store.state.auth.work_flow_trees;
+    this.allWorkFlowTree = this.$store.state.auth.allWorkFlow;
     this._activateMenuDropdown();
     this.$router.afterEach((routeTo, routeFrom) => {
       this._activateMenuDropdown();
     });
   },
   methods: {
+    showScreen(module, screen) {
+      let filterRes = this.allWorkFlowTree.filter(
+        (workflow) => workflow.name_e == module.name
+      );
+      let _module = filterRes.length ? filterRes[0] : null;
+      if (!_module) return false;
+      return _module.screen ? _module.screen.name_e == screen.name : true;
+    },
     /**
      * Returns true or false if given menu item has child or not
      * @param item menuItem
@@ -300,7 +310,15 @@ export default {
             <li class="menu-title" v-if="item.isTitle" :key="item.id">
               {{ $t(item.label) }}
             </li>
-            <li v-if="!item.isTitle && !item.isLayout && (workFlowTree.includes(item.name)||$store.state.auth.user.type == 'super_admin')" :key="item.id">
+            <li
+              v-if="
+                !item.isTitle &&
+                !item.isLayout &&
+                (workFlowTree.includes(item.name) ||
+                  $store.state.auth.user.type == 'super_admin')
+              "
+              :key="item.id"
+            >
               <a
                 v-if="hasItems(item)"
                 href="javascript:void(0);"
@@ -344,47 +362,61 @@ export default {
                   aria-expanded="false"
                 >
                   <template v-for="(subitem, index) of item.subItems">
-                      <li :key="index" v-if="workFlowTree.includes(item.name) || $store.state.auth.user.type == 'super_admin'">
-                          <router-link
-                              :to="subitem.link"
-                              v-if="!hasItems(subitem)"
-                              class="side-nav-link-ref"
-                          >{{ $t(subitem.label) }}</router-link
-                          >
-                          <a
-                              v-if="hasItems(subitem)"
-                              class="side-nav-link-a-ref has-arrow"
-                              @click="subitem.isMenuCollapsed = !subitem.isMenuCollapsed"
-                              href="javascript:void(0);"
-                          >{{ $t(subitem.label) }}
-                              <span class="menu-arrow"></span>
-                          </a>
+                    <li
+                      :key="index"
+                      v-if="
+                        showScreen(item, subitem)||$store.state.auth.user.type == 'super_admin'
+                      "
+                    >
+                      <router-link
+                        :to="subitem.link"
+                        v-if="!hasItems(subitem)"
+                        class="side-nav-link-ref"
+                        >{{ $t(subitem.label) }}</router-link
+                      >
+                      <a
+                        v-if="hasItems(subitem)"
+                        class="side-nav-link-a-ref has-arrow"
+                        @click="subitem.isMenuCollapsed = !subitem.isMenuCollapsed"
+                        href="javascript:void(0);"
+                        >{{ $t(subitem.label) }}
+                        <span class="menu-arrow"></span>
+                      </a>
 
-                          <div class="collapse" :class="{ show: subitem.isMenuCollapsed }">
-                              <ul v-if="hasItems(subitem)" class="sub-menu" aria-expanded="false">
-                                  <li v-for="(subSubitem, index) of subitem.subItems" :key="index">
-                                      <router-link :to="subSubitem.link" class="side-nav-link-ref">{{
-                                          $t(subSubitem.label)
-                                          }}</router-link>
-                                  </li>
-                              </ul>
-                          </div>
-                      </li>
+                      <div class="collapse" :class="{ show: subitem.isMenuCollapsed }">
+                        <ul
+                          v-if="hasItems(subitem)"
+                          class="sub-menu"
+                          aria-expanded="false"
+                        >
+                          <li
+                            v-for="(subSubitem, index) of subitem.subItems"
+                            :key="index"
+                          >
+                            <router-link
+                              :to="subSubitem.link"
+                              class="side-nav-link-ref"
+                              >{{ $t(subSubitem.label) }}</router-link
+                            >
+                          </li>
+                        </ul>
+                      </div>
+                    </li>
                   </template>
                 </ul>
               </div>
             </li>
           </template>
           <li v-if="$store.state.auth.user">
-                <router-link
-                    v-if="$store.state.auth.user.type == 'super_admin'"
-                    to="/dashboard/dictionary"
-                    class="side-nav-link-ref"
-                >
-                    <i class="fas fa-spell-check"></i>
-                    <span>{{ $t('general.dictionary') }}</span>
-                </router-link>
-            </li>
+            <router-link
+              v-if="$store.state.auth.user.type == 'super_admin'"
+              to="/dashboard/dictionary"
+              class="side-nav-link-ref"
+            >
+              <i class="fas fa-spell-check"></i>
+              <span>{{ $t("general.dictionary") }}</span>
+            </router-link>
+          </li>
         </ul>
       </div>
       <!-- End Sidebar -->

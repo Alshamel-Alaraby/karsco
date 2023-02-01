@@ -21,6 +21,7 @@ class RoleResource extends JsonResource
             'name' => $this->name,
             'name_e' => $this->name_e,
             'roletype' => new RoleTypeResource($this->roleType),
+            'roletype_id' => $this->roletype_id,
             "work_flow" => RoleWorkflowRelResource::collection($this->workflows),
         ];
     }

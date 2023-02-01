@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\CompanyScopeTrait;
 use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Bank extends Model
 {
-    use HasFactory, LogTrait, SoftDeletes;
+    use HasFactory, LogTrait, SoftDeletes, CompanyScopeTrait;
     protected $table="general_banks";
     protected $fillable = [
         'name',

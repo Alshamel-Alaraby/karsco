@@ -57,7 +57,12 @@ class RlstCustomer extends Model
 
     public function reservations()
     {
-        return $this->hasMany(RlstReservation::class,'customer_id');
+        return $this->hasMany(RlstReservation::class, 'customer_id');
+    }
+
+    public function bankAccount()
+    {
+        return $this->belongsTo(\App\Models\BankAccount::class, 'bank_account_id');
     }
     // attributes
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\CompanyScopeTrait;
 use App\Traits\MediaTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,8 @@ use Spatie\MediaLibrary\HasMedia;
 
 class File extends Model implements HasMedia
 {
+    protected $table="general_files";
     use HasFactory, MediaTrait;
+    use HasFactory, MediaTrait, CompanyScopeTrait;
 
 }

@@ -587,6 +587,7 @@ export default {
                 adminApi.post(`/bank-accounts`, {...this.create,company_id:this.company_id})
                     .then((res) => {
                         this.bankAccount_id = res.data.data.id;
+                        this.$emit('created');
                         setTimeout(() => {
                             Swal.fire({
                                 icon: 'success',

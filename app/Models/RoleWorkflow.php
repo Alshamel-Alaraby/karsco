@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\CompanyScopeTrait;
 use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,9 +12,9 @@ use Spatie\Activitylog\LogOptions;
 
 class RoleWorkflow extends Model
 {
-    use HasFactory, LogTrait;
+    use HasFactory, LogTrait, CompanyScopeTrait;
 
-    protected $table = 'role_workflows';
+    protected $table = 'general_role_workflows';
 
     protected $guarded = ['id'];
 

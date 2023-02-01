@@ -26,7 +26,7 @@ export default {
     PageHeader,
     Switches,
     ErrorMessage,
-    loader
+    loader,
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -38,9 +38,9 @@ export default {
         });
         return vm.$router.push({ name: "home" });
       } else if (
-        vm.$store.state.auth.work_flow_trees.includes("country") ||
-        vm.$store.state.auth.work_flow_trees.includes("area")
-          || vm.$store.state.auth.user.type == 'super_admin'
+        (vm.showScreen( "area","country") &&
+          vm.$store.state.auth.work_flow_trees.includes("area")) ||
+        vm.$store.state.auth.user.type == "super_admin"
       ) {
         return true;
       } else {
@@ -56,7 +56,7 @@ export default {
       countriesPagination: {},
       countries: [],
       isLoader: false,
-      company_id:null,
+      company_id: null,
       create: {
         name: "",
         name_e: "",
@@ -207,6 +207,14 @@ export default {
     });
   },
   methods: {
+    showScreen(module, screen) {
+      let filterRes = this.$store.state.auth.allWorkFlow.filter(
+        (workflow) => workflow.name_e == module
+      );
+      let _module = filterRes.length ? filterRes[0] : null;
+      if (!_module) return false;
+      return _module.screen ? _module.screen.name_e == screen : true;
+    },
     /**
      *  start get Data countrie && pagination
      */
@@ -476,7 +484,7 @@ export default {
         this.errors = {};
 
         adminApi
-          .post(`/countries`, {...this.create,company_id:this.company_id})
+          .post(`/countries`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.country_id = res.data.data.id;
             setTimeout(() => {
@@ -2576,7 +2584,3 @@ export default {
   max-height: 400px !important;
 }
 </style>
-
-
-
-

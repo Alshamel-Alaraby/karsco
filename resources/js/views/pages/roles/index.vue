@@ -41,7 +41,9 @@ export default {
         });
         return vm.$router.push({ name: "home" });
       }
-            if (vm.$store.state.auth.work_flow_trees.includes('roles') || vm.$store.state.auth.work_flow_trees.includes('role') || vm.$store.state.auth.user.type == 'super_admin') {
+            if (    ( vm.showScreen( "role","roles") &&
+        vm.$store.state.auth.work_flow_trees.includes("role"))
+  || vm.$store.state.auth.user.type == 'super_admin') {
                 return true;
             } else {
                 return vm.$router.push({ name: "home" });
@@ -157,6 +159,14 @@ export default {
     });
   },
   methods: {
+    showScreen(module, screen) {
+      let filterRes = this.$store.state.auth.allWorkFlow.filter(
+        (workflow) => workflow.name_e == module
+      );
+      let _module = filterRes.length ? filterRes[0] : null;
+      if (!_module) return false;
+      return _module.screen ? _module.screen.name_e == screen : true;
+    },
     /**
      *  start get Data module && pagination
      */
@@ -166,7 +176,6 @@ export default {
       for (let i = 0; i < this.filterSetting.length; ++i) {
         filter += `columns[${i}]=${this.filterSetting[i]}&`;
       }
-
       adminApi
         .get(
           `/roles?page=${page}&per_page=${this.per_page}&search=${this.search}&${filter}`

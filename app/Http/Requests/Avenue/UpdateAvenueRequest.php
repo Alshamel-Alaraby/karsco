@@ -24,12 +24,12 @@ class UpdateAvenueRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'string|max:255|unique:avenues,name,'. $this->id,
-            'name_e' => 'string|max:255|unique:avenues,name_e,'. $this->id,
+            'name' => 'string|max:255|unique:general_avenues,name,'. $this->id,
+            'name_e' => 'string|max:255|unique:general_avenues,name_e,'. $this->id,
             "is_active" => "nullable|in:active,inactive",
-            "country_id" => "exists:countries,id",
-            "city_id" => "exists:cities,id",
-            "governorate_id" => "exists:governorates,id",
+            "country_id" => "exists:general_countries,id",
+            "city_id" => "exists:general_cities,id",
+            "governorate_id" => "exists:general_governorates,id",
         ];
     }
 

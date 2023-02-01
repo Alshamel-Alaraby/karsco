@@ -30,7 +30,6 @@
 
 <script>
 import Swal from "sweetalert2";
-
 export default {
   name: "index",
   data() {
@@ -51,7 +50,7 @@ export default {
       this.$store.commit("auth/editCompanyId", id);
       await axios
         .get(
-          `${process.env.MIX_APP_URL_OUTSIDE}api/everything_about_the_company/${this.company_id}`
+          `${process.env.MIX_APP_URL_OUTSIDE}api/everything_about_the_company/${id}`
         )
         .then((res) => {
           let l = res.data.data;

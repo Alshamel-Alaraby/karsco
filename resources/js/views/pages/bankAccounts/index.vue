@@ -39,23 +39,26 @@ export default {
     Multiselect,
     Bank,
   },
-    beforeRouteEnter(to, from, next) {
-        next((vm) => {
-           if (vm.$store.state.auth.work_flow_trees.includes("bank-e")) {
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      if (vm.$store.state.auth.work_flow_trees.includes("bank-e")) {
         Swal.fire({
           icon: "error",
           title: `${vm.$t("general.Error")}`,
           text: `${vm.$t("general.ModuleExpired")}`,
         });
         return vm.$router.push({ name: "home" });
+      } else if (
+        (vm.showScreen( "bank","bank accounts") &&
+          vm.$store.state.auth.work_flow_trees.includes("bank")) ||
+        vm.$store.state.auth.user.type == "super_admin"
+      ) {
+        return true;
+      } else {
+        return vm.$router.push({ name: "home" });
       }
-            else if (vm.$store.state.auth.work_flow_trees.includes('bank accounts') || vm.$store.state.auth.work_flow_trees.includes('bank')  || vm.$store.state.auth.user.type == 'super_admin') {
-                return true;
-            } else {
-                return vm.$router.push({ name: "home" });
-            }
-        });
-    },
+    });
+  },
   data() {
     return {
       per_page: 50,
@@ -66,7 +69,7 @@ export default {
       bankAccountsPagination: {},
       bankAccounts: [],
       isLoader: false,
-      company_id:null,
+      company_id: null,
       create: {
         bank_id: null,
         account_number: "",
@@ -205,6 +208,14 @@ export default {
     });
   },
   methods: {
+    showScreen(module, screen) {
+      let filterRes = this.$store.state.auth.allWorkFlow.filter(
+        (workflow) => workflow.name_e == module
+      );
+      let _module = filterRes.length ? filterRes[0] : null;
+      if (!_module) return false;
+      return _module.screen ? _module.screen.name_e == screen : true;
+    },
     showBankModal() {
       if (this.create.bank_id == 0) {
         this.$bvModal.show("bank-create");
@@ -389,77 +400,76 @@ export default {
         });
       }
     },
-        /**
-         *  end delete countrie
-         */
-        /**
-         *  reset Modal (create)
-         */
-         resetModalHidden() {
-            this.create = {
-                bank_id: null,
-                account_number: '',
-                phone: '',
-                address: '',
-                email: '',
-                emp_id: '',
-                rp_code: '',
-                media: null
-            };
-            this.$nextTick(() => {
-                this.$v.$reset()
-            });
-            this.images = [];
-            this.bankAccount_id = null;
-            this.errors = {};
-            this.$bvModal.hide(`create`);
-
-        },
-        /**
-         *  hidden Modal (create)
-         */
-        async resetModal() {
-            await this.getBank();
-            this.create = {
-                bank_id: null,
-                account_number: '',
-                phone: '',
-                address: '',
-                email: '',
-                emp_id: '',
-                rp_code: '',
-            };
-            this.showPhoto = './images/img-1.png';
-            this.$nextTick(() => {
-                this.$v.$reset()
-            });
-            this.bankAccount_id = null;
-            this.media = {};
-            this.images = [];
-            this.errors = {};
-        },
-        /**
-         *  create countrie
-         */
-        async resetForm() {
-            await this.getBank();
-            this.create = {
-                bank_id: null,
-                account_number: '',
-                phone: '',
-                address: '',
-                email: '',
-                emp_id: '',
-                rp_code: '',
-            };
-            this.$nextTick(() => {
-                this.$v.$reset()
-            });
-            this.bankAccount_id = null;
-            this.media = {};
-            this.images = [];
-            this.errors = {};
-        },
+    /**
+     *  end delete countrie
+     */
+    /**
+     *  reset Modal (create)
+     */
+    resetModalHidden() {
+      this.create = {
+        bank_id: null,
+        account_number: "",
+        phone: "",
+        address: "",
+        email: "",
+        emp_id: "",
+        rp_code: "",
+        media: null,
+      };
+      this.$nextTick(() => {
+        this.$v.$reset();
+      });
+      this.images = [];
+      this.bankAccount_id = null;
+      this.errors = {};
+      this.$bvModal.hide(`create`);
+    },
+    /**
+     *  hidden Modal (create)
+     */
+    async resetModal() {
+      await this.getBank();
+      this.create = {
+        bank_id: null,
+        account_number: "",
+        phone: "",
+        address: "",
+        email: "",
+        emp_id: "",
+        rp_code: "",
+      };
+      this.showPhoto = "./images/img-1.png";
+      this.$nextTick(() => {
+        this.$v.$reset();
+      });
+      this.bankAccount_id = null;
+      this.media = {};
+      this.images = [];
+      this.errors = {};
+    },
+    /**
+     *  create countrie
+     */
+    async resetForm() {
+      await this.getBank();
+      this.create = {
+        bank_id: null,
+        account_number: "",
+        phone: "",
+        address: "",
+        email: "",
+        emp_id: "",
+        rp_code: "",
+      };
+      this.$nextTick(() => {
+        this.$v.$reset();
+      });
+      this.bankAccount_id = null;
+      this.media = {};
+      this.images = [];
+      this.errors = {};
+    },
     AddSubmit() {
       this.$v.create.$touch();
 
@@ -470,7 +480,7 @@ export default {
         this.errors = {};
 
         adminApi
-          .post(`/bank-accounts`, {...this.create,company_id:this.company_id})
+          .post(`/bank-accounts`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.bankAccount_id = res.data.data.id;
             setTimeout(() => {
@@ -852,29 +862,29 @@ export default {
                       :value="$i18n.locale == 'ar' ? 'bank.name' : 'bank.name_e'"
                       class="mb-1"
                     >
-                      {{ getCompanyKey('bank') }}
+                      {{ getCompanyKey("bank") }}
                     </b-form-checkbox>
                     <b-form-checkbox
                       v-model="filterSetting"
                       value="account_number"
                       class="mb-1"
                     >
-                      {{ getCompanyKey('bank_account_number') }}
+                      {{ getCompanyKey("bank_account_number") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="filterSetting" value="phone" class="mb-1">
-                      {{ getCompanyKey('bank_account_phone') }}
+                      {{ getCompanyKey("bank_account_phone") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="filterSetting" value="address" class="mb-1">
-                      {{ getCompanyKey('bank_account_address') }}
+                      {{ getCompanyKey("bank_account_address") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="filterSetting" value="email" class="mb-1">
-                      {{ getCompanyKey('bank_account_email') }}
+                      {{ getCompanyKey("bank_account_email") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="filterSetting" value="emp_id" class="mb-1">
-                      {{ getCompanyKey('employee') }}
+                      {{ getCompanyKey("employee") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="filterSetting" value="rp_code" class="mb-1"
-                      >{{ getCompanyKey('bank_account_rpcode') }}
+                      >{{ getCompanyKey("bank_account_rpcode") }}
                     </b-form-checkbox>
                   </b-dropdown>
                   <!-- Basic dropdown -->
@@ -969,25 +979,25 @@ export default {
                       class="dropdown-custom-ali"
                     >
                       <b-form-checkbox v-model="setting.bank_id" class="mb-1"
-                        >{{ getCompanyKey('bank') }}
+                        >{{ getCompanyKey("bank") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.account_number" class="mb-1">
-                        {{ getCompanyKey('bank_account_number') }}
+                        {{ getCompanyKey("bank_account_number") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.phone" class="mb-1">
-                        {{ getCompanyKey('bank_account_phone') }}
+                        {{ getCompanyKey("bank_account_phone") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.address" class="mb-1">
-                        {{ getCompanyKey('bank_account_address') }}
+                        {{ getCompanyKey("bank_account_address") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.email" class="mb-1">
-                        {{ getCompanyKey('bank_account_email') }}
+                        {{ getCompanyKey("bank_account_email") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.emp_id" class="mb-1">
-                        {{ getCompanyKey('employee') }}
+                        {{ getCompanyKey("employee") }}
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.rp_code" class="mb-1">
-                        {{ getCompanyKey('bank_account_rpcode') }}
+                        {{ getCompanyKey("bank_account_rpcode") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
                         <a href="javascript:void(0)" class="btn btn-primary btn-sm"
@@ -1102,7 +1112,7 @@ export default {
                           <div class="col-md-6">
                             <div class="form-group position-relative">
                               <label class="control-label">
-                                {{ getCompanyKey('bank') }}
+                                {{ getCompanyKey("bank") }}
                                 <span class="text-danger">*</span>
                               </label>
                               <multiselect
@@ -1133,7 +1143,7 @@ export default {
                           <div class="col-md-6">
                             <div class="form-group">
                               <label for="field-1" class="control-label">
-                                {{ getCompanyKey('bank_account_number') }}
+                                {{ getCompanyKey("bank_account_number") }}
                                 <span class="text-danger">*</span>
                               </label>
                               <input
@@ -1181,7 +1191,7 @@ export default {
                           <div class="col-md-6">
                             <div class="form-group">
                               <label for="field-3" class="control-label">
-                                {{ getCompanyKey('bank_account_phone') }}
+                                {{ getCompanyKey("bank_account_phone") }}
                                 <span class="text-danger">*</span>
                               </label>
 
@@ -1226,7 +1236,7 @@ export default {
                           <div class="col-md-6">
                             <div class="form-group">
                               <label for="field-2" class="control-label">
-                                {{ getCompanyKey('bank_account_address') }}
+                                {{ getCompanyKey("bank_account_address") }}
                                 <span class="text-danger">*</span>
                               </label>
                               <div dir="ltr">
@@ -1273,7 +1283,7 @@ export default {
                           <div class="col-md-6">
                             <div class="form-group">
                               <label for="field-4" class="control-label">
-                                {{ getCompanyKey('bank_account_email') }}
+                                {{ getCompanyKey("bank_account_email") }}
                                 <span class="text-danger">*</span>
                               </label>
                               <input
@@ -1303,7 +1313,7 @@ export default {
                           <div class="col-md-6">
                             <div class="form-group">
                               <label for="field-3" class="control-label">
-                                {{ getCompanyKey('employee') }}
+                                {{ getCompanyKey("employee") }}
                                 <span class="text-danger">*</span>
                               </label>
 
@@ -1348,7 +1358,7 @@ export default {
                           <div class="col-md-6">
                             <div class="form-group">
                               <label for="field-3" class="control-label">
-                                {{ getCompanyKey('bank_account_rpcode') }}
+                                {{ getCompanyKey("bank_account_rpcode") }}
                                 <span class="text-danger">*</span>
                               </label>
 
@@ -1538,7 +1548,7 @@ export default {
                     </th>
                     <th v-if="setting.bank_id">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('bank') }}</span>
+                        <span>{{ getCompanyKey("bank") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1553,7 +1563,7 @@ export default {
                     </th>
                     <th v-if="setting.account_number">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('bank_account_number') }}</span>
+                        <span>{{ getCompanyKey("bank_account_number") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1572,7 +1582,7 @@ export default {
                     </th>
                     <th v-if="setting.phone">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('bank_account_phone') }}</span>
+                        <span>{{ getCompanyKey("bank_account_phone") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1587,7 +1597,7 @@ export default {
                     </th>
                     <th v-if="setting.address">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('bank_account_address') }}</span>
+                        <span>{{ getCompanyKey("bank_account_address") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1602,7 +1612,7 @@ export default {
                     </th>
                     <th v-if="setting.email">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('bank_account_email') }}</span>
+                        <span>{{ getCompanyKey("bank_account_email") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1618,7 +1628,7 @@ export default {
 
                     <th v-if="setting.emp_id">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('employee') }}</span>
+                        <span>{{ getCompanyKey("employee") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1634,7 +1644,7 @@ export default {
 
                     <th v-if="setting.rp_code">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('bank_account_rpcode') }}</span>
+                        <span>{{ getCompanyKey("bank_account_rpcode") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -1775,7 +1785,7 @@ export default {
                                 <div class="col-md-6">
                                   <div class="form-group position-relative">
                                     <label class="control-label">
-                                      {{ getCompanyKey('bank') }}
+                                      {{ getCompanyKey("bank") }}
                                       <span class="text-danger">*</span>
                                     </label>
                                     <multiselect
@@ -1806,7 +1816,7 @@ export default {
                                 <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="field-1" class="control-label">
-                                      {{ getCompanyKey('bank_account_number') }}
+                                      {{ getCompanyKey("bank_account_number") }}
                                       <span class="text-danger">*</span>
                                     </label>
                                     <input
@@ -1855,7 +1865,7 @@ export default {
                                 <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="field-3" class="control-label">
-                                      {{ getCompanyKey('bank_account_phone') }}
+                                      {{ getCompanyKey("bank_account_phone") }}
                                       <span class="text-danger">*</span>
                                     </label>
 
@@ -1901,7 +1911,7 @@ export default {
                                 <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="field-2" class="control-label">
-                                      {{ getCompanyKey('bank_account_address') }}
+                                      {{ getCompanyKey("bank_account_address") }}
                                       <span class="text-danger">*</span>
                                     </label>
                                     <div dir="ltr">
@@ -1947,7 +1957,7 @@ export default {
                                 <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="field-4" class="control-label">
-                                      {{ getCompanyKey('bank_account_email') }}
+                                      {{ getCompanyKey("bank_account_email") }}
                                       <span class="text-danger">*</span>
                                     </label>
                                     <input
@@ -1981,7 +1991,7 @@ export default {
                                 <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="field-3" class="control-label">
-                                      {{ getCompanyKey('employee') }}
+                                      {{ getCompanyKey("employee") }}
                                       <span class="text-danger">*</span>
                                     </label>
 
@@ -2027,7 +2037,7 @@ export default {
                                 <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="field-3" class="control-label">
-                                      {{ getCompanyKey('bank_account_rpcode') }}
+                                      {{ getCompanyKey("bank_account_rpcode") }}
                                       <span class="text-danger">*</span>
                                     </label>
 

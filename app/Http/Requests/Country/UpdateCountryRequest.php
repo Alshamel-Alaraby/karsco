@@ -23,10 +23,10 @@ class UpdateCountryRequest extends FormRequest
      */public function rules()
     {
         return [
-            'name' => 'string|max:255|unique:countries,name,' . $this->id,
-            'name_e' => 'string|max:255|unique:countries,name,' . $this->id,
+            'name' => 'string|max:255|unique:general_countries,name,' . $this->id,
+            'name_e' => 'string|max:255|unique:general_countries,name,' . $this->id,
             "is_default" => "in:0,1",
-            "phone_key" => "unique:countries,phone_key," . $this->id,
+            "phone_key" => "unique:general_countries,phone_key," . $this->id,
             'national_id_length' => "integer",
             'long_name' => "max:100",
             'long_name_e' => "max:100",

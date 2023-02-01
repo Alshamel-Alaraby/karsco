@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\ConnTrait;
+use App\Traits\CompanyScopeTrait;
 use App\Traits\LogTrait;
 use App\Traits\MediaTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,9 +12,8 @@ use Spatie\MediaLibrary\HasMedia;
 
 class BankAccount extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes, LogTrait, MediaTrait;
+    use HasFactory, SoftDeletes, LogTrait, MediaTrait, CompanyScopeTrait;
     protected $table = 'general_bank_accounts';
-
 
     protected $fillable = [
         'bank_id',
@@ -24,7 +23,7 @@ class BankAccount extends Model implements HasMedia
         'email',
         'emp_id',
         'rp_code',
-        "company_id"
+        "company_id",
     ];
 
     public function bank()
@@ -32,6 +31,15 @@ class BankAccount extends Model implements HasMedia
         return $this->belongsTo(Bank::class);
     }
 
+    public function rlstCustomers()
+    {
+        return $this->hasMany(\Modules\RealEstate\Entities\RlstCustomer::class,"bank_account_id");
+    }
+
+    public function rlstOwners()
+    {
+        return $this->hasMany(\Modules\RealEstate\Entities\RlstOwner::class,"bank_account_id");
+    }
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
         $user = @auth()->user()->id ?: "system";

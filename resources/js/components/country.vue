@@ -1,7 +1,7 @@
 <template>
  <!--  create   -->
   <b-modal
-    id="country-create"
+    :id="id"
     :title="$t('country.addcountry')"
     title-class="font-18"
     dialog-class="modal-full-width"
@@ -552,7 +552,12 @@ export default {
     loader,
   },
   mixins:[translation],
-  
+    props:{
+        id:{
+            default:"country-create"
+        }
+    },
+
   mounted(){
 this.company_id=this.$store.getters["auth/company_id"];
   },

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\CompanyScopeTrait;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Spatie\Activitylog\LogOptions;
 
 class RoleScreenHotfield extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait;
+    use HasFactory, SoftDeletes, LogTrait, CompanyScopeTrait;
 
     protected $table = 'general_role_screen_hotfields';
 

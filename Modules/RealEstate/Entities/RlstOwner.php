@@ -49,6 +49,11 @@ class RlstOwner extends Model
         return $this->belongsTo(\App\Models\Country::class, 'nationality_id');
     }
 
+    public function bankAccount()
+    {
+        return $this->belongsTo(\App\Models\BankAccount::class);
+    }
+
     public function walletOwner()
     {
         return $this->hasMany(\Modules\RealEstate\Entities\RlstWalletOwner::class, "wallet_id");

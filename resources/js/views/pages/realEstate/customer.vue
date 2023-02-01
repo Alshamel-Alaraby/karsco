@@ -546,7 +546,6 @@ export default {
             } else {
                 this.isLoader = true;
                 this.errors = {};
-
                 adminApi.put(`/real-estate/customers/${id}`,this.edit)
                     .then((res) => {
                         this.$bvModal.hide(`modal-edit-${id}`);

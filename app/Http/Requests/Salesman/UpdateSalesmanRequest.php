@@ -25,7 +25,7 @@ class UpdateSalesmanRequest extends FormRequest
         return [
             "name" => "nullable|string|max:100",
             "name_e" => "nullable|string|max:100",
-            "salesman_type_id" => "nullable|exists:salesmen_types,id",
+            "salesman_type_id" => "nullable|exists:general_salesmen_types,id",
 
         ];
     }

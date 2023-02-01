@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Employee;
+use App\Traits\CompanyScopeTrait;
 use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use App\Traits\MediaTrait;
@@ -19,7 +20,7 @@ use Spatie\MediaLibrary\HasMedia;
 class User extends Authenticatable implements HasMedia
 {
     protected $table="general_users";
-    use HasApiTokens, HasFactory, Notifiable, MediaTrait, LogsActivity, CausesActivity, LogTrait;
+    use HasApiTokens, HasFactory, Notifiable, MediaTrait, LogsActivity, CausesActivity, LogTrait, CompanyScopeTrait;
 
     protected $fillable = [
         'name',
