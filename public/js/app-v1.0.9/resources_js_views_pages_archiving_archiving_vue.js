@@ -4639,6 +4639,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
  */
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: "customer",
   components: {
     Switches: vue_switches__WEBPACK_IMPORTED_MODULE_1__["default"],
     ErrorMessage: _components_widgets_errorMessage__WEBPACK_IMPORTED_MODULE_3__["default"],

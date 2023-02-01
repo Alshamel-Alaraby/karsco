@@ -8,7 +8,7 @@ export const state = {
     // permission: JSON.parse(localStorage.getItem("permission")) || [],
     partner: JSON.parse(localStorage.getItem("partner")) || {},
     companies: JSON.parse(localStorage.getItem("companies")) || [],
-    company_id: localStorage.getItem("company_id") || null,
+    company_id: JSON.parse(localStorage.getItem("company_id")) || null,
     work_flow_trees: JSON.parse(localStorage.getItem("work_flow_trees")) || [],
     allWorkFlow: JSON.parse(localStorage.getItem("allWorkFlow")) || [],
     user: JSON.parse(localStorage.getItem("user")) || {},

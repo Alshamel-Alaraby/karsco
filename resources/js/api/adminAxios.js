@@ -10,7 +10,7 @@ adminApi.interceptors.request.use(
     function (config) {
         config.headers['lang'] = localStorage.getItem("lang") || 'ar';
         config.headers['Authorization'] = "Bearer " + (Cookies.get("token") || '');
-        config.headers['Company-ID'] = localStorage.getItem("company_id");
+        config.headers['Company-ID'] = JSON.parse(localStorage.getItem("company_id"));
         if (JSON.parse(localStorage.getItem("type"))){
             config.headers['admin_id'] =  JSON.parse(localStorage.getItem("type")) == "admin" ? JSON.parse(localStorage.getItem("partner")).id : null;
             config.headers['user_id'] = JSON.parse(localStorage.getItem("type")) == "admin" ? null : JSON.parse(localStorage.getItem("user")).id;

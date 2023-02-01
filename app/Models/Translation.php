@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Translation extends Model
 {
-    use HasFactory,CompanyScopeTrait;
+    use HasFactory;
     protected $table="general_translations";
     protected $guarded = ['id'];
 }

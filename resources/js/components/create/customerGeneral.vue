@@ -27,6 +27,7 @@ import "quill/dist/quill.bubble.css";
  */
 
 export default {
+  name: "customer",
   components: {
     Switches,
     ErrorMessage,

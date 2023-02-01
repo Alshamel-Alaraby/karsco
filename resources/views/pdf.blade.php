@@ -25,7 +25,7 @@
                     {{$field->name_e}}
                 </label>
                 <input readonly
-                       value="{{$field->value}}"
+                       value="{{is_object($field->value)?$field->value->name_e:$field->value}}"
                        type="text"
                        data-create="9"
                        step="0.1"

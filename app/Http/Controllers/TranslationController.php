@@ -9,7 +9,7 @@ class TranslationController extends Controller
 {
     public function update(Request $request)
     {
-        $com_id = $request->company_id ?: 0;
+        $com_id = $request->company_id ;
         foreach ($request->translations as $key => $translation) {
             Translation::query()->updateOrCreate(
                 [
