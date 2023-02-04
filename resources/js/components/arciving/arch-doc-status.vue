@@ -6,6 +6,7 @@ import ErrorMessage from "../../components/widgets/errorMessage";
 import loader from "../../components/loader";
 import {dynamicSortString} from "../../helper/tableSort";
 import Multiselect from "vue-multiselect";
+import transMixinComp from "../../helper/translation-comp-mixin";
 
 /**
  * Advanced Table component
@@ -15,6 +16,8 @@ export default {
         title: "Arch Doc Status",
         meta: [{name: "description", content: "Arch Doc Status"}],
     },
+  mixins: [transMixinComp],
+
     beforeRouteEnter(to, from, next) {
         next((vm) => {
             if (vm.$store.state.auth.work_flow_trees.includes('arch doc status')) {
@@ -29,6 +32,8 @@ export default {
         loader,
         Multiselect
     },
+     props: ["companyKeys", "defaultsKeys"],
+
     updated() {
         $(".englishInput").keypress(function (event) {
             var ew = event.which;

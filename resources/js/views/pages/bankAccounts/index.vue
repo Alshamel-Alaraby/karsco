@@ -840,7 +840,7 @@ export default {
 <template>
   <Layout>
     <PageHeader />
-    <Bank @created="getBank" />
+    <Bank :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getBank" />
     <div class="row">
       <div class="col-12">
         <div class="card">

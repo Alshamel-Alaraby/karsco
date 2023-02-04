@@ -639,8 +639,8 @@ export default {
 <template>
     <Layout>
         <PageHeader />
-        <ArchDoc @create="getGenDocType" />
-        <DocField @create="getArchDocType" />
+        <ArchDoc :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @create="getGenDocType" />
+        <DocField :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @create="getArchDocType" />
         <div class="row">
             <div class="col-12">
                 <div class="card">

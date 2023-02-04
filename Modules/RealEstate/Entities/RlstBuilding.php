@@ -2,6 +2,9 @@
 
 namespace Modules\RealEstate\Entities;
 
+use App\Models\Avenue;
+use App\Models\City;
+use App\Models\Country;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -40,6 +43,18 @@ class RlstBuilding extends Model
     public function module()
     {
         return $this->belongsTo(\App\Models\Module::class);
+    }
+
+    public function country(){
+        return $this->belongsTo (Country::class);
+    }
+
+    public function city(){
+        return $this->belongsTo (City::class);
+    }
+
+    public function avenue(){
+        return $this->belongsTo (Avenue::class);
     }
 
 }

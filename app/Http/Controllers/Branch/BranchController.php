@@ -21,18 +21,19 @@ class BranchController extends Controller
     public function index(Request $request)
     {
 
-        if (count($_GET) > 0) {
-            cacheForget('branches');
-        }
-        $branches = cacheGet('branches');
-        if ($request->search || $request->is_active) {
-            cacheForget('branches');
-            $branches = $this->repository->getAllBranches($request);
-        }
-        if (!$branches) {
-            $branches = $this->repository->getAllBranches($request);
-            cachePut('branches', $branches);
-        }
+        // if (count($_GET) > 0) {
+        //     cacheForget('branches');
+        // }
+        // $branches = cacheGet('branches');
+        // if ($request->search || $request->is_active) {
+        //     cacheForget('branches');
+        //     $branches = $this->repository->getAllBranches($request);
+        // }
+        // if (!$branches) {
+        //     $branches = $this->repository->getAllBranches($request);
+        //     cachePut('branches', $branches);
+        // }
+        $branches = $this->repository->getAllBranches($request);
 
         return responseJson(200, 'success', ($this->resource)::collection($branches['data']), $branches['paginate'] ? getPaginates($branches['data']) : null);
     }

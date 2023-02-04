@@ -17,30 +17,35 @@ class EmployeeController extends Controller
 
     public function find($id)
     {
-        $model = cacheGet('employees_' . $id);
+        // $model = cacheGet('employees_' . $id);
+        // if (!$model) {
+        //     $model = $this->modelInterface->find($id);
+        //     if (!$model) {
+        //         return responseJson(404, __('message.data not found'));
+        //     } else {
+        //         cachePut('employees_' . $id, $model);
+        //     }
+        // }
+        $model = $this->modelInterface->find($id);
         if (!$model) {
-            $model = $this->modelInterface->find($id);
-            if (!$model) {
-                return responseJson(404, __('message.data not found'));
-            } else {
-                cachePut('employees_' . $id, $model);
-            }
+            return responseJson(404, __('message.data not found'));
         }
         return responseJson(200, 'success', new EmployeeResource($model));
     }
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('employees');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('employees', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
+        // if (count($_GET) == 0) {
+        //     $models = cacheGet('employees');
+        //     if (!$models) {
+        //         $models = $this->modelInterface->all($request);
+        //         cachePut('employees', $models);
+        //     }
+        // } else {
+        //     $models = $this->modelInterface->all($request);
+        // }
 
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', EmployeeResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
@@ -81,7 +86,7 @@ class EmployeeController extends Controller
         }
 
         if ($model->hasChildren()) {
-            return responseJson(400,__("this item has children and can't be deleted remove it's children first"));
+            return responseJson(400, __("this item has children and can't be deleted remove it's children first"));
         }
 
         $this->modelInterface->delete($id);

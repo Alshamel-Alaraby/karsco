@@ -788,7 +788,7 @@ export default {
 <template>
   <Layout>
     <PageHeader />
-    <employee @created="getEmployees" />
+    <employee :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getEmployees" />
     <div class="row">
       <div class="col-12">
         <div class="card">

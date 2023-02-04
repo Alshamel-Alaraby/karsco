@@ -191,26 +191,31 @@ export default {
                 'building_area',
                 'construction_year',
                 'module_id',
-                'country_id',
-                'city_id',
-                'avenue_id',
+                this.$i18n.locale == "ar" ? "country.name" : "country.name_e",
+                this.$i18n.locale == "ar" ? "city.name" : "city.name_e",
+                this.$i18n.locale == "ar" ? "avenue.name" : "avenue.name_e",
                 'lng',
                 'lat',
             ],
             Tooltip: '',
-            mouseEnter: null
+            mouseEnter: null,
+            enabled3: true,
+            printLoading: true,
+            printObj: {
+                id: "printBuilding",
+            }
         }
     },
     validations: {
         create: {
-            name: {required,minLength: minLength(2),maxLength: maxLength(100),},
-            name_e: {required,minLength: minLength(2),maxLength: maxLength(100),},
+            name: {required,minLength: minLength(2),maxLength: maxLength(255),},
+            name_e: {required,minLength: minLength(2),maxLength: maxLength(255),},
             description: {maxLength: maxLength(1000)},
             description_e: {maxLength: maxLength(1000)},
             land_area: {numeric,maxLength: maxLength(9),},
             building_area: {numeric,maxLength: maxLength(9),},
             construction_year: {integer,minLength: minLength(4),maxLength: maxLength(4)},
-            module_id: {},
+            module_id: {required},
             country_id: {},
             city_id: {},
             avenue_id: {},
@@ -218,14 +223,14 @@ export default {
             lat: {numeric}
         },
         edit: {
-            name: {required,minLength: minLength(2),maxLength: maxLength(100),},
-            name_e: {required,minLength: minLength(2),maxLength: maxLength(100),},
+            name: {required,minLength: minLength(2),maxLength: maxLength(255),},
+            name_e: {required,minLength: minLength(2),maxLength: maxLength(255),},
             description: {maxLength: maxLength(1000)},
             description_e: {maxLength: maxLength(1000)},
             land_area: {numeric,maxLength: maxLength(9),},
             building_area: {numeric,maxLength: maxLength(9),},
             construction_year: {integer,minLength: minLength(4),maxLength: maxLength(4)},
-            module_id: {},
+            module_id: {required},
             country_id: {},
             city_id: {},
             avenue_id: {},
@@ -811,6 +816,19 @@ export default {
                 this.getCity(this.edit.country_id);
             }
         },
+        ExportExcel(type, fn, dl) {
+            this.enabled3 = false;
+            setTimeout(() => {
+                let elt = this.$refs.exportable_table;
+                let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+                if (dl) {
+                    XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+                } else {
+                    XLSX.writeFile(wb, fn || (('Building' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+                }
+                this.enabled3 = true;
+            }, 100);
+        }
     },
 };
 </script>
@@ -818,8 +836,8 @@ export default {
 <template>
     <Layout>
         <PageHeader />
-        <Country @created="getCategory" />
-        <City @created="getCity(create.country_id ? create.country_id: edit.country_id)" />
+        <Country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCategory" />
+        <City :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCity(create.country_id ? create.country_id: edit.country_id)" />
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -839,10 +857,9 @@ export default {
                                         <b-form-checkbox v-model="filterSetting" value="land_area" class="mb-1">{{ getCompanyKey('building_land_area') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="building_area" class="mb-1">{{ getCompanyKey('building_area') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="construction_year" class="mb-1">{{ getCompanyKey('building_construction_year') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="module_id" class="mb-1">{{ getCompanyKey('module') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="country_id" class="mb-1">{{ getCompanyKey('country') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="city_id" class="mb-1">{{ getCompanyKey('city') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="avenue_id" class="mb-1">{{ getCompanyKey('avenue') }}</b-form-checkbox>
+                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar' ? 'country.name' : 'country.name_e'" class="mb-1">{{ getCompanyKey('country') }}</b-form-checkbox>
+                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar' ? 'country.name' : 'country.name_e'" class="mb-1">{{ getCompanyKey('city') }}</b-form-checkbox>
+                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar' ? 'country.name' : 'country.name_e'" class="mb-1">{{ getCompanyKey('avenue') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="lng" class="mb-1">{{ getCompanyKey('building_longitude') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="lat" class="mb-1">{{ getCompanyKey('building_latitude') }}</b-form-checkbox>
                                     </b-dropdown>
@@ -879,10 +896,10 @@ export default {
                                     <i class="fas fa-plus"></i>
                                 </b-button>
                                 <div class="d-inline-flex">
-                                    <button class="custom-btn-dowonload">
+                                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
                                         <i class="fas fa-file-download"></i>
                                     </button>
-                                    <button class="custom-btn-dowonload">
+                                    <button v-print="'#printBuilding'" class="custom-btn-dowonload">
                                         <i class="fe-printer"></i>
                                     </button>
                                     <button
@@ -1367,7 +1384,8 @@ export default {
                         <!--  /create   -->
 
                         <!-- start .table-responsive-->
-                        <div class="table-responsive mb-3 custom-table-theme position-relative">
+                        <div class="table-responsive mb-3 custom-table-theme position-relative"  ref="exportable_table"
+                             id="printBuilding">
 
                             <!--       start loader       -->
                             <loader size="large" v-if="isLoader" />
@@ -1376,7 +1394,7 @@ export default {
                             <table class="table table-borderless table-hover table-centered m-0">
                                 <thead>
                                 <tr>
-                                    <th scope="col" style="width: 0;">
+                                    <th scope="col" style="width: 0;" v-if="enabled3" class="do-not-print">
                                         <div class="form-check custom-control">
                                             <input
                                                 class="form-check-input"
@@ -1478,10 +1496,10 @@ export default {
                                             <span>{{ getCompanyKey('building_latitude') }}</span>
                                         </div>
                                     </th>
-                                    <th>
+                                    <th v-if="enabled3" class="do-not-print">
                                         {{ $t('general.Action') }}
                                     </th>
-                                    <th><i class="fas fa-ellipsis-v"></i></th>
+                                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                                 </tr>
                                 </thead>
                                 <tbody v-if="builds.length > 0">
@@ -1492,7 +1510,7 @@ export default {
                                     :key="data.id"
                                     class="body-tr-custom"
                                 >
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <div class="form-check custom-control" style="min-height: 1.9em;">
                                             <input
                                                 style="width: 17px;height: 17px;"
@@ -1520,7 +1538,7 @@ export default {
                                     <td v-if="setting.avenue_id">{{ data.avenue_id }}</td>
                                     <td v-if="setting.lng">{{ data.lng }}</td>
                                     <td v-if="setting.lat">{{ data.lat }}</td>
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <div class="btn-group">
                                             <button
                                                 type="button"
@@ -1921,7 +1939,7 @@ export default {
                                         </b-modal>
                                         <!--  /edit   -->
                                     </td>
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <button
                                             @mousemove="log(data.id)"
                                             @mouseover="log(data.id)"

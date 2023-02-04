@@ -18,15 +18,8 @@ class DocStatusController extends Controller
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('archDocStatus');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('archDocStatus', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
+     
+        $models = $this->modelInterface->all($request);
 
         return responseJson(200, 'success', DocStatusResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }

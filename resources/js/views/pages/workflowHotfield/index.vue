@@ -578,7 +578,7 @@ export default {
 <template>
   <Layout>
     <PageHeader />
-    <Role @created="getRole" />
+    <Role :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getRole" />
     <div class="row">
       <div class="col-12">
         <div class="card">

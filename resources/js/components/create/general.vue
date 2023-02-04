@@ -1,10 +1,10 @@
 <template>
     <div>
-        <employee @created="$emit('created')" />
-        <customerGeneral @created="$emit('created')" />
-        <country :id="'country-create-general'" @created="$emit('created')" />
-        <city :id="'city-create-general'" @created="$emit('created')" />
-        <propertyTree @created="$emit('created')" />
+        <employee :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="$emit('created')" />
+        <customerGeneral :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="$emit('created')" />
+        <country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'country-create-general'" @created="$emit('created')" />
+        <city :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'city-create-general'" @created="$emit('created')" />
+        <propertyTree :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="$emit('created')" />
     </div>
 </template>
 
@@ -36,8 +36,11 @@ export default {
         country,
         city
     },
+    
     props:[
-        "currentNode"
+        "currentNode",
+        "companyKeys",
+        "defaultsKeys"
     ],
     methods:{
 

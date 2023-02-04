@@ -17,16 +17,8 @@ class DepartmentController extends Controller
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('arcDocument');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('arcDocument', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
-
+      
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', DepartmentResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 

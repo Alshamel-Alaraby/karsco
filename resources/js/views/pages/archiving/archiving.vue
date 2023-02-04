@@ -2,7 +2,6 @@
 import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
-import outerAxios from "../../../api/outerAxios";
 import { required } from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
@@ -39,7 +38,7 @@ export default {
     Files,
     Details,
     VueHtml2pdf,
-      General
+    General,
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -75,6 +74,7 @@ export default {
       showPhoto: "/images/img-1.png",
       root: [],
       per_page: 6,
+      type: "",
       search: "",
       favourite: false,
       debounce: {},
@@ -89,6 +89,7 @@ export default {
       fileFields: [],
       from: 0,
       to: 0,
+      dropListPopup: false,
       fromDate: new Date(),
       toDate: new Date(),
       currentField: null,
@@ -133,6 +134,7 @@ export default {
       mouseEnter: null,
       isActiveFile: false,
       isSearch: false,
+      lockupTableObject: {},
     };
   },
   validations: {
@@ -183,8 +185,36 @@ export default {
     this.getSecondLevelNodes();
   },
   methods: {
+    getProperties() {
+      let filterRes = this.fields.filter((field) => {
+        return field.doc_field_id.tree_property_id;
+      });
+      let dropListTreePropId = filterRes.length
+        ? filterRes[0].doc_field_id.tree_property_id
+        : null;
+      if (dropListTreePropId) {
+        adminApi.get(`tree-properties/child-nodes/${dropListTreePropId}`).then((res) => {
+          let l = res.data;
+          l.unshift({ id: 0, name: "اضف خاصية", name_e: "Add property" });
+          this.properties = l;
+          this.dropListPopup = false;
+        });
+      }
+    },
     print() {
       window.print();
+    },
+    showPropertyModal(property) {
+      if (property.id == 0) {
+        this.dropListPopup = true;
+        this.$bvModal.show("property-create");
+        this.nodeFields.forEach((field, index) => {
+          if (field.doc_field_id.tree_property_id) {
+            field.value = null;
+            return;
+          }
+        });
+      }
     },
     getCurrentField(id) {
       this.from = 0;
@@ -241,6 +271,7 @@ export default {
       node.doc_type_field.sort((a, b) => (a.field_order > b.field_order ? 1 : -1));
       this.nodeFields = [...node.doc_type_field].map((field) => {
         if (field.doc_field_id.data_type.name_e == "Lookup (table)") {
+          this.lockupTableObject = field;
           this.getLookup(
             field.doc_field_id.lookup_table,
             field.doc_field_id.lookup_table_column,
@@ -259,7 +290,7 @@ export default {
         .get(`/document-field/column-data/${table}/${column}`)
         .then((res) => {
           let l = res.data;
-            l.data.unshift({ id: 0, name: "اضف", name_e: "Add" });
+          l.data.unshift({ id: 0, name: "اضف", name_e: "Add" });
           this.lockups.push({
             field_name: field_name,
             column: column,
@@ -278,30 +309,30 @@ export default {
           this.isLoader = false;
         });
     },
-      showComponentModal(chose,table,index) {
-        if (chose=="Add"||chose=="اضف"||chose==0) {
-            if (table == "general_employees"){
-                this.$bvModal.show("employee-create");
-                this.nodeFields[index].value = "";
-            }
-            if (table == "general_customers"){
-                this.$bvModal.show("customer-general-create");
-                this.nodeFields[index].value = "";
-            }
-            if (table == "general_tree_properties"){
-                this.$bvModal.show("property-create");
-                this.nodeFields[index].value = "";
-            }
-            if (table == "general_countries"){
-                this.$bvModal.show("country-create-general");
-                this.nodeFields[index].value = "";
-            }
-            if (table == "general_cities"){
-                this.$bvModal.show("city-create-general");
-                this.nodeFields[index].value = "";
-            }
-          }
-      },
+    showComponentModal(chose, table, index) {
+      if (chose == "Add" || chose == "اضف" || chose == 0) {
+        if (table == "general_employees") {
+          this.$bvModal.show("employee-create");
+          this.nodeFields[index].value = "";
+        }
+        if (table == "general_customers") {
+          this.$bvModal.show("customer-general-create");
+          this.nodeFields[index].value = "";
+        }
+        if (table == "general_tree_properties") {
+          this.$bvModal.show("property-create");
+          this.nodeFields[index].value = "";
+        }
+        if (table == "general_countries") {
+          this.$bvModal.show("country-create-general");
+          this.nodeFields[index].value = "";
+        }
+        if (table == "general_cities") {
+          this.$bvModal.show("city-create-general");
+          this.nodeFields[index].value = "";
+        }
+      }
+    },
     nodeWasClicked(result) {
       this.currentNode = result;
       this.filterSetting = [this.currentNode.id];
@@ -633,22 +664,14 @@ export default {
       this.images = [];
       this.errors = {};
       this.archive_id = null;
+      this.lockupTableObject = {};
+      this.type = "";
     },
     /**
      *  hidden Modal (create)
      */
     async resetModal() {
-      let filterRes = this.fields.filter((field) => {
-        return field.doc_field_id.tree_property_id;
-      });
-      let dropListTreePropId = filterRes.length
-        ? filterRes[0].doc_field_id.tree_property_id
-        : null;
-      if (dropListTreePropId) {
-        adminApi.get(`tree-properties/child-nodes/${dropListTreePropId}`).then((res) => {
-          this.properties = res.data;
-        });
-      }
+      this.getProperties();
       this.create = {
         data_type_value: null,
         data_type_id: null,
@@ -668,6 +691,7 @@ export default {
      *  create screen
      */
     resetForm() {
+      this.lockupTableObject = {};
       this.create = {
         data_type_value: null,
         data_type_id: null,
@@ -908,6 +932,7 @@ export default {
     },
     onImageChanged(e) {
       const file = e.target.files[0];
+      this.type = file.type;
       this.addImage(file);
     },
     addImage(file) {
@@ -929,7 +954,6 @@ export default {
               this.images.forEach((e) => old_media.push(e.id));
               let new_media = [];
               res.data.data.forEach((e) => new_media.push(e.id));
-
               adminApi
                 .put(`/arch-archive-files/${this.archive_id}`, {
                   old_media,
@@ -943,6 +967,9 @@ export default {
                     this.showPhoto = "/images/img-1.png";
                   }
                   // this.getData();
+                  if (this.type == "application/pdf") {
+                    this.$bvModal.hide("create");
+                  }
                 })
                 .catch((err) => {
                   Swal.fire({
@@ -1082,7 +1109,19 @@ export default {
 <template>
   <Layout>
     <PageHeader />
-      <General :currentNode="currentNode" @created="showModal(currentNode)" />
+    <General
+      :currentNode="currentNode"
+      :companyKeys="companyKeys" :defaultsKeys="defaultsKeys"
+      @created="
+        dropListPopup
+          ? getProperties()
+          : getLookup(
+              lockupTableObject.doc_field_id.lookup_table,
+              lockupTableObject.doc_field_id.lookup_table_column,
+              lockupTableObject.doc_field_id.name_e
+            )
+      "
+    />
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -1387,15 +1426,6 @@ export default {
                 <div class="card">
                   <div class="card-body">
                     <div class="mb-3 d-flex justify-content-end">
-                      <b-button
-                        variant="success"
-                        :disabled="!is_disabled"
-                        @click.prevent="resetForm"
-                        type="button"
-                        :class="['font-weight-bold px-2', is_disabled ? 'mx-2' : '']"
-                      >
-                        {{ $t("general.AddNewRecord") }}
-                      </b-button>
                       <template v-if="!is_disabled">
                         <b-button
                           variant="success"
@@ -1406,7 +1436,6 @@ export default {
                         >
                           {{ $t("general.Add") }}
                         </b-button>
-
                         <b-button variant="success" class="mx-1" disabled v-else>
                           <b-spinner small></b-spinner>
                           <span class="sr-only">{{ $t("login.Loading") }}...</span>
@@ -1468,12 +1497,33 @@ export default {
                             >
                             <multiselect
                               v-model="$v.nodeFields.$each[index].value.$model"
-                              @input="showComponentModal($v.nodeFields.$each[index].value.$model,lockups.find((e) => field.doc_field_id.name_e == e.field_name).table,index)"
+                              @input="
+                                showComponentModal(
+                                  $v.nodeFields.$each[index].value.$model,
+                                  lockups.find(
+                                    (e) => field.doc_field_id.name_e == e.field_name
+                                  ).table,
+                                  index
+                                )
+                              "
                               :options="
                                 lockups.length > 0 &&
-                                lockups.find((e) => field.doc_field_id.name_e == e.field_name)?
-                                lockups.find((e) => field.doc_field_id.name_e == e.field_name)
-                                      .field_data.map((type) =>type[lockups.find((e) => field.doc_field_id.name_e == e.field_name).column ])
+                                lockups.find(
+                                  (e) => field.doc_field_id.name_e == e.field_name
+                                )
+                                  ? lockups
+                                      .find(
+                                        (e) => field.doc_field_id.name_e == e.field_name
+                                      )
+                                      .field_data.map(
+                                        (type) =>
+                                          type[
+                                            lockups.find(
+                                              (e) =>
+                                                field.doc_field_id.name_e == e.field_name
+                                            ).column
+                                          ]
+                                      )
                                   : []
                               "
                               :class="{
@@ -1504,6 +1554,7 @@ export default {
                               >*</span
                             >
                             <multiselect
+                              @input="showPropertyModal"
                               v-model="$v.nodeFields.$each[index].value.$model"
                               :options="properties"
                               :custom-label="
@@ -1678,7 +1729,7 @@ export default {
                         </div>
                       </div>
                     </b-tab>
-                    <b-tab :disabled="!archive_id" :title="$t('general.ImageUploads')">
+                    <b-tab :disabled="!archive_id" :title="$t('general.UploadsFiles')">
                       <div class="row">
                         <input
                           accept="image/png, image/gif, image/jpeg, image/jpg"
@@ -1843,7 +1894,13 @@ export default {
                         </label>
                         <input
                           readonly
-                          :value="typeof field.value === 'object'?($i18n.locale=='ar'?field.value.name:field.value.name_e):field.value "
+                          :value="
+                            typeof field.value === 'object'
+                              ? $i18n.locale == 'ar'
+                                ? field.value.name
+                                : field.value.name_e
+                              : field.value
+                          "
                           type="text"
                           class="form-control"
                           data-create="9"

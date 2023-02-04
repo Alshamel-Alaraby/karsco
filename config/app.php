@@ -196,9 +196,9 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\TelescopeServiceProvider::class,
 
-        niklasravnsborg\LaravelPdf\PdfServiceProvider::class
+        niklasravnsborg\LaravelPdf\PdfServiceProvider::class,
     //    Barryvdh\DomPDF\ServiceProvider::class,//Add this code
-
+    Webklex\PDFMerger\Providers\PDFMergerServiceProvider::class
     ],
 
     /*
@@ -215,6 +215,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge(
         [
             'PDF' => niklasravnsborg\LaravelPdf\Facades\Pdf::class,
+            'PDFMerger' => Webklex\PDFMerger\Facades\PDFMergerFacade::class
         //    'PDF' => Barryvdh\DomPDF\Facade::class,//Add this code
         ]
     )->toArray(),

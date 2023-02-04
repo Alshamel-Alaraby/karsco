@@ -17,30 +17,35 @@ class StoreController extends Controller
 
     public function find($id)
     {
-        $model = cacheGet('stores_' . $id);
+        // $model = cacheGet('stores_' . $id);
+        // if (!$model) {
+        //     $model = $this->modelInterface->find($id);
+        //     if (!$model) {
+        //         return responseJson(404, __('message.data not found'));
+        //     } else {
+        //         cachePut('stores_' . $id, $model);
+        //     }
+        // }
+        $model = $this->modelInterface->find($id);
         if (!$model) {
-            $model = $this->modelInterface->find($id);
-            if (!$model) {
-                return responseJson(404, __('message.data not found'));
-            } else {
-                cachePut('stores_' . $id, $model);
-            }
+            return responseJson(404, __('message.data not found'));
         }
         return responseJson(200, 'success', new StoreResource($model));
     }
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('stores');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('stores', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
+        // if (count($_GET) == 0) {
+        //     $models = cacheGet('stores');
+        //     if (!$models) {
+        //         $models = $this->modelInterface->all($request);
+        //         cachePut('stores', $models);
+        //     }
+        // } else {
+        //     $models = $this->modelInterface->all($request);
+        // }
 
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', StoreResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
@@ -80,7 +85,7 @@ class StoreController extends Controller
         }
 
         if ($model->hasChildren()) {
-            return responseJson(400,__("this item has children and can't be deleted remove it's children first"));
+            return responseJson(400, __("this item has children and can't be deleted remove it's children first"));
         }
 
         $this->modelInterface->delete($id);

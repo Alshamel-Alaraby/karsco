@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // CountrySeeder::class,
             TranslationSeeder::class,
-            DataTypeSeeder::class,
-             UserSeeder::class
+            // DataTypeSeeder::class,
+            //  UserSeeder::class
         //    ArchiveFileSeeder::class
         ]);
 

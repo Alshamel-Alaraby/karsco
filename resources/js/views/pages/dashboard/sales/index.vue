@@ -127,6 +127,7 @@ export default {
   },
   mounted() {
       this.getStatices();
+
   },
   methods: {
       getStatices() {

@@ -19,15 +19,20 @@ class GovernorateController extends Controller
 
     public function find($id)
     {
-        $model = cacheGet('governorates_' . $id);
+        // $model = cacheGet('governorates_' . $id);
+        // if (!$model) {
+        //     $model = $this->modelInterface->find($id);
+        //     if (!$model) {
+        //         return responseJson(404, __('message.data not found'));
+        //     } else {
+        //         cachePut('governorates_' . $id, $model);
+        //     }
+        // }
+        $model = $this->modelInterface->find($id);
         if (!$model) {
-            $model = $this->modelInterface->find($id);
-            if (!$model) {
-                return responseJson(404, __('message.data not found'));
-            } else {
-                cachePut('governorates_' . $id, $model);
-            }
+            return responseJson(404, __('message.data not found'));
         }
+
         return responseJson(200, 'success', new GovernorateResource($model));
     }
 

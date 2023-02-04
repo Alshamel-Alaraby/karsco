@@ -6,21 +6,24 @@ import Swal from "sweetalert2";
 import ErrorMessage from "../../components/widgets/errorMessage";
 import { dynamicSortString } from "../../helper/tableSort";
 import Multiselect from "vue-multiselect";
-import translation from "../../helper/translation-mixin";
+import transMixinComp from "../../helper/translation-comp-mixin";
 
 /**
  * Advanced Table component
  */
 export default {
-  mixins: [translation],
   components: {
     Switches,
     ErrorMessage,
     Multiselect,
   },
+   props: ["companyKeys", "defaultsKeys"],
+
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
   },
+    mixins: [transMixinComp],
+
   updated() {
     $(".englishInput").keypress(function (event) {
       var ew = event.which;

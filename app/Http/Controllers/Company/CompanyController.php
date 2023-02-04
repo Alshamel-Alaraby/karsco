@@ -3,19 +3,18 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Mockery\Exception;
-use Illuminate\Contracts\Support\Renderable;
-use App\Repositories\Company\CompanyRepositoryInterface;
-use App\Http\Resources\Company\CompanyResource;
 use App\Http\Request\Company\StoreCompanyRequest;
 use App\Http\Request\Company\UpdateCompanyRequest;
+use App\Http\Resources\Company\CompanyResource;
+use App\Repositories\Company\CompanyRepositoryInterface;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
     public $repository;
     public $resource = CompanyResource::class;
-    public function __construct (CompanyRepositoryInterface $repository)
+    public function __construct(CompanyRepositoryInterface $repository)
     {
         $this->repository = $repository;
     }
@@ -26,7 +25,7 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        return $this->successResponse (($this->resource)::collection ($this->repository->getAllCompanies ()),__ ('Done'),200);
+        return $this->successResponse(($this->resource)::collection($this->repository->getAllCompanies()), __('Done'), 200);
     }
 
     /**
@@ -36,11 +35,9 @@ class CompanyController extends Controller
      */
     public function store(StoreCompanyRequest $request)
     {
-        try {
-            return $this->successResponse (new $this->resource($this->repository->create($request->validated ())),__('created'),200);
-        }catch (Exception $exception){
-            return $this->errorResponse ($exception->getMessage (),$exception->getCode ());
-        }
+
+        return $this->successResponse(new $this->resource($this->repository->create($request->validated())), __('created'), 200);
+
     }
 
     /**
@@ -50,10 +47,10 @@ class CompanyController extends Controller
      */
     public function show($id)
     {
-        if ($branch = $this->repository->show($id)){
-            return $this->successResponse (new $this->resource($branch),__ ('Done'),200);
+        if ($branch = $this->repository->show($id)) {
+            return $this->successResponse(new $this->resource($branch), __('Done'), 200);
         }
-        return $this->errorResponse ('not found',404);
+        return $this->errorResponse('not found', 404);
     }
 
     /**
@@ -74,11 +71,9 @@ class CompanyController extends Controller
      */
     public function update(UpdateCompanyRequest $request, $id)
     {
-        try {
-            return $this->successResponse (new $this->resource($this->repository->update($request->validated(),$id)),__('updated'),200);
-        }catch (Exception $exception){
-            return $this->errorResponse ($exception->getMessage(),$exception->getCode());
-        }
+
+        return $this->successResponse(new $this->resource($this->repository->update($request->validated(), $id)), __('updated'), 200);
+
     }
 
     /**
@@ -88,6 +83,6 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-        return $this->successResponse(null,__('deleted'),200);
+        return $this->successResponse(null, __('deleted'), 200);
     }
 }

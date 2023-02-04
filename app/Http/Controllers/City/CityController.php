@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\City;
 
-use Illuminate\Http\Request;
-use App\Traits\CanDeleteTrait;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\City\CityResource;
-use App\Http\Requests\City\EditCityRequest;
 use App\Http\Requests\City\CreateCityRequest;
+use App\Http\Requests\City\EditCityRequest;
+use App\Http\Resources\City\CityResource;
 use App\Repositories\City\CityRepositoryInterface;
+use App\Traits\CanDeleteTrait;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CityController extends Controller
 {
@@ -29,18 +29,19 @@ class CityController extends Controller
     public function index(Request $request)
     {
 
-        if (count($_GET) > 0) {
-            cacheForget('cities');
-        }
-        $data = cacheGet('cities');
-        if ($request->search || $request->is_active) {
-            cacheForget('cities');
-            $data = $this->repository->getAll($request);
-        }
-        if (!$data) {
-            $data = $this->repository->getAll($request);
-            cachePut('cities', $data);
-        }
+        // if (count($_GET) > 0) {
+        //     cacheForget('cities');
+        // }
+        // $data = cacheGet('cities');
+        // if ($request->search || $request->is_active) {
+        //     cacheForget('cities');
+        //     $data = $this->repository->getAll($request);
+        // }
+        // if (!$data) {
+        //     $data = $this->repository->getAll($request);
+        //     cachePut('cities', $data);
+        // }
+        $data = $this->repository->getAll($request);
 
         return responseJson(200, 'success', ($this->resource)::collection($data['data']), $data['paginate'] ? getPaginates($data['data']) : null);
     }

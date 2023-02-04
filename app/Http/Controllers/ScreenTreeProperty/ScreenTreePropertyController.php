@@ -4,12 +4,8 @@ namespace App\Http\Controllers\ScreenTreeProperty;
 
 use App\Http\Requests\ScreenTreeProperty\CreateScreenTreePropertyRequest;
 use App\Http\Requests\ScreenTreeProperty\EditScreenTreePropertyRequest;
-use App\Http\Requests\TreeProperty\CreateTreePropertyRequest;
-use App\Http\Requests\TreeProperty\EditTreePropertyRequest;
 use App\Http\Resources\ScreenTreeProperty\ScreenTreePropertyResource;
-use App\Http\Resources\TreeProperty\TreePropertyResource;
 use App\Repositories\ScreenTreeProperty\ScreenTreePropertyRepositoryInterface;
-use App\Repositories\TreeProperty\TreePropertyRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -23,29 +19,35 @@ class ScreenTreePropertyController extends Controller
 
     public function show($id)
     {
-        $model = cacheGet('ScreenTreeProperty_' . $id);
+        // $model = cacheGet('ScreenTreeProperty_' . $id);
+        // if (!$model) {
+        //     $model = $this->modelInterface->find($id);
+        //     if (!$model) {
+        //         return responseJson(404, __('message.data not found'));
+        //     } else {
+        //         cachePut('ScreenTreeProperty_' . $id, $model);
+        //     }
+        // }
+
+        $model = $this->modelInterface->find($id);
         if (!$model) {
-            $model = $this->modelInterface->find($id);
-            if (!$model) {
-                return responseJson(404, __('message.data not found'));
-            } else {
-                cachePut('ScreenTreeProperty_' . $id, $model);
-            }
+            return responseJson(404, __('message.data not found'));
         }
         return responseJson(200, 'success', new ScreenTreePropertyResource($model));
     }
 
     public function index(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('ScreenTreeProperty');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('ScreenTreeProperty', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
+        // if (count($_GET) == 0) {
+        //     $models = cacheGet('ScreenTreeProperty');
+        //     if (!$models) {
+        //         $models = $this->modelInterface->all($request);
+        //         cachePut('ScreenTreeProperty', $models);
+        //     }
+        // } else {
+        //     $models = $this->modelInterface->all($request);
+        // }
+        $models = $this->modelInterface->all($request);
 
         return responseJson(200, 'success', ScreenTreePropertyResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
@@ -66,7 +68,6 @@ class ScreenTreePropertyController extends Controller
 
         return responseJson(200, 'success');
     }
-
 
     public function setting(Request $request)
     {

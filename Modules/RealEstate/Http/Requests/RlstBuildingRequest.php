@@ -34,7 +34,7 @@ class RlstBuildingRequest extends FormRequest
             'construction_year' => ['gt:2018'],
             'country_id' => "exists:general_countries,id,deleted_at,null",
             'city_id' => "exists:general_cities,id,deleted_at,null",
-            'avenue_id' => "exists:avenues,id",
+            'avenue_id' => "exists:general_avenues,id,deleted_at,null",
             'lng' => "numeric|required_with:lat",
             'lat' => "numeric|required_with:lng",
             'properties' => "nullable|array",

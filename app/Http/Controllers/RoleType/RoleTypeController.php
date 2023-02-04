@@ -25,16 +25,16 @@ class RoleTypeController extends Controller
     public function index(Request $request)
     {
 
-        $data = cacheGet('role_types');
-        if ($request->search) {
-            cacheForget('role_types');
-            $data = $this->repository->getAll($request);
-        }
-        if (!$data) {
-            $data = $this->repository->getAll($request);
-            cachePut('role_types', $data);
-        }
-
+        // $data = cacheGet('role_types');
+        // if ($request->search) {
+        //     cacheForget('role_types');
+        //     $data = $this->repository->getAll($request);
+        // }
+        // if (!$data) {
+        //     $data = $this->repository->getAll($request);
+        //     cachePut('role_types', $data);
+        // }
+        $data = $this->repository->getAll($request);
         return responseJson(200, 'success', ($this->resource)::collection($data['data']), $data['paginate'] ? getPaginates($data['data']) : null);
     }
 
@@ -45,12 +45,10 @@ class RoleTypeController extends Controller
      */
     public function store(CreateRoleTypeRequest $request)
     {
-        try {
-            $this->repository->create($request->validated());
-            return responseJson(200, __('done'));
-        } catch (Exception $exception) {
-            return responseJson($exception->getCode(), $exception->getMessage());
-        }
+
+        $this->repository->create($request->validated());
+        return responseJson(200, __('done'));
+
     }
 
     /**
@@ -94,12 +92,9 @@ class RoleTypeController extends Controller
             $data['name_e'] = $request->name_e;
         }
 
-        try {
-            $this->repository->update($data, $id);
-            return responseJson(200, __('updated'));
-        } catch (\Exception$exception) {
-            return responseJson($exception->getCode(), $exception->getMessage());
-        }
+        $this->repository->update($data, $id);
+        return responseJson(200, __('updated'));
+
     }
     public function logs($id)
     {
@@ -107,7 +102,6 @@ class RoleTypeController extends Controller
         if (!$model) {
             return responseJson(404, __('message.data not found'));
         }
-
 
         $logs = $this->repository->logs($id);
         return responseJson(200, 'success', \App\Http\Resources\Log\LogResource::collection($logs));
@@ -126,7 +120,7 @@ class RoleTypeController extends Controller
         }
 
         if ($model->hasChildren()) {
-            return responseJson(400,__("this item has children and can't be deleted remove it's children first"));
+            return responseJson(400, __("this item has children and can't be deleted remove it's children first"));
         }
         $this->repository->delete($id);
         return responseJson(200, __('deleted'));

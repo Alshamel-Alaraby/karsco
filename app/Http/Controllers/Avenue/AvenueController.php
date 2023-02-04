@@ -8,38 +8,44 @@ use App\Http\Requests\Avenue\UpdateAvenueRequest;
 use App\Http\Resources\Avenue\AvenueResource;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use DB;
 
 class AvenueController extends Controller
 {
-    public function __construct(private \App\Repositories\Avenue\AvenueInterface$modelInterface){}
+    public function __construct(private \App\Repositories\Avenue\AvenueInterface$modelInterface)
+    {}
 
     public function find($id)
     {
-        $model = cacheGet('avenues_' . $id);
+        // $model = cacheGet('avenues_' . $id);
+        // if (!$model) {
+        //     $model = $this->modelInterface->find($id);
+        //     if (!$model) {
+        //         return responseJson(404, __('message.data not found'));
+        //     } else {
+        //         cachePut('avenues_' . $id, $model);
+        //     }
+        // }
+        $model = $this->modelInterface->find($id);
+
         if (!$model) {
-            $model = $this->modelInterface->find($id);
-            if (!$model) {
-                return responseJson(404, __('message.data not found'));
-            } else {
-                cachePut('avenues_' . $id, $model);
-            }
+            return responseJson(404, __('message.data not found'));
         }
         return responseJson(200, 'success', new AvenueResource($model));
     }
 
     public function all(AllRequest $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('avenues');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('avenues', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
+        // if (count($_GET) == 0) {
+        //     $models = cacheGet('avenues');
+        //     if (!$models) {
+        //         $models = $this->modelInterface->all($request);
+        //         cachePut('avenues', $models);
+        //     }
+        // } else {
+        //     $models = $this->modelInterface->all($request);
+        // }
 
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', AvenueResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 

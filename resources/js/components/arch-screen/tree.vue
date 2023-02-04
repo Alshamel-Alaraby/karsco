@@ -1,7 +1,7 @@
 <template>
   <draggable class="dragArea" tag="div" :list="nodes">
     <div
-     class="tree-container"
+      class="tree-container"
       v-for="(node, index) in nodes"
       :key="index"
       :style="
@@ -21,12 +21,12 @@
         ></i
       ></span>
       <span
-        :class="{ active:node == currentNode && depth == 1 }"
+        :class="{ active: node == currentNode && depth == 1 }"
         :style="depth == 1 ? 'cursor:pointer' : ''"
         class="title-tree"
         @click="onNodeSelected(node)"
         @dblclick="onDoubleClicked(node)"
-           >
+      >
         {{
           node.doc_field_id
             ? $i18n.locale == "ar"
@@ -36,7 +36,7 @@
             ? node.name
             : node.name_e
         }}
-        <span v-if="depth==1">({{node.files_count}})</span>
+        <span v-if="depth == 1">({{ node.files_count }})</span>
       </span>
       <TreeBrowser
         v-if="
@@ -49,8 +49,8 @@
             : node.children
         "
         :depth="depth + 1"
-        @onClick="(node) => $emit('onClick',node)"
-        @onDoubleClicked="(node) => $emit('onDoubleClicked',node)"
+        @onClick="(node) => $emit('onClick', node)"
+        @onDoubleClicked="(node) => $emit('onDoubleClicked', node)"
       />
     </div>
   </draggable>
@@ -58,16 +58,20 @@
 
 <script>
 import draggable from "vuedraggable";
+import transMixinComp from "../../helper/translation-comp-mixin";
 
 export default {
   name: "TreeBrowser",
+  mixins: [transMixinComp],
   props: {
-    currentNode:Object,
+    currentNode: Object,
     nodes: Array,
     depth: {
       type: Number,
       default: 0,
     },
+    companyKeys: Array,
+    defaultsKeys: Array,
   },
   data() {
     return {
@@ -75,9 +79,9 @@ export default {
     };
   },
   methods: {
-    onNodeSelected(node){
-      if(this.depth==1){
-        this.$emit("onClick",node);
+    onNodeSelected(node) {
+      if (this.depth == 1) {
+        this.$emit("onClick", node);
       }
     },
     isExpanded(node) {
@@ -188,7 +192,7 @@ i {
 .active {
   color: #159a80 !important;
 }
-.tree-container span{
-  font-size:16px !important;
+.tree-container span {
+  font-size: 16px !important;
 }
 </style>

@@ -57,7 +57,7 @@ export default {
       contractUnitsPagination: {},
       contractUnits: [],
       properties: [],
-      enabled3: false,
+      enabled3: true,
       isLoader: false,
       create: {
         unit_code: null,
@@ -77,6 +77,10 @@ export default {
       company_id: 48,
       Tooltip: "",
       mouseEnter: null,
+      printLoading: true,
+      printObj: {
+          id: "printContractUnit",
+      }
     };
   },
   validations: {
@@ -509,13 +513,26 @@ export default {
           });
       }
     },
+    ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('Contract Unit' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      }
   },
 };
 </script>
 
 <template>
   <Layout>
-    <PropertyTree @created="getProperties" />
+    <PropertyTree :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getProperties" />
     <PageHeader />
     <div class="row">
       <div class="col-12">
@@ -573,12 +590,12 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
-                    <i class="fas fa-file-download"></i>
-                  </button>
-                  <button class="custom-btn-dowonload">
-                    <i class="fe-printer"></i>
-                  </button>
+                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button v-print="'#printContractUnit'" class="custom-btn-dowonload">
+                        <i class="fe-printer"></i>
+                    </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -768,10 +785,11 @@ export default {
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
 
-              <table class="table table-borderless table-hover table-centered m-0">
+              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                     id="printContractUnit">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th scope="col" style="width: 0" v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -804,10 +822,10 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="contractUnits.length > 0">
@@ -818,7 +836,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -836,7 +854,7 @@ export default {
                         }}
                       </h5>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -955,7 +973,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mousemove="log(data.id)"
                         @mouseover="log(data.id)"

@@ -182,6 +182,7 @@ export default {
             custom_date_start: new Date(),
             errors: {},
             isCheckAll: false,
+            enabled3: true,
             checkAll: [],
             current_page: 1,
             image: '',
@@ -219,10 +220,10 @@ export default {
                 'unit_ty',
                 'status_date',  // date
                 'unit_area',
-                'building_id',
-                'owner_id' ,
-                'currency_id',
-                'wallet_id',
+                this.$i18n.locale == 'ar'? 'currency.name' : 'currency.name_e',
+                this.$i18n.locale == 'ar'? 'wallet.name' : 'wallet.name_e',
+                this.$i18n.locale == 'ar'? 'building.name' : 'building.name_e',
+                this.$i18n.locale == 'ar'? 'owner.name' : 'owner.name_e',
                 this.$i18n.locale == 'ar'? 'unitStatus.name' : 'unitStatus.name_e',
                 'commission_ty',
                 'commission_value',
@@ -234,7 +235,11 @@ export default {
                 'rank'
             ],
             Tooltip: '',
-            mouseEnter: null
+            mouseEnter: null,
+            printLoading: true,
+            printObj: {
+                id: "printUnit",
+            }
         }
     },
     validations: {
@@ -840,6 +845,19 @@ export default {
                 this.edit.start_date = null;
             }
         },
+        ExportExcel(type, fn, dl) {
+            this.enabled3 = false;
+            setTimeout(() => {
+                let elt = this.$refs.exportable_table;
+                let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+                if (dl) {
+                    XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+                } else {
+                    XLSX.writeFile(wb, fn || (('Unit' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+                }
+                this.enabled3 = true;
+            }, 100);
+        }
     },
 };
 </script>
@@ -866,10 +884,10 @@ export default {
                                         <b-form-checkbox v-model="filterSetting" value="code" class="mb-1">{{ getCompanyKey('realEstate_unit_code') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="unit_ty" class="mb-1">{{ getCompanyKey('realEstate_unit_unit_ty') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="unit_area" class="mb-1">{{ getCompanyKey('realEstate_unit_unit_area') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="building_id" class="mb-1">{{ getCompanyKey('realEstate_unit_building') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="owner_id" class="mb-1">{{ getCompanyKey('realEstate_unit_owner') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="currency_id" class="mb-1">{{ getCompanyKey('realEstate_unit_currency') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="wallet_id" class="mb-1">{{ getCompanyKey('realEstate_unit_wallet') }}</b-form-checkbox>
+                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'building.name' : 'building.name_e'" class="mb-1">{{ getCompanyKey('realEstate_unit_building') }}</b-form-checkbox>
+                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'owner.name' : 'owner.name_e'" class="mb-1">{{ getCompanyKey('realEstate_unit_owner') }}</b-form-checkbox>
+                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'currency.name' : 'currency.name_e'" class="mb-1">{{ getCompanyKey('realEstate_unit_currency') }}</b-form-checkbox>
+                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'wallet.name' : 'wallet.name_e'" class="mb-1">{{ getCompanyKey('realEstate_unit_wallet') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'unitStatus.name' : 'unitStatus.name_e'" class="mb-1">{{ getCompanyKey('realEstate_unit_unit_status') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="commission_ty" class="mb-1">{{ getCompanyKey('realEstate_unit_commission_ty') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="commission_value" class="mb-1">{{ getCompanyKey('realEstate_unit_commission_value') }}</b-form-checkbox>
@@ -913,10 +931,10 @@ export default {
                                     <i class="fas fa-plus"></i>
                                 </b-button>
                                 <div class="d-inline-flex">
-                                    <button class="custom-btn-dowonload">
+                                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
                                         <i class="fas fa-file-download"></i>
                                     </button>
-                                    <button class="custom-btn-dowonload">
+                                    <button v-print="'#printUnit'" class="custom-btn-dowonload">
                                         <i class="fe-printer"></i>
                                     </button>
                                     <button
@@ -1614,10 +1632,11 @@ export default {
                             <loader size="large" v-if="isLoader" />
                             <!--       end loader       -->
 
-                            <table class="table table-borderless table-hover table-centered m-0">
+                            <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                                   id="printUnit">
                                 <thead>
                                 <tr>
-                                    <th scope="col" style="width: 0;">
+                                    <th scope="col" style="width: 0;" v-if="enabled3" class="do-not-print">
                                         <div class="form-check custom-control">
                                             <input
                                                 class="form-check-input"
@@ -1796,10 +1815,10 @@ export default {
                                             </div>
                                         </div>
                                     </th>
-                                    <th>
+                                    <th v-if="enabled3" class="do-not-print">
                                         {{ $t('general.Action') }}
                                     </th>
-                                    <th><i class="fas fa-ellipsis-v"></i></th>
+                                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                                 </tr>
                                 </thead>
                                 <tbody v-if="units.length > 0">
@@ -1810,7 +1829,7 @@ export default {
                                     :key="data.id"
                                     class="body-tr-custom"
                                 >
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <div class="form-check custom-control" style="min-height: 1.9em;">
                                             <input
                                                 style="width: 17px;height: 17px;"
@@ -1847,7 +1866,7 @@ export default {
                                     <td v-if="setting.path">{{ data.path }}</td>
                                     <td v-if="setting.rank">{{ data.rank }}</td>
                                     <td v-if="setting.view">{{ data.view }}</td>
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <div class="btn-group">
                                             <button
                                                 type="button"
@@ -2447,7 +2466,7 @@ export default {
                                         </b-modal>
                                         <!--  /edit   -->
                                     </td>
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <button
                                             @mousemove="log(data.id)"
                                             @mouseover="log(data.id)"

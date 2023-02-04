@@ -17,15 +17,8 @@ class DocumentFieldController extends Controller
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('documentFields');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('documentFields', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
+
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', DocumentFieldResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
@@ -83,7 +76,7 @@ class DocumentFieldController extends Controller
         $data = [];
         foreach ($tables as $table) {
             foreach ($table as $key => $value) {
-                if (str_contains($value,'general')){
+                if (str_contains($value, 'general')) {
                     array_push($data, $value);
                 }
             }

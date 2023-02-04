@@ -589,7 +589,7 @@ export default {
 <template>
   <Layout>
     <PageHeader />
-    <salesManType @created="getSaleMenType" />
+    <salesManType :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getSaleMenType" />
     <div class="row">
       <div class="col-12">
         <div class="card">

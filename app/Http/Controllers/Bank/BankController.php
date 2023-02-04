@@ -18,30 +18,28 @@ class BankController extends Controller
 
     public function find($id)
     {
-        $model = cacheGet('banks_' . $id);
+        // $model = cacheGet('banks_' . $id);
+        // if (!$model) {
+        //     $model = $this->modelInterface->find($id);
+        //     if (!$model) {
+        //         return responseJson(404, __('message.data not found'));
+        //     } else {
+        //         cachePut('banks_' . $id, $model);
+        //     }
+        // }
+
+        $model = $this->modelInterface->find($id);
         if (!$model) {
-            $model = $this->modelInterface->find($id);
-            if (!$model) {
-                return responseJson(404, __('message.data not found'));
-            } else {
-                cachePut('banks_' . $id, $model);
-            }
+            return responseJson(404, __('message.data not found'));
         }
         return responseJson(200, 'success', new BankResource($model));
     }
 
     public function all(AllRequest $request)
     {
-//        if (count($_GET) == 0) {
-//            $models = cacheGet('banks');
-//            if (!$models) {
-//                $models = $this->modelInterface->all($request);
-//                cachePut('banks', $models);
-//            }
-//        } else {
-            $models = $this->modelInterface->all($request);
-//        }
 
+
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', BankResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 

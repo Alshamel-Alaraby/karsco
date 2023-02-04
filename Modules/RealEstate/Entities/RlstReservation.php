@@ -32,10 +32,10 @@ class RlstReservation extends Model
         return $this->belongsTo(\Modules\RealEstate\Entities\RlstCustomer::class);
     }
 
-    // public function paymentPlan()
-    // {
-    //     return $this->belongsTo(RpInstallmentPaymentPlanDetail::class);
-    // }
+     public function paymentPlan()
+     {
+         return @$this->belongsTo(\Modules\RecievablePayable\Entities\RpInstallmentPaymentPlan::class);
+     }
 
     public function contracts()
     {

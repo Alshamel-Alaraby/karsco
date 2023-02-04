@@ -75,7 +75,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
-                rp_code: null,
+                rp_code: '',
                 contact_person: '',
                 contact_phones:'',
                 national_id: null,
@@ -95,7 +95,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
-                rp_code: null,
+                rp_code: '',
                 contact_person: '',
                 contact_phones:'',
                 national_id: null,
@@ -114,6 +114,7 @@ export default {
             isCheckAll: false,
             checkAll: [],
             current_page: 1,
+            enabled3: true,
             image: '',
             setting: {
                 name: true,
@@ -138,52 +139,56 @@ export default {
                 'phone',
                 'email',
                 'rp_code',
-                'nationality_id',
+                this.$i18n.locale == 'ar'? 'nationality.name': 'nationality.name_e',
                 'contact_person',
                 'contact_phones',
                 'national_id',
-                'country_id',
-                'city_id',
-                'bank_account_id',
+                this.$i18n.locale == 'ar'? 'nationality.name': 'nationality.name_e',
+                this.$i18n.locale == 'ar'? 'country.name': 'country.name_e',
+                this.$i18n.locale == 'ar'? 'bankAccount.name': 'bankAccount.name_e',
                 'whatsapp',
                 'passport_no'
             ],
             Tooltip: '',
-            mouseEnter: null
+            mouseEnter: null,
+            printLoading: true,
+            printObj: {
+                id: "printCustomer",
+            }
         }
     },
     validations: {
         create: {
             name: {required,minLength: minLength(2),maxLength: maxLength(100),},
             name_e: {required,minLength: minLength(2),maxLength: maxLength(100),},
-            phone: {required,maxLength: maxLength(100)},
+            phone: {required,maxLength: maxLength(20)},
             email: {required,maxLength: maxLength(100),email},
-            rp_code: {required,integer,maxLength: maxLength(9),},
+            rp_code: {required,maxLength: maxLength(9),},
             nationality_id: {required,integer,maxLength: maxLength(40),},
             contact_person: {required,maxLength: maxLength(100)},
             contact_phones: {required,integer,maxLength: maxLength(100)},
-            national_id: {required,integer},
+            national_id: {required,integer,maxLength: maxLength(20)},
             country_id: {required},
             city_id: {required},
             bank_account_id: {required},
-            whatsapp: {numeric},
-            passport_no: {integer}
+            whatsapp: {integer,maxLength: maxLength(20)},
+            passport_no: {integer,maxLength: maxLength(20)}
         },
         edit: {
             name: {required,minLength: minLength(2),maxLength: maxLength(100),},
             name_e: {required,minLength: minLength(2),maxLength: maxLength(100),},
             phone: {required,maxLength: maxLength(100)},
             email: {required,maxLength: maxLength(100),email},
-            rp_code: {required,integer,maxLength: maxLength(9),},
+            rp_code: {required,maxLength: maxLength(9),},
             nationality_id: {required,integer,maxLength: maxLength(40),},
             contact_person: {required,maxLength: maxLength(100)},
             contact_phones: {required,integer,maxLength: maxLength(100)},
-            national_id: {required,integer},
+            national_id: {required,integer,maxLength: maxLength(20)},
             country_id: {required},
             city_id: {required},
             bank_account_id: {required},
-            passport_no: {integer},
-            whatsapp: {numeric}
+            whatsapp: {integer,maxLength: maxLength(20)},
+            passport_no: {integer,maxLength: maxLength(20)}
         },
     },
     watch: {
@@ -422,7 +427,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
-                rp_code: null,
+                rp_code: '',
                 nationality_id: null,
                 contact_person: '',
                 contact_phones:'',
@@ -432,6 +437,9 @@ export default {
                 city_id: null ,
                 whatsapp: ''
             };
+            this.countries = [];
+            this.cities = [];
+            this.bank_accounts = [];
             this.$nextTick(() => { this.$v.$reset() });
             this.errors = {};
             this.$bvModal.hide(`create`);
@@ -440,6 +448,9 @@ export default {
          *  hidden Modal (create)
          */
         async resetModal(){
+            this.countries = [];
+            this.cities = [];
+            this.bank_accounts = [];
             await this.getCategory();
             await this.getBankAcount();
             this.create = {
@@ -447,7 +458,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
-                rp_code: null,
+                rp_code: '',
                 nationality_id: null,
                 contact_person: '',
                 contact_phones:'',
@@ -464,6 +475,9 @@ export default {
          *  create countrie
          */
         async resetForm(){
+            this.countries = [];
+            this.cities = [];
+            this.bank_accounts = [];
             await this.getCategory();
             await this.getBankAcount();
             this.create = {
@@ -471,7 +485,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
-                rp_code: null,
+                rp_code: '',
                 nationality_id: null,
                 contact_person: '',
                 contact_phones:'',
@@ -578,6 +592,9 @@ export default {
          *   show Modal (edit)
          */
         async resetModalEdit(id){
+            this.countries = [];
+            this.cities = [];
+            this.bank_accounts = [];
             await this.getCategory();
             await this.getBankAcount();
             let build = this.customers.find(e => id == e.id );
@@ -606,7 +623,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
-                rp_code: null,
+                rp_code: '',
                 nationality_id: null,
                 contact_person: '',
                 contact_phones:'',
@@ -616,6 +633,9 @@ export default {
                 city_id: null ,
                 whatsapp: ''
             };
+            this.countries = [];
+            this.cities = [];
+            this.bank_accounts = [];
         },
         /**
          *  start  dynamicSortString
@@ -764,6 +784,19 @@ export default {
                 this.edit.bank_account_id = null;
             }
         },
+        ExportExcel(type, fn, dl) {
+            this.enabled3 = false;
+            setTimeout(() => {
+                let elt = this.$refs.exportable_table;
+                let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+                if (dl) {
+                    XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+                } else {
+                    XLSX.writeFile(wb, fn || (('Customer' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+                }
+                this.enabled3 = true;
+            }, 100);
+        }
     },
 };
 </script>
@@ -771,9 +804,9 @@ export default {
 <template>
     <Layout>
         <PageHeader />
-        <Country @created="getCategory" />
-        <City @created="getCity(create.country_id ? create.country_id: edit.country_id)" />
-        <bankAccount @created="getBankAcount" />
+        <bankAccount :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getBankAcount" />
+        <Country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCategory" />
+        <City :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCity(create.country_id ? create.country_id: edit.country_id)" />
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -791,13 +824,13 @@ export default {
                                         <b-form-checkbox v-model="filterSetting" value="phone" class="mb-1">{{ getCompanyKey('customer_phone') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="email" class="mb-1">{{ getCompanyKey('customer_email') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="rp_code" class="mb-1">{{ getCompanyKey('customer_code') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="nationality_id" class="mb-1">{{ getCompanyKey('customer_nationality') }}</b-form-checkbox>
+                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'nationality.name': 'nationality.name_e'" class="mb-1">{{ getCompanyKey('customer_nationality') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="contact_person" class="mb-1">{{ getCompanyKey('customer_contact_person') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="contact_phones" class="mb-1">{{ getCompanyKey('customer_contact_phones') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="country_id" class="mb-1">{{ getCompanyKey('country') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="city_id" class="mb-1">{{ getCompanyKey('city') }}</b-form-checkbox>
+                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'country.name': 'country.name_e'" class="mb-1">{{ getCompanyKey('country') }}</b-form-checkbox>
+                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'city.name': 'city.name_e'" class="mb-1">{{ getCompanyKey('city') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="national_id" class="mb-1">{{ getCompanyKey('customer_national_id') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="bank_account_id" class="mb-1">{{ getCompanyKey('bank_account') }}</b-form-checkbox>
+                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'bankAccount.name': 'bankAccount.name_e'" class="mb-1">{{ getCompanyKey('bank_account') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="whatsapp" class="mb-1">{{ getCompanyKey('customer_whatsapp') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="passport_no" class="mb-1">{{ getCompanyKey('customer_passport_number') }}</b-form-checkbox>
                                     </b-dropdown>
@@ -834,10 +867,10 @@ export default {
                                     <i class="fas fa-plus"></i>
                                 </b-button>
                                 <div class="d-inline-flex">
-                                    <button class="custom-btn-dowonload">
+                                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
                                         <i class="fas fa-file-download"></i>
                                     </button>
-                                    <button class="custom-btn-dowonload">
+                                    <button v-print="'#printCustomer'" class="custom-btn-dowonload">
                                         <i class="fe-printer"></i>
                                     </button>
                                     <button
@@ -1201,7 +1234,7 @@ export default {
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 class="form-control"
                                                 data-create="9"
                                                 @keypress.enter="moveInput('select','create',10)"
@@ -1319,10 +1352,11 @@ export default {
                             <loader size="large" v-if="isLoader" />
                             <!--       end loader       -->
 
-                            <table class="table table-borderless table-hover table-centered m-0">
+                            <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                                   id="printCustomer">
                                 <thead>
                                 <tr>
-                                    <th scope="col" style="width: 0;">
+                                    <th scope="col" style="width: 0;" v-if="enabled3" class="do-not-print">
                                         <div class="form-check custom-control">
                                             <input
                                                 class="form-check-input"
@@ -1424,10 +1458,10 @@ export default {
                                             <span>{{ getCompanyKey('customer_code') }}</span>
                                         </div>
                                     </th>
-                                    <th>
+                                    <th v-if="enabled3" class="do-not-print">
                                         {{ $t('general.Action') }}
                                     </th>
-                                    <th><i class="fas fa-ellipsis-v"></i></th>
+                                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                                 </tr>
                                 </thead>
                                 <tbody v-if="customers.length > 0">
@@ -1438,7 +1472,7 @@ export default {
                                     :key="data.id"
                                     class="body-tr-custom"
                                 >
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <div class="form-check custom-control" style="min-height: 1.9em;">
                                             <input
                                                 style="width: 17px;height: 17px;"
@@ -1466,7 +1500,7 @@ export default {
                                     <td v-if="setting.bank_account_id">{{ data.bank_account_id }}</td>
                                     <td v-if="setting.whatsapp">{{ data.whatsapp }}</td>
                                     <td v-if="setting.rp_code">{{ data.rp_code }}</td>
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <div class="btn-group">
                                             <button
                                                 type="button"
@@ -1748,15 +1782,15 @@ export default {
                                                                 <span class="text-danger">*</span>
                                                             </label>
                                                             <input
-                                                                type="number"
+                                                                type="text"
                                                                 class="form-control"
                                                                 data-edit="9"
                                                                 @keypress.enter="moveInput('select','edit',10)"
                                                                 v-model="$v.edit.rp_code.$model"
                                                                 :class="{
-                                                'is-invalid':$v.edit.rp_code.$error || errors.rp_code,
-                                                'is-valid':!$v.edit.rp_code.$invalid && !errors.rp_code
-                                            }"
+                                                                    'is-invalid':$v.edit.rp_code.$error || errors.rp_code,
+                                                                    'is-valid':!$v.edit.rp_code.$invalid && !errors.rp_code
+                                                                }"
                                                             />
                                                             <template v-if="errors.rp_code">
                                                                 <ErrorMessage v-for="(errorMessage,index) in errors.rp_code" :key="index">{{ errorMessage }}</ErrorMessage>
@@ -1859,7 +1893,7 @@ export default {
                                         </b-modal>
                                         <!--  /edit   -->
                                     </td>
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <button
                                             @mousemove="log(data.id)"
                                             @mouseover="log(data.id)"

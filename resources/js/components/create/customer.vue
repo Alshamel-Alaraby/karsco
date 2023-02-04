@@ -13,10 +13,10 @@ import Swal from "sweetalert2";
 import ErrorMessage from "../../components/widgets/errorMessage";
 import loader from "../../components/loader";
 import Multiselect from "vue-multiselect";
-import translation from "../../helper/translation-mixin";
 import country from "../country";
 import city from "../city";
 import bankAccount from "../create/bankAccount"
+import transMixinComp from "../../helper/translation-comp-mixin";
 
 // require styles
 import "quill/dist/quill.core.css";
@@ -36,7 +36,8 @@ export default {
       bankAccount,
       city
   },
-  mixins:[translation],
+   mixins: [transMixinComp],
+
   data() {
     return {
       cities: [],
@@ -86,6 +87,8 @@ export default {
       passport_no: { integer },
     },
   },
+   props: ["companyKeys", "defaultsKeys"],
+
   updated() {
     $(function () {
       $(".englishInput").keypress(function (event) {
@@ -324,9 +327,9 @@ export default {
 
 <template>
     <div>
-        <country :id="'country-create-customer'" @created="getCategory" />
-        <bankAccount @created="getBankAcount" />
-        <city :id="'city-create-customer'" @created="getCity(create.country_id)" />
+        <country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'country-create-customer'" @created="getCategory" />
+        <bankAccount :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getBankAcount" />
+        <city :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'city-create-customer'" @created="getCity(create.country_id)" />
 
         <!--  create   -->
         <b-modal

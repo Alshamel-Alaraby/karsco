@@ -589,6 +589,7 @@
         }
     },
     "general": {
+        "FileUploads":"تحميل الملف",
         "from":"من",
         "to":"الى",
         "fields":"الحقول",
@@ -877,6 +878,7 @@
         "DocumentName": "اسم المستند",
         "thisFieldIsUniq": "هذا الحقل متكرر",
         "true": "صحيح",
-        "false": "غير صحيح"
+        "false": "غير صحيح",
+        "UploadsFiles": "تحميل الملفات"
     }
 }

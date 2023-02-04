@@ -30,8 +30,6 @@ class RlstBuildingResource extends JsonResource
             "city" => new \App\Http\Resources\City\CityResource($this->city),
             "avenue_id" => $this->avenue_id,
             "avenue" => new \App\Http\Resources\Avenue\AvenueResource($this->avenue),
-            'city_id' => $this->city_id,
-            "city" => new \App\Http\Resources\City\CityResource($this->city),
             "lng" => $this->lng,
             "lat" => $this->lat,
             "properties" => $this->properties,

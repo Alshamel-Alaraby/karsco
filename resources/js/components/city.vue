@@ -1,212 +1,221 @@
 <template>
-    <div>
-        <country :id="'country-create-city'" @created="getCategory"/>
-        <governate :id="'governate-create-city'+this.id" @created="getGovernorate(create.country_id)"/>
-        <!--  create   -->
-        <b-modal
-            :id="id"
-            :title="getCompanyKey('city_create_form')"
-            title-class="font-18"
-            size="lg"
-            body-class="p-4 "
-            :hide-footer="true"
-            @show="resetModal"
-            @hidden="resetModalHidden"
-        >
-            <form>
-                <div class="mb-3 d-flex justify-content-end">
-                    <b-button
-                        variant="success"
-                        :disabled="!is_disabled"
-                        @click.prevent="resetForm"
-                        type="button"
-                        :class="['font-weight-bold px-2', is_disabled ? 'mx-2' : '']"
-                    >
-                        {{ $t("general.AddNewRecord") }}
-                    </b-button>
-                    <template v-if="!is_disabled">
-                        <b-button
-                            variant="success"
-                            type="submit"
-                            class="mx-1"
-                            v-if="!isLoader"
-                            @click.prevent="AddSubmit"
-                        >
-                            {{ $t("general.Add") }}
-                        </b-button>
+  <div>
+    <country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'country-create-city'" @created="getCategory" />
+    <governate
+    :companyKeys="companyKeys" :defaultsKeys="defaultsKeys"
+      :id="'governate-create-city' + this.id"
+      @created="getGovernorate(create.country_id)"
+    />
+    <!--  create   -->
+    <b-modal
+      :id="id"
+      :title="getCompanyKey('city_create_form')"
+      title-class="font-18"
+      size="lg"
+      body-class="p-4 "
+      :hide-footer="true"
+      @show="resetModal"
+      @hidden="resetModalHidden"
+    >
+      <form>
+        <div class="mb-3 d-flex justify-content-end">
+          <b-button
+            variant="success"
+            :disabled="!is_disabled"
+            @click.prevent="resetForm"
+            type="button"
+            :class="['font-weight-bold px-2', is_disabled ? 'mx-2' : '']"
+          >
+            {{ $t("general.AddNewRecord") }}
+          </b-button>
+          <template v-if="!is_disabled">
+            <b-button
+              variant="success"
+              type="submit"
+              class="mx-1"
+              v-if="!isLoader"
+              @click.prevent="AddSubmit"
+            >
+              {{ $t("general.Add") }}
+            </b-button>
 
-                        <b-button variant="success" class="mx-1" disabled v-else>
-                            <b-spinner small></b-spinner>
-                            <span class="sr-only">{{ $t("login.Loading") }}...</span>
-                        </b-button>
-                    </template>
-                    <b-button @click.prevent="$bvModal.hide(`city-create`)" variant="danger" type="button">
-                        {{ $t("general.Cancel") }}
-                    </b-button>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group position-relative">
-                            <label class="control-label">
-                                {{ getCompanyKey('country') }}
-                                <span class="text-danger">*</span>
-                            </label>
-                            <multiselect
-                                @input="showCountryModal"
-                                v-model="create.country_id"
-                                :options="countries.map((type) => type.id)"
-                                :custom-label="(opt) => countries.find((x) => x.id == opt).name"
-                            >
-                            </multiselect>
-                            <div
-                                v-if="$v.create.country_id.$error || errors.country_id"
-                                class="text-danger"
-                            >
-                                {{ $t("general.fieldIsRequired") }}
-                            </div>
-                            <template v-if="errors.country_id">
-                                <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.country_id"
-                                    :key="index"
-                                >{{ errorMessage }}</ErrorMessage
-                                >
-                            </template>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group position-relative">
-                            <label class="control-label">
-                                {{ getCompanyKey('governorate') }}
-                                <span class="text-danger">*</span>
-                            </label>
-                            <multiselect
-                                @input="showGovernorateModal"
-                                v-model="create.governorate_id"
-                                :options="governorates.map((type) => type.id)"
-                                :custom-label="(opt) => governorates.find((x) => x.id == opt).name"
-                            >
-                            </multiselect>
-                            <div
-                                v-if="$v.create.governorate_id.$error || errors.governorate_id"
-                                class="text-danger"
-                            >
-                                {{ $t("general.fieldIsRequired") }}
-                            </div>
-                            <template v-if="errors.governorate_id">
-                                <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.governorate_id"
-                                    :key="index"
-                                >{{ errorMessage }}</ErrorMessage
-                                >
-                            </template>
-                        </div>
-                    </div>
-                    <div class="col-md-6 direction" dir="rtl">
-                        <div class="form-group">
-                            <label for="field-1" class="control-label">
-                                {{ getCompanyKey('city_name_ar') }}
-                                <span class="text-danger">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                class="form-control arabicInput"
-                                data-create="1"
-                                @keypress.enter="moveInput('input', 'create', 2)"
-                                v-model="$v.create.name.$model"
-                                :class="{
-                'is-invalid': $v.create.name.$error || errors.name,
-                'is-valid': !$v.create.name.$invalid && !errors.name,
-              }"
-                                id="field-1"
-                            />
-                            <div v-if="!$v.create.name.minLength" class="invalid-feedback">
-                                {{ $t("general.Itmustbeatleast") }}
-                                {{ $v.create.name.$params.minLength.min }}
-                                {{ $t("general.letters") }}
-                            </div>
-                            <div v-if="!$v.create.name.maxLength" class="invalid-feedback">
-                                {{ $t("general.Itmustbeatmost") }}
-                                {{ $v.create.name.$params.maxLength.max }}
-                                {{ $t("general.letters") }}
-                            </div>
-                            <template v-if="errors.name">
-                                <ErrorMessage v-for="(errorMessage, index) in errors.name" :key="index">{{
-                                        errorMessage
-                                    }}</ErrorMessage>
-                            </template>
-                        </div>
-                    </div>
-                    <div class="col-md-6 direction-ltr" dir="ltr">
-                        <div class="form-group">
-                            <label for="field-2" class="control-label">
-                                {{ getCompanyKey('city_name_en') }}
-                                <span class="text-danger">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                class="form-control englishInput"
-                                data-create="2"
-                                @keypress.enter="moveInput('select', 'create', 5)"
-                                v-model="$v.create.name_e.$model"
-                                :class="{
-                'is-invalid': $v.create.name_e.$error || errors.name_e,
-                'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
-              }"
-                                id="field-2"
-                            />
-                            <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
-                                {{ $t("general.Itmustbeatleast") }}
-                                {{ $v.create.name_e.$params.minLength.min }}
-                                {{ $t("general.letters") }}
-                            </div>
-                            <div v-if="!$v.create.name_e.maxLength" class="invalid-feedback">
-                                {{ $t("general.Itmustbeatmost") }}
-                                {{ $v.create.name_e.$params.maxLength.max }}
-                                {{ $t("general.letters") }}
-                            </div>
-                            <template v-if="errors.name_e">
-                                <ErrorMessage v-for="(errorMessage, index) in errors.name_e" :key="index">{{
-                                        errorMessage
-                                    }}</ErrorMessage>
-                            </template>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="mr-2" for="inlineFormCustomSelectPref">
-                                {{ getCompanyKey('city_status') }}
-                                <span class="text-danger">*</span>
-                            </label>
-                            <select
-                                class="custom-select mr-sm-2"
-                                id="inlineFormCustomSelectPref"
-                                data-create="5"
-                                @keypress.enter.prevent="moveInput('input', 'create', 1)"
-                                v-model="$v.create.is_active.$model"
-                                :class="{
-                'is-invalid': $v.create.is_active.$error || errors.is_active,
-                'is-valid': !$v.create.is_active.$invalid && !errors.is_active,
-              }"
-                            >
-                                <option value="" selected>{{ $t("general.Choose") }}...</option>
-                                <option value="1">{{ $t("general.Active") }}</option>
-                                <option value="0">{{ $t("general.Inactive") }}</option>
-                            </select>
-                            <template v-if="errors.is_active">
-                                <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.is_active"
-                                    :key="index"
-                                >{{ errorMessage }}</ErrorMessage
-                                >
-                            </template>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </b-modal>
-        <!--  /create   -->
-    </div>
-
+            <b-button variant="success" class="mx-1" disabled v-else>
+              <b-spinner small></b-spinner>
+              <span class="sr-only">{{ $t("login.Loading") }}...</span>
+            </b-button>
+          </template>
+          <b-button
+            @click.prevent="$bvModal.hide(`city-create`)"
+            variant="danger"
+            type="button"
+          >
+            {{ $t("general.Cancel") }}
+          </b-button>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group position-relative">
+              <label class="control-label">
+                {{ getCompanyKey("country") }}
+                <span class="text-danger">*</span>
+              </label>
+              <multiselect
+                @input="showCountryModal"
+                v-model="create.country_id"
+                :options="countries.map((type) => type.id)"
+                :custom-label="(opt) => countries.find((x) => x.id == opt).name"
+              >
+              </multiselect>
+              <div
+                v-if="$v.create.country_id.$error || errors.country_id"
+                class="text-danger"
+              >
+                {{ $t("general.fieldIsRequired") }}
+              </div>
+              <template v-if="errors.country_id">
+                <ErrorMessage
+                  v-for="(errorMessage, index) in errors.country_id"
+                  :key="index"
+                  >{{ errorMessage }}</ErrorMessage
+                >
+              </template>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group position-relative">
+              <label class="control-label">
+                {{ getCompanyKey("governorate") }}
+                <span class="text-danger">*</span>
+              </label>
+              <multiselect
+                @input="showGovernorateModal"
+                v-model="create.governorate_id"
+                :options="governorates.map((type) => type.id)"
+                :custom-label="(opt) => governorates.find((x) => x.id == opt).name"
+              >
+              </multiselect>
+              <div
+                v-if="$v.create.governorate_id.$error || errors.governorate_id"
+                class="text-danger"
+              >
+                {{ $t("general.fieldIsRequired") }}
+              </div>
+              <template v-if="errors.governorate_id">
+                <ErrorMessage
+                  v-for="(errorMessage, index) in errors.governorate_id"
+                  :key="index"
+                  >{{ errorMessage }}</ErrorMessage
+                >
+              </template>
+            </div>
+          </div>
+          <div class="col-md-6 direction" dir="rtl">
+            <div class="form-group">
+              <label for="field-1" class="control-label">
+                {{ getCompanyKey("city_name_ar") }}
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control arabicInput"
+                data-create="1"
+                @keypress.enter="moveInput('input', 'create', 2)"
+                v-model="$v.create.name.$model"
+                :class="{
+                  'is-invalid': $v.create.name.$error || errors.name,
+                  'is-valid': !$v.create.name.$invalid && !errors.name,
+                }"
+                id="field-1"
+              />
+              <div v-if="!$v.create.name.minLength" class="invalid-feedback">
+                {{ $t("general.Itmustbeatleast") }}
+                {{ $v.create.name.$params.minLength.min }}
+                {{ $t("general.letters") }}
+              </div>
+              <div v-if="!$v.create.name.maxLength" class="invalid-feedback">
+                {{ $t("general.Itmustbeatmost") }}
+                {{ $v.create.name.$params.maxLength.max }}
+                {{ $t("general.letters") }}
+              </div>
+              <template v-if="errors.name">
+                <ErrorMessage v-for="(errorMessage, index) in errors.name" :key="index">{{
+                  errorMessage
+                }}</ErrorMessage>
+              </template>
+            </div>
+          </div>
+          <div class="col-md-6 direction-ltr" dir="ltr">
+            <div class="form-group">
+              <label for="field-2" class="control-label">
+                {{ getCompanyKey("city_name_en") }}
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control englishInput"
+                data-create="2"
+                @keypress.enter="moveInput('select', 'create', 5)"
+                v-model="$v.create.name_e.$model"
+                :class="{
+                  'is-invalid': $v.create.name_e.$error || errors.name_e,
+                  'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
+                }"
+                id="field-2"
+              />
+              <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
+                {{ $t("general.Itmustbeatleast") }}
+                {{ $v.create.name_e.$params.minLength.min }}
+                {{ $t("general.letters") }}
+              </div>
+              <div v-if="!$v.create.name_e.maxLength" class="invalid-feedback">
+                {{ $t("general.Itmustbeatmost") }}
+                {{ $v.create.name_e.$params.maxLength.max }}
+                {{ $t("general.letters") }}
+              </div>
+              <template v-if="errors.name_e">
+                <ErrorMessage
+                  v-for="(errorMessage, index) in errors.name_e"
+                  :key="index"
+                  >{{ errorMessage }}</ErrorMessage
+                >
+              </template>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="mr-2" for="inlineFormCustomSelectPref">
+                {{ getCompanyKey("city_status") }}
+                <span class="text-danger">*</span>
+              </label>
+              <select
+                class="custom-select mr-sm-2"
+                id="inlineFormCustomSelectPref"
+                data-create="5"
+                @keypress.enter.prevent="moveInput('input', 'create', 1)"
+                v-model="$v.create.is_active.$model"
+                :class="{
+                  'is-invalid': $v.create.is_active.$error || errors.is_active,
+                  'is-valid': !$v.create.is_active.$invalid && !errors.is_active,
+                }"
+              >
+                <option value="" selected>{{ $t("general.Choose") }}...</option>
+                <option value="1">{{ $t("general.Active") }}</option>
+                <option value="0">{{ $t("general.Inactive") }}</option>
+              </select>
+              <template v-if="errors.is_active">
+                <ErrorMessage
+                  v-for="(errorMessage, index) in errors.is_active"
+                  :key="index"
+                  >{{ errorMessage }}</ErrorMessage
+                >
+              </template>
+            </div>
+          </div>
+        </div>
+      </form>
+    </b-modal>
+    <!--  /create   -->
+  </div>
 </template>
 
 <script>
@@ -217,27 +226,34 @@ import Switches from "vue-switches";
 import ErrorMessage from "../components/widgets/errorMessage";
 import loader from "../components/loader";
 import Multiselect from "vue-multiselect";
-import translation from "../helper/translation-mixin";
 import governate from "./governate";
 import country from "./country";
+import transMixinComp from "../helper/translation-comp-mixin";
+
 export default {
   components: {
     Switches,
     Multiselect,
+
     ErrorMessage,
     loader,
-      governate,
-      country,
+    governate,
+    country,
   },
-  mixins:[translation],
-    props:{
-     id:{
-         default:"city-create"
-     }
+  mixins: [transMixinComp],
+  props: {
+    id: {
+      default: "city-create",
     },
-
-  mounted(){
-this.company_id=this.$store.getters["auth/company_id"];
+    companyKeys: {
+      default: [],
+    },
+    defaultsKeys: {
+      default: [],
+    },
+  },
+  mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
   },
 
   updated() {
@@ -324,20 +340,20 @@ this.company_id=this.$store.getters["auth/company_id"];
       this.errors = {};
     },
 
-      showCountryModal() {
-          if (this.create.country_id == 0) {
-              this.$bvModal.show("country-create");
-              this.create.country_id = null;
-          }else {
-              this.getGovernorate(this.create.country_id)
-          }
-      },
-      showGovernorateModal() {
-          if (this.create.governorate_id == 0) {
-              this.$bvModal.show("governate-create-city"+this.id);
-              this.create.governorate_id = null;
-          }
-      },
+    showCountryModal() {
+      if (this.create.country_id == 0) {
+        this.$bvModal.show("country-create");
+        this.create.country_id = null;
+      } else {
+        this.getGovernorate(this.create.country_id);
+      }
+    },
+    showGovernorateModal() {
+      if (this.create.governorate_id == 0) {
+        this.$bvModal.show("governate-create-city" + this.id);
+        this.create.governorate_id = null;
+      }
+    },
 
     async getCategory() {
       this.countries = [];
@@ -360,7 +376,7 @@ this.company_id=this.$store.getters["auth/company_id"];
         });
     },
     async getGovernorate(id) {
-      if(!id) return;
+      if (!id) return;
       this.governorates = [];
       this.create.city_id = null;
       this.create.governorate_id = null;
@@ -368,7 +384,7 @@ this.company_id=this.$store.getters["auth/company_id"];
         .get(`/governorates?country_id=${id}`)
         .then((res) => {
           let l = res.data.data;
-            l.unshift({ id: 0, name: "اضافه محافظه", name_e: "Add Governorate" });
+          l.unshift({ id: 0, name: "اضافه محافظه", name_e: "Add Governorate" });
           this.governorates = l;
         })
         .catch((err) => {
@@ -412,10 +428,10 @@ this.company_id=this.$store.getters["auth/company_id"];
         this.is_disabled = false;
 
         adminApi
-          .post(`/cities`,  {...this.create,company_id:this.company_id})
+          .post(`/cities`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.is_disabled = true;
-            this.$emit('created');
+            this.$emit("created");
             setTimeout(() => {
               Swal.fire({
                 icon: "success",
@@ -450,6 +466,3 @@ this.company_id=this.$store.getters["auth/company_id"];
   },
 };
 </script>
-
-
-

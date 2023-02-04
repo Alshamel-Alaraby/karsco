@@ -17,30 +17,37 @@ class CountryController extends Controller
 
     public function find($id)
     {
-        $model = cacheGet('countries_' . $id);
+        // $model = cacheGet('countries_' . $id);
+        // if (!$model) {
+        //     $model = $this->modelInterface->find($id);
+        //     if (!$model) {
+        //         return responseJson(404, __('message.data not found'));
+        //     } else {
+        //         cachePut('countries_' . $id, $model);
+        //     }
+        // }
+
+        $model = $this->modelInterface->find($id);
         if (!$model) {
-            $model = $this->modelInterface->find($id);
-            if (!$model) {
-                return responseJson(404, __('message.data not found'));
-            } else {
-                cachePut('countries_' . $id, $model);
-            }
+            return responseJson(404, __('message.data not found'));
         }
+
         return responseJson(200, 'success', new CountryResource($model));
     }
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('countries');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('countries', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
+        // if (count($_GET) == 0) {
+        //     $models = cacheGet('countries');
+        //     if (!$models) {
+        //         $models = $this->modelInterface->all($request);
+        //         cachePut('countries', $models);
+        //     }
+        // } else {
+        //     $models = $this->modelInterface->all($request);
+        // }
 
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', CountryResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
@@ -80,14 +87,13 @@ class CountryController extends Controller
             return responseJson(404, __('message.data not found'));
         }
         if ($model->hasChildren()) {
-            return responseJson(400,__("this item has children and can't be deleted remove it's children first"));
+            return responseJson(400, __("this item has children and can't be deleted remove it's children first"));
         }
 
         $this->modelInterface->delete($id);
 
         return responseJson(200, 'success');
     }
-
 
     public function bulkDelete(Request $request)
     {
@@ -105,6 +111,5 @@ class CountryController extends Controller
         }
         return responseJson(200, __('Done'));
     }
-
 
 }

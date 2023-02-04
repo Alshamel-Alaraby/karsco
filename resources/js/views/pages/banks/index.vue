@@ -601,8 +601,7 @@ export default {
 <template>
   <Layout>
     <PageHeader />
-    <Country @created="getCountries" />
-
+    <Country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCountries" />
     <div class="row">
       <div class="col-12">
         <div class="card">

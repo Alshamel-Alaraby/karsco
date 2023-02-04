@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers\UserRole;
 
-use App\Models\RoleUser;
-use App\Models\UserRole;
 use App\Http\Requests\AllRequest;
-use Illuminate\Routing\Controller;
-use App\Http\Resources\UserRole\UserRoleResource;
 use App\Http\Requests\UserRole\StoreUserRoleRequest;
 use App\Http\Requests\UserRole\UpdateUserRoleRequest;
+use App\Http\Resources\UserRole\UserRoleResource;
+use App\Models\RoleUser;
+use Illuminate\Routing\Controller;
 
 class UserRoleController extends Controller
 {
@@ -48,7 +47,7 @@ class UserRoleController extends Controller
             $model = $this->model->create([
                 'user_id' => $user,
                 'role_id' => $request->role,
-                "company_id" => $request->company_id
+                "company_id" => $request->company_id,
             ]);
             $data[] = new UserRoleResource($model);
         }
@@ -76,7 +75,6 @@ class UserRoleController extends Controller
         $model->delete();
         return responseJson(200, 'deleted');
     }
-
 
     public function logs($id)
     {

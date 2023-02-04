@@ -293,7 +293,7 @@ export const menuItems = [
                 id: 432234,
                 name: 'gen arch doc types',
                 label: 'menuitems.GenArchDocType.text',
-                link: '/dashboard/gen-arch-doc-types'
+                link: '/dashboard/documents'
             },
             {
                 id: 38781,

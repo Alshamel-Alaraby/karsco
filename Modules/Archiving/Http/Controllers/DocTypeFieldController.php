@@ -4,7 +4,6 @@ namespace Modules\Archiving\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Modules\Archiving\Entities\DocTypeField;
 use Modules\Archiving\Http\Requests\DocTypeFieldRequest;
 use Modules\Archiving\Repositories\DocTypeFieldInterface;
@@ -19,16 +18,8 @@ class DocTypeFieldController extends Controller
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('archDocTypeField');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('archDocTypeField', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
 
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', DocTypeFieldResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
@@ -78,7 +69,7 @@ class DocTypeFieldController extends Controller
     public function bulkUpdate(Request $request)
     {
         foreach ($request->all() as $item) {
-            DocTypeField::query ()->where ('doc_type_id',$item['doc_type_id'])->forceDelete ();
+            DocTypeField::query()->where('doc_type_id', $item['doc_type_id'])->forceDelete();
         }
         DocTypeField::query()->insert($request->all());
         return responseJson(200, __('Done'));

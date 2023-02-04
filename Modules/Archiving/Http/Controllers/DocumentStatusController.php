@@ -20,16 +20,8 @@ class DocumentStatusController extends Controller
 
     public function index(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('archDocumentStatus');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('archDocumentStatus', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
 
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', DocumentStatusResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 

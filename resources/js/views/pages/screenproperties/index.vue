@@ -543,7 +543,7 @@ export default {
 
 <template>
   <Layout>
-    <Property @created="getProperties" />
+    <Property :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getProperties" />
     <PageHeader />
     <div class="row">
       <div class="col-12">

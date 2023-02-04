@@ -17,30 +17,34 @@ class SalesmenTypeController extends Controller
 
     public function find($id)
     {
-        $model = cacheGet('salesmen_types_' . $id);
+        // $model = cacheGet('salesmen_types_' . $id);
+        // if (!$model) {
+        //     $model = $this->modelInterface->find($id);
+        //     if (!$model) {
+        //         return responseJson(404, __('message.data not found'));
+        //     } else {
+        //         cachePut('salesmen_types_' . $id, $model);
+        //     }
+        // }
+        $model = $this->modelInterface->find($id);
         if (!$model) {
-            $model = $this->modelInterface->find($id);
-            if (!$model) {
-                return responseJson(404, __('message.data not found'));
-            } else {
-                cachePut('salesmen_types_' . $id, $model);
-            }
+            return responseJson(404, __('message.data not found'));
         }
         return responseJson(200, 'success', new SalesmenTypeResource($model));
     }
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('salesmen_types');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('salesmen_types', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
-
+        // if (count($_GET) == 0) {
+        //     $models = cacheGet('salesmen_types');
+        //     if (!$models) {
+        //         $models = $this->modelInterface->all($request);
+        //         cachePut('salesmen_types', $models);
+        //     }
+        // } else {
+        //     $models = $this->modelInterface->all($request);
+        // }
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', SalesmenTypeResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 

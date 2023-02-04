@@ -36,6 +36,25 @@ export default {
     loader,
     Multiselect,
   },
+  beforeRouteEnter(to, from, next) {
+        next((vm) => {
+
+            if (vm.$store.state.auth.work_flow_trees.includes("real estate-e")) {
+                Swal.fire({
+                    icon: "error",
+                    title: `${vm.$t("general.Error")}`,
+                    text: `${vm.$t("general.ModuleExpired")}`,
+                });
+                return vm.$router.push({ name: "home" });
+            }
+
+            if (vm.$store.state.auth.work_flow_trees.includes('wallet owner')  || vm.$store.state.auth.work_flow_trees.includes('real estate') || vm.$store.state.auth.user.type == 'super_admin') {
+                return true;
+            } else {
+                return vm.$router.push({ name: "home" });
+            }
+        });
+    },
   data() {
     return {
       per_page: 50,
@@ -45,7 +64,7 @@ export default {
       debounce: {},
       walletOwnersPagination: {},
       walletOwners: [],
-      enabled3: false,
+      enabled3: true,
       isLoader: false,
       create: {
         wallet_id: null,
@@ -72,9 +91,12 @@ export default {
       filterSetting: [
         this.$i18n.locale == "ar" ? "owner.name" : "owner.name_e",
         this.$i18n.locale == "ar" ? "wallet.name" : "wallet.name_e",
-        ,
         "percentage",
       ],
+        printLoading: true,
+        printObj: {
+            id: "printWalletOwner",
+        }
     };
   },
   validations: {
@@ -83,26 +105,11 @@ export default {
       owner_id: { required },
       percentage: { required, numeric },
     },
-    beforeRouteEnter(to, from, next) {
-        next((vm) => {
-
-                    if (vm.$store.state.auth.work_flow_trees.includes("real estate-e")) {
-        Swal.fire({
-          icon: "error",
-          title: `${vm.$t("general.Error")}`,
-          text: `${vm.$t("general.ModuleExpired")}`,
-        });
-        return vm.$router.push({ name: "home" });
-      }
-
-            if (vm.$store.state.auth.work_flow_trees.includes('wallet owner')  || vm.$store.state.auth.work_flow_trees.includes('real estate') || vm.$store.state.auth.user.type == 'super_admin') {
-                return true;
-            } else {
-                return vm.$router.push({ name: "home" });
-            }
-        });
-    },
-    mixins: [translation],
+    edit: {
+        wallet_id: { required },
+        owner_id: { required },
+        percentage: { required, numeric },
+    }
   },
   watch: {
     /**
@@ -569,6 +576,19 @@ export default {
           });
       }
     },
+    ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('Wallet-Owner' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      }
   },
 };
 </script>
@@ -651,12 +671,12 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
-                    <i class="fas fa-file-download"></i>
-                  </button>
-                  <button class="custom-btn-dowonload">
-                    <i class="fe-printer"></i>
-                  </button>
+                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button v-print="'#printWalletOwner'" class="custom-btn-dowonload">
+                        <i class="fe-printer"></i>
+                    </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -908,10 +928,11 @@ export default {
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
 
-              <table class="table table-borderless table-hover table-centered m-0">
+              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                     id="printWalletOwner">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th scope="col" style="width: 0" v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -936,10 +957,10 @@ export default {
                         <span>{{ getCompanyKey("wallet_owner_percentage") }}</span>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="walletOwners.length > 0">
@@ -950,7 +971,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -976,7 +997,7 @@ export default {
                         {{ data.percentage }}
                       </h5>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1149,7 +1170,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mousemove="log(data.id)"
                         @mouseover="log(data.id)"

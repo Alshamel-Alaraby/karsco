@@ -4,6 +4,7 @@ namespace Modules\RealEstate\Transformers;
 
 use App\Http\Resources\Salesman\SalesmanResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\RecievablePayable\Transformers\RpInstallmentPaymentPlanResource;
 
 class RlstReservationResource extends JsonResource
 {
@@ -21,6 +22,7 @@ class RlstReservationResource extends JsonResource
             "salesman" => new SalesmanResource($this->salesman),
             "customer" => new RlstCustomerResource($this->customer),
             "payment_plan_id" => $this->payment_plan_id,
+            "paymentPlan" => @new \Modules\RecievablePayable\Transformers\RpInstallmentPaymentPlanResource($this->paymentPlan),
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
         ];

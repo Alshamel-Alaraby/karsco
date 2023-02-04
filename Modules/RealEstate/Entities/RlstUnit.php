@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\RealEstate\Transformers\RlstBuildingResource;
 use Spatie\Activitylog\LogOptions;
 
 class RlstUnit extends Model
@@ -46,6 +47,10 @@ class RlstUnit extends Model
     public function unitStatus()
     {
         return $this->belongsTo(\Modules\RealEstate\Entities\RlstUnitStatus::class);
+    }
+
+    public function building(){
+        return $this->belongsTo (RlstBuilding::class);
     }
 
     public function getActivitylogOptions(): LogOptions

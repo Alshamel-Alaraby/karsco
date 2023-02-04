@@ -60,7 +60,7 @@ export default {
       buildingWallets: [],
       wallets: [],
       buildings: [],
-      enabled3: false,
+      enabled3: true,
       isLoader: false,
       create: {
         wallet_id: null,
@@ -77,7 +77,10 @@ export default {
         wallet_id: true,
         bu_ty: true,
       },
-      filterSetting: ["building_id", "wallet_id"],
+      filterSetting: [
+          this.$i18n.locale == 'ar' ? 'wallet.name':'wallet.name_e',
+          this.$i18n.locale == 'ar' ? 'building.name':'building.name_e',
+      ],
       errors: {},
       isCheckAll: false,
       checkAll: [],
@@ -86,6 +89,10 @@ export default {
       company_id: 48,
       Tooltip: "",
       mouseEnter: null,
+        printLoading: true,
+        printObj: {
+            id: "printBuildingWallet",
+        }
     };
   },
   validations: {
@@ -575,6 +582,19 @@ showWalletModal() {
           });
       }
     },
+    ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('Building-Wallet' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      }
   },
 };
 </script>
@@ -582,8 +602,8 @@ showWalletModal() {
 <template>
   <Layout>
     <PageHeader />
-    <Building @created="getBuildings" />
-    <Wallet @created="getWallets" />
+    <Building :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getBuildings" />
+    <Wallet :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getWallets" />
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -601,13 +621,13 @@ showWalletModal() {
                   >
                     <b-form-checkbox
                       v-model="filterSetting"
-                      value="building_id"
+                      :value="$i18n.locale == 'ar' ? 'building.name':'building.name_e'"
                       class="mb-1"
                       >{{ getCompanyKey("building") }}</b-form-checkbox
                     >
                     <b-form-checkbox
                       v-model="filterSetting"
-                      value="wallet_id"
+                      :value="$i18n.locale == 'ar' ? 'wallet.name':'wallet.name_e'"
                       class="mb-1"
                       >{{ getCompanyKey("wallet") }}</b-form-checkbox
                     >
@@ -646,12 +666,12 @@ showWalletModal() {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
-                    <i class="fas fa-file-download"></i>
-                  </button>
-                  <button class="custom-btn-dowonload">
-                    <i class="fe-printer"></i>
-                  </button>
+                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button v-print="'#printBuildingWallet'" class="custom-btn-dowonload">
+                        <i class="fe-printer"></i>
+                    </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -923,10 +943,11 @@ showWalletModal() {
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
 
-              <table class="table table-borderless table-hover table-centered m-0">
+              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                     id="printBuildingWallet">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th scope="col" style="width: 0" v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -1000,10 +1021,10 @@ showWalletModal() {
                         </div>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="buildingWallets.length > 0">
@@ -1014,7 +1035,7 @@ showWalletModal() {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -1046,7 +1067,7 @@ showWalletModal() {
                         }}
                       </span>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1237,7 +1258,7 @@ showWalletModal() {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mousemove="log(data.id)"
                         @mouseover="log(data.id)"

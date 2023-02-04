@@ -9,7 +9,7 @@ import {dynamicSortString} from "../../helper/tableSort";
 import Multiselect from "vue-multiselect";
 import ArchDoc from "../../components/create/arch/gen-arch-doc-type";
 import DocField from "../../components/create/arch/doc-field";
-import translation from "../../helper/translation-mixin";
+import transMixinComp from "../../helper/translation-comp-mixin";
 
 /**
  * Advanced Table component
@@ -19,8 +19,9 @@ export default {
         title: "Arch Doc Type Field",
         meta: [{name: "description", content: "Arch Doc Type Field"}],
     },
-    props: ["arch_doc_type_id", "doc_type_field","document_data"],
-    mixins: [translation],
+  mixins: [transMixinComp],
+
+    props: ["arch_doc_type_id", "doc_type_field","document_data","companyKeys", "defaultsKeys"],
     components: {
         Layout,
         ErrorMessage,
@@ -382,7 +383,7 @@ export default {
 <template>
 
     <div class="row position-relative">
-        <DocField @create="getArchDocType"/>
+        <DocField :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @create="getArchDocType"/>
         <loader size="large" v-if="isLoader"/>
         <div class="col-md-12 text-center">
             <h3>{{$t('general.DocumentName')}} : {{ $i18n.locale == "ar" ? document_data.name : document_data.name_e }}</h3>

@@ -17,29 +17,34 @@ class ExternalSalesmenController extends Controller
 
     public function find($id)
     {
-        $model = cacheGet('external_salesmen_' . $id);
+        // $model = cacheGet('external_salesmen_' . $id);
+        // if (!$model) {
+        //     $model = $this->modelInterface->find($id);
+        //     if (!$model) {
+        //         return responseJson(404, __('message.data not found'));
+        //     } else {
+        //         cachePut('external_salesmen_' . $id, $model);
+        //     }
+        // }
+        $model = $this->modelInterface->find($id);
         if (!$model) {
-            $model = $this->modelInterface->find($id);
-            if (!$model) {
-                return responseJson(404, __('message.data not found'));
-            } else {
-                cachePut('external_salesmen_' . $id, $model);
-            }
+            return responseJson(404, __('message.data not found'));
         }
         return responseJson(200, 'success', new ExternalSalesmenResource($model));
     }
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('external_salesmen');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('external_salesmen', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
+        // if (count($_GET) == 0) {
+        //     $models = cacheGet('external_salesmen');
+        //     if (!$models) {
+        //         $models = $this->modelInterface->all($request);
+        //         cachePut('external_salesmen', $models);
+        //     }
+        // } else {
+        //     $models = $this->modelInterface->all($request);
+        // }
+        $models = $this->modelInterface->all($request);
 
         return responseJson(200, 'success', ExternalSalesmenResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
@@ -60,7 +65,6 @@ class ExternalSalesmenController extends Controller
 
         return responseJson(200, 'success');
     }
-
 
     public function logs($id)
     {

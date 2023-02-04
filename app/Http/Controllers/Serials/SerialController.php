@@ -26,18 +26,19 @@ class SerialController extends Controller
     public function index(Request $request)
     {
 
-        if(count($_GET) > 0){
-            cacheForget('serials');
-        }
-        $serials = cacheGet('serials');
-        if ($request->search || $request->is_active) {
-            cacheForget('serials');
-            $serials = $this->repository->getAll($request);
-        }
-        if (!$serials) {
-            $serials = $this->repository->getAll($request);
-            cachePut('serials', $serials);
-        }
+        // if(count($_GET) > 0){
+        //     cacheForget('serials');
+        // }
+        // $serials = cacheGet('serials');
+        // if ($request->search || $request->is_active) {
+        //     cacheForget('serials');
+        //     $serials = $this->repository->getAll($request);
+        // }
+        // if (!$serials) {
+        //     $serials = $this->repository->getAll($request);
+        //     cachePut('serials', $serials);
+        // }
+        $serials = $this->repository->getAll($request);
 
         return responseJson(200, 'success', ($this->resource)::collection($serials['data']), $serials['paginate'] ? getPaginates($serials['data']) : null);
     }
@@ -49,21 +50,19 @@ class SerialController extends Controller
      */
     public function store(CreateSerialRequest $request)
     {
-        try {
-            // if (!DB::table('companies')->find($request->company_id)) {
-            //     return responseJson(404, __('company does\'t exist'));
-            // }
-            // if (!DB::table('branches')->find($request->branch_id)) {
-            //     return responseJson(404, __('branch does\'t exist'));
-            // }
-            // if (!DB::table('stores')->find($request->store_id)) {
-            //     return responseJson(404, __('store does\'t exist'));
-            // }
-            $this->repository->create($request->validated());
-            return responseJson(200, __('done'));
-        } catch (Exception $exception) {
-            return responseJson($exception->getCode(), $exception->getMessage());
-        }
+
+        // if (!DB::table('companies')->find($request->company_id)) {
+        //     return responseJson(404, __('company does\'t exist'));
+        // }
+        // if (!DB::table('branches')->find($request->branch_id)) {
+        //     return responseJson(404, __('branch does\'t exist'));
+        // }
+        // if (!DB::table('stores')->find($request->store_id)) {
+        //     return responseJson(404, __('store does\'t exist'));
+        // }
+        $this->repository->create($request->validated());
+        return responseJson(200, __('done'));
+
     }
 
     /**
@@ -131,12 +130,10 @@ class SerialController extends Controller
         if ($request->is_default) {
             $data['is_default'] = $request->is_default;
         }
-        try {
-            $this->repository->update($data, $id);
-            return responseJson(200, __('updated'));
-        } catch (\Exception$exception) {
-            return responseJson($exception->getCode(), $exception->getMessage());
-        }
+
+        $this->repository->update($data, $id);
+        return responseJson(200, __('updated'));
+
     }
     public function logs($id)
     {

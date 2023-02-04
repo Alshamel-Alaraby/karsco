@@ -22,7 +22,7 @@ export default {
     beforeRouteEnter(to, from, next) {
         next((vm) => {
 
-                    if (vm.$store.state.auth.work_flow_trees.includes("real estate-e")) {
+      if (vm.$store.state.auth.work_flow_trees.includes("real estate-e")) {
         Swal.fire({
           icon: "error",
           title: `${vm.$t("general.Error")}`,
@@ -54,7 +54,7 @@ export default {
             walletsPagination: {},
             wallets: [],
             parents: [],
-            enabled3: false,
+            enabled3: true,
             isLoader: false,
             create: {
                 name: '',
@@ -77,6 +77,10 @@ export default {
             filterSetting: ['name', 'name_e'],
             Tooltip: '',
             mouseEnter: null,
+            printLoading: true,
+            printObj: {
+                id: "printWallet",
+            }
         }
     },
     validations: {
@@ -504,6 +508,19 @@ export default {
                     });
             }
         },
+        ExportExcel(type, fn, dl) {
+            this.enabled3 = false;
+            setTimeout(() => {
+                let elt = this.$refs.exportable_table;
+                let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+                if (dl) {
+                    XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+                } else {
+                    XLSX.writeFile(wb, fn || (('Wallet' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+                }
+                this.enabled3 = true;
+            }, 100);
+        }
     },
 };
 </script>
@@ -565,10 +582,10 @@ export default {
                                     <i class="fas fa-plus"></i>
                                 </b-button>
                                 <div class="d-inline-flex">
-                                    <button class="custom-btn-dowonload">
+                                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
                                         <i class="fas fa-file-download"></i>
                                     </button>
-                                    <button class="custom-btn-dowonload">
+                                    <button v-print="'#printWallet'" class="custom-btn-dowonload">
                                         <i class="fe-printer"></i>
                                     </button>
                                     <button
@@ -795,10 +812,11 @@ export default {
                             <loader size="large" v-if="isLoader"/>
                             <!--       end loader       -->
 
-                            <table class="table table-borderless table-hover table-centered m-0">
+                            <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                                   id="printWallet">
                                 <thead>
                                 <tr>
-                                    <th scope="col" style="width: 0;">
+                                    <th scope="col" style="width: 0;" v-if="enabled3" class="do-not-print">
                                         <div class="form-check custom-control">
                                             <input
                                                 class="form-check-input"
@@ -829,10 +847,10 @@ export default {
                                             </div>
                                         </div>
                                     </th>
-                                    <th>
+                                    <th v-if="enabled3" class="do-not-print">
                                         {{ $t('general.Action') }}
                                     </th>
-                                    <th><i class="fas fa-ellipsis-v"></i></th>
+                                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                                 </tr>
                                 </thead>
                                 <tbody v-if="wallets.length > 0">
@@ -843,7 +861,7 @@ export default {
                                     :key="data.id"
                                     class="body-tr-custom"
                                 >
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <div class="form-check custom-control" style="min-height: 1.9em;">
                                             <input
                                                 style="width: 17px;height: 17px;"
@@ -871,7 +889,7 @@ export default {
                                             {{ data.is_active == 'active' ? `${$t('general.Active')}` : `${$t('general.Inactive')}` }}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <div class="btn-group">
                                             <button
                                                 type="button"
@@ -1030,7 +1048,7 @@ export default {
                                         </b-modal>
                                         <!--  /edit   -->
                                     </td>
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <button
                                             @mousemove="log(data.id)"
                                             @mouseover="log(data.id)"

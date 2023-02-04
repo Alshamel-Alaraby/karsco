@@ -17,16 +17,8 @@ class DocumentDtlController extends Controller
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('archDocumentDtl');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('archDocumentDtl', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
 
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', DocumentDtlResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 

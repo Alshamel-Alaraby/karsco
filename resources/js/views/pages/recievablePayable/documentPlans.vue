@@ -600,7 +600,7 @@ export default {
 <template>
     <Layout>
         <PageHeader />
-        <Branch @created="getBranch" />
+        <Branch :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getBranch" />
         <div class="row">
             <div class="col-12">
                 <div class="card">

@@ -19,29 +19,35 @@ class TreePropertyController extends Controller
 
     public function show($id)
     {
-        $model = cacheGet('tree_properties_' . $id);
+        // $model = cacheGet('tree_properties_' . $id);
+        // if (!$model) {
+        //     $model = $this->modelInterface->find($id);
+        //     if (!$model) {
+        //         return responseJson(404, __('message.data not found'));
+        //     } else {
+        //         cachePut('tree_properties_' . $id, $model);
+        //     }
+        // }
+
+        $model = $this->modelInterface->find($id);
         if (!$model) {
-            $model = $this->modelInterface->find($id);
-            if (!$model) {
-                return responseJson(404, __('message.data not found'));
-            } else {
-                cachePut('tree_properties_' . $id, $model);
-            }
+            return responseJson(404, __('message.data not found'));
         }
         return responseJson(200, 'success', new TreePropertyResource($model));
     }
 
     public function index(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('tree_properties');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('tree_properties', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
+        // if (count($_GET) == 0) {
+        //     $models = cacheGet('tree_properties');
+        //     if (!$models) {
+        //         $models = $this->modelInterface->all($request);
+        //         cachePut('tree_properties', $models);
+        //     }
+        // } else {
+        //     $models = $this->modelInterface->all($request);
+        // }
+        $models = $this->modelInterface->all($request);
 
         return responseJson(200, 'success', TreePropertyResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
@@ -62,7 +68,6 @@ class TreePropertyController extends Controller
 
         return responseJson(200, 'success');
     }
-
 
     public function setting(Request $request)
     {
@@ -96,7 +101,7 @@ class TreePropertyController extends Controller
             return responseJson(404, __('message.data not found'));
         }
         if ($model->hasChildren()) {
-            return responseJson(400,__("this item has children and can't be deleted remove it's children first"));
+            return responseJson(400, __("this item has children and can't be deleted remove it's children first"));
         }
         $this->modelInterface->delete($id);
 
@@ -120,12 +125,13 @@ class TreePropertyController extends Controller
         return responseJson(200, __('Done'));
     }
 
-
-    public function getRootNodes(){
+    public function getRootNodes()
+    {
         return $this->modelInterface->getRootNodes();
     }
-    public function getChildNodes($parentId){
+    public function getChildNodes($parentId)
+    {
         return $this->modelInterface->getChildNodes($parentId);
     }
-    
+
 }

@@ -35,7 +35,7 @@ class RlstUnitRequest extends FormRequest
             'owner_id' => "nullable|integer|exists:rlst_owners,id,deleted_at,null",
             'currency_id' => "nullable|integer|exists:general_currencies,id,deleted_at,null",
             'wallet_id' => "nullable|integer|exists:rlst_wallets,id,deleted_at,null",
-            'unit_status_id' => "nullable|integer",
+            'unit_status_id' => "nullable|integer|exists:rlst_unit_statuses,id,deleted_at,null",
             'commission_ty' => "nullable|integer",
             'commission_value' => "nullable|numeric",
             'price' => "nullable|numeric",
@@ -48,7 +48,6 @@ class RlstUnitRequest extends FormRequest
             'attachments' => "required|array",
             'module_id' => "required|integer",
             // 'attachments' => "required|array",
-            // 'module_id' => "required|integer",
         ];
     }
 

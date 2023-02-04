@@ -30,38 +30,42 @@ class UserController extends Controller
         return responseJson(400, 'invalid credentials');
     }
 
-    public function profile(Request $request){
-        $user = $request->user ();
-        return responseJson(200, 'success',  new UserResource($user));
+    public function profile(Request $request)
+    {
+        $user = $request->user();
+        return responseJson(200, 'success', new UserResource($user));
     }
 
     public function find($id)
     {
 
-        $model = cacheGet('users_' . $id);
-        if (!$model) {
-            $model = $this->modelInterface->find($id);
-            if (!$model) {
-                return responseJson(404, __('message.data not found'));
-            } else {
-                cachePut('users_' . $id, $model);
-            }
-        }
+        // $model = cacheGet('users_' . $id);
+        // if (!$model) {
+        //     $model = $this->modelInterface->find($id);
+        //     if (!$model) {
+        //         return responseJson(404, __('message.data not found'));
+        //     } else {
+        //         cachePut('users_' . $id, $model);
+        //     }
+        // }
+
+        $model = $this->modelInterface->find($id);
         return responseJson(200, 'success', new UserResource($model));
     }
 
     public function all(AllRequest $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('users');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('users', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
-
+        // if (count($_GET) == 0) {
+        //     $models = cacheGet('users');
+        //     if (!$models) {
+        //         $models = $this->modelInterface->all($request);
+        //         cachePut('users', $models);
+        //     }
+        // } else {
+        //     $models = $this->modelInterface->all($request);
+        // }
+        
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', UserResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 

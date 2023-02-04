@@ -5,18 +5,19 @@ import { required, minLength, maxLength, integer } from "vuelidate/lib/validator
 import Swal from "sweetalert2";
 import ErrorMessage from "../../components/widgets/errorMessage";
 import loader from "../../components/loader";
-import translation from "../../helper/translation-mixin";
+import transMixinComp from "../../helper/translation-comp-mixin";
 
 /**
  * Advanced Table component
  */
 export default {
-  mixins: [translation],
   components: {
     Switches,
     ErrorMessage,
     loader,
   },
+  mixins: [transMixinComp],
+
   data() {
     return {
       enabled3: false,
@@ -36,6 +37,8 @@ export default {
       name_e: { required, minLength: minLength(3), maxLength: maxLength(100) },
     },
   },
+  props: ["companyKeys", "defaultsKeys"],
+
   updated() {
     $(function () {
       $(".englishInput").keypress(function (event) {

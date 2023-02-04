@@ -17,16 +17,8 @@ class ClosedReferenceController extends Controller
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('archiveClosedReference');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('archiveClosedReference', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
-
+      
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', ClosedReferenceResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 

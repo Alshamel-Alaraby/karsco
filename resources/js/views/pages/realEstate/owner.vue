@@ -137,7 +137,12 @@ export default {
                 'whatsapp',
             ],
             Tooltip: '',
-            mouseEnter: null
+            mouseEnter: null,
+            printLoading: true,
+            enabled3: true,
+            printObj: {
+                id: "printOwner",
+            }
         }
     },
     validations: {
@@ -751,6 +756,19 @@ export default {
                 this.edit.bank_account_id = null;
             }
         },
+        ExportExcel(type, fn, dl) {
+            this.enabled3 = false;
+            setTimeout(() => {
+                let elt = this.$refs.exportable_table;
+                let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+                if (dl) {
+                    XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+                } else {
+                    XLSX.writeFile(wb, fn || (('Document Department' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+                }
+                this.enabled3 = true;
+            }, 100);
+        }
     },
 };
 </script>
@@ -758,9 +776,9 @@ export default {
 <template>
     <Layout>
         <PageHeader />
-        <Country @created="getCategory" />
-        <City @created="getCity(create.country_id ? create.country_id: edit.country_id)" />
-        <bankAccount @created="getBankAcount" />
+        <Country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCategory" />
+        <City :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCity(create.country_id ? create.country_id: edit.country_id)" />
+        <bankAccount :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getBankAcount" />
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -820,10 +838,10 @@ export default {
                                     <i class="fas fa-plus"></i>
                                 </b-button>
                                 <div class="d-inline-flex">
-                                    <button class="custom-btn-dowonload">
+                                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
                                         <i class="fas fa-file-download"></i>
                                     </button>
-                                    <button class="custom-btn-dowonload">
+                                    <button v-print="'#printOwner'" class="custom-btn-dowonload">
                                         <i class="fe-printer"></i>
                                     </button>
                                     <button
@@ -1282,10 +1300,11 @@ export default {
                             <loader size="large" v-if="isLoader" />
                             <!--       end loader       -->
 
-                            <table class="table table-borderless table-hover table-centered m-0">
+                            <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                                   id="printOwner">
                                 <thead>
                                 <tr>
-                                    <th scope="col" style="width: 0;">
+                                    <th scope="col" style="width: 0;" v-if="enabled3" class="do-not-print">
                                         <div class="form-check custom-control">
                                             <input
                                                 class="form-check-input"
@@ -1387,10 +1406,10 @@ export default {
                                             <span>{{ getCompanyKey('owner_code') }}</span>
                                         </div>
                                     </th>
-                                    <th>
+                                    <th v-if="enabled3" class="do-not-print">
                                         {{ $t('general.Action') }}
                                     </th>
-                                    <th><i class="fas fa-ellipsis-v"></i></th>
+                                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                                 </tr>
                                 </thead>
                                 <tbody v-if="owners.length > 0">
@@ -1401,7 +1420,7 @@ export default {
                                     :key="data.id"
                                     class="body-tr-custom"
                                 >
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <div class="form-check custom-control" style="min-height: 1.9em;">
                                             <input
                                                 style="width: 17px;height: 17px;"
@@ -1429,7 +1448,7 @@ export default {
                                     <td v-if="setting.bank_account_id">{{ data.bank_account_id }}</td>
                                     <td v-if="setting.whatsapp">{{ data.whatsapp }}</td>
                                     <td v-if="setting.rp_code">{{ data.rp_code }}</td>
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <div class="btn-group">
                                             <button
                                                 type="button"
@@ -1799,7 +1818,7 @@ export default {
                                         </b-modal>
                                         <!--  /edit   -->
                                     </td>
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <button
                                             @mousemove="log(data.id)"
                                             @mouseover="log(data.id)"
@@ -1816,7 +1835,7 @@ export default {
                                 </tbody>
                                 <tbody v-else>
                                 <tr>
-                                    <th class="text-center" colspan="16">{{ $t('general.notDataFound') }}</th>
+                                    <th class="text-center" colspan="20">{{ $t('general.notDataFound') }}</th>
                                 </tr>
                                 </tbody>
                             </table>

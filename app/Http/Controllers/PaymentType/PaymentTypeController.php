@@ -17,30 +17,37 @@ class PaymentTypeController extends Controller
 
     public function find($id)
     {
-        $model = cacheGet('payment_types_' . $id);
-        if (!$model) {
-            $model = $this->modelInterface->find($id);
-            if (!$model) {
-                return responseJson(404, __('message.data not found'));
-            } else {
-                cachePut('payment_types_' . $id, $model);
-            }
+        // $model = cacheGet('payment_types_' . $id);
+        // if (!$model) {
+        //     $model = $this->modelInterface->find($id);
+        //     if (!$model) {
+        //         return responseJson(404, __('message.data not found'));
+        //     } else {
+        //         cachePut('payment_types_' . $id, $model);
+        //     }
+        // }
+        $model = $this->modelInterface->find($id);
+        if ($model) {
+            return responseJson(200, 'success', new PaymentTypeResource($model));
+        } else {
+            return responseJson(404, __('message.data not found'));
         }
-        return responseJson(200, 'success', new PaymentTypeResource($model));
+
     }
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('payment_types');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('payment_types', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
+        // if (count($_GET) == 0) {
+        //     $models = cacheGet('payment_types');
+        //     if (!$models) {
+        //         $models = $this->modelInterface->all($request);
+        //         cachePut('payment_types', $models);
+        //     }
+        // } else {
+        //     $models = $this->modelInterface->all($request);
+        // }
 
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', PaymentTypeResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 

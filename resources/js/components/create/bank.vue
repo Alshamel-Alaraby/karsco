@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Country @created="getCountries" />
+    <Country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCategory" />
     <!--  create   -->
     <b-modal
       id="bank-create"
@@ -200,10 +200,12 @@ import loader from "../loader";
 import adminApi from "../../api/adminAxios";
 import Swal from "sweetalert2";
 import Country from "../../components/country.vue";
-import translation from "../../helper/translation-mixin";
+import transMixinComp from "../../helper/translation-comp-mixin";
 
 export default {
   name: "bank",
+  mixins: [transMixinComp],
+
   components: {
     Switches,
     Multiselect,
@@ -211,10 +213,11 @@ export default {
     loader,
     Country,
   },
-  mixins: [translation],
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
   },
+  props: ["companyKeys", "defaultsKeys"],
+
   updated() {
     $(function () {
       $(".englishInput").keypress(function (event) {
@@ -281,7 +284,7 @@ export default {
      *  hidden Modal (create)
      */
     async resetModal() {
-      await this.getCountries();
+      await this.getCategory();
       this.create = {
         name: "",
         name_e: "",
@@ -297,7 +300,7 @@ export default {
      *  create countrie
      */
     async resetForm() {
-      await this.getCountries();
+      await this.getCategory();
       this.create = {
         name: "",
         name_e: "",
@@ -327,7 +330,7 @@ export default {
         this.errors = {};
         this.is_disabled = false;
         adminApi
-          .post(`/banks`, {...this.create,company_id:this.company_id})
+          .post(`/banks`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.$emit("created");
             this.is_disabled = true;
@@ -356,7 +359,7 @@ export default {
     moveInput(tag, c, index) {
       document.querySelector(`${tag}[data-${c}='${index}']`).focus();
     },
-    async getCountries() {
+    async getCategory() {
       this.isLoader = true;
       await adminApi
         .get(`/countries?is_active=active`)

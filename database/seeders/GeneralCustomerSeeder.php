@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Translation;
 
 class GeneralCustomerSeeder extends Seeder
 {
@@ -628,6 +629,16 @@ class GeneralCustomerSeeder extends Seeder
                 "new_en" => "",
                 "company_id" => 0,
                 "screen" => "archiving"
+            ],
+            [
+                "key" => "bank_account",
+                "default_en" => "Bank account name",
+                "default_ar" => "اسم الحساب البنكي",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "archiving"
+
             ],
         ]);
     }

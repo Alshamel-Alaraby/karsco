@@ -631,8 +631,8 @@ export default {
 <template>
   <Layout>
     <PageHeader />
-    <ArchStatus @created="getArcDocStatus" />
-    <ArchDocumentType @created="getGenArchDocType" />
+    <ArchStatus :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getArcDocStatus" />
+    <ArchDocumentType :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getGenArchDocType" />
     <div class="row">
       <div class="col-12">
         <div class="card">

@@ -19,23 +19,15 @@ class DocTypeController extends Controller
 
     public function all(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('ArchDoctype');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('ArchDoctype', $models);
-            }
-        } else {
-            $models = $this->modelInterface->all($request);
-        }
 
+        $models = $this->modelInterface->all($request);
         return responseJson(200, 'success', DocTypeResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
     public function find($id)
     {
 
-       $model= $this->modelInterface->find($id);
+        $model = $this->modelInterface->find($id);
         if (!$model) {
             return responseJson(404, 'data not found');
         }
@@ -79,8 +71,6 @@ class DocTypeController extends Controller
         }
         return responseJson(200, __('Done'));
     }
-
-    
 
     public function update(DocTypeRequest $request, $id)
     {

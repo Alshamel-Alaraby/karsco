@@ -1,5 +1,5 @@
 <template>
- <!--  create   -->
+  <!--  create   -->
   <b-modal
     :id="id"
     :title="$t('country.addcountry')"
@@ -61,7 +61,7 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="field-1" class="control-label">
-                        {{ getCompanyKey('country_name_ar') }}
+                        {{ getCompanyKey("country_name_ar") }}
                         <span class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
@@ -101,7 +101,7 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="field-3" class="control-label">
-                        {{ getCompanyKey('country_long_name_ar') }}
+                        {{ getCompanyKey("country_long_name_ar") }}
                         <span class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
@@ -141,7 +141,7 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
-                        {{ getCompanyKey('country_name_en') }}
+                        {{ getCompanyKey("country_name_en") }}
                         <span class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
@@ -180,7 +180,7 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="field-4" class="control-label">
-                        {{ getCompanyKey('country_long_name_en') }}
+                        {{ getCompanyKey("country_long_name_en") }}
                         <span class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
@@ -231,7 +231,7 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="create-20" class="control-label">
-                        {{ getCompanyKey('country_national_id') }}
+                        {{ getCompanyKey("country_national_id") }}
                         <span class="text-danger">*</span>
                       </label>
                       <input
@@ -278,7 +278,7 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="field-4" class="control-label">
-                        {{ getCompanyKey('country_short_code') }}
+                        {{ getCompanyKey("country_short_code") }}
                         <span class="text-danger">*</span>
                       </label>
                       <input
@@ -322,7 +322,7 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="field-4" class="control-label">
-                        {{ getCompanyKey('country_phone_key') }}
+                        {{ getCompanyKey("country_phone_key") }}
                         <span class="text-danger">*</span>
                       </label>
                       <input
@@ -359,7 +359,7 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label class="mr-2" for="field-11">
-                        {{ getCompanyKey('country_default') }}
+                        {{ getCompanyKey("country_default") }}
                       </label>
                       <select
                         class="custom-select mr-sm-2"
@@ -389,7 +389,7 @@
                   <div class="col-md-12">
                     <div class="form-group">
                       <label class="mr-2">
-                        {{ getCompanyKey('country_status') }}
+                        {{ getCompanyKey("country_status") }}
                         <span class="text-danger">*</span>
                       </label>
                       <b-form-group
@@ -533,7 +533,6 @@
     </form>
   </b-modal>
   <!--  /create   -->
-
 </template>
 
 <script>
@@ -543,7 +542,7 @@ import Swal from "sweetalert2";
 import Switches from "vue-switches";
 import ErrorMessage from "../components/widgets/errorMessage";
 import loader from "../components/loader";
-import translation from "../helper/translation-mixin";
+import transMixinComp from "../helper/translation-comp-mixin";
 
 export default {
   components: {
@@ -551,15 +550,22 @@ export default {
     ErrorMessage,
     loader,
   },
-  mixins:[translation],
-    props:{
-        id:{
-            default:"country-create"
-        }
-    },
+  mixins: [transMixinComp],
 
-  mounted(){
-this.company_id=this.$store.getters["auth/company_id"];
+  props: {
+    id: {
+      default: "country-create",
+    },
+    companyKeys:{
+      default:[]
+    },
+    defaultsKeys:{
+      default:[]
+    },
+  },
+
+  mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
   },
 
   updated() {
@@ -721,7 +727,7 @@ this.company_id=this.$store.getters["auth/company_id"];
         this.errors = {};
 
         adminApi
-          .post(`/countries`, {...this.create,company_id:this.company_id})
+          .post(`/countries`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.country_id = res.data.data.id;
             this.$emit("created");
@@ -904,39 +910,41 @@ this.company_id=this.$store.getters["auth/company_id"];
 
 <style>
 .modal-dialog .card {
-        margin: 0 !important;
- }
- .country.modal-body {
-     padding: 0 !important;
- }
- .modal-dialog .card-body {
-     padding: 1.5rem 1.5rem 0 1.5rem !important;
- }
- .nav-bordered{
-     border: unset !important;
- }
- .nav {
-     background-color: #dff0fe;
- }
- .tab-content {
-     padding: 70px 60px 40px;
-     min-height: 300px;
-     background-color: #f5f5f5;
-     position: relative;
- }
+  margin: 0 !important;
+}
+.country.modal-body {
+  padding: 0 !important;
+}
+.modal-dialog .card-body {
+  padding: 1.5rem 1.5rem 0 1.5rem !important;
+}
+.nav-bordered {
+  border: unset !important;
+}
+.nav {
+  background-color: #dff0fe;
+}
+.tab-content {
+  padding: 70px 60px 40px;
+  min-height: 300px;
+  background-color: #f5f5f5;
+  position: relative;
+}
 .nav-tabs .nav-link {
-    border: 1px solid #b7b7b7 !important;
-    background-color: #d7e5f2;
-    border-bottom: 0 !important;
-    margin-bottom: 1px;
+  border: 1px solid #b7b7b7 !important;
+  background-color: #d7e5f2;
+  border-bottom: 0 !important;
+  margin-bottom: 1px;
 }
 
- .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
-    color: #000;
-    background-color: hsl(0deg 0% 96%);
-     border-bottom: 0 !important;
- }
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+  color: #000;
+  background-color: hsl(0deg 0% 96%);
+  border-bottom: 0 !important;
+}
 
 .img-thumbnail {
-    max-height: 400px !important;
-}</style>
+  max-height: 400px !important;
+}
+</style>

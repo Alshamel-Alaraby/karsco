@@ -61,7 +61,6 @@ export default {
       customers: [],
       salesmen: [],
       reservations: [],
-      enabled3: false,
       isLoader: false,
       create: {
         customer_id: null,
@@ -81,7 +80,11 @@ export default {
         salesman_id: true,
         reservation_id: true,
       },
-      filterSetting: ["salesman_id", "customer_id"],
+      filterSetting: [
+          this.$i18n.locale == 'ar' ? 'salesman.name':'salesman.name_e',
+          this.$i18n.locale == 'ar' ? 'customer.name':'customer.name_e',
+          this.$i18n.locale == 'ar' ? 'reservation.name':'reservation.name_e'
+      ],
       errors: {},
       isCheckAll: false,
       checkAll: [],
@@ -90,6 +93,10 @@ export default {
       company_id: 48,
       Tooltip: "",
       mouseEnter: null,
+        enabled3: true,
+        printObj: {
+            id: "printContract",
+        }
     };
   },
   validations: {
@@ -611,6 +618,19 @@ export default {
           });
       }
     },
+    ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('realEstate-Contract' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      }
   },
 };
 </script>
@@ -618,8 +638,8 @@ export default {
 <template>
   <Layout>
     <PageHeader />
-    <Saleman @created="getSalesmen" />
-    <Customer @created="getCustomers" />
+    <Saleman :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getSalesmen" />
+    <Customer :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCustomers" />
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -637,16 +657,19 @@ export default {
                   >
                     <b-form-checkbox
                       v-model="filterSetting"
-                      value="salesman_id"
+                      value="$i18n.locale == 'ar' ? 'salesman.name':'salesman.name_e'"
                       class="mb-1"
-                      >{{ getCompanyKey("sale_man") }}</b-form-checkbox
-                    >
+                      >{{ getCompanyKey("sale_man") }}</b-form-checkbox>
                     <b-form-checkbox
                       v-model="filterSetting"
-                      value="customer_id"
+                      :value="$i18n.locale == 'ar' ? 'customer.name':'customer.name_e'"
                       class="mb-1"
-                      >{{ getCompanyKey("customer") }}</b-form-checkbox
-                    >
+                      >{{ getCompanyKey("customer") }}</b-form-checkbox>
+                      <b-form-checkbox
+                          v-model="filterSetting"
+                          :value="$i18n.locale == 'ar' ? 'reservation.name':'reservation.name_e'"
+                          class="mb-1"
+                      >{{ getCompanyKey("reservation_date") }}</b-form-checkbox>
                   </b-dropdown>
                   <!-- Basic dropdown -->
                 </div>
@@ -682,12 +705,12 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
-                    <i class="fas fa-file-download"></i>
-                  </button>
-                  <button class="custom-btn-dowonload">
-                    <i class="fe-printer"></i>
-                  </button>
+                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button v-print="'#printContract'" class="custom-btn-dowonload">
+                        <i class="fe-printer"></i>
+                    </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -855,7 +878,6 @@ export default {
                         type="date"
                         class="form-control"
                         data-create="9"
-                        @keypress.enter="moveInput('select', 'create', 10)"
                         v-model="$v.create.date.$model"
                         :class="{
                           'is-invalid': $v.create.date.$error || errors.date,
@@ -983,10 +1005,11 @@ export default {
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
 
-              <table class="table table-borderless table-hover table-centered m-0">
+              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                     id="printContract">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th scope="col" style="width: 0" v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -1090,10 +1113,10 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="contracts.length > 0">
@@ -1104,7 +1127,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -1139,7 +1162,7 @@ export default {
                         }}
                       </h5>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1353,7 +1376,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mousemove="log(data.id)"
                         @mouseover="log(data.id)"

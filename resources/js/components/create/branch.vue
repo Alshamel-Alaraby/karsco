@@ -50,7 +50,7 @@
         <div class="col-md-12">
           <div class="form-group">
             <label for="field-1" class="control-label">
-              {{ getCompanyKey('branch_name_ar') }}
+              {{ getCompanyKey("branch_name_ar") }}
               <span class="text-danger">*</span>
             </label>
             <div dir="rtl">
@@ -85,7 +85,7 @@
         <div class="col-md-12">
           <div class="form-group">
             <label for="field-2" class="control-label">
-              {{ getCompanyKey('branch_name_en')}}
+              {{ getCompanyKey("branch_name_en") }}
               <span class="text-danger">*</span>
             </label>
             <div dir="ltr">
@@ -120,7 +120,7 @@
         <div class="col-md-12">
           <div class="form-group">
             <label class="mr-2">
-              {{ getCompanyKey('branch_status') }}
+              {{ getCompanyKey("branch_status") }}
               <span class="text-danger">*</span>
             </label>
             <b-form-group
@@ -163,11 +163,12 @@
 import { maxLength, minLength, required } from "vuelidate/lib/validators";
 import adminApi from "../../api/adminAxios";
 import Swal from "sweetalert2";
-import translation from "../../helper/translation-mixin";
+import transMixinComp from "../../helper/translation-comp-mixin";
 
 export default {
   name: "branch",
-  mixins: [translation],
+  mixins: [transMixinComp],
+  props: ["companyKeys", "defaultsKeys"],
 
   updated() {
     $(function () {

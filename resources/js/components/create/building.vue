@@ -1,5 +1,5 @@
 <script>
-import translation from "../../helper/translation-mixin";
+import transMixinComp from "../../helper/translation-comp-mixin";
 
 import adminApi from "../../api/adminAxios";
 import Switches from "vue-switches";
@@ -23,7 +23,6 @@ import "quill/dist/quill.bubble.css";
  */
 
 export default {
-  mixins: [translation],
 
   components: {
     Switches,
@@ -31,6 +30,8 @@ export default {
     loader,
     Multiselect,
   },
+    mixins: [transMixinComp],
+
   data() {
     return {
       editorOption: {
@@ -141,6 +142,8 @@ export default {
       lat: { numeric },
     },
   },
+   props: ["companyKeys", "defaultsKeys"],
+
   updated() {
     $(function () {
       $(".englishInput").keypress(function (event) {

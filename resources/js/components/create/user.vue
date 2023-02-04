@@ -8,14 +8,13 @@ import loader from "../../components/loader";
 import Multiselect from "vue-multiselect";
 import employee from "../../components/create/employee.vue";
 import { formatDateOnly } from "../../helper/startDate";
-import translation from "../../helper/translation-mixin";
+import transMixinComp from "../../helper/translation-comp-mixin";
 
 /**
  * Advanced Table component
  */
 
 export default {
-  mixins: [translation],
   components: {
     Switches,
     ErrorMessage,
@@ -23,6 +22,8 @@ export default {
     Multiselect,
     employee,
   },
+    mixins: [transMixinComp],
+
   data() {
     return {
       employees: [],
@@ -60,6 +61,8 @@ export default {
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
   },
+   props: ["companyKeys", "defaultsKeys"],
+
   updated() {
     $(function () {
       $(".englishInput").keypress(function (event) {
@@ -398,7 +401,7 @@ export default {
 
 <template>
   <div>
-    <employee @created="getEmployees" />
+    <employee :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getEmployees" />
 
     <!--  create   -->
     <b-modal

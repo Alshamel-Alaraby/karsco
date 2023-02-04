@@ -31,7 +31,7 @@ class RlstUnitResource extends JsonResource
             'currency_id' => $this->currency_id,
             'wallet_id' => $this->wallet_id,
             'unit_status_id' => $this->unit_status_id,
-            "unit-status" => new RlstUnitStatus($this->unitStatus),
+            "unit-status" => new RlstUnitStatusResource($this->unitStatus),
             'commission_ty' => $this->commission_ty,
             'commission_value' => $this->commission_value,
             'price' => $this->price,

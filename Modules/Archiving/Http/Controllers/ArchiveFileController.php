@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\GeneralNotification;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Modules\Archiving\Entities\ArchiveFile;
 use Modules\Archiving\Http\Requests\ArchiveFileRequest;
 use Modules\Archiving\Http\Requests\ToggleFavouriteRequest;
@@ -42,7 +43,7 @@ class ArchiveFileController extends Controller
                 $q->whereIn("arch_doc_type_id", $arch_doc_type_id);
             }
 
-            if ($request->favourite=="true") {
+            if ($request->favourite == "true") {
                 $q->whereHas("favourites", function ($q) use ($request) {
                     $favourite = null;
                     $user_id = $request->header('user_id');
@@ -53,11 +54,8 @@ class ArchiveFileController extends Controller
                     } elseif ($admin_id) {
                         $q->where("admin_id", $admin_id);
                     }
-
                 });
-
             }
-
         })->filter($request)->orderBy($request->order ? $request->order : 'updated_at', $request->sort ? $request->sort : 'DESC');
         $field = $request->field;
         $field = json_decode($field, true);
@@ -87,7 +85,6 @@ class ArchiveFileController extends Controller
                 })->reject(function ($i) {
                     return $i == null;
                 });
-
             }
             $ids = $res->values();
             if (@count($ids) > 0) {
@@ -96,13 +93,11 @@ class ArchiveFileController extends Controller
         }
         if ($request->per_page) {
             $models = ['data' => $models->paginate($request->per_page), 'paginate' => true];
-
         } else {
             $models = ['data' => $models->get(), 'paginate' => false];
         }
 
         return responseJson(200, 'success', ArchiveFileResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
-
     }
     public function create(ArchiveFileRequest $request)
     {
@@ -192,28 +187,42 @@ class ArchiveFileController extends Controller
 
     public function pdf($id)
     {
+        return DB::transaction(function () use ($id) {
+            set_time_limit(0);
+            $model = $this->model->find($id);
+            if (!$model) {
+                return responseJson(404, 'not found');
+            }
+            $path = public_path($path = public_path(is_object($model->data_type_value[0]->value)?$model->data_type_value[0]->value->name_e:$model->data_type_value[0]->value . "-" . rand(1111, 999) . '.pdf') . "-" . rand(1111, 999) . '.pdf');
+            $data = [
+                'id' => $model->id,
+                "data_type_value" => $model->data_type_value,
+                "media" => isset($model->files) ? \App\Http\Resources\FileResource::collection($model->files) : null,
+                "media_count" => count((array) $model->files),
+                'created_at' => $model->created_at,
+                'updated_at' => $model->updated_at,
+            ];
+            $oMerger = \Webklex\PDFMerger\Facades\PDFMergerFacade::init();
+            $pdfs = $model->files->where('mime_type', 'application/pdf');
+            $lastPdf = $pdfs->last();
+            if ($lastPdf) {
+                Pdf::loadView('pdf', $data)->save($path);
+                $oMerger->addPDF($path, 'all');
+                $oMerger->addPDF($lastPdf->getPath(), 'all');
+                $oMerger->merge('file');
+                $oMerger->save($path);
+                $model->addMedia($path)->toMediaCollection('media');
+                $lastPdf->delete();
+                $model->refresh();
+                return responseJson(200, 'done', new ArchiveFileResource($model));
+            } else {
+                Pdf::loadView('pdf', $data)->save($path);
+                $model->addMedia($path)->toMediaCollection('media');
+                $model->refresh();
+                return responseJson(200, 'done', new ArchiveFileResource($model));
+            }
 
-        set_time_limit(0);
-
-        $model = $this->model->find($id);
-
-        if (!$model) {
-            return responseJson(404, 'not found');
-        }
-        $path = public_path($model->data_type_value[0]->value . "-" . rand(1111, 999) . '.pdf');
-
-        $data = [
-            'id' => $model->id,
-            "data_type_value" => $model->data_type_value,
-            "media" => isset($model->files) ? \App\Http\Resources\FileResource::collection($model->files) : null,
-            'created_at' => $model->created_at,
-            'updated_at' => $model->updated_at,
-            "media_count" => count((array) $model->files),
-        ];
-        Pdf::loadView('pdf', $data)->save($path);
-        $model->addMedia($path)->toMediaCollection('media');
-        $model->refresh();
-        return responseJson(200, 'done', new ArchiveFileResource($model));
+        });
     }
 
     public function toggleFavourite(ToggleFavouriteRequest $request)
@@ -257,11 +266,11 @@ class ArchiveFileController extends Controller
             return responseJson(404, 'not found');
         }
 
-        User::whereIn('id',$request->users)->get()->each(function ($user) use ($model,$request) {
+        User::whereIn('id', $request->users)->get()->each(function ($user) use ($model, $request) {
             $user->notify(new GeneralNotification(
                 [
                     'archiveFile' => $model,
-                    'sender' => $request->sender
+                    'sender' => $request->sender,
                 ],
                 $request->id,
                 'archiving-pdf',

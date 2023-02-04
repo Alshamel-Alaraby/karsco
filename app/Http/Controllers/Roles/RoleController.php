@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class RoleController extends Controller
 {
-    use CanDeleteTrait,BulkDeleteTrait;
+    use CanDeleteTrait, BulkDeleteTrait;
     public $repository;
     public $resource = RoleResource::class;
     public function __construct(RoleRepositoryInterface $repository)
@@ -29,16 +29,17 @@ class RoleController extends Controller
     public function index(Request $request)
     {
 
-        $data = cacheGet('roles');
-        if ($request->search || $request->roletype_id) {
-            cacheForget('roles');
-            $data = $this->repository->getAll($request);
-        }
-        if (!$data) {
-            $data = $this->repository->getAll($request);
-            cachePut('roles', $data);
-        }
+        // $data = cacheGet('roles');
+        // if ($request->search || $request->roletype_id) {
+        //     cacheForget('roles');
+        //     $data = $this->repository->getAll($request);
+        // }
+        // if (!$data) {
+        //     $data = $this->repository->getAll($request);
+        //     cachePut('roles', $data);
+        // }
 
+        $data = $this->repository->getAll($request);
         return responseJson(200, 'success', ($this->resource)::collection($data['data']), $data['paginate'] ? getPaginates($data['data']) : null);
     }
 
@@ -49,15 +50,13 @@ class RoleController extends Controller
      */
     public function store(CreateRoleRequest $request)
     {
-        try {
-            if (!DB::table('general_role_types')->find($request->roletype_id)) {
-                return responseJson(404, __('role_type does\'t exist'));
-            }
-            $this->repository->create($request->validated());
-            return responseJson(200, __('done'));
-        } catch (Exception $exception) {
-            return responseJson($exception->getCode(), $exception->getMessage());
+
+        if (!DB::table('general_role_types')->find($request->roletype_id)) {
+            return responseJson(404, __('role_type does\'t exist'));
         }
+        $this->repository->create($request->validated());
+        return responseJson(200, __('done'));
+
     }
 
     /**
@@ -106,12 +105,9 @@ class RoleController extends Controller
             $data['name_e'] = $request->name_e;
         }
 
-        try {
-            $this->repository->update($data, $id);
-            return responseJson(200, __('updated'));
-        } catch (\Exception$exception) {
-            return responseJson($exception->getCode(), $exception->getMessage());
-        }
+        $this->repository->update($data, $id);
+        return responseJson(200, __('updated'));
+
     }
 
     public function logs($id)

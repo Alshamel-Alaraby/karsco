@@ -67,8 +67,8 @@ export default [
         component: () => import('../../views/pages/archiving/document-field'),
     },
     {
-        path: '/dashboard/gen-arch-doc-types',
-        name: 'gen-arch-doc-types',
+        path: '/dashboard/documents',
+        name: 'documents',
         meta: {
             middleware: [auth,checkAuth]
         },

@@ -585,6 +585,7 @@
         }
     },
     "general": {
+        "FileUploads":"File uploads",
         "from":"From",
         "to":"to",
         "fields":"Fields",
@@ -892,6 +893,7 @@
         "DocumentName": "Document name",
         "thisFieldIsUniq": "this Field Is Unique",
         "true": "true",
-        "false": "false"
+        "false": "false",
+        "UploadsFiles": "Uploads Files"
     }
 }

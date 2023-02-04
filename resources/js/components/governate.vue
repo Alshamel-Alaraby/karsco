@@ -49,7 +49,7 @@
         <div class="col-md-6">
           <div class="form-group position-relative">
             <label class="control-label">
-              {{ getCompanyKey('country') }}
+              {{ getCompanyKey("country") }}
               <span class="text-danger">*</span>
             </label>
             <multiselect
@@ -76,7 +76,7 @@
         <div class="col-md-6">
           <div class="form-group">
             <label for="field-5" class="control-label">
-              {{ getCompanyKey('governorate_phone_key') }}
+              {{ getCompanyKey("governorate_phone_key") }}
               <span class="text-danger">*</span>
             </label>
             <input
@@ -114,7 +114,7 @@
         <div class="col-md-6 direction" dir="rtl">
           <div class="form-group">
             <label for="field-1" class="control-label">
-              {{ getCompanyKey('governorate_name_ar') }}
+              {{ getCompanyKey("governorate_name_ar") }}
               <span class="text-danger">*</span>
             </label>
             <input
@@ -149,7 +149,7 @@
         <div class="col-md-6 direction-ltr" dir="ltr">
           <div class="form-group">
             <label for="field-2" class="control-label">
-              {{ getCompanyKey('governorate_name_en') }}
+              {{ getCompanyKey("governorate_name_en") }}
               <span class="text-danger">*</span>
             </label>
             <input
@@ -184,7 +184,7 @@
         <div class="col-md-6">
           <div class="form-group">
             <label class="mr-2" for="field-11">
-              {{ getCompanyKey('governorate_default') }}
+              {{ getCompanyKey("governorate_default") }}
             </label>
             <select
               class="custom-select mr-sm-2"
@@ -213,7 +213,7 @@
         <div class="col-md-6">
           <div class="form-group">
             <label class="mr-2" for="inlineFormCustomSelectPref">
-              {{ getCompanyKey('governorate_status') }}
+              {{ getCompanyKey("governorate_status") }}
               <span class="text-danger">*</span>
             </label>
             <select
@@ -254,7 +254,7 @@ import Switches from "vue-switches";
 import ErrorMessage from "../components/widgets/errorMessage";
 import loader from "../components/loader";
 import Multiselect from "vue-multiselect";
-import translation from "../helper/translation-mixin";
+import transMixinComp from "../helper/translation-comp-mixin";
 
 export default {
   components: {
@@ -263,15 +263,20 @@ export default {
     loader,
     Multiselect,
   },
-  mixins:[translation],
-    props:{
-        id:{
-            default:"governate-create"
-        }
+  mixins: [transMixinComp],
+  props: {
+    id: {
+      default: "governate-create",
     },
-
-  mounted(){
-this.company_id=this.$store.getters["auth/company_id"];
+    companyKeys:{
+      default:[]
+    },
+    defaultsKeys:{
+      default:[]
+    },
+  },
+  mounted() {
+    this.company_id = this.$store.getters["auth/company_id"];
   },
 
   updated() {
@@ -418,10 +423,10 @@ this.company_id=this.$store.getters["auth/company_id"];
         this.errors = {};
         this.is_disabled = false;
         adminApi
-          .post(`/governorates`, {...this.create,company_id:this.company_id})
+          .post(`/governorates`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.is_disabled = true;
-              this.$emit('created');
+            this.$emit("created");
             setTimeout(() => {
               Swal.fire({
                 icon: "success",
@@ -446,8 +451,7 @@ this.company_id=this.$store.getters["auth/company_id"];
             this.isLoader = false;
           });
       }
-    }
+    },
   },
 };
 </script>
-

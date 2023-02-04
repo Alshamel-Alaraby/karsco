@@ -8,7 +8,6 @@ use App\Http\Resources\RoleWorkflow\RoleWorkflowResource;
 use App\Repositories\RoleWorkflow\RoleWorkflowRepository;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Mockery\Exception;
 
 class RoleWorkflowController extends Controller
 {
@@ -25,11 +24,12 @@ class RoleWorkflowController extends Controller
     public function index(Request $request)
     {
 
-        $data = cacheGet('RoleWorkflow');
-        if (!$data) {
-            $data = $this->repository->getAll($request);
-            cachePut('RoleWorkflow', $data);
-        }
+        // $data = cacheGet('RoleWorkflow');
+        // if (!$data) {
+        //     $data = $this->repository->getAll($request);
+        //     cachePut('RoleWorkflow', $data);
+        // }
+        $data = $this->repository->getAll($request);
         return responseJson(200, 'success', RoleWorkflowResource::collection($data['data']), $data['paginate'] ? getPaginates($data['data']) : null);
     }
 
@@ -40,12 +40,10 @@ class RoleWorkflowController extends Controller
      */
     public function store(CreateRoleWorkflowRequest $request)
     {
-        try {
-            $this->repository->create($request->validated());
-            return responseJson(200, __('done'));
-        } catch (Exception $exception) {
-            return responseJson($exception->getCode(), $exception->getMessage());
-        }
+
+        $this->repository->create($request->validated());
+        return responseJson(200, __('done'));
+
     }
 
     /**
@@ -88,12 +86,9 @@ class RoleWorkflowController extends Controller
             $data['name_e'] = $request->name_e;
         }
 
-        try {
-            $this->repository->update($data, $id);
-            return responseJson(200, __('updated'));
-        } catch (\Exception$exception) {
-            return responseJson($exception->getCode(), $exception->getMessage());
-        }
+        $this->repository->update($data, $id);
+        return responseJson(200, __('updated'));
+
     }
 
     /**

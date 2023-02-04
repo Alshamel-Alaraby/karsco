@@ -12,6 +12,7 @@ import DocumentStatus from "../../../components/arciving/arch-doc-status";
 import DocumentTypeField from "../../../components/arciving/doc-type-field";
 import DocumentTypeFieldEdit from "../../../components/arciving/doc-type-field-edit";
 import DocumentDepartment from "../../../components/arciving/document-department";
+import translation from "../../../helper/translation-mixin";
 
 import ArchStatus from "../../../components/create/arch-status";
 
@@ -23,6 +24,7 @@ export default {
         title: "Gen Arch Doc Type",
         meta: [{name: "description", content: "Gen Arch Doc Type"}],
     },
+    mixins: [translation],
     components: {
         Layout,
         PageHeader,
@@ -664,7 +666,7 @@ export default {
 
 <template>
     <Layout>
-        <ArchStatus @created="getDocumentStatuses"/>
+        <ArchStatus :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getDocumentStatuses"/>
         <PageHeader/>
         <div class="row">
             <div class="col-12">
@@ -964,10 +966,10 @@ export default {
                                                                 class="form-control englishInput"
                                                                 v-model="$v.create.name_e.$model"
                                                                 :class="{
-                                  'is-invalid': $v.create.name_e.$error || errors.name_e,
-                                  'is-valid':
-                                    !$v.create.name_e.$invalid && !errors.name_e,
-                                }"
+                                                                  'is-invalid': $v.create.name_e.$error || errors.name_e,
+                                                                  'is-valid':
+                                                                    !$v.create.name_e.$invalid && !errors.name_e,
+                                                                }"
                                                                 id="field-2"
                                                             />
                                                             <div
@@ -1068,13 +1070,21 @@ export default {
                                                 :disabled="!arch_doc_type_id || !create.parent_id"
                                                 :title="$t('menuitems.ArchDocTypeField.text')"
                                             >
-                                                <DocumentTypeField :arch_doc_type_id="arch_doc_type_id" :document_data="create"/>
+                                                <DocumentTypeField
+                                                    :arch_doc_type_id="arch_doc_type_id"
+                                                    :document_data="create"
+                                                    :companyKeys="companyKeys" :defaultsKeys="defaultsKeys"
+                                                />
                                             </b-tab>
                                             <b-tab
                                                 :disabled="!arch_doc_type_id || !create.parent_id"
                                                 :title="$t('general.DocumentDepartment')"
                                             >
-                                                <DocumentDepartment :arch_doc_type_id="arch_doc_type_id" :document_data="create"/>
+                                                <DocumentDepartment
+                                                    :arch_doc_type_id="arch_doc_type_id"
+                                                    :document_data="create"
+                                                    :companyKeys="companyKeys" :defaultsKeys="defaultsKeys"
+                                                />
                                             </b-tab>
                                             <b-tab
                                                 :disabled="!arch_doc_type_id || !create.parent_id"
@@ -1570,13 +1580,24 @@ export default {
                                                     </form>
                                                 </b-tab>
                                                 <b-tab :disabled="!arch_doc_type_id || !edit.parent_id"  :title="$t('menuitems.ArchDocTypeField.text')" >
-                                                    <DocumentTypeFieldEdit :arch_doc_type_id="arch_doc_type_id" :doc_type_field="doc_type_field" @update-doc-type-field="getData" :document_data="edit"/>
+                                                    <DocumentTypeFieldEdit
+                                                        :arch_doc_type_id="arch_doc_type_id"
+                                                        :doc_type_field="doc_type_field"
+                                                        @update-doc-type-field="getData"
+                                                        :document_data="edit"
+                                                        :companyKeys="companyKeys"
+                                                        :defaultsKeys="defaultsKeys"
+                                                    />
                                                 </b-tab>
                                                 <b-tab
                                                     :disabled="!arch_doc_type_id || !edit.parent_id"
                                                     :title="$t('general.DocumentDepartment')"
                                                 >
-                                                    <DocumentDepartment :arch_doc_type_id="arch_doc_type_id" :document_data="edit"/>
+                                                    <DocumentDepartment
+                                                        :arch_doc_type_id="arch_doc_type_id"
+                                                        :document_data="edit"
+                                                        :companyKeys="companyKeys" :defaultsKeys="defaultsKeys"
+                                                    />
                                                 </b-tab>
                                                 <b-tab
                                                     :disabled="!arch_doc_type_id || !edit.parent_id"

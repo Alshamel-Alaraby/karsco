@@ -35,6 +35,7 @@ export default {
       per_page: 50,
       search: "",
       debounce: {},
+      enabled3: true,
       unitStatusPagination: {},
       unitStatuses: [],
       isLoader: false,
@@ -44,13 +45,13 @@ export default {
         name: "",
         name_e: "",
         is_active: "active",
-        is_default: "active",
+        is_default: 1,
       },
       edit: {
         name: "",
         name_e: "",
         is_active: "active",
-        is_default: "active",
+        is_default: 1,
       },
       company_id: null,
       errors: {},
@@ -67,7 +68,7 @@ export default {
       filterSetting: ["name", "name_e"],
       printLoading: true,
       printObj: {
-        id: "printDepartment",
+        id: "printUnitStatus",
       }
     };
   },
@@ -370,7 +371,7 @@ export default {
         name: "",
         name_e: "",
         is_active: "active",
-        is_default: "active",
+        is_default: 1,
       };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -386,7 +387,7 @@ export default {
         name: "",
         name_e: "",
         is_active: "active",
-        is_default: "active",
+        is_default: 1,
       };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -401,7 +402,7 @@ export default {
         name: "",
         name_e: "",
         is_active: "active",
-        is_default: "active",
+        is_default: 1,
       };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -427,7 +428,7 @@ export default {
           name: this.create.name,
           name_e: this.create.name_e,
           is_active: this.create.is_active,
-          is_default: this.create.is_default == "active" ? 1 : 0,
+          is_default: this.create.is_default,
         };
         adminApi
           .post(`real-estate/unit-statuses`, data)
@@ -480,7 +481,7 @@ export default {
           name: this.edit.name,
           name_e: this.edit.name_e,
           is_active: this.edit.is_active,
-          is_default: this.edit.is_default == "active" ? 1 : 0,
+          is_default: this.edit.is_default,
         };
         adminApi
           .put(`real-estate/unit-statuses/${id}`, data)
@@ -520,7 +521,7 @@ export default {
       this.edit.name = unitStatus.name;
       this.edit.name_e = unitStatus.name_e;
       this.edit.is_active = unitStatus.is_active;
-      this.edit.is_default = unitStatus.is_default==1?"active":"inactive";
+      this.edit.is_default = unitStatus.is_default;
       this.errors = {};
     },
     /**
@@ -532,7 +533,7 @@ export default {
         name: "",
         name_e: "",
         is_active: "active",
-        is_default: "active",
+        is_default: 1,
       };
     },
     /*
@@ -569,7 +570,7 @@ export default {
               if (dl) {
                   XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
               } else {
-                  XLSX.writeFile(wb, fn || (('Document Department' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+                  XLSX.writeFile(wb, fn || (('Unit-Status' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
               }
               this.enabled3 = true;
           }, 100);
@@ -643,12 +644,12 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
-                    <i class="fas fa-file-download"></i>
-                  </button>
-                  <button class="custom-btn-dowonload">
-                    <i class="fe-printer"></i>
-                  </button>
+                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button v-print="'#printUnitStatus'" class="custom-btn-dowonload">
+                        <i class="fe-printer"></i>
+                    </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -907,8 +908,8 @@ export default {
                         }"
                       >
                         <option value="">{{ $t("general.Choose") }}...</option>
-                        <option value="active">{{ $t("general.Default") }}</option>
-                        <option value="inactive">{{ $t("general.Nondefault") }}</option>
+                        <option value="1">{{ $t("general.Default") }}</option>
+                        <option value="0">{{ $t("general.Nondefault") }}</option>
                       </select>
                       <template v-if="errors.is_default">
                         <ErrorMessage
@@ -965,10 +966,11 @@ export default {
               <!--       start loader       -->
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
-              <table class="table table-borderless table-hover table-centered m-0">
+              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                     id="printUnitStatus">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th scope="col" style="width: 0" v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -1038,10 +1040,10 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="unitStatuses.length > 0">
@@ -1052,7 +1054,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -1097,7 +1099,7 @@ export default {
                         }}
                       </span>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1287,10 +1289,10 @@ export default {
                                   }"
                                 >
                                   <option value="">{{ $t("general.Choose") }}...</option>
-                                  <option value="active">
+                                  <option value="1">
                                     {{ $t("general.Default") }}
                                   </option>
-                                  <option value="inactive">
+                                  <option value="0">
                                     {{ $t("general.Nondefault") }}
                                   </option>
                                 </select>
@@ -1346,7 +1348,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mouseover="log(data.id)"
                         @mousemove="log(data.id)"
@@ -1358,7 +1360,7 @@ export default {
                       >
                         <i class="fe-info" style="font-size: 22px"></i>
                       </button>
-                    </td>
+                    </td v-if="enabled3" class="do-not-print">
                   </tr>
                 </tbody>
                 <tbody v-else>

@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import ErrorMessage from "../../components/widgets/errorMessage";
 import loader from "../../components/loader";
 import Multiselect from "vue-multiselect";
-import translation from "../../helper/translation-mixin";
+import transMixinComp from "../../helper/translation-comp-mixin";
 
 /**
  * Advanced Table component
@@ -16,7 +16,8 @@ export default {
     loader,
     Multiselect,
   },
-  mixins: [translation],
+  mixins: [transMixinComp],
+  props: ["companyKeys", "defaultsKeys"],
   updated() {
     $(".englishInput").keypress(function (event) {
       var ew = event.which;

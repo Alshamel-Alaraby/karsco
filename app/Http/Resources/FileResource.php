@@ -28,6 +28,7 @@ class FileResource extends JsonResource
                 'id' => $this->id,
                 'url' => $this->original_url,
                 "name" => $this->name,
+
                 "mime_type" => $this->mime_type
             ];
         }
