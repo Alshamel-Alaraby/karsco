@@ -193,7 +193,7 @@ class ArchiveFileController extends Controller
             if (!$model) {
                 return responseJson(404, 'not found');
             }
-            $path = public_path($path = public_path(is_object($model->data_type_value[0]->value)?$model->data_type_value[0]->value->name_e:$model->data_type_value[0]->value . "-" . rand(1111, 999) . '.pdf') . "-" . rand(1111, 999) . '.pdf');
+            $path = public_path(is_object($model->data_type_value[0]->value)?$model->data_type_value[0]->value->name_e:$model->data_type_value[0]->value . "-" . rand(1111, 999) . '.pdf');
             $data = [
                 'id' => $model->id,
                 "data_type_value" => $model->data_type_value,

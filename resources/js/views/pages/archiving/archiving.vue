@@ -1729,7 +1729,7 @@ export default {
                         </div>
                       </div>
                     </b-tab>
-                    <b-tab :disabled="!archive_id" :title="$t('general.UploadsFiles')">
+                    <b-tab :disabled="!archive_id" :title="$t('general.Uploads')">
                       <div class="row">
                         <input
                           accept="image/png, image/gif, image/jpeg, image/jpg"

@@ -16,7 +16,7 @@
             <div class="up-section">
               <h6>
                 {{
-                      file.data_type_value.length > 0 ? (typeof file.data_type_value[0].value === 'object'?file.data_type_value[0].value.name_e:file.data_type_value[0].value) : "File"
+                  file.data_type_value.length > 0 ? (typeof file.data_type_value[0].value === 'object'?file.data_type_value[0].value.name_e:file.data_type_value[0].value) : "File"
                 }}
                 ({{ file.id }})
               </h6>
