@@ -125,22 +125,25 @@ export default {
      */
     async getData(page = 1) {
       this.isLoader = true;
-      await adminApi
-        .get(`/arch-doc-type-department/getDepartmentByDocument/${this.arch_doc_type_id}`)
-        .then((res) => {
-          let l = res.data;
-          this.storedData = l.data;
-        })
-        .catch((err) => {
-          Swal.fire({
-            icon: "error",
-            title: `${this.$t("general.Error")}`,
-            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
-          });
-        })
-        .finally(() => {
-          this.isLoader = false;
-        });
+      setTimeout(()=>{
+           adminApi
+              .get(`/arch-doc-type-department/getDepartmentByDocument/${this.arch_doc_type_id}`)
+              .then((res) => {
+                  let l = res.data;
+                  this.storedData = l.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },1000)
+
     },
     /**
      *  delete document field

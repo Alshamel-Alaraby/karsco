@@ -1,9 +1,9 @@
 <template>
   <div>
-    <Country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCategory" />
+    <Country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'country_bank-'+this.id" @created="getCategory" />
     <!--  create   -->
     <b-modal
-      id="bank-create"
+      :id="id"
       :title="getCompanyKey('bank_create_form')"
       title-class="font-18"
       body-class="p-4 "
@@ -216,7 +216,17 @@ export default {
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
   },
-  props: ["companyKeys", "defaultsKeys"],
+    props: {
+        id: {
+            default: "bank-create",
+        },
+        companyKeys:{
+            default:[]
+        },
+        defaultsKeys:{
+            default:[]
+        },
+    },
 
   updated() {
     $(function () {
@@ -264,7 +274,7 @@ export default {
   methods: {
     showCountryModal() {
       if (this.create.country_id == 0) {
-        this.$bvModal.show("country-create");
+        this.$bvModal.show("country_bank-"+this.id);
         this.create.country_id = null;
       }
     },

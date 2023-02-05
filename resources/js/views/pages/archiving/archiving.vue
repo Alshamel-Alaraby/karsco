@@ -268,7 +268,7 @@ export default {
     showModal(node) {
       this.currentNode = node;
       this.lockups = [];
-      node.doc_type_field.sort((a, b) => (a.field_order > b.field_order ? 1 : -1));
+      node.doc_type_field.sort((a, b) => (parseInt(a.field_order) > parseInt(b.field_order) ? 1 : -1));
       this.nodeFields = [...node.doc_type_field].map((field) => {
         if (field.doc_field_id.data_type.name_e == "Lookup (table)") {
           this.lockupTableObject = field;
@@ -331,6 +331,18 @@ export default {
           this.$bvModal.show("city-create-general");
           this.nodeFields[index].value = "";
         }
+        if (table == "general_banks") {
+          this.$bvModal.show("bank_create_form_general");
+          this.nodeFields[index].value = "";
+        }
+        if (table == "general_bank_accounts") {
+          this.$bvModal.show("bank-account-create-general");
+          this.nodeFields[index].value = "";
+        }
+        if (table == "general_branches") {
+          this.$bvModal.show("branch-create-general");
+          this.nodeFields[index].value = "";
+        }
       }
     },
     nodeWasClicked(result) {
@@ -361,7 +373,7 @@ export default {
               node.children.forEach((child) => {
                 if (child.doc_type_field) {
                   child.doc_type_field.sort((a, b) =>
-                    a.field_order > b.field_order ? 1 : -1
+                   parseInt(a.field_order) >parseInt(b.field_order) ? 1 : -1
                   );
                 }
               });

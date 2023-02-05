@@ -1,8 +1,8 @@
 <template>
   <div>
-    <Bank :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getBank" />
+    <Bank :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'bank-create-'+id" @created="getBank" />
     <b-modal
-      id="bank-account-create"
+      :id="id"
       :title="$t('general.addBankAccount')"
       title-class="font-18"
       dialog-class="modal-full-width"
@@ -495,8 +495,17 @@ export default {
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
   },
-  props: ["companyKeys", "defaultsKeys"],
-
+    props: {
+        id: {
+            default: "bank-account-create",
+        },
+        companyKeys:{
+            default:[]
+        },
+        defaultsKeys:{
+            default:[]
+        },
+    },
   updated() {
     $(function () {
       $(".englishInput").keypress(function (event) {
@@ -520,7 +529,7 @@ export default {
   methods: {
     showBankModal() {
       if (this.create.bank_id == 0) {
-        this.$bvModal.show("bank-create");
+        this.$bvModal.show("bank-create-"+this.id);
         this.create.bank_id = null;
       }
     },

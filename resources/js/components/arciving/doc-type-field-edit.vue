@@ -162,6 +162,7 @@ export default {
          *  get arch doc field data
          */
         async getArchDocType() {
+            this.isLoader = true;
             await adminApi
                 .get(`/document-field`)
                 .then((res) => {
@@ -172,6 +173,7 @@ export default {
                         if (this.doc_type_field.length > 0 && this.edit.length == 0)
                         {
                             this.resetModalEdit(this.arch_doc_type_id);
+                            this.isLoader = false;
                         }else if(this.doc_type_field.length == 0) {
                             this.allOrder.push({order: true});
                             this.allDrop.push({order: true});
@@ -182,8 +184,9 @@ export default {
                                 is_required: 1,
                                 field_characters: null,
                             });
+                            this.isLoader = false;
                         }
-                    },100)
+                    },5000)
                 })
                 .catch((err) => {
                     Swal.fire({
@@ -266,7 +269,7 @@ export default {
          */
         async resetModalEdit(id) {
             let editGenDocType = this.doc_type_field.sort((a, b) => (parseInt(a.field_order) > parseInt(b.field_order) ? 1 : -1));
-            editGenDocType.forEach((el) => {
+           await editGenDocType.forEach((el) => {
                 this.allOrder.push({order: true});
                 this.allDrop.push({order: true});
                 this.edit.push({
@@ -311,7 +314,7 @@ export default {
             this.orderDropChange(index);
             if (this.edit[index].doc_field_id == 0) {
                 this.$bvModal.show("create-doc-field");
-                this.edit.doc_field_id = null;
+                this.edit[index].doc_field_id = null;
             }else {
                 if(
                     this.archDocFieldData.find(el => el.id == this.edit[index].doc_field_id)
@@ -382,7 +385,7 @@ export default {
 
 <template>
 
-    <div class="row position-relative">
+    <div class="row position-relative" style="height: 500px; overflow-x: scroll">
         <DocField :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @create="getArchDocType"/>
         <loader size="large" v-if="isLoader"/>
 <!--        <div class="col-md-12 text-center">-->

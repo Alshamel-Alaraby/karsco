@@ -1,5 +1,8 @@
 <template>
     <div>
+        <bank :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'bank_create_form_general'" @created="$emit('created')" />
+        <bankAccount :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'bank-account-create-general'" @created="$emit('created')" />
+        <branch :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'branch-create-general'" @created="$emit('created')" />
         <employee :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="$emit('created')" />
         <customerGeneral :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="$emit('created')" />
         <country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'country-create-general'" @created="$emit('created')" />
@@ -10,6 +13,9 @@
 
 <script>
 import employee from "../../components/create/employee.vue";
+import bank from "../../components/create/bank";
+import bankAccount from "../../components/create/bankAccount";
+import branch from "../../components/create/branch";
 import customerGeneral from "../../components/create/customerGeneral";
 import country from "../../components/country";
 import city from "../../components/city";
@@ -34,9 +40,11 @@ export default {
         customerGeneral,
         propertyTree,
         country,
-        city
+        city,
+        bank,
+        bankAccount
     },
-    
+
     props:[
         "currentNode",
         "companyKeys",

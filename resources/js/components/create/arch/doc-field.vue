@@ -45,7 +45,7 @@
         <b-button
           variant="danger"
           type="button"
-          @click.prevent="$bvModal.hide(`create-doc-field`)"
+          @click.prevent="resetModalHidden"
         >
           {{ $t("general.Cancel") }}
         </b-button>
@@ -325,6 +325,7 @@ export default {
         this.$v.$reset();
       });
       this.errors = {};
+      this.$bvModal.hide(`create-doc-field`)
     },
     /**
      *  hidden Modal (create)

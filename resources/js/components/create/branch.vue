@@ -1,7 +1,7 @@
 <template>
   <!--  create   -->
   <b-modal
-    id="branch-create"
+    :id="id"
     :title="getCompanyKey('branch_create_form')"
     title-class="font-18"
     body-class="p-4 "
@@ -168,7 +168,17 @@ import transMixinComp from "../../helper/translation-comp-mixin";
 export default {
   name: "branch",
   mixins: [transMixinComp],
-  props: ["companyKeys", "defaultsKeys"],
+    props: {
+        id: {
+            default: "branch-create",
+        },
+        companyKeys:{
+            default:[]
+        },
+        defaultsKeys:{
+            default:[]
+        },
+    },
 
   updated() {
     $(function () {
