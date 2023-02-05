@@ -16,8 +16,8 @@ class EditRpInstallmentPaymentTypeRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:rp_installment_payment_types,name,'.$this->id,
-            'name_e' => 'required|string|max:255|unique:rp_installment_payment_types,name_e,'.$this->id,
+            'name' => 'required|string|max:255|unique:rp_installment_payment_types,id,'.$this->id,
+            'name_e' => 'required|string|max:255|unique:rp_installment_payment_types,id,'.$this->id,
             'auto_freq' => [],
             'is_partially' => [],
         ];

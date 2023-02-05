@@ -607,7 +607,7 @@ export default {
                             </div>
                             <template v-for="(item,index) in create">
                                 <div class="row">
-                                    <div class="col-md-3 mb-2">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label>
                                                 {{ getCompanyKey("arch_doc_field") }}
@@ -646,7 +646,7 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-3 mb-2">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="field-1" class="control-label">
                                                 {{ getCompanyKey("arch_doc_field_order") }}
@@ -683,7 +683,7 @@ export default {
                                             v-if="
                                            archDocFieldData.find(el => el.id == create[index].doc_field_id)
                                         "
-                                            class="col-md-3 mb-2"
+                                            class="col-md-3"
                                         >
                                             <div class="form-group">
                                                 <label class="control-label">
@@ -864,7 +864,7 @@ export default {
                                             </div>
                                         </div>
                                     </template>
-                                    <div class="col-md-2 mb-2">
+                                    <div class="col-md-2">
                                         <div class="form-group">
                                             <label class="mr-2">
                                                 {{ getCompanyKey("is_required") }}
@@ -900,13 +900,13 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-1 mb-2 pt-3" v-if="create.length > 1">
+                                    <div class="col-md-1 p-0 pt-3" v-if="create.length > 1">
                                         <button
                                             type="button"
                                             @click.prevent="removeNewField(index)"
-                                            class="closeField"
+                                            class="custom-btn-dowonload"
                                         >
-                                            x
+                                            <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </div>
                                 </div>

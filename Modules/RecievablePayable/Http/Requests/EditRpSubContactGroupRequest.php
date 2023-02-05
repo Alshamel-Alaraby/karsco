@@ -18,7 +18,8 @@ class EditRpSubContactGroupRequest extends FormRequest
         return [
             'name' => 'required|string|max:255|unique:rp_sub_contact_groups,name,'.$this->id,
             'name_e' => 'required|string|max:255|unique:rp_sub_contact_groups,name_e,'.$this->id,
-            // 'gl_acc_no'=>'required'
+            'gl_acc_no'=>[],
+            'rp_main_contact_group_id'=>[]
         ];
     }
 

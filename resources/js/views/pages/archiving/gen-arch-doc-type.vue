@@ -1090,9 +1090,9 @@ export default {
                                                 :disabled="!arch_doc_type_id || !create.parent_id"
                                                 :title="$t('general.DocumentStatus')"
                                             >
-                                                <div class="col-md-12 text-center">
-                                                    <h3>{{$t('general.DocumentName')}} : {{ $i18n.locale == "ar" ? edit.name : edit.name_e }}</h3>
-                                                </div>
+<!--                                                <div class="col-md-12 text-center">-->
+<!--                                                    <h3>{{$t('general.DocumentName')}} : {{ $i18n.locale == "ar" ? edit.name : edit.name_e }}</h3>-->
+<!--                                                </div>-->
                                                 <div class="col-md-6 mb-4 p-0 position-relative">
                                                     <div class="form-group">
                                                         <label class="my-1 mr-2">{{
@@ -1381,7 +1381,7 @@ export default {
                                         <!--  edit   -->
                                         <b-modal
                                             :id="`modal-edit-${data.id}`"
-                                            :title="$t('GenArchDocType.EditGenArchDocType')"
+                                            :title="$t('GenArchDocType.EditGenArchDocType')+' : '+ ($i18n.locale == 'ar' ? edit.name : edit.name_e) "
                                             title-class="font-18"
                                             body-class="paddingUnset"
                                             dialog-class="modal-full-width"
@@ -1603,9 +1603,9 @@ export default {
                                                     :disabled="!arch_doc_type_id || !edit.parent_id"
                                                     :title="$t('general.DocumentStatus')"
                                                 >
-                                                    <div class="col-md-12 text-center">
-                                                        <h3>{{$t('general.DocumentName')}} : {{ $i18n.locale == "ar" ? edit.name : edit.name_e }}</h3>
-                                                    </div>
+<!--                                                    <div class="col-md-12 text-center">-->
+<!--                                                        <h3>{{$t('general.DocumentName')}} : {{ $i18n.locale == "ar" ? edit.name : edit.name_e }}</h3>-->
+<!--                                                    </div>-->
                                                     <div class="col-md-6 mb-4 p-0 position-relative">
                                                         <div class="form-group">
                                                             <label class="my-1 mr-2">{{

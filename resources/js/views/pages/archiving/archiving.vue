@@ -1414,7 +1414,7 @@ export default {
             <b-modal
               dialog-class="modal-full-width"
               id="create"
-              :title="getCompanyKey('archive_create_form')"
+              :title="$t('general.FileUploads')"
               title-class="font-18"
               size="lg"
               body-class="p-4 "
@@ -1485,7 +1485,7 @@ export default {
                             "
                             class="form-group"
                           >
-                            <label class="my-1 mr-2">
+                            <label class="control-label">
                               {{
                                 $i18n.locale == "ar"
                                   ? field.doc_field_id.name
@@ -1543,7 +1543,7 @@ export default {
                             "
                             class="form-group"
                           >
-                            <label class="my-1 mr-2">
+                            <label class="control-label">
                               {{
                                 $i18n.locale == "ar"
                                   ? field.doc_field_id.name

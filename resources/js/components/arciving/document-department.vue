@@ -334,12 +334,12 @@ export default {
 <template>
   <div class="row">
     <DocDepartment :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @create-arch-department="getDepartment" />
-    <div class="col-md-12 text-center">
-      <h3>
-        {{ $t("general.DocumentName") }} :
-        {{ $i18n.locale == "ar" ? document_data.name : document_data.name_e }}
-      </h3>
-    </div>
+<!--    <div class="col-md-12 text-center">-->
+<!--      <h3>-->
+<!--        {{ $t("general.DocumentName") }} :-->
+<!--        {{ $i18n.locale == "ar" ? document_data.name : document_data.name_e }}-->
+<!--      </h3>-->
+<!--    </div>-->
     <div class="col-12">
       <div class="card">
         <div class="card-body">

@@ -2,6 +2,7 @@
 
 namespace Modules\RecievablePayable\Http\Controllers;
 
+use App\Traits\BulkDeleteTrait;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -12,6 +13,7 @@ use Modules\RecievablePayable\Transformers\RpInstallmentPaymentTypeResource;
 
 class RpInstallmentPaymentTypeController extends Controller
 {
+    use BulkDeleteTrait;
     private $modelInterface;
     public function __construct(RpInstallmentPaymentTypeRepositoryInterface $modelInterface)
     {

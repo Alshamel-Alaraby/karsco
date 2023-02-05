@@ -3,6 +3,7 @@
 namespace Modules\RecievablePayable\Http\Controllers;
 
 
+use App\Traits\BulkDeleteTrait;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\RecievablePayable\Http\Requests\CreateRpInstallmentStatusRequest;
@@ -12,6 +13,7 @@ use Modules\RecievablePayable\Transformers\RpInstallmentStatusResource;
 
 class RpInstallmentStatusController extends Controller
 {
+    use BulkDeleteTrait;
     private $modelInterface;
     public function __construct(RpInstallmentStatusRepositoryInterface $modelInterface)
     {
