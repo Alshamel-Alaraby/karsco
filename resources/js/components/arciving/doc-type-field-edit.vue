@@ -265,7 +265,7 @@ export default {
          *   show Modal (edit)
          */
         async resetModalEdit(id) {
-            let editGenDocType = this.doc_type_field.sort((a, b) => (a.field_order > b.field_order ? 1 : -1));
+            let editGenDocType = this.doc_type_field.sort((a, b) => (parseInt(a.field_order) > parseInt(b.field_order) ? 1 : -1));
             editGenDocType.forEach((el) => {
                 this.allOrder.push({order: true});
                 this.allDrop.push({order: true});
