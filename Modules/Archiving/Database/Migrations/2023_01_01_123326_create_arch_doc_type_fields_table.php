@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('doc_field_id');
             $table->unsignedBigInteger('field_order');
             $table->tinyInteger('is_required')->default(0);
-            $table->string('field_characters');
+            $table->unsignedBigInteger("parent_id")->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

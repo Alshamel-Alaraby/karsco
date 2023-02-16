@@ -3,8 +3,6 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Modules\Archiving\Entities\ArchiveFile;
-use niklasravnsborg\LaravelPdf\Facades\Pdf;
 
 class Test extends Command
 {
@@ -29,26 +27,37 @@ class Test extends Command
      */
     public function handle()
     {
-        set_time_limit(0);
+        // $model = \Modules\Archiving\Entities\DocType::create([
+        //     "name" => "test",
+        //     "name_e" => "test",
+        //     "parent_id" => 2,
+        //     "is_active" => 1]);
 
-        $model = ArchiveFile::find(2);
-        if (!$model) {
-            return responseJson(404, 'not found');
-        }
-        $path = public_path ('/pdf/'.rand (1111111111,9999999999).'.pdf');
+        // $model = \Modules\Archiving\Entities\DocType::find($model->parent_id);
+        // // doc type field
+        // $doc_type_fields = \Modules\Archiving\Entities\DocTypeField::where("doc_type_id", $model->id)->get();
+        // // dd($doc_type_fields);
+        // foreach ($doc_type_fields as $doc_type_field) {
+        //     \Modules\Archiving\Entities\DocTypeField::create([
+        //         "doc_type_id" => $model->id,
+        //         "doc_field_id" => $doc_type_field->doc_field_id,
+        //         "is_required" => $doc_type_field->is_required,
+        //         "field_order" => $doc_type_field->field_order,
+        //     ]
+        //     );
+        // }
 
-        $data = [
-            'id' => $model->id,
-            "data_type_value" => $model->data_type_value,
-            "media" =>  isset($model->files) ? collect($model->files)->values () : null,
-            'created_at' => $model->created_at,
-            'updated_at' => $model->updated_at,
-            "media_count"=>count((array) $model->files)
-        ];
-        PDF::loadView('pdf', $data, [], [
-            'format' => 'A4'
-        ])->save($path);
+        // $ids = \Modules\Archiving\Entities\DocTypeDepartment::where("arch_doc_type_id", $model->id)->pluck("arch_department_id")->toArray();
 
+        // foreach ($ids as $id) {
+        //     \Modules\Archiving\Entities\DocTypeDepartment::create([
+        //         "arch_doc_type_id" => $model->id,
+        //         "arch_department_id" => $id,
+        //     ]);
+        // }
+
+        // $ids = $model->statuses()->pluck("status_id")->toArray();
+        // $model->statuses()->attach($ids);
 
     }
 }

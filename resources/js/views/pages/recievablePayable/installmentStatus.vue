@@ -10,6 +10,7 @@ import loader from "../../../components/loader";
 import {dynamicSortString} from "../../../helper/tableSort";
 import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
+import {arabicValue, englishValue} from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -53,7 +54,6 @@ export default {
             debounce: {},
             installmentStatusPagination: {},
             installmentStatus: [],
-            enabled3: false,
             isLoader: false,
             create: {
                 name: '',
@@ -71,6 +71,11 @@ export default {
             isCheckAll: false,
             checkAll: [],
             current_page: 1,
+            enabled3: true,
+            printLoading: true,
+            printObj: {
+                id: "printCustom",
+            },
             setting: {
                 name: true,
                 name_e: true,
@@ -124,35 +129,35 @@ export default {
             }
         }
     },
-    updated(){
-
-        $(function(){
-            $(".englishInput").keypress(function(event){
-                var ew = event.which;
-                if(ew == 32)
-                    return true;
-                if(48 <= ew && ew <= 57)
-                    return true;
-                if(65 <= ew && ew <= 90)
-                    return true;
-                if(97 <= ew && ew <= 122)
-                    return true;
-                return false;
-            });
-            $(".arabicInput").keypress(function(event){
-                var ew = event.which;
-                if(ew == 32)
-                    return true;
-                if(48 <= ew && ew <= 57)
-                    return true;
-                if(65 <= ew && ew <= 90)
-                    return false;
-                if(97 <= ew && ew <= 122)
-                    return false;
-                return true;
-            });
-        });
-    },
+    // updated(){
+    //
+    //     $(function(){
+    //         $(".englishInput").keypress(function(event){
+    //             var ew = event.which;
+    //             if(ew == 32)
+    //                 return true;
+    //             if(48 <= ew && ew <= 57)
+    //                 return true;
+    //             if(65 <= ew && ew <= 90)
+    //                 return true;
+    //             if(97 <= ew && ew <= 122)
+    //                 return true;
+    //             return false;
+    //         });
+    //         $(".arabicInput").keypress(function(event){
+    //             var ew = event.which;
+    //             if(ew == 32)
+    //                 return true;
+    //             if(48 <= ew && ew <= 57)
+    //                 return true;
+    //             if(65 <= ew && ew <= 90)
+    //                 return false;
+    //             if(97 <= ew && ew <= 122)
+    //                 return false;
+    //             return true;
+    //         });
+    //     });
+    // },
     mounted() {
         this.getData();
     },
@@ -193,7 +198,7 @@ export default {
                     filter += `columns[${i}]=${this.filterSetting[i]}&`;
                 }
 
-                adminApi.get(`/recievable-payable/rp_installment_status?page=${page}&per_page=${this.per_page}&search=${this.search}&${filter}`)
+                adminApi.get(`/recievable-payable/rp_installment_status?page=${this.current_page}&per_page=${this.per_page}&search=${this.search}&${filter}`)
                     .then((res) => {
                         let l = res.data;
                         this.installmentStatus = l.data;
@@ -510,6 +515,27 @@ export default {
                     });
             }
         },
+        ExportExcel(type, fn, dl) {
+            this.enabled3 = false;
+            setTimeout(() => {
+                let elt = this.$refs.exportable_table;
+                let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+                if (dl) {
+                    XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+                } else {
+                    XLSX.writeFile(wb, fn || (('InstallmentStatus' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+                }
+                this.enabled3 = true;
+            }, 100);
+        },
+        arabicValueName(txt){
+            this.create.name = arabicValue(txt);
+            this.edit.name = arabicValue(txt);
+        },
+        englishValueName(txt){
+            this.create.name_e = englishValue(txt);
+            this.edit.name_e = englishValue(txt);
+        }
     },
 };
 </script>
@@ -571,10 +597,10 @@ export default {
                                     <i class="fas fa-plus"></i>
                                 </b-button>
                                 <div class="d-inline-flex">
-                                    <button class="custom-btn-dowonload">
+                                    <button class="custom-btn-dowonload" @click="ExportExcel('xlsx')">
                                         <i class="fas fa-file-download"></i>
                                     </button>
-                                    <button class="custom-btn-dowonload">
+                                    <button class="custom-btn-dowonload" v-print="'#printCustom'">
                                         <i class="fe-printer"></i>
                                     </button>
                                     <button
@@ -733,7 +759,7 @@ export default {
                                                     type="text"
                                                     class="form-control arabicInput"
                                                     data-create="1"
-                                                    @keypress.enter="moveInput('input','create',2)"
+                                                    @keyup="arabicValueName(create.name)"
                                                     v-model="$v.create.name.$model"
                                                     :class="{
                                                         'is-invalid':$v.create.name.$error || errors.name,
@@ -768,7 +794,7 @@ export default {
                                                     type="text"
                                                     class="form-control englishInput"
                                                     data-create="2"
-                                                    @keypress.enter="moveInput('select','create',3)"
+                                                    @keyup="englishValueName(create.name_e)"
                                                     v-model="$v.create.name_e.$model"
                                                     :class="{
                                                 'is-invalid':$v.create.name_e.$error || errors.name_e,
@@ -797,28 +823,28 @@ export default {
                                             <label class="mr-2" for="field-11">
                                                 {{ getCompanyKey('installment_status_default') }}
                                             </label>
-                                            <select
-                                                class="custom-select mr-sm-2"
+                                            <b-form-group
                                                 id="field-11"
-                                                data-create="8"
-                                                @keypress.enter.prevent="
-                                    moveInput('select', 'create', 9)
-                                  "
-                                                v-model="$v.create.is_default.$model"
                                                 :class="{
-                                    'is-invalid':
-                                      $v.create.is_default.$error || errors.is_default,
-                                    'is-valid':
-                                      !$v.create.is_default.$invalid &&
-                                      !errors.is_default,
-                                  }"
+                                                      'is-invalid': $v.create.is_default.$error || errors.is_default,
+                                                      'is-valid': !$v.create.is_default.$invalid && !errors.is_default,
+                                                    }"
                                             >
-                                                <option value="" selected>
-                                                    {{ $t("general.Choose") }}...
-                                                </option>
-                                                <option value="1">{{ $t("general.Yes") }}</option>
-                                                <option value="0">{{ $t("general.No") }}</option>
-                                            </select>
+                                                <b-form-radio
+                                                    class="d-inline-block"
+                                                    v-model="$v.create.is_default.$model"
+                                                    name="some-radios"
+                                                    value="1"
+                                                >{{ $t("general.Yes") }}</b-form-radio
+                                                >
+                                                <b-form-radio
+                                                    class="d-inline-block m-1"
+                                                    v-model="$v.create.is_default.$model"
+                                                    name="some-radios"
+                                                    value="0"
+                                                >{{ $t("general.No") }}</b-form-radio
+                                                >
+                                            </b-form-group>
                                             <template v-if="errors.is_default">
                                                 <ErrorMessage
                                                     v-for="(errorMessage, index) in errors.is_default"
@@ -834,7 +860,8 @@ export default {
                         <!--  /create   -->
 
                         <!-- start .table-responsive-->
-                        <div class="table-responsive mb-3 custom-table-theme position-relative">
+                        <div class="table-responsive mb-3 custom-table-theme position-relative" ref="exportable_table"
+                             id="printCustom">
 
                             <!--       start loader       -->
                             <loader size="large" v-if="isLoader"/>
@@ -843,7 +870,7 @@ export default {
                             <table class="table table-borderless table-hover table-centered m-0">
                                 <thead>
                                 <tr>
-                                    <th scope="col" style="width: 0;">
+                                    <th scope="col" style="width: 0;" v-if="enabled3" class="do-not-print">
                                         <div class="form-check custom-control">
                                             <input
                                                 class="form-check-input"
@@ -879,10 +906,10 @@ export default {
                                             <span>{{ getCompanyKey('installment_status_default') }}</span>
                                         </div>
                                     </th>
-                                    <th>
+                                    <th v-if="enabled3" class="do-not-print">
                                         {{ $t('general.Action') }}
                                     </th>
-                                    <th><i class="fas fa-ellipsis-v"></i></th>
+                                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                                 </tr>
                                 </thead>
                                 <tbody v-if="installmentStatus.length > 0">
@@ -893,7 +920,7 @@ export default {
                                     :key="data.id"
                                     class="body-tr-custom"
                                 >
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <div class="form-check custom-control" style="min-height: 1.9em;">
                                             <input
                                                 style="width: 17px;height: 17px;"
@@ -921,7 +948,7 @@ export default {
                                             {{ data.is_default == 1 ? `${$t('general.Active')}` : `${$t('general.Inactive')}` }}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <div class="btn-group">
                                             <button
                                                 type="button"
@@ -1005,6 +1032,7 @@ export default {
                                                                     type="text"
                                                                     class="form-control arabicInput"
                                                                     v-model="$v.edit.name.$model"
+                                                                    @keyup="arabicValueName(edit.name)"
                                                                     :class="{
                                                                     'is-invalid':$v.edit.name.$error || errors.name,
                                                                     'is-valid':!$v.edit.name.$invalid && !errors.name
@@ -1043,6 +1071,7 @@ export default {
                                                                     type="text"
                                                                     class="form-control englishInput"
                                                                     v-model="$v.edit.name_e.$model"
+                                                                    @keyup="englishValueName(edit.name_e)"
                                                                     :class="{
                                                                     'is-invalid':$v.edit.name_e.$error || errors.name_e,
                                                                     'is-valid':!$v.edit.name_e.$invalid && !errors.name_e
@@ -1080,38 +1109,33 @@ export default {
                                                             <label class="mr-2" for="edit-11">
                                                                 {{ getCompanyKey('installment_status_default') }}
                                                             </label>
-                                                            <select
-                                                                class="custom-select mr-sm-2"
+                                                            <b-form-group
                                                                 id="edit-11"
-                                                                data-edit="8"
-                                                                @keypress.enter.prevent="
-                                                                moveInput('select', 'edit', 9)
-                                                              "
-                                                                                    v-model="$v.edit.is_default.$model"
-                                                                                    :class="{
-                                                                'is-invalid':
-                                                                  $v.edit.is_default.$error ||
-                                                                  errors.is_default,
-                                                                'is-valid':
-                                                                  !$v.edit.is_default.$invalid &&
-                                                                  !errors.is_default,
-                                                              }"
+                                                                :class="{
+                                                                  'is-invalid': $v.edit.is_default.$error || errors.is_default,
+                                                                  'is-valid': !$v.edit.is_default.$invalid && !errors.is_default,
+                                                                }"
                                                             >
-                                                                <option value="" selected>
-                                                                    {{ $t("general.Choose") }}...
-                                                                </option>
-                                                                <option value="1">
-                                                                    {{ $t("general.Yes") }}
-                                                                </option>
-                                                                <option value="0">
-                                                                    {{ $t("general.No") }}
-                                                                </option>
-                                                            </select>
+                                                                <b-form-radio
+                                                                    class="d-inline-block"
+                                                                    v-model="$v.edit.is_default.$model"
+                                                                    name="some-radios"
+                                                                    value="1"
+                                                                >{{ $t("general.Yes") }}</b-form-radio
+                                                                >
+                                                                <b-form-radio
+                                                                    class="d-inline-block m-1"
+                                                                    v-model="$v.edit.is_default.$model"
+                                                                    name="some-radios"
+                                                                    value="0"
+                                                                >{{ $t("general.No") }}</b-form-radio
+                                                                >
+                                                            </b-form-group>
                                                             <template v-if="errors.is_default">
                                                                 <ErrorMessage
                                                                     v-for="(
-                                              errorMessage, index
-                                            ) in errors.is_default"
+                                                                          errorMessage, index
+                                                                        ) in errors.is_default"
                                                                     :key="index"
                                                                 >{{ errorMessage }}
                                                                 </ErrorMessage>
@@ -1123,7 +1147,7 @@ export default {
                                         </b-modal>
                                         <!--  /edit   -->
                                     </td>
-                                    <td>
+                                    <td v-if="enabled3" class="do-not-print">
                                         <button
                                             @mousemove="log(data.id)"
                                             @mouseover="log(data.id)"

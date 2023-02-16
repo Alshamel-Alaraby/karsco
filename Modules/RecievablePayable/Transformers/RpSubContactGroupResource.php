@@ -19,6 +19,9 @@ class RpSubContactGroupResource extends JsonResource
             "name"=>$this->name,
             "name_e"=>$this->name_e,
             "gl_acc_no"=>$this->gl_acc_no,
+            "rp_main_contact_group_id"=>$this->rp_main_contact_group_id,
+            "mainContactGroup"=>$this->mainContactGroup,
+            "glAccount"=>$this->glAccount
         ];
     }
 }

@@ -16,7 +16,6 @@ class CreateRpDocumentPlanRequest extends FormRequest
     public function rules()
     {
         return [
-            'document_id' => 'required',
             'plan_id' => 'required',
         ];
     }

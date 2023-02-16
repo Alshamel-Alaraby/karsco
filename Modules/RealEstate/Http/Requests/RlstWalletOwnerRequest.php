@@ -14,8 +14,8 @@ class RlstWalletOwnerRequest extends FormRequest
     public function rules()
     {
         return [
-            'wallet_id' => 'required|integer|exists:rlst_wallets,id,deleted_at,null',
-            'owner_id' => 'required|integer|exists:rlst_owners,id,deleted_at,null',
+            'wallet_id' => 'required|integer|exists:rlst_wallets,id',
+            'owner_id' => 'required|integer|exists:rlst_owners,id',
             'percentage' => 'required|numeric',
         ];
     }

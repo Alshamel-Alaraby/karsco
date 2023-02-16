@@ -9,6 +9,8 @@ import loader from "../../../components/loader";
 import {dynamicSortString} from "../../../helper/tableSort";
 import Multiselect from "vue-multiselect";
 import translation from "../../../helper/translation-mixin";
+import DocField from "../../../components/create/arch/doc-field";
+import { arabicValue, englishValue } from "../../../helper/langTransform";
 
 
 /**
@@ -26,6 +28,7 @@ export default {
         ErrorMessage,
         loader,
         Multiselect,
+        DocField
     },
     beforeRouteEnter(to, from, next) {
         next((vm) => {
@@ -46,24 +49,24 @@ export default {
             }
         });
     },
-    updated() {
-        $(".englishInput").keypress(function (event) {
-            var ew = event.which;
-            if (ew == 32) return true;
-            if (48 <= ew && ew <= 57) return true;
-            if (65 <= ew && ew <= 90) return true;
-            if (97 <= ew && ew <= 122) return true;
-            return false;
-        });
-        $(".arabicInput").keypress(function (event) {
-            var ew = event.which;
-            if (ew == 32) return true;
-            if (48 <= ew && ew <= 57) return false;
-            if (65 <= ew && ew <= 90) return false;
-            if (97 <= ew && ew <= 122) return false;
-            return true;
-        });
-    },
+    // updated() {
+    //     $(".englishInput").keypress(function (event) {
+    //         var ew = event.which;
+    //         if (ew == 32) return true;
+    //         if (48 <= ew && ew <= 57) return true;
+    //         if (65 <= ew && ew <= 90) return true;
+    //         if (97 <= ew && ew <= 122) return true;
+    //         return false;
+    //     });
+    //     $(".arabicInput").keypress(function (event) {
+    //         var ew = event.which;
+    //         if (ew == 32) return true;
+    //         if (48 <= ew && ew <= 57) return false;
+    //         if (65 <= ew && ew <= 90) return false;
+    //         if (97 <= ew && ew <= 122) return false;
+    //         return true;
+    //     });
+    // },
     data() {
         return {
             per_page: 50,
@@ -73,11 +76,14 @@ export default {
             archDepartmentAr: [],
             enabled3: true,
             isLoader: false,
+            archDocFieldData: [],
             create: {
                 name: "",
                 name_e: "",
                 parent_id: "",
                 is_active: "active",
+                is_key: 1,
+                key_value:""
 
             }, //Create form
             edit: {
@@ -85,6 +91,8 @@ export default {
                 name_e: "",
                 parent_id: "",
                 is_active: "active",
+                is_key: 1,
+                key_value:""
             }, //Edit form
             setting: {
                 name: true,
@@ -113,6 +121,8 @@ export default {
                 maxLength: maxLength(255),
             },
             is_active: {required},
+            is_key: {required},
+            key_value: {},
             parent_id: {integer},
         },
         edit: {
@@ -123,6 +133,8 @@ export default {
                 maxLength: maxLength(255),
             },
             is_active: {required},
+            is_key: {required},
+            key_value: {},
             parent_id: {integer},
         },
     },
@@ -157,10 +169,21 @@ export default {
             }
         },
     },
-    mounted() {
-        this.getData();
+   async mounted() {
+        await this.getData();
+        await this.getArchDocType();
     },
     methods: {
+            arabicValue(txt) {
+      this.create.name = arabicValue(txt);
+      this.edit.name = arabicValue(txt);
+    },
+
+    englishValue(txt) {
+      this.create.name_e = englishValue(txt);
+      this.edit.name_e = englishValue(txt);
+    },
+
         /**
          *  get Data Arch Department
          */
@@ -226,6 +249,25 @@ export default {
                         this.isLoader = false;
                     });
             }
+        },
+        /**
+         *  get arch doc field data
+         */
+        async getArchDocType() {
+            await adminApi
+                .get(`/document-field`)
+                .then((res) => {
+                    let l = res.data.data;
+                    l.unshift({ id: 0, name: "Add Document Field", name_e: "Add Document Field" });
+                    this.archDocFieldData = l;
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: `${this.$t("general.Error")}`,
+                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                    });
+                });
         },
         /**
          *  delete Arch Department
@@ -335,7 +377,8 @@ export default {
          *  reset Modal (create)
          */
         resetModalHidden() {
-            this.create = {name: "", name_e: "", is_active: "active", parent_id: ""};
+            this.create = {name: "", name_e: "", is_active: "active",is_key: 1,
+                key_value: "", parent_id: ""};
             this.$nextTick(() => {
                 this.$v.$reset();
             });
@@ -344,8 +387,10 @@ export default {
         /**
          *  hidden Modal (create)
          */
-        resetModal() {
-            this.create = {name: "", name_e: "", is_active: "active", parent_id: ""};
+       async resetModal() {
+            await this.getArchDocType();
+            this.create = {name: "", name_e: "", is_active: "active",is_key: 1,
+                key_value: "", parent_id: ""};
             this.is_disabled = false;
             this.$nextTick(() => {
                 this.$v.$reset();
@@ -356,7 +401,8 @@ export default {
          *  create Arch Department
          */
         resetForm() {
-            this.create = {name: "", name_e: "", is_active: "active", parent_id: ""};
+            this.create = {name: "", name_e: "", is_active: "active",is_key: 1,
+                key_value: "", parent_id: ""};
             this.is_disabled = false;
             this.$nextTick(() => {
                 this.$v.$reset();
@@ -369,6 +415,12 @@ export default {
             if (this.create.name || this.create.name_e) {
                 this.create.name = this.create.name ? this.create.name : this.create.name_e;
                 this.create.name_e = this.create.name_e ? this.create.name_e : this.create.name;
+            }
+            if (parseInt(this.create.is_key) != 1){
+                this.create.key_value = "";
+            }
+            if (parseInt(this.create.is_key) == 1 && !this.create.key_value){
+                return;
             }
             this.$v.create.$touch();
             if (this.$v.create.$invalid) {
@@ -417,18 +469,27 @@ export default {
                 this.edit.name = this.edit.name ? this.edit.name : this.edit.name_e;
                 this.edit.name_e = this.edit.name_e ? this.edit.name_e : this.create.name;
             }
+            if (parseInt(this.edit.is_key) != 1){
+                this.edit.key_value = "";
+            }
+            if (parseInt(this.edit.is_key) == 1 && !this.edit.key_value){
+                return;
+            }
             this.$v.edit.$touch();
             if (this.$v.edit.$invalid) {
                 return;
             } else {
                 this.isLoader = true;
                 this.errors = {};
-                let {name, name_e, is_active, parent_id} = this.edit;
+                let {name, name_e, is_active,is_key,
+                    key_value, parent_id} = this.edit;
                 adminApi
                     .put(`/arch-department/${id}`, {
                         name,
                         name_e,
                         is_active,
+                        is_key,
+                        key_value,
                         parent_id,
                     })
                     .then((res) => {
@@ -467,6 +528,8 @@ export default {
             this.edit.name = archDepartment.name;
             this.edit.name_e = archDepartment.name_e;
             this.edit.is_active = archDepartment.is_active;
+            this.edit.is_key = archDepartment.is_key ? 1 : 0;
+            this.edit.key_value = archDepartment.is_key ? archDepartment.key_value.id : "";
             this.edit.parent_id = archDepartment.parent_id;
             this.errors = {};
         },
@@ -479,6 +542,8 @@ export default {
                 name: "",
                 name_e: "",
                 is_active: "active",
+                is_key: 1,
+                key_value: "",
                 parent_id: "",
             };
         },
@@ -512,7 +577,20 @@ export default {
                 }
                 this.enabled3 = true;
             }, 100);
-        }
+        },
+        showDocFieldModal() {
+            if (this.create.key_value == 0) {
+                this.$bvModal.show("create-doc-field");
+                this.create.key_value = "";
+            }
+        },
+
+        showDocFieldModalEdit() {
+            if (this.edit.key_value == 0) {
+                this.$bvModal.show("create-doc-field");
+                this.edit.key_value = "";
+            }
+        },
     },
 };
 </script>
@@ -521,6 +599,7 @@ export default {
     <Layout>
         <PageHeader/>
         <div class="row">
+            <DocField :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @create="getArchDocType" />
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
@@ -768,8 +847,10 @@ export default {
                                             </label>
                                             <div dir="rtl">
                                                 <input
+                                                @keyup="arabicValue(create.name)"
+
                                                     type="text"
-                                                    class="form-control arabicInput"
+                                                    class="form-control"
                                                     v-model="$v.create.name.$model"
                                                     :class="{
                                                   'is-invalid': $v.create.name.$error || errors.name,
@@ -805,8 +886,10 @@ export default {
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <input
+                                            @keyup="englishValue(create.name_e)"
+
                                                 type="text"
-                                                class="form-control englishInput"
+                                                class="form-control"
                                                 v-model="$v.create.name_e.$model"
                                                 :class="{
                                                   'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -854,6 +937,73 @@ export default {
                                             <template v-if="errors.parent_id">
                                                 <ErrorMessage v-for="(errorMessage,index) in errors.parent_id"
                                                               :key="index">{{ errorMessage }}
+                                                </ErrorMessage>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="mr-2">
+                                                {{ $t('general.is_key') }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <b-form-group
+                                                :class="{
+                                                    'is-invalid':
+                                                      $v.create.is_key.$error || errors.is_key,
+                                                    'is-valid':
+                                                      !$v.create.is_key.$invalid && !errors.is_key,
+                                                  }"
+                                            >
+                                                <b-form-radio
+                                                    class="d-inline-block"
+                                                    v-model="$v.create.is_key.$model"
+                                                    name="is_key"
+                                                    value="1"
+                                                >{{ $t("general.Yes") }}
+                                                </b-form-radio
+                                                >
+                                                <b-form-radio
+                                                    class="d-inline-block m-1"
+                                                    v-model="$v.create.is_key.$model"
+                                                    name="is_key"
+                                                    value="0"
+                                                >{{ $t("general.No") }}
+                                                </b-form-radio
+                                                >
+                                            </b-form-group>
+                                            <template v-if="errors.is_key">
+                                                <ErrorMessage
+                                                    v-for="(errorMessage, index) in errors.is_key"
+                                                    :key="index"
+                                                >{{ errorMessage }}
+                                                </ErrorMessage>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12" v-if="create.is_key == 1">
+                                        <div class="form-group">
+                                            <label>
+                                                {{ getCompanyKey("arch_doc_field") }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <multiselect
+                                                @input="showDocFieldModal()"
+                                                v-model="$v.create.key_value.$model"
+                                                :options="archDocFieldData.map((type) => type.id)"
+                                                :custom-label="
+                                                  (opt) =>
+                                                    $i18n.locale
+                                                      ? archDocFieldData.find((x) => x.id == opt).name
+                                                      : archDocFieldData.find((x) => x.id == opt).name_e
+                                                "
+                                            >
+                                            </multiselect>
+                                            <template v-if="errors.key_value">
+                                                <ErrorMessage
+                                                    v-for="(errorMessage, index) in errors.key_value"
+                                                    :key="index"
+                                                >{{ errorMessage }}
                                                 </ErrorMessage>
                                             </template>
                                         </div>
@@ -1127,8 +1277,9 @@ export default {
                                                             </label>
                                                             <div dir="rtl">
                                                                 <input
+                                                                @keyup="arabicValue(edit.name)"
                                                                     type="text"
-                                                                    class="form-control arabicInput"
+                                                                    class="form-control"
                                                                     v-model="$v.edit.name.$model"
                                                                     :class="{
                                                                         'is-invalid': $v.edit.name.$error || errors.name,
@@ -1171,8 +1322,9 @@ export default {
                                                                 <span class="text-danger">*</span>
                                                             </label>
                                                             <input
+                                                            @keyup="englishValue(edit.name_e)"
                                                                 type="text"
-                                                                class="form-control englishInput"
+                                                                class="form-control"
                                                                 v-model="$v.edit.name_e.$model"
                                                                 :class="{
                                                                     'is-invalid': $v.edit.name_e.$error || errors.name_e,
@@ -1230,6 +1382,73 @@ export default {
                                                                 <ErrorMessage
                                                                     v-for="(errorMessage,index) in errors.parent_id"
                                                                     :key="index">{{ errorMessage }}
+                                                                </ErrorMessage>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label class="mr-2">
+                                                                {{ $t('general.is_key') }}
+                                                                <span class="text-danger">*</span>
+                                                            </label>
+                                                            <b-form-group
+                                                                :class="{
+                                                                    'is-invalid':
+                                                                      $v.edit.is_key.$error || errors.is_key,
+                                                                    'is-valid':
+                                                                      !$v.edit.is_key.$invalid && !errors.is_key,
+                                                                  }"
+                                                            >
+                                                                <b-form-radio
+                                                                    class="d-inline-block"
+                                                                    v-model="$v.edit.is_key.$model"
+                                                                    name="is_key"
+                                                                    value="1"
+                                                                >{{ $t("general.Yes") }}
+                                                                </b-form-radio
+                                                                >
+                                                                <b-form-radio
+                                                                    class="d-inline-block m-1"
+                                                                    v-model="$v.edit.is_key.$model"
+                                                                    name="is_key"
+                                                                    value="0"
+                                                                >{{ $t("general.No") }}
+                                                                </b-form-radio
+                                                                >
+                                                            </b-form-group>
+                                                            <template v-if="errors.is_key">
+                                                                <ErrorMessage
+                                                                    v-for="(errorMessage, index) in errors.is_key"
+                                                                    :key="index"
+                                                                >{{ errorMessage }}
+                                                                </ErrorMessage>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12" v-if="edit.is_key == 1">
+                                                        <div class="form-group">
+                                                            <label>
+                                                                {{ getCompanyKey("arch_doc_field") }}
+                                                                <span class="text-danger">*</span>
+                                                            </label>
+                                                            <multiselect
+                                                                @input="showDocFieldModalEdit()"
+                                                                v-model="$v.edit.key_value.$model"
+                                                                :options="archDocFieldData.map((type) => type.id)"
+                                                                :custom-label="
+                                                                  (opt) =>
+                                                                    $i18n.locale
+                                                                      ? archDocFieldData.find((x) => x.id == opt).name
+                                                                      : archDocFieldData.find((x) => x.id == opt).name_e
+                                                                "
+                                                            >
+                                                            </multiselect>
+                                                            <template v-if="errors.key_value">
+                                                                <ErrorMessage
+                                                                    v-for="(errorMessage, index) in errors.key_value"
+                                                                    :key="index"
+                                                                >{{ errorMessage }}
                                                                 </ErrorMessage>
                                                             </template>
                                                         </div>

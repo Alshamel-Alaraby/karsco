@@ -12,6 +12,7 @@ import Multiselect from "vue-multiselect";
 import Templates from "../email/templates.vue";
 import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
+import {arabicValue, englishValue} from "../../../helper/langTransform";
 let self;
 
 /**
@@ -55,22 +56,22 @@ export default {
     });
   },
   updated() {
-    $(".englishInput").keypress(function (event) {
-      var ew = event.which;
-      if (ew == 32) return true;
-      if (48 <= ew && ew <= 57) return true;
-      if (65 <= ew && ew <= 90) return true;
-      if (97 <= ew && ew <= 122) return true;
-      return false;
-    });
-    $(".arabicInput").keypress(function (event) {
-      var ew = event.which;
-      if (ew == 32) return true;
-      if (48 <= ew && ew <= 57) return false;
-      if (65 <= ew && ew <= 90) return false;
-      if (97 <= ew && ew <= 122) return false;
-      return true;
-    });
+    // $(".englishInput").keypress(function (event) {
+    //   var ew = event.which;
+    //   if (ew == 32) return true;
+    //   if (48 <= ew && ew <= 57) return true;
+    //   if (65 <= ew && ew <= 90) return true;
+    //   if (97 <= ew && ew <= 122) return true;
+    //   return false;
+    // });
+    // $(".arabicInput").keypress(function (event) {
+    //   var ew = event.which;
+    //   if (ew == 32) return true;
+    //   if (48 <= ew && ew <= 57) return false;
+    //   if (65 <= ew && ew <= 90) return false;
+    //   if (97 <= ew && ew <= 122) return false;
+    //   return true;
+    // });
   },
   data() {
     return {
@@ -79,7 +80,7 @@ export default {
       debounce: {},
       treePropertiesPagination: {},
       treeProperties: [],
-      enabled3: false,
+      enabled3: true,
       isLoader: false,
       rootNodes: [],
       childNodes: [],
@@ -111,6 +112,10 @@ export default {
       is_disabled: false,
       current_page: 1,
       company_id: null,
+        printLoading: true,
+        printObj: {
+            id: "printData",
+        }
     };
   },
   validations: {
@@ -808,6 +813,33 @@ export default {
         this.checkAll.splice(index, 1);
       }
     },
+
+      /**
+       *   Export Excel
+       */
+      ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('Tree Properties' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      },
+
+      arabicValue(txt){
+          this.create.name = arabicValue(txt);
+          this.edit.name = arabicValue(txt);
+      } ,
+
+      englishValue(txt){
+          this.create.name_e = englishValue(txt);
+          this.edit.name_e = englishValue(txt);
+      }
   },
 };
 </script>
@@ -874,12 +906,12 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
-                    <i class="fas fa-file-download"></i>
-                  </button>
-                  <button class="custom-btn-dowonload">
-                    <i class="fe-printer"></i>
-                  </button>
+                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button v-print="'#printData'" class="custom-btn-dowonload">
+                        <i class="fe-printer"></i>
+                    </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -1204,6 +1236,7 @@ export default {
                               'is-invalid': $v.create.name.$error || errors.name,
                               'is-valid': !$v.create.name.$invalid && !errors.name,
                             }"
+                            @keyup="arabicValue(create.name)"
                             id="field-1"
                           />
                           <div v-if="!$v.create.name.minLength" class="invalid-feedback">
@@ -1239,6 +1272,7 @@ export default {
                               'is-invalid': $v.create.name_e.$error || errors.name_e,
                               'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
                             }"
+                            @keyup="englishValue(create.name_e)"
                             id="field-2"
                           />
                           <div
@@ -1316,10 +1350,11 @@ export default {
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
 
-              <table class="table table-borderless table-hover table-centered m-0">
+              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                     id="printData">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th v-if="enabled3" class="do-not-print" scope="col" style="width: 0">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -1389,10 +1424,10 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="treeProperties.length > 0">
@@ -1403,7 +1438,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -1439,7 +1474,7 @@ export default {
                         {{ $i18n.locale == "ar" ? data.parent.name : data.parent.name_e }}
                       </template>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1722,6 +1757,7 @@ export default {
                                           !$v.edit.name.$invalid && !errors.name,
                                       }"
                                       :placeholder="$t('general.Name')"
+                                      @keyup="arabicValue(edit.name)"
                                       id="field-u-1"
                                     />
                                     <div
@@ -1766,6 +1802,7 @@ export default {
                                           !$v.edit.name_e.$invalid && !errors.name_e,
                                       }"
                                       :placeholder="$t('general.Name_en')"
+                                      @keyup="englishValue(edit.name_e)"
                                       id="field-u-2"
                                     />
                                     <div
@@ -1838,7 +1875,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mouseover="log(data.id)"
                         @mousemove="log(data.id)"
@@ -1914,4 +1951,23 @@ ul,
   }
 }
 /* Remove default bullets */
+
+@media print {
+    .do-not-print {
+        display: none;
+    }
+    .arrow-sort {
+        display: none;
+    }
+    .text-success{
+        background-color:unset;
+        color: #6c757d !important;
+        border: unset;
+    }
+    .text-danger{
+        background-color:unset;
+        color: #6c757d !important;
+        border: unset;
+    }
+}
 </style>

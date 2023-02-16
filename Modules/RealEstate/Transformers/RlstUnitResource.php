@@ -2,7 +2,6 @@
 
 namespace Modules\RealEstate\Transformers;
 
-use Modules\RealEstate\Entities\RlstUnitStatus;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RlstUnitResource extends JsonResource
@@ -25,13 +24,17 @@ class RlstUnitResource extends JsonResource
             'unit_ty' => $this->unit_ty,
             'status_date' => $this->status_date,
             'unit_area' => $this->unit_area,
-            'building_id' => $this->building_id,
+            // 'building_id' => $this->building_id,
             "building" => new RlstBuildingResource($this->building),
-            'owner_id' => $this->owner_id,
-            'currency_id' => $this->currency_id,
-            'wallet_id' => $this->wallet_id,
-            'unit_status_id' => $this->unit_status_id,
-            "unit-status" => new RlstUnitStatusResource($this->unitStatus),
+            // 'owner_id' => $this->owner_id,
+            "owner" => new RlstOwnerResource($this->owner),
+            // 'currency_id' => $this->currency_id,
+            'currency' => new \App\Http\Resources\Currency\CurrencyResource($this->currency),
+            // 'wallet_id' => $this->wallet_id,
+            "wallet" => new \Modules\RealEstate\Transformers\RlstWalletResource($this->wallet),
+            // 'unit_status_id' => $this->unit_status_id,
+            // "unit_status" => new RlstUnitStatusResource($this->unitStatus),
+            "unit_status" => new RlstUnitStatusResource($this->unitStatus),
             'commission_ty' => $this->commission_ty,
             'commission_value' => $this->commission_value,
             'price' => $this->price,
@@ -42,9 +45,9 @@ class RlstUnitResource extends JsonResource
             'rank' => $this->rank,
             'properties' => $this->properties,
             'attachments' => $this->attachments,
-            'module_id' => $this->module_id,
+            'module' => $this->module,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at
+            'updated_at' => $this->updated_at,
         ];
     }
 }

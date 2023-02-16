@@ -12,6 +12,7 @@ import Multiselect from "vue-multiselect";
 import employee from "../../../components/create/employee.vue";
 import {formatDateOnly} from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
+import {arabicValue, englishValue} from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -23,7 +24,7 @@ export default {
     meta: [{ name: "description", content: "Users" }],
   },
   mixins: [translation],
-    beforeRouteEnter(to, from, next) {
+  beforeRouteEnter(to, from, next) {
         next((vm) => {
             if (vm.$store.state.auth.work_flow_trees.includes('users') || vm.$store.state.auth.user.type == 'super_admin') {
                 return true;
@@ -93,6 +94,11 @@ export default {
           this.$i18n.locale == 'ar'?'employee.name':'employee.name_e',
           "email"
       ],
+        enabled3: true,
+        printLoading: true,
+        printObj: {
+            id: "printCustom",
+        },
     };
   },
   watch: {
@@ -126,31 +132,30 @@ export default {
       }
     },
   },
-
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
-  updated() {
-    $(function () {
-      $(".englishInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return true;
-        if (65 <= ew && ew <= 90) return true;
-        if (97 <= ew && ew <= 122) return true;
-        return false;
-      });
-      $(".arabicInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return false;
-        if (48 <= ew && ew <= 57) return true;
-        if (65 <= ew && ew <= 90) return false;
-        if (97 <= ew && ew <= 122) return false;
-        return true;
-      });
-    });
-  },
+  // updated() {
+  //   $(function () {
+  //     $(".englishInput").keypress(function (event) {
+  //       var ew = event.which;
+  //       if (ew == 32) return true;
+  //       if (48 <= ew && ew <= 57) return true;
+  //       if (65 <= ew && ew <= 90) return true;
+  //       if (97 <= ew && ew <= 122) return true;
+  //       return false;
+  //     });
+  //     $(".arabicInput").keypress(function (event) {
+  //       var ew = event.which;
+  //       if (ew == 32) return false;
+  //       if (48 <= ew && ew <= 57) return true;
+  //       if (65 <= ew && ew <= 90) return false;
+  //       if (97 <= ew && ew <= 122) return false;
+  //       return true;
+  //     });
+  //   });
+  // },
   validations() {
     return {
       create: {
@@ -244,7 +249,7 @@ export default {
     /**
      *  start delete workflow
      */
-                      deleteCountry(id, index) {
+     deleteCountry(id, index) {
       if (Array.isArray(id)) {
         Swal.fire({
           title: `${this.$t("general.Areyousure")}`,
@@ -781,6 +786,27 @@ export default {
                   });
           }
       },
+      ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('Users' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      },
+      arabicValueName(txt){
+          this.create.name = arabicValue(txt);
+          this.edit.name = arabicValue(txt);
+      },
+      englishValueName(txt){
+          this.create.name_e = englishValue(txt);
+          this.edit.name_e = englishValue(txt);
+      }
   },
 };
 </script>
@@ -854,10 +880,10 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
+                  <button class="custom-btn-dowonload"  @click="ExportExcel('xlsx')">
                     <i class="fas fa-file-download"></i>
                   </button>
-                  <button class="custom-btn-dowonload">
+                  <button class="custom-btn-dowonload" v-print="'#printCustom'">
                     <i class="fe-printer"></i>
                   </button>
                   <button
@@ -1130,9 +1156,9 @@ export default {
                               <div dir="rtl">
                                 <input
                                   type="text"
-                                  class="form-control arabicInput"
+                                  class="form-control"
                                   data-create="1"
-                                  @keypress.enter="moveInput('input', 'create', 2)"
+                                  @keyup="arabicValueName(create.name)"
                                   v-model="$v.create.name.$model"
                                   :class="{
                                     'is-invalid': $v.create.name.$error || errors.name,
@@ -1178,7 +1204,7 @@ export default {
                                   type="text"
                                   class="form-control englishInput"
                                   data-create="2"
-                                  @keypress.enter="moveInput('input', 'create', 3)"
+                                  @keyup="englishValueName(create.name_e)"
                                   v-model="$v.create.name_e.$model"
                                   :class="{
                                     'is-invalid':
@@ -1376,7 +1402,8 @@ export default {
             <!--  /create   -->
 
             <!-- start .table-responsive-->
-            <div class="table-responsive mb-3 custom-table-theme position-relative">
+            <div class="table-responsive mb-3 custom-table-theme position-relative" ref="exportable_table"
+                 id="printCustom">
               <!--       start loader       -->
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
@@ -1384,7 +1411,7 @@ export default {
               <table class="table table-borderless table-hover table-centered m-0">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th scope="col" style="width: 0" v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -1477,10 +1504,10 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="users.length > 0">
@@ -1491,7 +1518,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -1532,7 +1559,7 @@ export default {
                         }}
                       </span>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1707,6 +1734,52 @@ export default {
                                     </div>
                                   </div>
                                   <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="field-1" class="control-label">
+                                                {{ getCompanyKey('user_name_ar') }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <div dir="rtl">
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    data-create="1"
+                                                    @keyup="arabicValueName(edit.name)"
+                                                    v-model="$v.edit.name.$model"
+                                                    :class="{
+                                                        'is-invalid': $v.edit.name.$error || errors.name,
+                                                        'is-valid': !$v.edit.name.$invalid && !errors.name,
+                                                      }"
+                                                    id="field-1djks"
+                                                />
+                                            </div>
+                                            <div
+                                                v-if="!$v.edit.name.minLength"
+                                                class="invalid-feedback"
+                                            >
+                                                {{ $t("general.Itmustbeatleast") }}
+                                                {{ $v.edit.name.$params.minLength.min }}
+                                                {{ $t("general.letters") }}
+                                            </div>
+                                            <div
+                                                v-if="!$v.edit.name.maxLength"
+                                                class="invalid-feedback"
+                                            >
+                                                {{ $t("general.Itmustbeatmost") }}
+                                                {{ $v.edit.name.$params.maxLength.max }}
+                                                {{ $t("general.letters") }}
+                                            </div>
+
+                                            <template v-if="errors.name">
+                                                <ErrorMessage
+                                                    v-for="(errorMessage, index) in errors.name"
+                                                    :key="index"
+                                                >{{ errorMessage }}
+                                                </ErrorMessage>
+                                            </template>
+                                        </div>
+                                    </div>
+                                  <div class="col-md-6">
                                     <div class="form-group">
                                       <label for="field-2" class="control-label">
                                         {{ getCompanyKey('user_name_en') }}
@@ -1717,9 +1790,7 @@ export default {
                                           type="text"
                                           class="form-control englishInput"
                                           data-create="2"
-                                          @keypress.enter="
-                                            moveInput('input', 'create', 3)
-                                          "
+                                          @keyup="englishValueName(edit.name_e)"
                                           v-model="$v.edit.name_e.$model"
                                           :class="{
                                             'is-invalid':
@@ -1925,7 +1996,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                         <button
                             @mousemove="log(data.id)"
                             @mouseover="log(data.id)"

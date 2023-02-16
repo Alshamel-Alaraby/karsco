@@ -95,4 +95,5 @@ function get_trans(){
         ];
     }
     return $arr;
+
 }

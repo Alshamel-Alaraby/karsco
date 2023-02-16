@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('lookup_table')->nullable();
             $table->string("lookup_table_column")->nullable();
             $table->unsignedBigInteger('tree_property_id')->nullable();
+            $table->string('field_characters')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

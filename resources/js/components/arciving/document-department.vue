@@ -14,7 +14,7 @@ import transMixinComp from "../../helper/translation-comp-mixin";
  * Advanced Table component
  */
 export default {
-  props: ["arch_doc_type_id", "document_data", "companyKeys", "defaultsKeys"],
+  props: ["created","arch_doc_type_id", "document_data", "companyKeys", "defaultsKeys"],
   mixins: [transMixinComp],
 
   page: {
@@ -86,6 +86,10 @@ export default {
     },
   },
   watch: {
+    arch_doc_type_id(after, befour) {
+      this.getData();
+    },
+
     /**
      * watch per_page
      */
@@ -125,25 +129,29 @@ export default {
      */
     async getData(page = 1) {
       this.isLoader = true;
-      setTimeout(()=>{
-           adminApi
-              .get(`/arch-doc-type-department/getDepartmentByDocument/${this.arch_doc_type_id}`)
-              .then((res) => {
-                  let l = res.data;
-                  this.storedData = l.data;
-              })
-              .catch((err) => {
-                  Swal.fire({
-                      icon: "error",
-                      title: `${this.$t("general.Error")}`,
-                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+      if (this.arch_doc_type_id)
+      {
+          setTimeout(() => {
+              adminApi
+                  .get(
+                      `/arch-doc-type-department/getDepartmentByDocument/${this.arch_doc_type_id}`
+                  )
+                  .then((res) => {
+                      let l = res.data;
+                      this.storedData = l.data;
+                  })
+                  .catch((err) => {
+                      Swal.fire({
+                          icon: "error",
+                          title: `${this.$t("general.Error")}`,
+                          text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                      });
+                  })
+                  .finally(() => {
+                      this.isLoader = false;
                   });
-              })
-              .finally(() => {
-                  this.isLoader = false;
-              });
-      },1000)
-
+          }, 1000);
+      }
     },
     /**
      *  delete document field
@@ -202,7 +210,7 @@ export default {
      */
     async getDepartment() {
       await adminApi
-        .get(`/arch-department`)
+        .get(`/arch-department?is_key=1`)
         .then((res) => {
           let l = res.data.data;
           l.unshift({
@@ -336,13 +344,17 @@ export default {
 
 <template>
   <div class="row">
-    <DocDepartment :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @create-arch-department="getDepartment" />
-<!--    <div class="col-md-12 text-center">-->
-<!--      <h3>-->
-<!--        {{ $t("general.DocumentName") }} :-->
-<!--        {{ $i18n.locale == "ar" ? document_data.name : document_data.name_e }}-->
-<!--      </h3>-->
-<!--    </div>-->
+    <DocDepartment
+      :companyKeys="companyKeys"
+      :defaultsKeys="defaultsKeys"
+      @create-arch-department="getDepartment"
+    />
+    <!--    <div class="col-md-12 text-center">-->
+    <!--      <h3>-->
+    <!--        {{ $t("general.DocumentName") }} :-->
+    <!--        {{ $i18n.locale == "ar" ? document_data.name : document_data.name_e }}-->
+    <!--      </h3>-->
+    <!--    </div>-->
     <div class="col-12">
       <div class="card">
         <div class="card-body">
@@ -470,6 +482,7 @@ export default {
                       </button>
                       <div class="dropdown-menu dropdown-menu-custom">
                         <a
+                        v-if="!data.parent_id"
                           class="dropdown-item text-black"
                           href="#"
                           @click.prevent="singleDelete(data.id)"

@@ -116,6 +116,8 @@ img {
   background: #fff;
   padding: 40px 20px;
   border-radius: 14px;
+    height: 260px;
+    margin: 7px 0;
 }
 .container {
   max-width: 1100px !important;

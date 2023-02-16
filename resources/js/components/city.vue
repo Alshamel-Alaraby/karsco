@@ -1,6 +1,6 @@
 <template>
   <div>
-    <country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'country-create-city'" @created="getCategory" />
+    <country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'country-create-city-'+this.id" @created="getCategory" />
     <governate
     :companyKeys="companyKeys" :defaultsKeys="defaultsKeys"
       :id="'governate-create-city' + this.id"
@@ -45,7 +45,7 @@
             </b-button>
           </template>
           <b-button
-            @click.prevent="$bvModal.hide(`city-create`)"
+            @click.prevent="$bvModal.hide(`${id}`)"
             variant="danger"
             type="button"
           >
@@ -125,6 +125,7 @@
                   'is-invalid': $v.create.name.$error || errors.name,
                   'is-valid': !$v.create.name.$invalid && !errors.name,
                 }"
+                @keyup="arabicValue(create.name)"
                 id="field-1"
               />
               <div v-if="!$v.create.name.minLength" class="invalid-feedback">
@@ -160,6 +161,7 @@
                   'is-invalid': $v.create.name_e.$error || errors.name_e,
                   'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
                 }"
+                @keyup="englishValue(create.name_e)"
                 id="field-2"
               />
               <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
@@ -229,6 +231,7 @@ import Multiselect from "vue-multiselect";
 import governate from "./governate";
 import country from "./country";
 import transMixinComp from "../helper/translation-comp-mixin";
+import {arabicValue,englishValue} from "../helper/langTransform";
 
 export default {
   components: {
@@ -257,24 +260,24 @@ export default {
   },
 
   updated() {
-    $(function () {
-      $(".englishInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return true;
-        if (65 <= ew && ew <= 90) return true;
-        if (97 <= ew && ew <= 122) return true;
-        return false;
-      });
-      $(".arabicInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return false;
-        if (65 <= ew && ew <= 90) return false;
-        if (97 <= ew && ew <= 122) return false;
-        return true;
-      });
-    });
+    // $(function () {
+    //   $(".englishInput").keypress(function (event) {
+    //     var ew = event.which;
+    //     if (ew == 32) return true;
+    //     if (48 <= ew && ew <= 57) return true;
+    //     if (65 <= ew && ew <= 90) return true;
+    //     if (97 <= ew && ew <= 122) return true;
+    //     return false;
+    //   });
+    //   $(".arabicInput").keypress(function (event) {
+    //     var ew = event.which;
+    //     if (ew == 32) return true;
+    //     if (48 <= ew && ew <= 57) return false;
+    //     if (65 <= ew && ew <= 90) return false;
+    //     if (97 <= ew && ew <= 122) return false;
+    //     return true;
+    //   });
+    // });
   },
   validations: {
     create: {
@@ -342,7 +345,7 @@ export default {
 
     showCountryModal() {
       if (this.create.country_id == 0) {
-        this.$bvModal.show("country-create");
+        this.$bvModal.show("country-create-city-"+this.id);
         this.create.country_id = null;
       } else {
         this.getGovernorate(this.create.country_id);
@@ -463,6 +466,14 @@ export default {
     moveInput(tag, c, index) {
       document.querySelector(`${tag}[data-${c}='${index}']`).focus();
     },
+
+      arabicValue(txt){
+          this.create.name = arabicValue(txt);
+      } ,
+
+      englishValue(txt){
+          this.create.name_e = englishValue(txt);
+      }
   },
 };
 </script>

@@ -17,6 +17,7 @@ class DocTypeField extends Model
         'field_order',
         'is_required',
         'field_characters',
+        "parent_id"
     ];
 
     // relation
@@ -28,6 +29,11 @@ class DocTypeField extends Model
     public function archField()
     {
         return $this->belongsTo(DocumentField::class, 'doc_field_id', 'id');
+    }
+
+    public function canEdit()
+    {
+        return $this->archDocType->parent_id === $this->archDocType->parent_id;
     }
 
 }

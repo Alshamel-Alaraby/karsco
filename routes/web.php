@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Spatie\MediaLibrary\Conversions\ImageGenerators\Pdf;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,5 +22,5 @@ Route::get('/dashboard', function () {
 });
 
 Route::get('/dashboard/{any?}', function ($any) {
-  return view('welcome');
-})->where('any','.*');
+    return view('welcome');
+})->where('any', '.*');

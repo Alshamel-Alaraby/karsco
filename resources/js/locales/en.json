@@ -585,6 +585,12 @@
         }
     },
     "general": {
+        "ScreenSubContactGroupTable":"Screen subcontact groups table",
+        "ScreenSubcontactGroup":"Screen subcontact group",
+        "documentPlansTable":"Document plans table",
+        "DocumentPlan":"Document plan",
+        "document":"Document",
+        "customTable":"Custom table",
         "Uploads":"Uploads",
         "FileUploads":"File uploads",
         "from":"From",
@@ -894,6 +900,7 @@
         "DocumentName": "Document name",
         "thisFieldIsUniq": "this Field Is Unique",
         "true": "true",
-        "false": "false"
+        "false": "false",
+        "is_key": "key"
     }
 }

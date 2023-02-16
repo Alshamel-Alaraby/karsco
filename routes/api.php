@@ -33,15 +33,14 @@ Route::controller(\App\Http\Controllers\MainController::class)->group(function (
     Route::get("/setting/{user_id}/{screen_id}", "getSetting");
     Route::post("/send-email", "sendEmail");
 });
-
 Route::middleware('auth:sanctum')->group(function () {
 
     // start Notification
     Route::controller(\App\Http\Controllers\MainController::class)->group(function () {
-        Route::get('getAllNot','getAllNot');
-        Route::get('getNotNotRead','getNotNotRead');
-        Route::post('clearItem/{id}','clearItem');
-        Route::post('getNotNotRead','clearAll');
+        Route::get('getAllNot', 'getAllNot');
+        Route::get('getNotNotRead', 'getNotNotRead');
+        Route::post('clearItem/{id}', 'clearItem');
+        Route::post('getNotNotRead', 'clearAll');
     });
     // end Notification
 
@@ -52,8 +51,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{id}', [CompanyController::class, "update"]);
         Route::delete('/{id}', [CompanyController::class, "destroy"]);
     });
-    Route::group (['prefix'=>'users'],function (){
-        Route::get ('profile',[\App\Http\Controllers\User\UserController::class,'profile']);
+    Route::group(['prefix' => 'users'], function () {
+        Route::get('profile', [\App\Http\Controllers\User\UserController::class, 'profile']);
     });
 });
 
@@ -115,6 +114,26 @@ Route::group(['prefix' => 'employees'], function () {
         Route::put('/{id}', 'update')->name('employees.update');
         Route::delete('/{id}', 'delete')->name('employees.destroy');
         Route::post("bulk-delete", "bulkDelete");
+    });
+
+});
+Route::group(['prefix' => 'customTable'], function () {
+    Route::controller(\App\Http\Controllers\CustomTable\GeneralCustomTableController::class)->group(function () {
+        Route::get('/', 'all')->name('customTable.index');
+        Route::get('logs/{id}', 'logs')->name('customTable.logs');
+        Route::get('/{id}', 'find');
+        Route::post('/', 'create')->name('customTable.create');
+        Route::put('/{id}', 'update')->name('customTable.update');
+        Route::delete('/{id}', 'delete')->name('customTable.destroy');
+        Route::post("bulk-delete", "bulkDelete");
+
+//        Route::get('/', 'all')->name('countries.index');
+//        Route::get('logs/{id}', 'logs')->name('countries.logs');
+//        Route::get('/{id}', 'find');
+//        Route::post('/', 'create')->name('countries.create');
+//        Route::put('/{id}', 'update')->name('countries.update');
+//        Route::delete('/{id}', 'delete')->name('countries.destroy');
+//        Route::post("bulk-delete", "bulkDelete");
     });
 });
 

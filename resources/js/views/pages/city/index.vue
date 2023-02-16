@@ -13,6 +13,7 @@ import Country from "../../../components/country.vue";
 import Governate from "../../../components/governate.vue";
 import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
+import { arabicValue, englishValue } from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -75,6 +76,11 @@ export default {
   },
   data() {
     return {
+        enabled3: true,
+        printLoading: true,
+        printObj: {
+            id: "printCustom",
+        },
       per_page: 50,
       search: "",
       debounce: {},
@@ -180,6 +186,15 @@ export default {
     this.getData();
   },
   methods: {
+            arabicValue(txt) {
+      this.create.name = arabicValue(txt);
+      this.edit.name = arabicValue(txt);
+    },
+    englishValue(txt) {
+      this.create.name_e = englishValue(txt);
+      this.edit.name_e = englishValue(txt);
+    },
+
     showScreen(module, screen) {
       let filterRes = this.$store.state.auth.allWorkFlow.filter(
         (workflow) => workflow.name_e == module
@@ -214,6 +229,19 @@ export default {
         this.$v.$reset();
       });
     },
+    ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('City' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      },
 
     /**
      *  start get Data countrie && pagination
@@ -666,8 +694,8 @@ export default {
 <template>
   <Layout>
     <PageHeader />
-    <Country @created="getCategory" />
-    <Governate />
+    <Country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCategory" />
+    <Governate :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" />
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -744,10 +772,10 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
+                  <button class="custom-btn-dowonload" @click="ExportExcel('xlsx')">
                     <i class="fas fa-file-download"></i>
                   </button>
-                  <button class="custom-btn-dowonload">
+                  <button class="custom-btn-dowonload" v-print="'#printCustom'">
                     <i class="fe-printer"></i>
                   </button>
                   <button
@@ -978,8 +1006,9 @@ export default {
                         <span class="text-danger">*</span>
                       </label>
                       <input
+                      @keyup="arabicValue(create.name)"
                         type="text"
-                        class="form-control arabicInput"
+                        class="form-control"
                         data-create="1"
                         @keypress.enter="moveInput('input', 'create', 2)"
                         v-model="$v.create.name.$model"
@@ -1015,8 +1044,10 @@ export default {
                         <span class="text-danger">*</span>
                       </label>
                       <input
+                      @keyup="englishValue(create.name_e)"
+
                         type="text"
-                        class="form-control englishInput"
+                        class="form-control"
                         data-create="2"
                         @keypress.enter="moveInput('select', 'create', 5)"
                         v-model="$v.create.name_e.$model"
@@ -1081,7 +1112,8 @@ export default {
             <!--  /create   -->
 
             <!-- start .table-responsive-->
-            <div class="table-responsive mb-3 custom-table-theme position-relative">
+            <div class="table-responsive mb-3 custom-table-theme position-relative" ref="exportable_table"
+                 id="printCustom">
               <!--       start loader       -->
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
@@ -1089,7 +1121,7 @@ export default {
               <table class="table table-borderless table-hover table-centered m-0">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th scope="col" style="width: 0" v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -1174,10 +1206,10 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="cities.length > 0">
@@ -1188,7 +1220,7 @@ export default {
                     :key="data.id"
                     :class="['body-tr-custom ', data.id]"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -1229,7 +1261,7 @@ export default {
                         }}
                       </span>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1376,8 +1408,10 @@ export default {
                                   <span class="text-danger">*</span>
                                 </label>
                                 <input
+                                @keyup="arabicValue(edit.name)"
+
                                   type="text"
-                                  class="form-control arabicInput"
+                                  class="form-control"
                                   data-edit="1"
                                   @keypress.enter="moveInput('input', 'edit', 2)"
                                   v-model="$v.edit.name.$model"
@@ -1419,8 +1453,10 @@ export default {
                                   <span class="text-danger">*</span>
                                 </label>
                                 <input
+                                @keyup="englishValue(edit.name_e)"
+
                                   type="text"
-                                  class="form-control englishInput"
+                                  class="form-control"
                                   data-edit="2"
                                   @keypress.enter="moveInput('input', 'edit', 5)"
                                   v-model="$v.edit.name_e.$model"
@@ -1495,7 +1531,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mousemove="log(data.id)"
                         @mouseover="log(data.id)"

@@ -32,6 +32,7 @@ class DocumentFieldRequest extends FormRequest
                 // 'type' => ['required'],
 //                "tree_property_id" => ["required", "exists:general_tree_properties,id"],
                 'is_reference' => ['required', Rule::in(['1', '0'])],
+                "field_characters" => "nullable|string",
             ];
         }
         return [

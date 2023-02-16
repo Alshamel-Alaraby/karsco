@@ -2725,6 +2725,24 @@ class TranslationSeeder extends Seeder
                 "company_id" => 0,
                 "screen" => "sub contact group"
             ],
+            [
+                "key" => "main_contact_group",
+                "default_en" => "Main contact group name ",
+                "default_ar" => "اسم جروب التواصل الاساسي",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "sub contact group"
+            ],
+            [
+                "key" => "gl_coa_acc",
+                "default_en" => "GL Coa account",
+                "default_ar" => "اسم الحساب",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "sub contact group"
+            ],
         ]);
         //Payment plan installment
         Translation::insert([
@@ -6192,7 +6210,7 @@ class TranslationSeeder extends Seeder
             [
                 "key" => "installment_payment_auto_freq",
                 "default_en" => "Installment Status Auto Freq",
-                "default_ar" => "Installment Status Auto Freq",
+                "default_ar" => "حالة تقسيط التكرار التلقائي",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
@@ -6201,7 +6219,7 @@ class TranslationSeeder extends Seeder
             [
                 "key" => "installment_payment_is_partially",
                 "default_en" => "Installment Payment Partially",
-                "default_ar" => "Installment Payment Partially",
+                "default_ar" => "تقسيط السداد جزئيا",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
@@ -6379,5 +6397,168 @@ class TranslationSeeder extends Seeder
                 "screen" => "role user"
             ],
         ]);
+        //Installment payment plan
+        Translation::insert([
+            [
+                "key" => "installment_payment_plan_create",
+                "default_en" => "Add new install payment plan",
+                "default_ar" => "اضف خطة دفع جديدة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "installment_payment_edit_form",
+                "default_en" => "Edit install payment plan",
+                "default_ar" => "تعديل خطة الدفع",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "installment_payment_name_ar",
+                "default_en" => "Installment payment name (arabic)",
+                "default_ar" => "اسم خطة الدفع (عربي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "installment_payment_name_en",
+                "default_en" => "Install payment plan name (english)",
+                "default_ar" => "اسم خطة الدفع (انجليزي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "is_default",
+                "default_en" => "Is default",
+                "default_ar" => "افتراضي",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "is_active",
+                "default_en" => "Is active",
+                "default_ar" => "فعال",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "installment_payment_description_ar",
+                "default_en" => "Installment payment description (arabic)",
+                "default_ar" => "وصف خطة الدفع (عربي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "installment_payment_description_en",
+                "default_en" => "Install payment plan description (english)",
+                "default_ar" => "وصف خطة الدفع (انجليزي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "installment_payment_start_date",
+                "default_en" => "Install payment plan start date",
+                "default_ar" => "تاريخ بداية خطة الدفع",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "installment_payment_type",
+                "default_en" => "Install payment type name",
+                "default_ar" => "اسم نوع الدفع",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+        ]);
+         //installment document plan
+         Translation::insert([
+            [
+                "key" => "installment_document_plan_create_form",
+                "default_en" => "Add document plan",
+                "default_ar" => "اضف خطة وثيقة جديدة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "installment_document_plan_edit_form",
+                "default_en" => "Edit installment document plan",
+                "default_ar" => "تعديل خطة وثيقة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "installment_plan",
+                "default_en" => "Installment plan",
+                "default_ar" => "خطة الدفع",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+        ]);
+          //screen sub contact group
+          Translation::insert([
+            [
+                "key" => "screen_subcontact_group_create_form",
+                "default_en" => "Add new screen subcontact group",
+                "default_ar" => "اضف جروب اتصال فرعي للشاشة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "screen_subcontact_group_edit_form",
+                "default_en" => "Edit screen subcontact group",
+                "default_ar" => "تعديل جروب الاتصال الفرعي للشاشة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "subcontact_group",
+                "default_en" => "Subcontact group name",
+                "default_ar" => "اسم جروب التواصل الفرعي",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "screen",
+                "default_en" => "Screen name",
+                "default_ar" => "اسم الشاشة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+        ]);
     }
+    
 }

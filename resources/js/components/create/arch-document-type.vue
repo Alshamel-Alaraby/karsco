@@ -6,6 +6,7 @@ import ErrorMessage from "../../components/widgets/errorMessage";
 import loader from "../../components/loader";
 import Multiselect from "vue-multiselect";
 import transMixinComp from "../../helper/translation-comp-mixin";
+import {arabicValue, englishValue} from "../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -19,22 +20,22 @@ export default {
   mixins: [transMixinComp],
   props: ["companyKeys", "defaultsKeys"],
   updated() {
-    $(".englishInput").keypress(function (event) {
-      var ew = event.which;
-      if (ew == 32) return true;
-      if (48 <= ew && ew <= 57) return true;
-      if (65 <= ew && ew <= 90) return true;
-      if (97 <= ew && ew <= 122) return true;
-      return false;
-    });
-    $(".arabicInput").keypress(function (event) {
-      var ew = event.which;
-      if (ew == 32) return true;
-      if (48 <= ew && ew <= 57) return false;
-      if (65 <= ew && ew <= 90) return false;
-      if (97 <= ew && ew <= 122) return false;
-      return true;
-    });
+    // $(".englishInput").keypress(function (event) {
+    //   var ew = event.which;
+    //   if (ew == 32) return true;
+    //   if (48 <= ew && ew <= 57) return true;
+    //   if (65 <= ew && ew <= 90) return true;
+    //   if (97 <= ew && ew <= 122) return true;
+    //   return false;
+    // });
+    // $(".arabicInput").keypress(function (event) {
+    //   var ew = event.which;
+    //   if (ew == 32) return true;
+    //   if (48 <= ew && ew <= 57) return false;
+    //   if (65 <= ew && ew <= 90) return false;
+    //   if (97 <= ew && ew <= 122) return false;
+    //   return true;
+    // });
   },
   data() {
     return {
@@ -186,6 +187,13 @@ export default {
           });
       }
     },
+      arabicValue(txt){
+          this.create.name = arabicValue(txt);
+      },
+
+      englishValue(txt){
+          this.create.name_e = englishValue(txt);
+      }
   },
 };
 </script>
@@ -258,6 +266,7 @@ export default {
                 'is-invalid': $v.create.name.$error || errors.name,
                 'is-valid': !$v.create.name.$invalid && !errors.name,
               }"
+              @keyup="arabicValue(create.name)"
               id="field-1"
             />
             <div v-if="!$v.create.name.minLength" class="invalid-feedback">
@@ -291,6 +300,7 @@ export default {
                 'is-invalid': $v.create.name_e.$error || errors.name_e,
                 'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
               }"
+              @keyup="englishValue(create.name_e)"
               id="field-2"
             />
             <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">

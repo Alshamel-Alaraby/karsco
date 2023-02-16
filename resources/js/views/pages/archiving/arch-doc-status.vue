@@ -8,6 +8,8 @@ import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
 import { dynamicSortString } from "../../../helper/tableSort";
 import Multiselect from "vue-multiselect";
+import { arabicValue, englishValue } from "../../../helper/langTransform";
+
 /**
  * Advanced Table component
  */
@@ -16,9 +18,9 @@ export default {
     title: "Arch Doc Status",
     meta: [{ name: "description", content: "Arch Doc Status" }],
   },
-    beforeRouteEnter(to, from, next) {
-        next((vm) => {
-                              if (vm.$store.state.auth.work_flow_trees.includes("archiving-e")) {
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      if (vm.$store.state.auth.work_flow_trees.includes("archiving-e")) {
         Swal.fire({
           icon: "error",
           title: `${vm.$t("general.Error")}`,
@@ -27,39 +29,42 @@ export default {
         return vm.$router.push({ name: "home" });
       }
 
-
-            if (vm.$store.state.auth.work_flow_trees.includes('arch doc status') || vm.$store.state.auth.work_flow_trees.includes('archiving') || vm.$store.state.auth.user.type == 'super_admin') {
-                return true;
-            } else {
-                return vm.$router.push({ name: "home" });
-            }
-        });
-    },
+      if (
+        vm.$store.state.auth.work_flow_trees.includes("arch doc status") ||
+        vm.$store.state.auth.work_flow_trees.includes("archiving") ||
+        vm.$store.state.auth.user.type == "super_admin"
+      ) {
+        return true;
+      } else {
+        return vm.$router.push({ name: "home" });
+      }
+    });
+  },
   components: {
     Layout,
     PageHeader,
     ErrorMessage,
     loader,
-    Multiselect
+    Multiselect,
   },
-  updated() {
-    $(".englishInput").keypress(function (event) {
-      var ew = event.which;
-      if (ew == 32) return true;
-      if (48 <= ew && ew <= 57) return true;
-      if (65 <= ew && ew <= 90) return true;
-      if (97 <= ew && ew <= 122) return true;
-      return false;
-    });
-    $(".arabicInput").keypress(function (event) {
-      var ew = event.which;
-      if (ew == 32) return true;
-      if (48 <= ew && ew <= 57) return false;
-      if (65 <= ew && ew <= 90) return false;
-      if (97 <= ew && ew <= 122) return false;
-      return true;
-    });
-  },
+  // updated() {
+  //   $(".englishInput").keypress(function (event) {
+  //     var ew = event.which;
+  //     if (ew == 32) return true;
+  //     if (48 <= ew && ew <= 57) return true;
+  //     if (65 <= ew && ew <= 90) return true;
+  //     if (97 <= ew && ew <= 122) return true;
+  //     return false;
+  //   });
+  //   $(".arabicInput").keypress(function (event) {
+  //     var ew = event.which;
+  //     if (ew == 32) return true;
+  //     if (48 <= ew && ew <= 57) return false;
+  //     if (65 <= ew && ew <= 90) return false;
+  //     if (97 <= ew && ew <= 122) return false;
+  //     return true;
+  //   });
+  // },
   data() {
     return {
       per_page: 50,
@@ -72,7 +77,7 @@ export default {
       isLoader: false,
       create: {
         name: "",
-        name_e: ""
+        name_e: "",
       }, //Create form
       edit: {
         name: "",
@@ -143,6 +148,16 @@ export default {
     this.getData();
   },
   methods: {
+    arabicValue(txt) {
+      this.create.name = arabicValue(txt);
+      this.edit.name = arabicValue(txt);
+    },
+
+    englishValue(txt) {
+      this.create.name_e = englishValue(txt);
+      this.edit.name_e = englishValue(txt);
+    },
+
     /**
      *  get Data document field
      */
@@ -270,8 +285,8 @@ export default {
         if (result.value) {
           this.isLoader = true;
           adminApi
-            .post(`/arch-doc-status/bulk-delete`,{
-              ids : id
+            .post(`/arch-doc-status/bulk-delete`, {
+              ids: id,
             })
             .then((res) => {
               this.getData();
@@ -298,7 +313,6 @@ export default {
       });
     },
 
-
     /**
      *  reset Modal (create)
      */
@@ -313,7 +327,7 @@ export default {
      *  hidden Modal (create)
      */
     async resetModal() {
-      this.create = { name: "", name_e: ""  };
+      this.create = { name: "", name_e: "" };
       this.is_disabled = false;
       this.$nextTick(() => {
         this.$v.$reset();
@@ -347,7 +361,7 @@ export default {
         this.is_disabled = false;
         adminApi
           .post(`/arch-doc-status`, {
-            ...this.create
+            ...this.create,
           })
           .then((res) => {
             this.getData();
@@ -395,7 +409,7 @@ export default {
         adminApi
           .put(`/arch-doc-status/${id}`, {
             name,
-            name_e
+            name_e,
           })
           .then((res) => {
             this.$bvModal.hide(`modal-edit-${id}`);
@@ -459,6 +473,22 @@ export default {
         this.checkAll.splice(index, 1);
       }
     },
+    ExportExcel(type, fn, dl) {
+      this.enabled3 = false;
+      setTimeout(() => {
+        let elt = this.$refs.exportable_table;
+        let wb = XLSX.utils.table_to_book(elt, { sheet: "Sheet JS" });
+        if (dl) {
+          XLSX.write(wb, { bookType: type, bookSST: true, type: "base64" });
+        } else {
+          XLSX.writeFile(
+            wb,
+            fn || ("arch-status" + "." || "SheetJSTableExport.") + (type || "xlsx")
+          );
+        }
+        this.enabled3 = true;
+      }, 100);
+    },
   },
 };
 </script>
@@ -477,7 +507,7 @@ export default {
                 <div class="d-inline-block" style="width: 22.2%">
                   <!-- Basic dropdown -->
                   <b-dropdown
-                    variant="primary"
+                    variant="mary"
                     :text="$t('general.searchSetting')"
                     ref="dropdown"
                     class="btn-block setting-search"
@@ -530,10 +560,10 @@ export default {
                 </b-button>
                 <!-- end create modal  -->
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
+                  <button class="custom-btn-dowonload" @click="ExportExcel('xlsx')">
                     <i class="fas fa-file-download"></i>
                   </button>
-                  <button class="custom-btn-dowonload">
+                  <button class="custom-btn-dowonload" v-print="'#printCustom'">
                     <i class="fe-printer"></i>
                   </button>
                   <!-- Start one edit -->
@@ -704,8 +734,9 @@ export default {
                         <span class="text-danger">*</span>
                       </label>
                       <input
+                        @keyup="arabicValue(create.name)"
                         type="text"
-                        class="form-control arabicInput"
+                        class="form-control"
                         v-model="$v.create.name.$model"
                         :class="{
                           'is-invalid': $v.create.name.$error || errors.name,
@@ -739,6 +770,7 @@ export default {
                         <span class="text-danger">*</span>
                       </label>
                       <input
+                        @keyup="englishValue(create.name_e)"
                         type="text"
                         class="form-control englishInput"
                         v-model="$v.create.name_e.$model"
@@ -773,7 +805,11 @@ export default {
             <!--  /create   -->
 
             <!-- start .table-responsive-->
-            <div class="table-responsive mb-3 custom-table-theme position-relative">
+            <div
+              class="table-responsive mb-3 custom-table-theme position-relative"
+              ref="exportable_table"
+              id="printCustom"
+            >
               <!--       start loader       -->
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
@@ -781,7 +817,7 @@ export default {
               <table class="table table-borderless table-hover table-centered m-0">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th scope="col" style="width: 0" v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -821,10 +857,12 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </th>
                   </tr>
                 </thead>
                 <tbody v-if="storedData.length > 0">
@@ -835,7 +873,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -852,7 +890,7 @@ export default {
                     <td v-if="setting.name_e">
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -937,8 +975,9 @@ export default {
                                   <span class="text-danger">*</span>
                                 </label>
                                 <input
+                                  @keyup="arabicValue(edit.name)"
                                   type="text"
-                                  class="form-control arabicInput"
+                                  class="form-control"
                                   v-model="$v.edit.name.$model"
                                   :class="{
                                     'is-invalid': $v.edit.name.$error || errors.name,
@@ -979,6 +1018,7 @@ export default {
                                   <span class="text-danger">*</span>
                                 </label>
                                 <input
+                                  @keyup="englishValue(edit.name_e)"
                                   type="text"
                                   class="form-control englishInput"
                                   v-model="$v.edit.name_e.$model"
@@ -1020,7 +1060,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <i class="fe-info" style="font-size: 22px"></i>
                     </td>
                   </tr>

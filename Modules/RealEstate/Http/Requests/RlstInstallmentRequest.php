@@ -17,7 +17,7 @@ class RlstInstallmentRequest extends FormRequest
             'date' => 'required|date',
             "pay_type" => "required|in:down_payment,quarter_per,half_per,year_per,installment",
             'amount' => 'required|numeric',
-            "currency_id" => "required|integer|exists:general_currencies,id,deleted_at,null",
+            "currency_id" => "required|integer|exists:general_currencies,id",
             'rest_amount' => 'required|numeric',
 
         ];

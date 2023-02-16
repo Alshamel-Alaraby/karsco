@@ -13,6 +13,7 @@ import { dynamicSortString } from "../../../helper/tableSort";
 import senderHoverHelper from "../../../helper/senderHoverHelper";
 import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
+import {arabicValue,englishValue} from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -33,7 +34,7 @@ export default {
         });
         return vm.$router.push({ name: "home" });
       } else if (
-        // 
+        //
        ( vm.showScreen("bank","payment types") &&
         vm.$store.state.auth.work_flow_trees.includes("bank"))
           || vm.$store.state.auth.user.type == 'super_admin'
@@ -59,7 +60,7 @@ export default {
       paymentTypesPagination: {},
       paymentTypes: [],
       parents: [],
-      enabled3: false,
+      enabled3: true,
       isLoader: false,
       create: {
         name: "",
@@ -87,6 +88,10 @@ export default {
       filterSetting: ["name", "name_e"],
       Tooltip: "",
       mouseEnter: null,
+        printLoading: true,
+        printObj: {
+            id: "printData",
+        }
     };
   },
   validations: {
@@ -136,26 +141,26 @@ export default {
     this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
-  updated() {
-    $(function () {
-      $(".englishInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return true;
-        if (65 <= ew && ew <= 90) return true;
-        if (97 <= ew && ew <= 122) return true;
-        return false;
-      });
-      $(".arabicInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return true;
-        if (65 <= ew && ew <= 90) return false;
-        if (97 <= ew && ew <= 122) return false;
-        return true;
-      });
-    });
-  },
+  // updated() {
+  //   $(function () {
+  //     $(".englishInput").keypress(function (event) {
+  //       var ew = event.which;
+  //       if (ew == 32) return true;
+  //       if (48 <= ew && ew <= 57) return true;
+  //       if (65 <= ew && ew <= 90) return true;
+  //       if (97 <= ew && ew <= 122) return true;
+  //       return false;
+  //     });
+  //     $(".arabicInput").keypress(function (event) {
+  //       var ew = event.which;
+  //       if (ew == 32) return true;
+  //       if (48 <= ew && ew <= 57) return true;
+  //       if (65 <= ew && ew <= 90) return false;
+  //       if (97 <= ew && ew <= 122) return false;
+  //       return true;
+  //     });
+  //   });
+  // },
   methods: {
      showScreen(module, screen) {
       let filterRes = this.$store.state.auth.allWorkFlow.filter(
@@ -538,6 +543,34 @@ export default {
           });
       }
     },
+
+      /**
+       *   Export Excel
+       */
+      ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('Payment Types' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      },
+
+      arabicValue(txt){
+        this.create.name = arabicValue(txt);
+        this.edit.name = arabicValue(txt);
+      } ,
+
+      englishValue(txt){
+        this.create.name_e = englishValue(txt);
+        this.edit.name_e = englishValue(txt);
+      }
+
   },
 };
 </script>
@@ -604,12 +637,12 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
-                    <i class="fas fa-file-download"></i>
-                  </button>
-                  <button class="custom-btn-dowonload">
-                    <i class="fe-printer"></i>
-                  </button>
+                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button v-print="'#printData'" class="custom-btn-dowonload">
+                        <i class="fe-printer"></i>
+                    </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -778,7 +811,7 @@ export default {
                       <div dir="rtl">
                         <input
                           type="text"
-                          class="form-control arabicInput"
+                          class="form-control "
                           data-create="1"
                           @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
@@ -786,6 +819,7 @@ export default {
                             'is-invalid': $v.create.name.$error || errors.name,
                             'is-valid': !$v.create.name.$invalid && !errors.name,
                           }"
+                          @keyup="arabicValue(create.name)"
                           id="field-1"
                         />
                       </div>
@@ -818,7 +852,7 @@ export default {
                       <div dir="ltr">
                         <input
                           type="text"
-                          class="form-control englishInput"
+                          class="form-control "
                           data-create="2"
                           @keypress.enter="moveInput('select', 'create', 3)"
                           v-model="$v.create.name_e.$model"
@@ -826,6 +860,7 @@ export default {
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
                             'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
                           }"
+                          @keyup="englishValue(create.name_e)"
                           id="field-2"
                         />
                       </div>
@@ -848,44 +883,51 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
-                    <div class="form-group">
-                      <label class="my-1 mr-2" for="inlineFormCustomSelectPref">
-                        {{ getCompanyKey("payment_type_default") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <select
-                        class="custom-select my-1 mr-sm-2"
-                        id="inlineFormCustomSelectPref"
-                        data-create="3"
-                        @keypress.enter.prevent="moveInput('input', 'create', 4)"
-                        v-model="$v.create.is_default.$model"
-                        :class="{
-                          'is-invalid': $v.create.is_default.$error || errors.is_default,
-                          'is-valid':
-                            !$v.create.is_default.$invalid && !errors.is_default,
-                        }"
-                      >
-                        <option value="" selected>{{ $t("general.Choose") }}...</option>
-                        <option value="1">{{ $t("general.Yes") }}</option>
-                        <option value="0">{{ $t("general.No") }}</option>
-                      </select>
-                      <template v-if="errors.is_default">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.is_default"
-                          :key="index"
-                          >{{ errorMessage }}
-                        </ErrorMessage>
-                      </template>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="mr-2">
+                                {{ getCompanyKey("payment_type_default") }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            <b-form-group :class="{
+                                      'is-invalid':
+                                        $v.create.is_default.$error || errors.is_default,
+                                      'is-valid':
+                                        !$v.create.is_default.$invalid && !errors.is_default,
+                                    }"
+                            >
+                                <b-form-radio
+                                    class="d-inline-block"
+                                    v-model="$v.create.is_default.$model"
+                                    name="some-radios"
+                                    value="1"
+                                >{{ $t("general.Yes") }}</b-form-radio
+                                >
+                                <b-form-radio
+                                    class="d-inline-block m-1"
+                                    v-model="$v.create.is_default.$model"
+                                    name="some-radios"
+                                    value="0"
+                                >{{ $t("general.No") }}</b-form-radio
+                                >
+                            </b-form-group>
+                            <template v-if="errors.is_default">
+                                <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.is_default"
+                                    :key="index"
+                                >{{ errorMessage }}</ErrorMessage
+                                >
+                            </template>
+                        </div>
                     </div>
-                  </div>
                 </div>
               </form>
             </b-modal>
             <!--  /create   -->
 
             <!-- start .table-responsive-->
-            <div class="table-responsive mb-3 custom-table-theme position-relative">
+            <div class="table-responsive mb-3 custom-table-theme position-relative" ref="exportable_table"
+                 id="printData">
               <!--       start loader       -->
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
@@ -893,7 +935,7 @@ export default {
               <table class="table table-borderless table-hover table-centered m-0">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th v-if="enabled3" class="do-not-print" scope="col" style="width: 0">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -948,10 +990,10 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="paymentTypes.length > 0">
@@ -962,7 +1004,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -995,7 +1037,7 @@ export default {
                         }}
                       </span>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1087,6 +1129,7 @@ export default {
                                       'is-invalid': $v.edit.name.$error || errors.name,
                                       'is-valid': !$v.edit.name.$invalid && !errors.name,
                                     }"
+                                    @keyup="arabicValue(edit.name)"
                                     id="field-u-1"
                                   />
                                 </div>
@@ -1132,6 +1175,7 @@ export default {
                                       'is-valid':
                                         !$v.edit.name_e.$invalid && !errors.name_e,
                                     }"
+                                    @keyup="englishValue(edit.name_e)"
                                     id="field-u-2"
                                   />
                                 </div>
@@ -1166,47 +1210,49 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <label
-                                  class="my-1 mr-2"
-                                  for="inlineFormCustomSelectPrefs"
-                                >
-                                  {{ getCompanyKey("payment_type_default") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <select
-                                  class="custom-select my-1 mr-sm-2"
-                                  id="inlineFormCustomSelectPrefs"
-                                  v-model="$v.edit.is_default.$model"
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.is_default.$error || errors.is_default,
-                                    'is-valid':
-                                      !$v.edit.is_default.$invalid && !errors.is_default,
-                                  }"
-                                >
-                                  <option value="" selected>
-                                    {{ $t("general.Choose") }}...
-                                  </option>
-                                  <option value="1">{{ $t("general.Yes") }}</option>
-                                  <option value="0">{{ $t("general.No") }}</option>
-                                </select>
-                                <template v-if="errors.is_default">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.is_default"
-                                    :key="index"
-                                    >{{ errorMessage }}
-                                  </ErrorMessage>
-                                </template>
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                      <label class="mr-2">
+                                          {{ getCompanyKey("payment_type_default") }}
+                                          <span class="text-danger">*</span>
+                                      </label>
+                                      <b-form-group :class="{
+                                      'is-invalid':
+                                        $v.edit.is_default.$error || errors.is_default,
+                                      'is-valid':
+                                        !$v.edit.is_default.$invalid && !errors.is_default,
+                                    }"
+                                      >
+                                          <b-form-radio
+                                              class="d-inline-block"
+                                              v-model="$v.edit.is_default.$model"
+                                              name="some-radios"
+                                              value="1"
+                                          >{{ $t("general.Yes") }}</b-form-radio
+                                          >
+                                          <b-form-radio
+                                              class="d-inline-block m-1"
+                                              v-model="$v.edit.is_default.$model"
+                                              name="some-radios"
+                                              value="0"
+                                          >{{ $t("general.No") }}</b-form-radio
+                                          >
+                                      </b-form-group>
+                                      <template v-if="errors.is_default">
+                                          <ErrorMessage
+                                              v-for="(errorMessage, index) in errors.is_default"
+                                              :key="index"
+                                          >{{ errorMessage }}</ErrorMessage
+                                          >
+                                      </template>
+                                  </div>
                               </div>
-                            </div>
                           </div>
                         </form>
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mousemove="log(data.id)"
                         @mouseover="log(data.id)"

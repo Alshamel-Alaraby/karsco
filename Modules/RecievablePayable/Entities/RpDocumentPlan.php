@@ -16,4 +16,7 @@ class RpDocumentPlan extends Model
     {
         return \Modules\RecievablePayable\Database\factories\RpDocumentPlanFactory::new();
     }
+    public function installPaymentPlan(){
+        return $this->belongsTo(RpInstallmentPaymentPlan::class,"plan_id");
+    }
 }

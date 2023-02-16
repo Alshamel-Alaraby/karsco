@@ -12,6 +12,13 @@ import {formatDateOnly, formatDateTime} from "../../../helper/startDate";
 import Multiselect from "vue-multiselect";
 import DatePicker from "vue2-datepicker";
 import translation from "../../../helper/translation-mixin";
+import Building from "../../../components/create/building";
+import Wallet from "../../../components/create/wallet";
+import owner from "../../../components/create/realEstate/owner";
+import unitStatus from "../../../components/create/realEstate/unitStatus";
+import currency from "../../../components/create/currency";
+import { arabicValue, englishValue } from "../../../helper/langTransform";
+
 
 // require styles
 import 'quill/dist/quill.core.css'
@@ -53,7 +60,12 @@ export default {
         ErrorMessage,
         loader,
         DatePicker,
-        Multiselect
+        Multiselect,
+        Building,
+        Wallet,
+        owner,
+        unitStatus,
+        currency
     },
     data() {
         return {
@@ -129,7 +141,7 @@ export default {
             owners: [],
             currencies: [],
             wallets: [],
-            modules: [],
+            modules: ['sale','buying'],
             isLoader: false,
             create: {
                 name: '', //
@@ -140,7 +152,7 @@ export default {
                 unit_ty: 0,
                 status_date: null,  // date
                 unit_area: 0,
-                module_id: null, //
+                module: '', //
                 building_id: null, //
                 owner_id: null , //
                 currency_id: null, //
@@ -164,7 +176,7 @@ export default {
                 unit_ty: 0,
                 status_date: null,  // date
                 unit_area: 0,
-                module_id: null,
+                module_id: '',
                 building_id: null,
                 owner_id: null ,
                 currency_id: null,
@@ -252,12 +264,12 @@ export default {
             unit_ty: {integer},
             unit_area: {numeric},
             status_date: {},
-            module_id: {required,integer},
-            building_id: {integer},
-            owner_id: {integer},
-            currency_id: {integer},
-            wallet_id: {integer},
-            unit_status_id: {integer},
+            module: {},
+            building_id: {},
+            owner_id: {},
+            currency_id: {},
+            wallet_id: {},
+            unit_status_id: {},
             commission_ty: {integer},
             commission_value: {numeric},
             price: {numeric},
@@ -276,12 +288,12 @@ export default {
             unit_ty: {integer},
             unit_area: {numeric},
             status_date: {},
-            module_id: {required,integer},
-            building_id: {integer},
-            owner_id: {integer},
-            currency_id: {integer},
-            wallet_id: {integer},
-            unit_status_id: {integer},
+            module: {},
+            building_id: {},
+            owner_id: {},
+            currency_id: {},
+            wallet_id: {},
+            unit_status_id: {},
             commission_ty: {integer},
             commission_value: {numeric},
             price: {numeric},
@@ -326,35 +338,43 @@ export default {
     mounted() {
         this.getData();
     },
-    updated(){
-        $(function(){
-            $(".englishInput").keypress(function(event){
-                var ew = event.which;
-                if(ew == 32)
-                    return true;
-                if(48 <= ew && ew <= 57)
-                    return true;
-                if(65 <= ew && ew <= 90)
-                    return true;
-                if(97 <= ew && ew <= 122)
-                    return true;
-                return false;
-            });
-            $(".arabicInput").keypress(function(event){
-                var ew = event.which;
-                if(ew == 32)
-                    return true;
-                if(48 <= ew && ew <= 57)
-                    return true;
-                if(65 <= ew && ew <= 90)
-                    return false;
-                if(97 <= ew && ew <= 122)
-                    return false;
-                return true;
-            });
-        });
-    },
+    // updated(){
+    //     $(function(){
+    //         $(".englishInput").keypress(function(event){
+    //             var ew = event.which;
+    //             if(ew == 32)
+    //                 return true;
+    //             if(48 <= ew && ew <= 57)
+    //                 return true;
+    //             if(65 <= ew && ew <= 90)
+    //                 return true;
+    //             if(97 <= ew && ew <= 122)
+    //                 return true;
+    //             return false;
+    //         });
+    //         $(".arabicInput").keypress(function(event){
+    //             var ew = event.which;
+    //             if(ew == 32)
+    //                 return true;
+    //             if(48 <= ew && ew <= 57)
+    //                 return true;
+    //             if(65 <= ew && ew <= 90)
+    //                 return false;
+    //             if(97 <= ew && ew <= 122)
+    //                 return false;
+    //             return true;
+    //         });
+    //     });
+    // },
     methods: {
+                arabicValue(txt) {
+      this.create.name = arabicValue(txt);
+      this.edit.name = arabicValue(txt);
+    },
+    englishValue(txt) {
+      this.create.name_e = englishValue(txt);
+      this.edit.name_e = englishValue(txt);
+    },
         /**
          *  start get Data units && pagination
          */
@@ -532,7 +552,7 @@ export default {
                 unit_ty: 0,
                 status_date: null,  // date
                 unit_area: 0,
-                module_id: null, //
+                module: '', //
                 building_id: null, //
                 owner_id: null , //
                 currency_id: null, //
@@ -555,6 +575,10 @@ export default {
          *  hidden Modal (create)
          */
         async resetModal(){
+            await this.getBuildings();
+            await this.getWallets();
+            await this.getOwner();
+            await this.getUnitStatus();
             this.create = {
                 name: '', //
                 name_e: '', //
@@ -564,7 +588,7 @@ export default {
                 unit_ty: 0,
                 status_date: null,  // date
                 unit_area: 0,
-                module_id: null, //
+                module: '', //
                 building_id: null, //
                 owner_id: null , //
                 currency_id: null, //
@@ -587,6 +611,10 @@ export default {
          *  create countrie
          */
         async resetForm(){
+            await this.getBuildings();
+            await this.getWallets();
+            await this.getOwner();
+            await this.getUnitStatus();
             this.create = {
                 name: '', //
                 name_e: '', //
@@ -596,7 +624,7 @@ export default {
                 unit_ty: 0,
                 status_date: null,  // date
                 unit_area: 0,
-                module_id: null, //
+                module: '', //
                 building_id: null, //
                 owner_id: null , //
                 currency_id: null, //
@@ -710,6 +738,10 @@ export default {
          *   show Modal (edit)
          */
         async resetModalEdit(id){
+            await this.getBuildings();
+            await this.getWallets();
+            await this.getOwner();
+            await this.getUnitStatus();
             let unit = this.units.find(e => id == e.id );
             this.edit.name = unit.name;
             this.edit.name_e = unit.name_e;
@@ -720,7 +752,7 @@ export default {
             this.edit.currency_id = unit.currency_id;
             this.edit.building_id = unit.building_id;
             this.edit.unit_status_id = unit.unit_status_id;
-            this.edit.module_id = unit.module_id;
+            this.edit.module = unit.module;
             this.edit.code = unit.code;
             this.edit.commission_ty = unit.commission_ty;
             this.edit.commission_value = unit.commission_value;
@@ -750,7 +782,7 @@ export default {
                 unit_ty: 0,
                 status_date: null,  // date
                 unit_area: 0,
-                module_id: null, //
+                module: null, //
                 building_id: null, //
                 owner_id: null , //
                 currency_id: null, //
@@ -817,6 +849,109 @@ export default {
                     });
             }
         },
+        async getBuildings() {
+            this.isLoader = true;
+            await adminApi
+                .get(`/real-estate/buildings`)
+                .then((res) => {
+                    this.isLoader = false;
+                    let l = res.data.data;
+                    l.unshift({ id: 0, name: "اضافة مبنى", name_e: "Add building" });
+                    this.buildings = l;
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: `${this.$t("general.Error")}`,
+                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                    });
+                });
+        },
+        async getWallets() {
+            this.isLoader = true;
+            await adminApi
+                .get(`/real-estate/wallets`)
+                .then((res) => {
+                    this.isLoader = false;
+                    let l = res.data.data;
+                    l.unshift({ id: 0, name: "اضافة محفظة", name_e: "Add wallet" });
+                    this.wallets = l;
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: `${this.$t("general.Error")}`,
+                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                    });
+                });
+        },
+        async getOwner() {
+            this.isLoader = true;
+
+            await adminApi
+                .get(`/real-estate/owners`)
+                .then((res) => {
+                    let l = res.data.data;
+                    l.unshift({ id: 0, name: "اضف مالك  ", name_e: "Add Owner" });
+                    this.owners = l;
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: `${this.$t("general.Error")}`,
+                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                    });
+                })
+                .finally(() => {
+                    this.isLoader = false;
+                });
+        },
+        async getUnitStatus() {
+            this.isLoader = true;
+
+            await adminApi
+                .get(
+                    `real-estate/unit-statuses?is_active=active`
+                )
+                .then((res) => {
+                    let l = res.data.data;
+                    l.unshift({ id: 0, name: "اضف حاله الوحده  ", name_e: "Add Unit Status" });
+                    this.unit_status = l;
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: `${this.$t("general.Error")}`,
+                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                    });
+                })
+                .finally(() => {
+                    this.isLoader = false;
+                });
+        },
+        async getCurrencies() {
+                this.isLoader = true;
+
+                adminApi
+                    .get(
+                        `/currencies`
+                    )
+                    .then((res) => {
+                        let l = res.data.data;
+                        l.unshift({ id: 0, name: "اضف عمله جديده  ", name_e: "Add New Currency" });
+                        this.currencies = l;
+                    })
+                    .catch((err) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: `${this.$t("general.Error")}`,
+                            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                        });
+                    })
+                    .finally(() => {
+                        this.isLoader = false;
+                    });
+            },
         getCurrentYear() {
             return new Date().getFullYear();
         },
@@ -857,7 +992,67 @@ export default {
                 }
                 this.enabled3 = true;
             }, 100);
-        }
+        },
+        showBuildingModal() {
+            if (this.create.building_id == 0) {
+                this.$bvModal.show("building-create");
+                this.create.building_id = null;
+            }
+        },
+        showBuildingModalEdit() {
+            if (this.edit.building_id == 0) {
+                this.$bvModal.show("building-create");
+                this.edit.building_id = null;
+            }
+        },
+        showWalletModal() {
+            if (this.create.wallet_id == 0) {
+                this.$bvModal.show("wallet-create");
+                this.create.wallet_id = null;
+            }
+        },
+        showWalletModalEdit() {
+            if (this.edit.wallet_id == 0) {
+                this.$bvModal.show("wallet-create");
+                this.edit.wallet_id = null;
+            }
+        },
+        showOwnerModal() {
+            if (this.create.owner_id == 0) {
+                this.$bvModal.show("owner-create");
+                this.create.owner_id = null;
+            }
+        },
+        showOwnerEditModal() {
+            if (this.edit.owner_id == 0) {
+                this.$bvModal.show("owner-create");
+                this.edit.owner_id = null;
+            }
+        },
+        showUnitStatusModal() {
+            if (this.create.unit_status_id == 0) {
+                this.$bvModal.show("unit-satatus-create");
+                this.create.unit_status_id = null;
+            }
+        },
+        showUnitStatusEditModal() {
+            if (this.edit.unit_status_id == 0) {
+                this.$bvModal.show("unit-satatus-create");
+                this.edit.unit_status_id = null;
+            }
+        },
+        showCurrencyModal() {
+            if (this.create.currency_id == 0) {
+                this.$bvModal.show("currency-create");
+                this.create.currency_id = null;
+            }
+        },
+        showCurrencyEditModal() {
+            if (this.edit.currency_id == 0) {
+                this.$bvModal.show("currency-create");
+                this.edit.currency_id = null;
+            }
+        },
     },
 };
 </script>
@@ -865,6 +1060,11 @@ export default {
 <template>
     <Layout>
         <PageHeader />
+        <Building :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getBuildings" />
+        <owner :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getOwner" />
+        <Wallet :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getWallets" />
+        <unitStatus :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getWallets" />
+        <currency :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCurrencies" />
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -1103,20 +1303,20 @@ export default {
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <multiselect
-                                                v-model="$v.create.module_id.$model"
-                                                :options="modules.map((type) => type.id)"
-                                                :custom-label="(opt) => modules.find((x) => x.id == opt).name"
+                                                v-model="$v.create.module.$model"
+                                                :options="modules.map((type) => type)"
+                                                :custom-label="(opt) => opt"
                                             >
                                             </multiselect>
                                             <div
-                                                v-if="$v.create.module_id.$error || errors.module_id"
+                                                v-if="$v.create.module.$error || errors.module"
                                                 class="text-danger"
                                             >
                                                 {{ $t("general.fieldIsRequired") }}
                                             </div>
-                                            <template v-if="errors.module_id">
+                                            <template v-if="errors.module">
                                                 <ErrorMessage
-                                                    v-for="(errorMessage, index) in errors.module_id"
+                                                    v-for="(errorMessage, index) in errors.module"
                                                     :key="index"
                                                 >{{ errorMessage }}</ErrorMessage
                                                 >
@@ -1130,6 +1330,7 @@ export default {
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <multiselect
+                                                @input="showBuildingModal"
                                                 v-model="$v.create.building_id.$model"
                                                 :options="buildings.map((type) => type.id)"
                                                 :custom-label="(opt) => $i18n.locale == 'ar' ?  buildings.find((x) => x.id == opt).name:buildings.find((x) => x.id == opt).name_e"
@@ -1157,6 +1358,7 @@ export default {
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <multiselect
+                                                @input="showOwnerModal"
                                                 v-model="$v.create.owner_id.$model"
                                                 :options="owners.map((type) => type.id)"
                                                 :custom-label="(opt) => $i18n.locale == 'ar' ? owners.find((x) => x.id == opt).name : owners.find((x) => x.id == opt).name_e"
@@ -1184,6 +1386,7 @@ export default {
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <multiselect
+                                                @input="showCurrencyModal"
                                                 v-model="$v.create.currency_id.$model"
                                                 :options="currencies.map((type) => type.id)"
                                                 :custom-label="(opt) => $i18n.locale == 'ar' ?currencies.find((x) => x.id == opt).name:currencies.find((x) => x.id == opt).name_e"
@@ -1211,6 +1414,7 @@ export default {
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <multiselect
+                                                @input="showWalletModalEdit"
                                                 v-model="$v.create.wallet_id.$model"
                                                 :options="wallets.map((type) => type.id)"
                                                 :custom-label="(opt) => $i18n.locale == 'ar' ?wallets.find((x) => x.id == opt).name:wallets.find((x) => x.id == opt).name_e"
@@ -1238,6 +1442,7 @@ export default {
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <multiselect
+                                                @input="showUnitStatusModal"
                                                 v-model="$v.create.unit_status_id.$model"
                                                 :options="unit_status.map((type) => type.id)"
                                                 :custom-label="(opt) => $i18n.locale == 'ar' ?unit_status.find((x) => x.id == opt).name:unit_status.find((x) => x.id == opt).name_e"
@@ -1508,8 +1713,9 @@ export default {
                                             </label>
                                             <div dir="rtl">
                                                 <input
+                                                @keyup="arabicValue(create.name)"
                                                     type="text"
-                                                    class="form-control arabicInput"
+                                                    class="form-control"
                                                     data-create="1"
                                                     @keypress.enter="moveInput('input','create',2)"
                                                     v-model="$v.create.name.$model"
@@ -1535,8 +1741,9 @@ export default {
                                             </label>
                                             <div dir="ltr">
                                                 <input
+                                                @keyup="englishValue(create.name_e)"
                                                     type="text"
-                                                    class="form-control englishInput"
+                                                    class="form-control"
                                                     data-create="2"
                                                     @keypress.enter="moveInput('input','create',3)"
                                                     v-model="$v.create.name_e.$model"
@@ -1563,7 +1770,7 @@ export default {
                                             <div dir="ltr">
                                                 <input
                                                     type="text"
-                                                    class="form-control englishInput"
+                                                    class="form-control"
                                                     data-create="2"
                                                     @keypress.enter="moveInput('input','create',3)"
                                                     v-model="$v.create.code.$model"
@@ -1850,7 +2057,7 @@ export default {
                                     <td v-if="setting.description_e">{{ data.description_e }}</td>
                                     <td v-if="setting.code">{{ data.code }}</td>
                                     <td v-if="setting.status_date">{{ formatDate(data.status_date) }}</td>
-                                    <td v-if="setting.module_id">{{ data.module_id }}</td>
+                                    <td v-if="setting.module">{{ data.module }}</td>
                                     <td v-if="setting.building_id">{{ data.building_id }}</td>
                                     <td v-if="setting.wallet_id">{{ data.wallet_id }}</td>
                                     <td v-if="setting.unit_status_id">{{ data.unit_status_id }}</td>
@@ -1946,20 +2153,20 @@ export default {
                                                                 <span class="text-danger">*</span>
                                                             </label>
                                                             <multiselect
-                                                                v-model="$v.edit.module_id.$model"
-                                                                :options="modules.map((type) => type.id)"
-                                                                :custom-label="(opt) => modules.find((x) => x.id == opt).name"
+                                                                v-model="$v.edit.module.$model"
+                                                                :options="modules.map((type) => type)"
+                                                                :custom-label="(opt) => opt"
                                                             >
                                                             </multiselect>
                                                             <div
-                                                                v-if="$v.edit.module_id.$error || errors.module_id"
+                                                                v-if="$v.edit.module.$error || errors.module"
                                                                 class="text-danger"
                                                             >
                                                                 {{ $t("general.fieldIsRequired") }}
                                                             </div>
-                                                            <template v-if="errors.module_id">
+                                                            <template v-if="errors.module">
                                                                 <ErrorMessage
-                                                                    v-for="(errorMessage, index) in errors.module_id"
+                                                                    v-for="(errorMessage, index) in errors.module"
                                                                     :key="index"
                                                                 >{{ errorMessage }}</ErrorMessage
                                                                 >
@@ -1973,6 +2180,7 @@ export default {
                                                                 <span class="text-danger">*</span>
                                                             </label>
                                                             <multiselect
+                                                                @input="showBuildingModalEdit"
                                                                 v-model="$v.edit.building_id.$model"
                                                                 :options="buildings.map((type) => type.id)"
                                                                 :custom-label="(opt) => $i18n.locale == 'ar' ?  buildings.find((x) => x.id == opt).name:buildings.find((x) => x.id == opt).name_e"
@@ -2000,6 +2208,7 @@ export default {
                                                                 <span class="text-danger">*</span>
                                                             </label>
                                                             <multiselect
+                                                                @input="showOwnerEditModal"
                                                                 v-model="$v.edit.owner_id.$model"
                                                                 :options="owners.map((type) => type.id)"
                                                                 :custom-label="(opt) => $i18n.locale == 'ar' ? owners.find((x) => x.id == opt).name : owners.find((x) => x.id == opt).name_e"
@@ -2027,6 +2236,7 @@ export default {
                                                                 <span class="text-danger">*</span>
                                                             </label>
                                                             <multiselect
+                                                                @input="showCurrencyEditModal"
                                                                 v-model="$v.edit.currency_id.$model"
                                                                 :options="currencies.map((type) => type.id)"
                                                                 :custom-label="(opt) => $i18n.locale == 'ar' ?currencies.find((x) => x.id == opt).name:currencies.find((x) => x.id == opt).name_e"
@@ -2054,6 +2264,7 @@ export default {
                                                                 <span class="text-danger">*</span>
                                                             </label>
                                                             <multiselect
+                                                                @input="showWalletModalEdit"
                                                                 v-model="$v.edit.wallet_id.$model"
                                                                 :options="wallets.map((type) => type.id)"
                                                                 :custom-label="(opt) => $i18n.locale == 'ar' ?wallets.find((x) => x.id == opt).name:wallets.find((x) => x.id == opt).name_e"
@@ -2081,6 +2292,7 @@ export default {
                                                                 <span class="text-danger">*</span>
                                                             </label>
                                                             <multiselect
+                                                                @input="showUnitStatusEditModal"
                                                                 v-model="$v.edit.unit_status_id.$model"
                                                                 :options="unit_status.map((type) => type.id)"
                                                                 :custom-label="(opt) => $i18n.locale == 'ar' ?unit_status.find((x) => x.id == opt).name:unit_status.find((x) => x.id == opt).name_e"
@@ -2351,8 +2563,9 @@ export default {
                                                             </label>
                                                             <div dir="rtl">
                                                                 <input
+                                                                @keyup="arabicValue(edit.name)"
                                                                     type="text"
-                                                                    class="form-control arabicInput"
+                                                                    class="form-control"
                                                                     data-edit="1"
                                                                     @keypress.enter="moveInput('input','edit',2)"
                                                                     v-model="$v.edit.name.$model"
@@ -2378,8 +2591,9 @@ export default {
                                                             </label>
                                                             <div dir="ltr">
                                                                 <input
+                                                                @keyup="englishValue(edit.name_e)"
                                                                     type="text"
-                                                                    class="form-control englishInput"
+                                                                    class="form-control"
                                                                     data-edit="2"
                                                                     @keypress.enter="moveInput('input','edit',3)"
                                                                     v-model="$v.edit.name_e.$model"
@@ -2405,7 +2619,7 @@ export default {
                                                             <div dir="ltr">
                                                                 <input
                                                                     type="text"
-                                                                    class="form-control englishInput"
+                                                                    class="form-control"
                                                                     data-edit="2"
                                                                     @keypress.enter="moveInput('input','edit',3)"
                                                                     v-model="$v.edit.code.$model"
@@ -2504,3 +2718,7 @@ export default {
     height: 300px;
 }
 </style>
+
+
+
+

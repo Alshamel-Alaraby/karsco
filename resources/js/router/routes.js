@@ -30,15 +30,11 @@ import users from  "./routeChild/users";
 import propertyTrees from  "./routeChild/property-tree";
 import realEstate from  "./routeChild/realEstate";
 import archiving from "./routeChild/archiving";
-import subContactGroup from "./routeChild/sub-contact-group";
-import payemntPlanInstallment from "./routeChild/payment-plan-installments";
 import recievablePayable from "./routeChild/recievablePayable";
 
 
 export default [
     ...login,
-    ...payemntPlanInstallment,
-    ...subContactGroup,
     ...company,
     ...country,
     ...governorate,
@@ -76,6 +72,14 @@ export default [
             middleware: [auth,checkAuth]
         },
         component: () => import('../views/pages/notification')
+    },
+    {
+        path: '/dashboard/custom-table',
+        name: 'custom table',
+        meta: {
+            middleware: [auth,checkAuth]
+        },
+        component: () => import('../views/pages/custom-table/index')
     },
     {
         path: '/dashboard/',

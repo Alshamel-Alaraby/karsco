@@ -6,8 +6,8 @@
       :key="index"
       :style="
         $i18n.locale == 'ar'
-          ? 'margin-right:21px; text-align: right;'
-          : 'margin-left:21px; text-align: left; '
+          ? 'margin-right:10px; text-align: right;'
+          : 'margin-left:10px; text-align: left; '
       "
       :class="[$i18n.locale == 'ar' ? 'dir-node' : '', 'node']"
     >
@@ -15,14 +15,15 @@
         ><i
           v-if="
             (node.children && node.children.length) ||
-            (node.doc_type_field && node.doc_type_field.length)
+            (node.arch_documents && node.arch_documents.length)||
+            (node.key && node.key.length)
           "
           :class="isExpanded(node) ? 'fas fa-minus' : 'fas fa-plus'"
         ></i
       ></span>
       <span
-        :class="{ active: node == currentNode && depth == 1 }"
-        :style="depth == 1 ? 'cursor:pointer' : ''"
+        :class="{ active: node == currentNode && (depth > 1 && !node.parent_id) }"
+        style="cursor:pointer"
         class="title-tree"
         @click="onNodeSelected(node)"
         @dblclick="onDoubleClicked(node)"
@@ -36,18 +37,14 @@
             ? node.name
             : node.name_e
         }}
-        <span v-if="depth == 1">({{ node.files_count }})</span>
+        <!-- <span v-if="depth > 1 && !node.parent_id">({{ node.files_count }})</span> -->
       </span>
       <TreeBrowser
         v-if="
           isExpanded(node) &&
-          (node.children || (node.doc_type_field && node.doc_type_field.length))
+          (node.children || (node.arch_documents && node.arch_documents.length) ||(node.key && node.key.length))
         "
-        :nodes="
-          node.doc_type_field && node.doc_type_field.length
-            ? node.doc_type_field
-            : node.children
-        "
+        :nodes="getAppropriateNodes(node)"
         :depth="depth + 1"
         @onClick="(node) => $emit('onClick', node)"
         @onDoubleClicked="(node) => $emit('onDoubleClicked', node)"
@@ -79,16 +76,27 @@ export default {
     };
   },
   methods: {
-    onNodeSelected(node) {
-      if (this.depth == 1) {
-        this.$emit("onClick", node);
+    getAppropriateNodes(node){
+      if(node.arch_documents && node.arch_documents.length){
+        return node.arch_documents; 
       }
+      else if(node.key && node.key.length){
+        return node.key;
+      }
+      else{
+            return node.children
+      }
+    },
+    onNodeSelected(node) {
+      // if (this.depth > 1 && !node.parent_id) {
+        this.$emit("onClick", node);
+      // }
     },
     isExpanded(node) {
       return this.expanded.indexOf(node) !== -1;
     },
     onDoubleClicked(node) {
-      if (this.depth == 1) {
+      if (this.depth > 1 && node.parent_id===null) {
         this.$emit("onDoubleClicked", node);
       }
     },
@@ -108,17 +116,13 @@ export default {
 </script>
 
 <style scoped>
-* {
-  font-size: 16px;
-}
-.node {
-  font-size: 16px;
-}
 .title-tree {
-  font-size: 16px;
+  font-size: 12px !important;
   font-weight: 500;
 }
-
+span.type i{
+  font-size: 10px;
+}
 .type {
   margin-right: 10px;
 }
@@ -192,7 +196,8 @@ i {
 .active {
   color: #159a80 !important;
 }
-.tree-container span {
-  font-size: 16px !important;
+
+span,.tree-container{
+      white-space: nowrap;
 }
 </style>

@@ -8,12 +8,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class RpInstallmentPaymentPlan extends Model
 {
-    use HasFactory,LogTrait;
+    use HasFactory, LogTrait;
 
     protected $guarded = ['id'];
 
     protected static function newFactory()
     {
         return \Modules\RecievablePayable\Database\factories\RpInstallmentPaymentPlanFactory::new();
+    }
+    public function installment_payment_type()
+    {
+        return $this->belongsTo(RpInstallmentPaymentType::class, "installment_payment_type_id");
     }
 }

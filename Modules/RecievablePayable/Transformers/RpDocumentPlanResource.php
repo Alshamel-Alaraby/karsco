@@ -18,6 +18,7 @@ class RpDocumentPlanResource extends JsonResource
             "id"=>$this->id,
             "document_id"=>$this->document_id,
             "plan_id"=>$this->plan_id,
+            "install_payment_plan"=>$this->installPaymentPlan
         ];
     }
 }

@@ -13,6 +13,7 @@ import { dynamicSortString } from "../../../helper/tableSort";
 import senderHoverHelper from "../../../helper/senderHoverHelper";
 import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
+import {arabicValue,englishValue} from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -57,7 +58,7 @@ export default {
       salesmenTypesPagination: {},
       salesmenTypes: [],
       parents: [],
-      enabled3: false,
+      enabled3: true,
       isLoader: false,
       Tooltip: "",
       mouseEnter: "",
@@ -85,6 +86,10 @@ export default {
       is_disabled: false,
       filterSetting: ["name", "name_e"],
       company_id: null,
+        printLoading: true,
+        printObj: {
+            id: "printData",
+        }
     };
   },
   validations: {
@@ -135,24 +140,24 @@ export default {
     this.getData();
   },
   updated() {
-    $(function () {
-      $(".englishInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return true;
-        if (65 <= ew && ew <= 90) return true;
-        if (97 <= ew && ew <= 122) return true;
-        return false;
-      });
-      $(".arabicInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return false;
-        if (65 <= ew && ew <= 90) return false;
-        if (97 <= ew && ew <= 122) return false;
-        return true;
-      });
-    });
+    // $(function () {
+    //   $(".englishInput").keypress(function (event) {
+    //     var ew = event.which;
+    //     if (ew == 32) return true;
+    //     if (48 <= ew && ew <= 57) return true;
+    //     if (65 <= ew && ew <= 90) return true;
+    //     if (97 <= ew && ew <= 122) return true;
+    //     return false;
+    //   });
+    //   $(".arabicInput").keypress(function (event) {
+    //     var ew = event.which;
+    //     if (ew == 32) return true;
+    //     if (48 <= ew && ew <= 57) return false;
+    //     if (65 <= ew && ew <= 90) return false;
+    //     if (97 <= ew && ew <= 122) return false;
+    //     return true;
+    //   });
+    // });
   },
   methods: {
     showScreen(module, screen) {
@@ -529,6 +534,32 @@ export default {
     moveInput(tag, c, index) {
       document.querySelector(`${tag}[data-${c}='${index}']`).focus();
     },
+
+      /**
+       *   Export Excel
+       */
+      ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('Sales Man Types' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      },
+      arabicValue(txt){
+          this.create.name = arabicValue(txt);
+          this.edit.name = arabicValue(txt);
+      } ,
+
+      englishValue(txt){
+          this.create.name_e = englishValue(txt);
+          this.edit.name_e = englishValue(txt);
+      }
   },
 };
 </script>
@@ -595,12 +626,12 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
-                    <i class="fas fa-file-download"></i>
-                  </button>
-                  <button class="custom-btn-dowonload">
-                    <i class="fe-printer"></i>
-                  </button>
+                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button v-print="'#printData'" class="custom-btn-dowonload">
+                        <i class="fe-printer"></i>
+                    </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -778,6 +809,7 @@ export default {
                             'is-invalid': $v.create.name.$error || errors.name,
                             'is-valid': !$v.create.name.$invalid && !errors.name,
                           }"
+                          @keyup="arabicValue(create.name)"
                           id="field-1"
                         />
                       </div>
@@ -818,6 +850,7 @@ export default {
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
                             'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
                           }"
+                          @keyup="englishValue(create.name_e)"
                           id="field-2"
                         />
                       </div>
@@ -840,38 +873,43 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
-                    <div class="form-group">
-                      <label class="my-1 mr-2" for="inlineFormCustomSelectPref">
-                        {{ getCompanyKey("is_employee") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <select
-                        class="custom-select my-1 mr-sm-2"
-                        id="inlineFormCustomSelectPref"
-                        data-create="3"
-                        @keypress.enter.prevent="moveInput('input', 'create', 4)"
-                        v-model="$v.create.is_employee.$model"
-                        :class="{
-                          'is-invalid':
-                            $v.create.is_employee.$error || errors.is_employee,
-                          'is-valid':
-                            !$v.create.is_employee.$invalid && !errors.is_employee,
-                        }"
-                      >
-                        <option value="" selected>{{ $t("general.Choose") }}...</option>
-                        <option value="1">{{ $t("general.Yes") }}</option>
-                        <option value="0">{{ $t("general.No") }}</option>
-                      </select>
-                      <template v-if="errors.is_employee">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.is_employee"
-                          :key="index"
-                          >{{ errorMessage }}
-                        </ErrorMessage>
-                      </template>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="mr-2">
+                                {{ getCompanyKey("is_employee") }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            <b-form-group :class="{
+                                      'is-invalid':
+                                        $v.create.is_employee.$error || errors.is_employee,
+                                      'is-valid':
+                                        !$v.create.is_employee.$invalid && !errors.is_employee,
+                                    }"
+                            >
+                                <b-form-radio
+                                    class="d-inline-block"
+                                    v-model="$v.create.is_employee.$model"
+                                    name="some-radios"
+                                    value="1"
+                                >{{ $t("general.Yes") }}</b-form-radio
+                                >
+                                <b-form-radio
+                                    class="d-inline-block m-1"
+                                    v-model="$v.create.is_employee.$model"
+                                    name="some-radios"
+                                    value="0"
+                                >{{ $t("general.No") }}</b-form-radio
+                                >
+                            </b-form-group>
+                            <template v-if="errors.is_employee">
+                                <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.is_employee"
+                                    :key="index"
+                                >{{ errorMessage }}</ErrorMessage
+                                >
+                            </template>
+                        </div>
                     </div>
-                  </div>
                 </div>
               </form>
             </b-modal>
@@ -883,10 +921,11 @@ export default {
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
 
-              <table class="table table-borderless table-hover table-centered m-0">
+              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                     id="printData">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th v-if="enabled3" class="do-not-print" scope="col" style="width: 0">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -941,10 +980,10 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="salesmenTypes.length > 0">
@@ -955,7 +994,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -988,7 +1027,7 @@ export default {
                         }}
                       </span>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1080,6 +1119,7 @@ export default {
                                       'is-invalid': $v.edit.name.$error || errors.name,
                                       'is-valid': !$v.edit.name.$invalid && !errors.name,
                                     }"
+                                    @keyup="arabicValue(edit.name)"
                                     id="field-u-1"
                                   />
                                 </div>
@@ -1125,6 +1165,7 @@ export default {
                                       'is-valid':
                                         !$v.edit.name_e.$invalid && !errors.name_e,
                                     }"
+                                    @keyup="englishValue(edit.name_e)"
                                     id="field-u-2"
                                   />
                                 </div>
@@ -1159,48 +1200,49 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <label
-                                  class="my-1 mr-2"
-                                  for="inlineFormCustomSelectPrefs"
-                                >
-                                  {{ getCompanyKey("is_employee") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <select
-                                  class="custom-select my-1 mr-sm-2"
-                                  id="inlineFormCustomSelectPrefs"
-                                  v-model="$v.edit.is_employee.$model"
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.is_employee.$error || errors.is_employee,
-                                    'is-valid':
-                                      !$v.edit.is_employee.$invalid &&
-                                      !errors.is_employee,
-                                  }"
-                                >
-                                  <option value="" selected>
-                                    {{ $t("general.Choose") }}...
-                                  </option>
-                                  <option value="1">{{ $t("general.Yes") }}</option>
-                                  <option value="0">{{ $t("general.No") }}</option>
-                                </select>
-                                <template v-if="errors.is_employee">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.is_employee"
-                                    :key="index"
-                                    >{{ errorMessage }}
-                                  </ErrorMessage>
-                                </template>
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                      <label class="mr-2">
+                                          {{ getCompanyKey("is_employee") }}
+                                          <span class="text-danger">*</span>
+                                      </label>
+                                      <b-form-group :class="{
+                                      'is-invalid':
+                                        $v.edit.is_employee.$error || errors.is_employee,
+                                      'is-valid':
+                                        !$v.edit.is_employee.$invalid && !errors.is_employee,
+                                    }"
+                                      >
+                                          <b-form-radio
+                                              class="d-inline-block"
+                                              v-model="$v.edit.is_employee.$model"
+                                              name="some-radios"
+                                              value="1"
+                                          >{{ $t("general.Yes") }}</b-form-radio
+                                          >
+                                          <b-form-radio
+                                              class="d-inline-block m-1"
+                                              v-model="$v.edit.is_employee.$model"
+                                              name="some-radios"
+                                              value="0"
+                                          >{{ $t("general.No") }}</b-form-radio
+                                          >
+                                      </b-form-group>
+                                      <template v-if="errors.is_employee">
+                                          <ErrorMessage
+                                              v-for="(errorMessage, index) in errors.is_employee"
+                                              :key="index"
+                                          >{{ errorMessage }}</ErrorMessage
+                                          >
+                                      </template>
+                                  </div>
                               </div>
-                            </div>
                           </div>
                         </form>
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mouseover="log(data.id)"
                         @mousemove="log(data.id)"
@@ -1231,3 +1273,24 @@ export default {
     </div>
   </Layout>
 </template>
+
+<style>
+@media print {
+    .do-not-print {
+        display: none;
+    }
+    .arrow-sort {
+        display: none;
+    }
+    .text-success{
+        background-color:unset;
+        color: #6c757d !important;
+        border: unset;
+    }
+    .text-danger{
+        background-color:unset;
+        color: #6c757d !important;
+        border: unset;
+    }
+}
+</style>

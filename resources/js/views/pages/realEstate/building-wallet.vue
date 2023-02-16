@@ -155,7 +155,7 @@ export default {
         this.edit.building_id = null;
       }
     },
-showWalletModal() {
+    showWalletModal() {
       if (this.create.wallet_id == 0) {
         this.$bvModal.show("wallet-create");
         this.create.wallet_id = null;

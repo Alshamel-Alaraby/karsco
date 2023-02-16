@@ -17,20 +17,21 @@ class ArchiveFile extends Model implements HasMedia
     protected $fillable = [
         'arch_doc_type_id',
         'data_type_value',
+        'arch_department_id',
     ];
 
     public function docType()
     {
         return $this->belongsTo(DocType::class);
     }
+    public function department(){
+        return $this->belongsTo(Department::class);
+    }
 
     public function favourites()
     {
-        return $this->hasMany(ArchiveFileFavourite::class,'arch_archive_file_id');
+        return $this->hasMany(ArchiveFileFavourite::class, 'arch_archive_file_id');
     }
-
-
-
 
     protected function dataTypeValue(): Attribute
     {

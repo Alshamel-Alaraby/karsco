@@ -19,6 +19,14 @@ export default [
         component: () => import('../../views/pages/recievablePayable/InstallmentPaymentType'),
     },
     {
+        path: '/dashboard/sub-contact-group',
+        name: 'subContactGroup',
+        meta: {
+            middleware: [auth,checkAuth]
+        },
+        component: () => import('../../views/pages/recievablePayable/sub-contact-group'),
+    },
+    {
         path: '/dashboard/MainContactGroups',
         name: 'MainContactGroups',
         meta: {
@@ -41,5 +49,29 @@ export default [
             middleware: [auth,checkAuth]
         },
         component: () => import('../../views/pages/recievablePayable/InstallmentPaymentPlan'),
+    },
+    {
+        path: '/dashboard/payment-plan-installments',
+        name: 'payment plan installment',
+        meta: {
+            middleware: [auth,checkAuth]
+        },
+        component: () => import('../../views/pages/recievablePayable/payment_plan_installments'),
+    },
+    {
+        path: '/dashboard/installment-document-plan',
+        name: 'installment document plan',
+        meta: {
+            middleware: [auth,checkAuth]
+        },
+        component: () => import('../../views/pages/recievablePayable/documentPlans'),
+    },
+    {
+        path: '/dashboard/screen-subcontact-group',
+        name: 'screen subcontact group',
+        meta: {
+            middleware: [auth,checkAuth]
+        },
+        component: () => import('../../views/pages/recievablePayable/screenSubcontactgroup'),
     },
 ];

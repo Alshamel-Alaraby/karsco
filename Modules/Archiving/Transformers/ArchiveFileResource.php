@@ -33,6 +33,7 @@ class ArchiveFileResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             "media_count" => count((array) $this->files),
+            "arch_department_id" => $this->arch_department_id,
         ];
 
     }

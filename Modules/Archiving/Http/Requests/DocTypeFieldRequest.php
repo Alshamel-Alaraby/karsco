@@ -27,7 +27,7 @@ class DocTypeFieldRequest extends FormRequest
         return [
             'doc_type_id' => ['required'],
             'doc_field_id' => ['required'],
-            'field_characters' => ['required', 'string'],
+            // 'field_characters' => ['nullable', 'string'],
             'field_order' => ['required', 'integer'],
             'is_required' => ['required', Rule::in(['1', '0'])],
         ];

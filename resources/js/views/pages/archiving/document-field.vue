@@ -9,6 +9,8 @@ import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
 import { dynamicSortString } from "../../../helper/tableSort";
 import translation from "../../../helper/translation-mixin";
+import propertyTree from "../../../components/create/property-tree";
+import { arabicValue, englishValue } from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -25,6 +27,7 @@ export default {
     PageHeader,
     ErrorMessage,
     loader,
+    propertyTree,
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -48,26 +51,31 @@ export default {
       }
     });
   },
-  updated() {
-    $(".englishInput").keypress(function (event) {
-      var ew = event.which;
-      if (ew == 32) return true;
-      if (48 <= ew && ew <= 57) return true;
-      if (65 <= ew && ew <= 90) return true;
-      if (97 <= ew && ew <= 122) return true;
-      return false;
-    });
-    $(".arabicInput").keypress(function (event) {
-      var ew = event.which;
-      if (ew == 32) return true;
-      if (48 <= ew && ew <= 57) return false;
-      if (65 <= ew && ew <= 90) return false;
-      if (97 <= ew && ew <= 122) return false;
-      return true;
-    });
-  },
+  // updated() {
+  //   $(".englishInput").keypress(function (event) {
+  //     var ew = event.which;
+  //     if (ew == 32) return true;
+  //     if (48 <= ew && ew <= 57) return true;
+  //     if (65 <= ew && ew <= 90) return true;
+  //     if (97 <= ew && ew <= 122) return true;
+  //     return false;
+  //   });
+  //   $(".arabicInput").keypress(function (event) {
+  //     var ew = event.which;
+  //     if (ew == 32) return true;
+  //     if (48 <= ew && ew <= 57) return false;
+  //     if (65 <= ew && ew <= 90) return false;
+  //     if (97 <= ew && ew <= 122) return false;
+  //     return true;
+  //   });
+  // },
   data() {
     return {
+        enabled3: true,
+        printLoading: true,
+        printObj: {
+            id: "printCustom",
+        },
       per_page: 50,
       showInput: false,
       search: "", //Search table column
@@ -76,7 +84,6 @@ export default {
       columns: [],
       documentFieldPagination: {},
       documentFields: [],
-      enabled3: false,
       isLoader: false,
       dataTypes: [],
       properties: [],
@@ -88,6 +95,7 @@ export default {
         lookup_table: "",
         lookup_table_column: "",
         tree_property_id: null,
+        field_characters: null,
       }, //Create form
       edit: {
         name: "",
@@ -97,6 +105,7 @@ export default {
         lookup_table: "",
         lookup_table_column: "",
         tree_property_id: null,
+        field_characters: null,
       }, //Edit form
       setting: {
         name: true,
@@ -105,6 +114,7 @@ export default {
         is_reference: true,
         lookup_table: true,
         lookup_table_column: true,
+        field_characters: true,
       }, //Table columns
       filterSetting: ["name", "name_e"],
       errors: {}, //Server Side Validation Errors
@@ -131,6 +141,11 @@ export default {
           return this.create.type == 10;
         }),
       },
+      field_characters: {
+        required: requiredIf(function (model) {
+          return this.create.type != 7;
+        }),
+      },
     },
     edit: {
       name: { required, minLength: minLength(3), maxLength: maxLength(255) },
@@ -146,6 +161,11 @@ export default {
       tree_property_id: {
         required: requiredIf(function (model) {
           return this.edit.type == 10;
+        }),
+      },
+      field_characters: {
+        required: requiredIf(function (model) {
+          return this.edit.type != 7;
         }),
       },
     },
@@ -185,11 +205,23 @@ export default {
     this.getData();
   },
   methods: {
+    arabicValue(txt) {
+      this.create.name = arabicValue(txt);
+      this.edit.name = arabicValue(txt);
+    },
+
+    englishValue(txt) {
+      this.create.name_e = englishValue(txt);
+      this.edit.name_e = englishValue(txt);
+    },
+
     async getProperties() {
       await adminApi
         .get(`/tree-properties/root-nodes`)
         .then((res) => {
-          this.properties = res.data;
+          let l = res.data;
+          l.unshift({ id: 0, name: "اضف خاصية", name_e: "Add property" });
+          this.properties = l;
         })
         .catch((err) => {
           Swal.fire({
@@ -288,94 +320,107 @@ export default {
     /**
      *  delete document field
      */
-    deleteDocumentField(id) {
-      Swal.fire({
-        title: `${this.$t("general.Areyousure")}`,
-        text: `${this.$t("general.Youwontbeabletoreverthis")}`,
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonText: `${this.$t("general.Yesdeleteit")}`,
-        cancelButtonText: `${this.$t("general.Nocancel")}`,
-        confirmButtonClass: "btn btn-success mt-2",
-        cancelButtonClass: "btn btn-danger ml-2 mt-2",
-        buttonsStyling: false,
-      }).then((result) => {
-        if (result.value) {
-          this.isLoader = true;
-          adminApi
-            .delete(`/document-field/${id}`)
-            .then((res) => {
-              this.getData();
-              this.checkAll = [];
-              Swal.fire({
-                icon: "success",
-                title: `${this.$t("general.Deleted")}`,
-                text: `${this.$t("general.Yourrowhasbeendeleted")}`,
-                showConfirmButton: false,
-                timer: 1500,
+    deleteDocumentField(id, index) {
+      if (Array.isArray(id)) {
+        Swal.fire({
+          title: `${this.$t("general.Areyousure")}`,
+          text: `${this.$t("general.Youwontbeabletoreverthis")}`,
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonText: `${this.$t("general.Yesdeleteit")}`,
+          cancelButtonText: `${this.$t("general.Nocancel")}`,
+          confirmButtonClass: "btn btn-success mt-2",
+          cancelButtonClass: "btn btn-danger ml-2 mt-2",
+          buttonsStyling: false,
+        }).then((result) => {
+          if (result.value) {
+            this.isLoader = true;
+            adminApi
+              .post(`/document-field/bulk-delete`, { ids: id })
+              .then((res) => {
+                this.checkAll = [];
+                this.getData();
+                Swal.fire({
+                  icon: "success",
+                  title: `${this.$t("general.Deleted")}`,
+                  text: `${this.$t("general.Yourrowhasbeendeleted")}`,
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              })
+              .catch((err) => {
+                if (err.response.status == 400) {
+                  Swal.fire({
+                    icon: "error",
+                    title: `${this.$t("general.Error")}`,
+                    text: `${this.$t("general.CantDeleteRelation")}`,
+                  });
+                  this.getData();
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: `${this.$t("general.Error")}`,
+                    text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+                }
+              })
+              .finally(() => {
+                this.isLoader = false;
               });
-            })
-            .catch((err) => {
-              Swal.fire({
-                icon: "error",
-                title: `${this.$t("general.Error")}`,
-                text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+          }
+        });
+      } else {
+        Swal.fire({
+          title: `${this.$t("general.Areyousure")}`,
+          text: `${this.$t("general.Youwontbeabletoreverthis")}`,
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonText: `${this.$t("general.Yesdeleteit")}`,
+          cancelButtonText: `${this.$t("general.Nocancel")}`,
+          confirmButtonClass: "btn btn-success mt-2",
+          cancelButtonClass: "btn btn-danger ml-2 mt-2",
+          buttonsStyling: false,
+        }).then((result) => {
+          if (result.value) {
+            this.isLoader = true;
+
+            adminApi
+              .delete(`/document-field/${id}`)
+              .then((res) => {
+                this.checkAll = [];
+                this.getData();
+                Swal.fire({
+                  icon: "success",
+                  title: `${this.$t("general.Deleted")}`,
+                  text: `${this.$t("general.Yourrowhasbeendeleted")}`,
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              })
+
+              .catch((err) => {
+                if (err.response.status == 400) {
+                  Swal.fire({
+                    icon: "error",
+                    title: `${this.$t("general.Error")}`,
+                    text: `${this.$t("general.CantDeleteRelation")}`,
+                  });
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: `${this.$t("general.Error")}`,
+                    text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+                }
+              })
+              .finally(() => {
+                this.isLoader = false;
               });
-            })
-            .finally(() => {
-              this.isLoader = false;
-            });
-        }
-      });
+          }
+        });
+      }
     },
-    /**
-     *  Bulk delete document fields
-     */
-    bulkDeleteDocumentField(id) {
-      Swal.fire({
-        title: `${this.$t("general.Areyousure")}`,
-        text: `${this.$t("general.Youwontbeabletoreverthis")}`,
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonText: `${this.$t("general.Yesdeleteit")}`,
-        cancelButtonText: `${this.$t("general.Nocancel")}`,
-        confirmButtonClass: "btn btn-success mt-2",
-        cancelButtonClass: "btn btn-danger ml-2 mt-2",
-        buttonsStyling: false,
-      }).then((result) => {
-        if (result.value) {
-          this.isLoader = true;
-          adminApi
-            .post(`/document-field/bulk-delete`, {
-              ids: id,
-            })
-            .then((res) => {
-              this.getData();
-              this.checkAll = [];
-              Swal.fire({
-                icon: "success",
-                title: `${this.$t("general.Deleted")}`,
-                text: `${this.$t("general.Yourrowhasbeendeleted")}`,
-                showConfirmButton: false,
-                timer: 1500,
-              });
-            })
-            .catch((err) => {
-              Swal.fire({
-                icon: "error",
-                title: `${this.$t("general.Error")}`,
-                text: `${this.$t("general.Thereisanerrorinthesystem")}`,
-              });
-            })
-            .finally(() => {
-              this.isLoader = false;
-            });
-        }
-      });
-    },
-    /**
-     *  reset Modal (create)
-     */
+
     resetModalHidden() {
       this.create = {
         name: "",
@@ -384,6 +429,7 @@ export default {
         is_reference: 0,
         lookup_table: "",
         lookup_table_column: {},
+        field_characters: null,
       };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -405,6 +451,7 @@ export default {
         lookup_table: "",
         lookup_table_column: "",
         tree_property_id: null,
+        field_characters: null,
       };
       this.is_disabled = false;
       this.$nextTick(() => {
@@ -425,6 +472,7 @@ export default {
         lookup_table: "",
         lookup_table_column: "",
         tree_property_id: null,
+        field_characters: null,
       };
       this.is_disabled = false;
       this.$nextTick(() => {
@@ -503,6 +551,7 @@ export default {
           type,
           lookup_table_column,
           tree_property_id,
+          field_characters,
         } = this.edit;
         adminApi
           .put(`/document-field/${id}`, {
@@ -513,6 +562,7 @@ export default {
             lookup_table_column,
             lookup_table,
             tree_property_id,
+            field_characters,
           })
           .then((res) => {
             this.$bvModal.hide(`modal-edit-${id}`);
@@ -559,6 +609,7 @@ export default {
       this.edit.is_reference = documentField.is_reference;
       this.edit.lookup_table = documentField.lookup_table;
       this.edit.tree_property_id = documentField.tree_property_id;
+      this.edit.field_characters = documentField.field_characters;
       if (this.edit.type == "lookup(Table)") {
         this.showInput = true;
       }
@@ -578,9 +629,9 @@ export default {
         lookup_table: "",
         lookup_table_column: "",
         tree_property_id: null,
+        field_characters: null,
       };
     },
-
     /**
      *  start  dynamicSortString
      */
@@ -642,6 +693,31 @@ export default {
         this.showInput = false;
       }
     },
+      showTreeCreate(){
+          if (this.create.tree_property_id == 0) {
+              this.$bvModal.show("property-create");
+              this.create.tree_property_id = null;
+          }
+      },
+      showTreeEdit(){
+          if (this.edit.tree_property_id == 0) {
+              this.$bvModal.show("property-create");
+              this.edit.tree_property_id = null;
+          }
+      },
+      ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('document-field' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      }
   },
 };
 </script>
@@ -649,6 +725,11 @@ export default {
 <template>
   <Layout>
     <PageHeader />
+    <propertyTree
+      :companyKeys="companyKeys"
+      :defaultsKeys="defaultsKeys"
+      @created="getProperties"
+    />
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -710,10 +791,10 @@ export default {
                 </b-button>
                 <!-- end create modal  -->
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
+                  <button class="custom-btn-dowonload" @click="ExportExcel('xlsx')">
                     <i class="fas fa-file-download"></i>
                   </button>
-                  <button class="custom-btn-dowonload">
+                  <button class="custom-btn-dowonload"  v-print="'#printCustom'">
                     <i class="fe-printer"></i>
                   </button>
                   <!-- Start one edit -->
@@ -729,7 +810,7 @@ export default {
                   <button
                     class="custom-btn-dowonload"
                     v-if="checkAll.length > 1"
-                    @click.prevent="bulkDeleteDocumentField(checkAll)"
+                    @click.prevent="deleteDocumentField(checkAll)"
                   >
                     <i class="fas fa-trash-alt"></i>
                   </button>
@@ -738,7 +819,7 @@ export default {
                   <button
                     class="custom-btn-dowonload"
                     v-if="checkAll.length == 1"
-                    @click.prevent="deleteDocumentField(checkAll)"
+                    @click.prevent="deleteDocumentField(checkAll[0])"
                   >
                     <i class="fas fa-trash-alt"></i>
                   </button>
@@ -782,6 +863,9 @@ export default {
                     </b-form-checkbox>
                     <b-form-checkbox v-model="setting.lookup_table" class="mb-1">
                       {{ getCompanyKey("document-field-lookup") }}
+                    </b-form-checkbox>
+                    <b-form-checkbox v-model="setting.field_characters" class="mb-1">
+                      {{ getCompanyKey("arch_doc_field_character") }}
                     </b-form-checkbox>
                     <b-form-checkbox v-model="setting.lookup_table_column" class="mb-1">
                       {{ getCompanyKey("document-field-lookup_column") }}
@@ -897,8 +981,9 @@ export default {
                         <span class="text-danger">*</span>
                       </label>
                       <input
+                        @keyup="arabicValue(create.name)"
                         type="text"
-                        class="form-control arabicInput"
+                        class="form-control"
                         v-model="$v.create.name.$model"
                         :class="{
                           'is-invalid': $v.create.name.$error || errors.name,
@@ -932,8 +1017,9 @@ export default {
                         <span class="text-danger">*</span>
                       </label>
                       <input
+                        @keyup="englishValue(create.name_e)"
                         type="text"
-                        class="form-control englishInput"
+                        class="form-control"
                         v-model="$v.create.name_e.$model"
                         :class="{
                           'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -979,13 +1065,39 @@ export default {
                           {{ $i18n.locale == "ar" ? type.name : type.name_e }}...
                         </option>
                       </select>
-
                       <template v-if="errors.type">
                         <ErrorMessage
                           v-for="(errorMessage, index) in errors.type"
                           :key="index"
                           >{{ errorMessage }}</ErrorMessage
                         >
+                      </template>
+                    </div>
+                  </div>
+                  <div class="col-md-6" v-if="create.type && create.type != 7">
+                    <div class="form-group">
+                      <label class="control-label">
+                        {{ getCompanyKey("arch_doc_field_character") }}
+                        <span class="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        v-model="$v.create.field_characters.$model"
+                        :class="{
+                          'is-invalid':
+                            $v.create.field_characters.$error || errors.field_characters,
+                          'is-valid':
+                            !$v.create.field_characters.$invalid &&
+                            !errors.field_characters,
+                        }"
+                      />
+                      <template v-if="errors.field_characters">
+                        <ErrorMessage
+                          v-for="(errorMessage, index) in errors.field_characters"
+                          :key="index"
+                          >{{ errorMessage }}
+                        </ErrorMessage>
                       </template>
                     </div>
                   </div>
@@ -996,6 +1108,7 @@ export default {
                         <span class="text-danger">*</span>
                       </label>
                       <select
+                        @change="showTreeCreate"
                         class="custom-select"
                         v-model="$v.create.tree_property_id.$model"
                         :class="{
@@ -1126,7 +1239,8 @@ export default {
             <!--  /create   -->
 
             <!-- start .table-responsive-->
-            <div class="table-responsive mb-3 custom-table-theme position-relative">
+            <div class="table-responsive mb-3 custom-table-theme position-relative" ref="exportable_table"
+                 id="printCustom">
               <!--       start loader       -->
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
@@ -1134,7 +1248,7 @@ export default {
               <table class="table table-borderless table-hover table-centered m-0">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th scope="col" style="width: 0" v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -1204,16 +1318,31 @@ export default {
                         </div>
                       </div>
                     </th>
+                    <th v-if="setting.field_characters">
+                      <div class="d-flex justify-content-center">
+                        <span>{{ getCompanyKey("arch_doc_field_character") }}</span>
+                        <div class="arrow-sort">
+                          <i
+                            class="fas fa-arrow-up"
+                            @click="documentFields.sort(sortString('field_characters'))"
+                          ></i>
+                          <i
+                            class="fas fa-arrow-down"
+                            @click="documentFields.sort(sortString('-field_characters'))"
+                          ></i>
+                        </div>
+                      </div>
+                    </th>
                     <td v-if="setting.lookup_table">
                       {{ getCompanyKey("document-field-lookup") }}
                     </td>
                     <td v-if="setting.lookup_table_column">
                       {{ getCompanyKey("document-field-lookup_column") }}
                     </td>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="documentFields.length > 0">
@@ -1224,7 +1353,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -1264,13 +1393,16 @@ export default {
                         }}
                       </h5>
                     </td>
+                    <td v-if="setting.field_characters">
+                      {{ data.field_characters }}
+                    </td>
                     <td v-if="setting.lookup_table">
                       {{ data.lookup_table ? data.lookup_table : "-" }}
                     </td>
                     <td v-if="setting.lookup_table_column">
                       {{ data.lookup_table_column ? data.lookup_table_column : "-" }}
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1355,8 +1487,9 @@ export default {
                                   <span class="text-danger">*</span>
                                 </label>
                                 <input
+                                  @keyup="arabicValue(edit.name)"
                                   type="text"
-                                  class="form-control arabicInput"
+                                  class="form-control"
                                   v-model="$v.edit.name.$model"
                                   :class="{
                                     'is-invalid': $v.edit.name.$error || errors.name,
@@ -1397,8 +1530,9 @@ export default {
                                   <span class="text-danger">*</span>
                                 </label>
                                 <input
+                                  @keyup="englishValue(edit.name_e)"
                                   type="text"
-                                  class="form-control englishInput"
+                                  class="form-control"
                                   v-model="$v.edit.name_e.$model"
                                   :class="{
                                     'is-invalid': $v.edit.name_e.$error || errors.name_e,
@@ -1467,6 +1601,36 @@ export default {
                                 </template>
                               </div>
                             </div>
+                            <div class="col-md-6" v-if="edit.type && edit.type != 7">
+                              <div class="form-group">
+                                <label class="control-label">
+                                  {{ getCompanyKey("arch_doc_field_character") }}
+                                  <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  v-model="$v.edit.field_characters.$model"
+                                  :class="{
+                                    'is-invalid':
+                                      $v.edit.field_characters.$error ||
+                                      errors.field_characters,
+                                    'is-valid':
+                                      !$v.edit.field_characters.$invalid &&
+                                      !errors.field_characters,
+                                  }"
+                                />
+                                <template v-if="errors.field_characters">
+                                  <ErrorMessage
+                                    v-for="(
+                                      errorMessage, index
+                                    ) in errors.field_characters"
+                                    :key="index"
+                                    >{{ errorMessage }}
+                                  </ErrorMessage>
+                                </template>
+                              </div>
+                            </div>
                             <div v-if="edit.type == 10" class="col-md-6">
                               <div class="form-group">
                                 <label>
@@ -1475,6 +1639,7 @@ export default {
                                 </label>
                                 <select
                                   class="custom-select"
+                                  @change="showTreeEdit"
                                   v-model="$v.edit.tree_property_id.$model"
                                   :class="{
                                     'is-invalid':
@@ -1613,7 +1778,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <i class="fe-info" style="font-size: 22px"></i>
                     </td>
                   </tr>
@@ -1634,6 +1799,3 @@ export default {
     </div>
   </Layout>
 </template>
-
-
-

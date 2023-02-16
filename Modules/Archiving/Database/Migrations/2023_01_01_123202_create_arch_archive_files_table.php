@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('arch_archive_files', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('arch_department_id')->nullable();
             $table->foreignId('arch_doc_type_id');
             $table->json('data_type_value');
             $table->unsignedBigInteger("user_id")->nullable();

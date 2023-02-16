@@ -82,7 +82,6 @@ export default {
                     doc_field_id: null,
                     field_order: null,
                     is_required: 1,
-                    field_characters: null,
                 }
             ], //Create form
             dataType: [],
@@ -106,7 +105,6 @@ export default {
                 doc_field_id: { required },
                 field_order: { required, integer },
                 is_required: { required },
-                field_characters: { required },
             }
         }
     },
@@ -155,7 +153,6 @@ export default {
                 doc_field_id: null,
                 field_order: null,
                 is_required: 1,
-                field_characters: null,
             });
             this.allOrder.push({order: true});
             this.allDrop.push({order: true});
@@ -384,7 +381,6 @@ export default {
                 doc_field_id: "",
                 field_order: "",
                 is_required: 1,
-                field_characters: "",
             };
             this.$nextTick(() => {
                 this.$v.$reset();
@@ -402,7 +398,6 @@ export default {
                 doc_field_id: "",
                 field_order: "",
                 is_required: 1,
-                field_characters: "",
             };
             this.is_disabled = false;
             this.$nextTick(() => {
@@ -419,7 +414,6 @@ export default {
                 doc_field_id: "",
                 field_order: "",
                 is_required: 1,
-                field_characters: "",
             };
             this.is_disabled = false;
             this.$nextTick(() => {
@@ -452,7 +446,6 @@ export default {
                                 doc_field_id: null,
                                 field_order: null,
                                 is_required: null,
-                                field_characters: null,
                             }];
                         this.$nextTick(() => {
                             this.$v.$reset();
@@ -501,30 +494,8 @@ export default {
             if (this.create[index].doc_field_id == 0) {
                 this.$bvModal.show("create-doc-field");
                 this.create.doc_field_id = null;
-            }else {
-                if(
-                    this.archDocFieldData.find(el => el.id == this.create[index].doc_field_id)
-                    .data_type.name_e == 'DATE'
-                ){
-                    this.create[index].field_characters = 'dd-mm-yyyy';
-                }
-                if(
-                    this.archDocFieldData.find(el => el.id == this.create[index].doc_field_id)
-                    .data_type.name_e == 'TIME'
-                ){
-                    this.create[index].field_characters = 'h:mm tt';
-                }
-                if(
-                    this.archDocFieldData.find(el => el.id == this.create[index].doc_field_id)
-                    .data_type.name_e == 'TIMESTAMP'
-                ){
-                    this.create[index].field_characters = 'dd-mm-yyyy h:mm tt';
-                } if(
-                    this.archDocFieldData.find(el => el.id == this.create[index].doc_field_id)
-                    .data_type.name_e == 'BOOLEAN'
-                ){
-                    this.create[index].field_characters = 'True And False';
-                }
+            }
+            else {
             }
         },
 
@@ -678,192 +649,6 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <template v-if="archDocFieldData && create[index].doc_field_id != 0">
-                                        <div
-                                            v-if="
-                                           archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                        "
-                                            class="col-md-3"
-                                        >
-                                            <div class="form-group">
-                                                <label class="control-label">
-                                                    {{ getCompanyKey("arch_doc_field_character") }}
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <input
-                                                    v-if="
-                                                        archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                        .data_type.name_e == 'DATE'
-                                                    "
-                                                    type="text"
-                                                    disabled
-                                                    class="form-control"
-                                                    v-model="$v.create.$each[index].field_characters.$model"
-                                                    :class="{
-                                                  'is-invalid':
-                                                    $v.create.$each[index].field_characters.$error || errors.field_characters,
-                                                  'is-valid':
-                                                    !$v.create.$each[index].field_characters.$invalid &&
-                                                    !errors.field_characters,
-                                                }"
-                                                />
-                                                <input
-                                                    v-if="
-                                                        archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                        .data_type.name_e == 'INTEGER'
-                                                    "
-                                                    type="number"
-                                                    class="form-control"
-                                                    v-model="$v.create.$each[index].field_characters.$model"
-                                                    :class="{
-                                                  'is-invalid':
-                                                    $v.create.$each[index].field_characters.$error || errors.field_characters,
-                                                  'is-valid':
-                                                    !$v.create.$each[index].field_characters.$invalid &&
-                                                    !errors.field_characters,
-                                                }"
-                                                />
-                                                <input
-                                                    v-if="
-                                                        archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                        .data_type.name_e == 'FLOAT' ||
-                                                        archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                        .data_type.name_e == 'DOUBLE'
-                                                    "
-                                                    type="number"
-                                                    step="0.1"
-                                                    class="form-control"
-                                                    v-model="$v.create.$each[index].field_characters.$model"
-                                                    :class="{
-                                                  'is-invalid':
-                                                    $v.create.$each[index].field_characters.$error || errors.field_characters,
-                                                  'is-valid':
-                                                    !$v.create.$each[index].field_characters.$invalid &&
-                                                    !errors.field_characters,
-                                                }"
-                                                />
-                                                <input
-                                                    v-if="
-                                                        archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                        .data_type.name_e == 'Lookup (table)'
-                                                    "
-                                                    type="number"
-                                                    class="form-control"
-                                                    v-model="$v.create.$each[index].field_characters.$model"
-                                                    :class="{
-                                                  'is-invalid':
-                                                    $v.create.$each[index].field_characters.$error || errors.field_characters,
-                                                  'is-valid':
-                                                    !$v.create.$each[index].field_characters.$invalid &&
-                                                    !errors.field_characters,
-                                                }"
-                                                />
-                                                <input
-                                                    v-if="
-                                                        archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                        .data_type.name_e == 'TEXT' ||
-                                                        archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                        .data_type.name_e == 'LONGTEXT'
-                                                    "
-                                                    type="text"
-                                                    class="form-control"
-                                                    v-model="$v.create.$each[index].field_characters.$model"
-                                                    :class="{
-                                                  'is-invalid':
-                                                    $v.create.$each[index].field_characters.$error || errors.field_characters,
-                                                  'is-valid':
-                                                    !$v.create.$each[index].field_characters.$invalid &&
-                                                    !errors.field_characters,
-                                                }"
-                                                />
-                                                <input
-                                                    v-if="
-                                                        archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                        .data_type.name_e == 'BOOLEAN'
-                                                    "
-                                                    type="text"
-                                                    disabled
-                                                    class="form-control"
-                                                    v-model="$v.create.$each[index].field_characters.$model"
-                                                    :class="{
-                                                  'is-invalid':
-                                                    $v.create.$each[index].field_characters.$error || errors.field_characters,
-                                                  'is-valid':
-                                                    !$v.create.$each[index].field_characters.$invalid &&
-                                                    !errors.field_characters,
-                                                }"
-                                                />
-                                                <input
-                                                    v-if="
-                                                        archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                        .data_type.name_e == 'TIME'
-                                                    "
-                                                    type="text"
-                                                    disabled
-                                                    class="form-control"
-                                                    v-model="$v.create.$each[index].field_characters.$model"
-                                                    :class="{
-                                                  'is-invalid':
-                                                    $v.create.$each[index].field_characters.$error || errors.field_characters,
-                                                  'is-valid':
-                                                    !$v.create.$each[index].field_characters.$invalid &&
-                                                    !errors.field_characters,
-                                                }"
-                                                />
-                                                <input
-                                                    v-if="
-                                                        archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                        .data_type.name_e == 'TIMESTAMP'
-                                                    "
-                                                    type="text"
-                                                    disabled
-                                                    class="form-control"
-                                                    v-model="$v.create.$each[index].field_characters.$model"
-                                                    :class="{
-                                                  'is-invalid':
-                                                    $v.create.$each[index].field_characters.$error || errors.field_characters,
-                                                  'is-valid':
-                                                    !$v.create.$each[index].field_characters.$invalid &&
-                                                    !errors.field_characters,
-                                                }"
-                                                />
-                                                <input
-                                                    v-if="
-                                                        archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                        .data_type.name_e == 'ENUM (droplist)'
-                                                    "
-                                                    type="number"
-                                                    class="form-control"
-                                                    v-model="$v.create.$each[index].field_characters.$model"
-                                                    :class="{
-                                                  'is-invalid':
-                                                    $v.create.$each[index].field_characters.$error || errors.field_characters,
-                                                  'is-valid':
-                                                    !$v.create.$each[index].field_characters.$invalid &&
-                                                    !errors.field_characters,
-                                                }"
-                                                />
-                                                <span
-                                                    :style="{'font-size': '10px'}"
-                                                    v-if="archDocFieldData.find(el => el.id == create[index].doc_field_id).data_type"
-                                                    class="text-info"
-                                                >
-                                                    {{
-                                                        $i18n.locale == 'ar'? archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                            .data_type.placeholder : archDocFieldData.find(el => el.id == create[index].doc_field_id)
-                                                            .data_type.placeholder_e
-                                                    }}
-                                                </span>
-                                                <template v-if="errors.field_characters">
-                                                    <ErrorMessage
-                                                        v-for="(errorMessage, index) in errors.field_characters"
-                                                        :key="index"
-                                                    >{{ errorMessage }}
-                                                    </ErrorMessage>
-                                                </template>
-                                            </div>
-                                        </div>
-                                    </template>
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label class="mr-2">

@@ -27,6 +27,11 @@ class Company extends Model
         return $this->hasMany(Branch::class);
     }
 
+    public function customTables()
+    {
+        return $this->hasMany(GeneralCustomTable::class);
+    }
+
     public function hasChildren()
     {
         return $this->stores()->count() > 0 ||
@@ -34,6 +39,7 @@ class Company extends Model
         ;
     }
 
-    
+
+
 
 }

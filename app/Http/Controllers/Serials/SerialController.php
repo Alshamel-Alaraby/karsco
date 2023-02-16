@@ -104,13 +104,13 @@ class SerialController extends Controller
             $data['company_id'] = $request->company_id;
         }
         if ($request->branch_id) {
-            if (!DB::table('branches')->find($request->branch_id)) {
+            if (!DB::table('general_branches')->find($request->branch_id)) {
                 return responseJson(422, __('branch does\'t exist'));
             }
             $data['branch_id'] = $request->branch_id;
         }
         if ($request->store_id) {
-            if (!DB::table('stores')->find($request->store_id)) {
+            if (!DB::table('general_stores')->find($request->store_id)) {
                 return responseJson(422, __('branch does\'t exist'));
             }
             $data['store_id'] = $request->store_id;

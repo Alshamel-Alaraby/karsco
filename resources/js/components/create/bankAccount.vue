@@ -627,7 +627,7 @@ export default {
                 timer: 1500,
               });
             }, 200);
-            this.getData();
+
           })
           .catch((err) => {
             if (err.response.data) {
@@ -687,7 +687,6 @@ export default {
                   } else {
                     this.showPhoto = "./images/img-1.png";
                   }
-                  this.getData();
                 })
                 .catch((err) => {
                   Swal.fire({
@@ -747,7 +746,6 @@ export default {
                       } else {
                         this.showPhoto = "./images/img-1.png";
                       }
-                      this.getData();
                     })
                     .catch((err) => {
                       Swal.fire({

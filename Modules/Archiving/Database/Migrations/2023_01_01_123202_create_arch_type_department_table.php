@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('arch_doc_type_id');
             $table->unsignedBigInteger('arch_department_id');
+            $table->unsignedBigInteger("parent_id")->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

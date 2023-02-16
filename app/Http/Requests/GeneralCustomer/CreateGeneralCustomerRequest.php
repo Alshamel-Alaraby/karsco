@@ -34,6 +34,8 @@ class CreateGeneralCustomerRequest extends FormRequest
             'note2'=>[],
             'note3'=>[],
             'note4'=>[],
+            'city_id'=>['numeric'],
+
         ];
     }
 
