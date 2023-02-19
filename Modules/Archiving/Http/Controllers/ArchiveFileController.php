@@ -291,11 +291,6 @@ class ArchiveFileController extends Controller
                 $q->where('arch_doc_type_id',$request->arch_doc_type_id);
             });
         })->get();
-<<<<<<< HEAD
-
-=======
-        
->>>>>>> dev-test
         if (!$model) {
             return responseJson(404, 'not found');
         }

@@ -1762,7 +1762,7 @@ __webpack_require__.r(__webpack_exports__);
       return this.expanded.indexOf(node) !== -1;
     },
     onDoubleClicked: function onDoubleClicked(node) {
-      if (this.depth > 1 && node.parent_id === null) {
+      if (this.depth >= 1 && node.parent_id === null) {
         this.$emit("onDoubleClicked", node);
       }
     },
