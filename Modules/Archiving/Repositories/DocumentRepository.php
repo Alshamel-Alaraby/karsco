@@ -34,6 +34,8 @@ class DocumentRepository implements DocumentInterface
         return DB::transaction(function () use ($request) {
             cacheForget("archDocument");
             return $this->model->create($request->all());
+
+            
         });
     }
 

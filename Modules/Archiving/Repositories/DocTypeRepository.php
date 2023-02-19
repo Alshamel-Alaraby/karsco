@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Intervention\Image\Exception\NotFoundException;
 use Modules\Archiving\Entities\ArchDocumentStatus;
 use Modules\Archiving\Entities\DocType;
+use Modules\Archiving\Entities\DocTypeField;
 
 class DocTypeRepository implements DocTypeInterface
 {
@@ -40,8 +41,40 @@ class DocTypeRepository implements DocTypeInterface
     {
         return DB::transaction(function () use ($request) {
             cacheForget("ArchDoctype");
-            return $this->model->create($request->all());
+            $data = $this->model->create($request->all());
+            if ($request->parent_id) {
+                $model = $this->model->find($request->parent_id);
+                // doc type field
+                $doc_type_fields = DocTypeField::where("doc_type_id", $model->id)->get();
+                // dd($doc_type_fields);
+                foreach ($doc_type_fields as $doc_type_field) {
+                    DocTypeField::create([
+                        "doc_type_id" => $data->id,
+                        "doc_field_id" => $doc_type_field->doc_field_id,
+                        "is_required" => $doc_type_field->is_required,
+                        "field_order" => $doc_type_field->field_order,
+                        "parent_id" => $model->id,
+                    ]
+                    );
+                }
+
+                $ids = \Modules\Archiving\Entities\DocTypeDepartment::where("arch_doc_type_id", $model->id)->pluck("arch_department_id")->toArray();
+
+                foreach ($ids as $id) {
+                    \Modules\Archiving\Entities\DocTypeDepartment::create([
+                        "arch_doc_type_id" => $data->id,
+                        "arch_department_id" => $id,
+                        'parent_id' => $model->id,
+                    ]);
+                }
+
+                $ids = $model->statuses()->pluck("status_id")->toArray();
+                $model->statuses()->attach($ids);
+            }
+            return $data;
+
         });
+
     }
 
     public function update($request, $id)

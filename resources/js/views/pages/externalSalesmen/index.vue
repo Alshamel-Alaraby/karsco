@@ -59,6 +59,7 @@ export default {
       externalSalesmensPagination: {},
       externalSalesmens: [],
       isLoader: false,
+        enabled3: true,
       Tooltip: "",
       mouseEnter: "",
 
@@ -105,6 +106,10 @@ export default {
         "is_active",
       ],
       countries: [],
+        printLoading: true,
+        printObj: {
+            id: "printData",
+        }
     };
   },
   validations: {
@@ -602,6 +607,23 @@ export default {
         this.edit.country_id = null;
       }
     },
+
+      /**
+       *   Export Excel
+       */
+      ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('External Sales Man' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      },
   },
 };
 </script>
@@ -703,12 +725,12 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
-                    <i class="fas fa-file-download"></i>
-                  </button>
-                  <button class="custom-btn-dowonload">
-                    <i class="fe-printer"></i>
-                  </button>
+                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button v-print="'#printData'" class="custom-btn-dowonload">
+                        <i class="fe-printer"></i>
+                    </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -1129,10 +1151,11 @@ export default {
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
 
-              <table class="table table-borderless table-hover table-centered m-0">
+              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                     id="printData">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th v-if="enabled3" class="do-not-print" scope="col" style="width: 0">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -1227,10 +1250,10 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="externalSalesmens.length > 0">
@@ -1241,7 +1264,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -1274,7 +1297,7 @@ export default {
                         }}
                       </span>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1614,7 +1637,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mouseover="log(data.id)"
                         @mousemove="log(data.id)"
@@ -1645,3 +1668,23 @@ export default {
     </div>
   </Layout>
 </template>
+<style>
+@media print {
+    .do-not-print {
+        display: none;
+    }
+    .arrow-sort {
+        display: none;
+    }
+    .text-success{
+        background-color:unset;
+        color: #6c757d !important;
+        border: unset;
+    }
+    .text-danger{
+        background-color:unset;
+        color: #6c757d !important;
+        border: unset;
+    }
+}
+</style>

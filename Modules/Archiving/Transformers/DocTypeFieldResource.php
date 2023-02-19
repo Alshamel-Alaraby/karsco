@@ -3,8 +3,6 @@
 namespace Modules\Archiving\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Archiving\Entities\DocTypeField;
-use Modules\Archiving\Entities\DocumentField;
 
 class DocTypeFieldResource extends JsonResource
 {
@@ -16,7 +14,7 @@ class DocTypeFieldResource extends JsonResource
      */
     public function toArray($request)
     {
-   
+
         return [
             'id' => $this->id,
             'doc_type_id' => new DocRelationResource($this->archDocType),
@@ -25,6 +23,7 @@ class DocTypeFieldResource extends JsonResource
             'field_order' => $this->field_order,
             'is_required' => $this->is_required,
             'field_characters' => $this->field_characters,
+            "parent_id" => $this->parent_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

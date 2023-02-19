@@ -17,4 +17,9 @@ class RpInstallmentPaymentType extends Model
     {
         return \Modules\RecievablePayable\Database\factories\RpInstallmentPaymentTypeFactory::new();
     }
+
+    public function installment_condation()
+    {
+        return $this->belongsTo(RpInstallmentCondation::class, "installment_condation_id");
+    }
 }

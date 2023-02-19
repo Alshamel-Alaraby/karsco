@@ -21,7 +21,7 @@ export default {
     meta: [{ name: "Role Workflow Hotfield", content: "Role Workflow Hotfield" }],
   },
   mixins: [translation],
-    beforeRouteEnter(to, from, next) {
+  beforeRouteEnter(to, from, next) {
         next((vm) => {
                     if (vm.$store.state.auth.work_flow_trees.includes("role-e")) {
         Swal.fire({
@@ -51,11 +51,15 @@ export default {
   data() {
     return {
       per_page: 50,
+        enabled3: true,
+        printLoading: true,
+        printObj: {
+            id: "printCustom",
+        },
       search: "",
       debounce: {},
       roleWorkflowHotfieldsPagination: {},
       roleWorkflowHotfields: [],
-      enabled3: false,
       isLoader: false,
       create: {
         role_id: null,
@@ -169,39 +173,6 @@ export default {
         .finally(() => {
           this.isLoader = false;
         });
-    },
-    methods: {
-        /**
-         *  start get Data module && pagination
-         */
-        async getData(page = 1) {
-            this.isLoader = true;
-            let filter = '';
-            for (let i = 0; i < this.filterSetting.length; ++i) {
-                filter += `columns[${i}]=${this.filterSetting[i]}&`;
-            }
-
-        adminApi
-          .get(
-            `/role-screen-hotfield?page=${page}&per_page=${this.per_page}&search=${this.search}&${filter}`
-          )
-          .then((res) => {
-            let l = res.data;
-            this.roleWorkflowHotfields = l.data;
-            this.roleWorkflowHotfieldsPagination = l.pagination;
-            this.current_page = l.pagination.current_page;
-          })
-          .catch((err) => {
-            Swal.fire({
-              icon: "error",
-              title: `${this.$t("general.Error")}`,
-              text: `${this.$t("general.Thereisanerrorinthesystem")}`,
-            });
-          })
-          .finally(() => {
-            this.isLoader = false;
-          });
-      }
     },
     /**
      *  end get Data module && pagination
@@ -571,6 +542,19 @@ export default {
           });
       }
     },
+    ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('WorkflowHotifeld' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      }
   },
 };
 </script>
@@ -646,10 +630,10 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
+                  <button class="custom-btn-dowonload" @click="ExportExcel('xlsx')">
                     <i class="fas fa-file-download"></i>
                   </button>
-                  <button class="custom-btn-dowonload">
+                  <button class="custom-btn-dowonload" v-print="'#printCustom'">
                     <i class="fe-printer"></i>
                   </button>
                   <button
@@ -896,7 +880,8 @@ export default {
             <!--  /create   -->
 
             <!-- start .table-responsive-->
-            <div class="table-responsive mb-3 custom-table-theme position-relative">
+            <div class="table-responsive mb-3 custom-table-theme position-relative" ref="exportable_table"
+                 id="printCustom">
               <!--       start loader       -->
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
@@ -904,7 +889,7 @@ export default {
               <table class="table table-borderless table-hover table-centered m-0">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th scope="col" style="width: 0" v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -929,10 +914,10 @@ export default {
                         <span>{{ getCompanyKey('workflow') }}</span>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="roleWorkflowHotfields.length > 0">
@@ -943,7 +928,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -983,7 +968,7 @@ export default {
                         }}
                       </h5>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1140,7 +1125,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mousemove="log(data.id)"
                         @mouseover="log(data.id)"

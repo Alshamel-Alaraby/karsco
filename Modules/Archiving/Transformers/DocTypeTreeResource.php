@@ -23,7 +23,7 @@ class DocTypeTreeResource extends JsonResource
             'children' => DocTypeResource::collection($this->children),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            "archive_files" => ArchiveFileResource::collection($this->archiveFiles)
+            "archive_files" => ArchiveFileResource::collection($this->archiveFiles),
         ];
     }
 }

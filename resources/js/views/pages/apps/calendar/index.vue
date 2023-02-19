@@ -355,6 +355,3 @@ export default {
     </b-modal>
   </Layout>
 </template>
-
-
-

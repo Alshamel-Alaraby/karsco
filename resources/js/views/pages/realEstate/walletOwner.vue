@@ -12,6 +12,8 @@ import {
 } from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
+import owner from "../../../components/create/realEstate/owner";
+import wallet from "../../../components/create/realEstate/wallet";
 import loader from "../../../components/loader";
 import Role from "../../../components/create/role.vue";
 import Multiselect from "vue-multiselect";
@@ -35,6 +37,8 @@ export default {
     ErrorMessage,
     loader,
     Multiselect,
+      owner,
+      wallet
   },
   beforeRouteEnter(to, from, next) {
         next((vm) => {
@@ -93,8 +97,8 @@ export default {
         this.$i18n.locale == "ar" ? "wallet.name" : "wallet.name_e",
         "percentage",
       ],
-        printLoading: true,
-        printObj: {
+      printLoading: true,
+      printObj: {
             id: "printWalletOwner",
         }
     };
@@ -588,7 +592,19 @@ export default {
               }
               this.enabled3 = true;
           }, 100);
-      }
+      },
+    showOwnerModal() {
+          if (this.create.owner_id == 0) {
+              this.$bvModal.show("owner-create");
+              this.create.owner_id = null;
+          }
+      },
+    showOwnerEditModal() {
+          if (this.edit.owner_id == 0) {
+              this.$bvModal.show("owner-create");
+              this.edit.owner_id = null;
+          }
+      },
   },
 };
 </script>
@@ -596,7 +612,8 @@ export default {
 <template>
   <Layout>
     <PageHeader />
-
+    <owner :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getOwner" />
+    <wallet :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getWallet" />
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -839,7 +856,7 @@ export default {
                 <div class="row">
                   <div class="col-md-12">
                     <div class="form-group">
-                      <label class="my-1 mr-2">{{ getCompanyKey("owner") }}</label>
+                      <label class="my-1 mr-2">{{ getCompanyKey("wallet")  }}</label>
                       <multiselect
                         @input="showWalletModal"
                         v-model="$v.create.wallet_id.$model"
@@ -866,8 +883,9 @@ export default {
                   </div>
                   <div class="col-md-12">
                     <div class="form-group">
-                      <label class="my-1 mr-2">{{ getCompanyKey("wallet") }}</label>
+                      <label class="my-1 mr-2">{{ getCompanyKey("owner") }}</label>
                       <multiselect
+                        @input="showOwnerModal"
                         v-model="$v.create.owner_id.$model"
                         :options="owners.map((type) => type.id)"
                         :custom-label="
@@ -1077,7 +1095,7 @@ export default {
                             <div class="col-md-12">
                               <div class="form-group">
                                 <label class="my-1 mr-2">{{
-                                  getCompanyKey("owner")
+                                      getCompanyKey("wallet")
                                 }}</label>
                                 <multiselect
                                   @input="showWalleModalEdit"
@@ -1109,9 +1127,10 @@ export default {
                             <div class="col-md-12">
                               <div class="form-group">
                                 <label class="my-1 mr-2">{{
-                                  getCompanyKey("wallet")
+                                        getCompanyKey("owner")
                                 }}</label>
                                 <multiselect
+                                  @input="showOwnerEditModal"
                                   v-model="$v.edit.owner_id.$model"
                                   :options="owners.map((type) => type.id)"
                                   :custom-label="

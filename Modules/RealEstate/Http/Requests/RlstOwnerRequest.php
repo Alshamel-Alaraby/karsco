@@ -18,17 +18,17 @@ class RlstOwnerRequest extends FormRequest
             'name_e' => 'required|string|max:100',
             'phone' => 'required|string|max:20',
             'email' => 'required|string|max:100',
-            'country_id' => 'required|integer|exists:general_countries,id,deleted_at,null',
-            'city_id' => 'required|integer|exists:general_cities,id,deleted_at,null',
+            'country_id' => 'required|integer|exists:general_countries,id',
+            'city_id' => 'required|integer|exists:general_cities,id',
             'rb_code' => 'required|string|max:255',
-            'nationality_id' => 'required|integer|exists:general_countries,id,deleted_at,null',
+            'nationality_id' => 'required|integer|exists:general_countries,id',
             "bank_account_id" => "required|integer|exists:general_bank_accounts,id",
             "contact_person" => "required|string|max:100",
             "contact_phones" => "required|string|max:100",
             "national_id" => "required|string|max:20",
             "whatsapp" => "required|string|max:20",
-            "categories" => "required|array",
-            "attachments" => "required|array",
+            "categories" => "nullable|array",
+            "attachments" => "nullable|array",
         ];
     }
 

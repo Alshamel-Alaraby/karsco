@@ -33,8 +33,8 @@ class DocTypeRequest extends FormRequest
             ];
         }
         return [
-            'name' => ['required', 'string', 'max:255',"unique:arch_doc_types,name"],
-            'name_e' => ['required', 'string', 'max:255',"unique:arch_doc_types,name_e"],
+            'name' => ['required', 'string', 'max:255',Rule::unique("arch_doc_types")->whereNull("deleted_at")],
+            'name_e' => ['required', 'string', 'max:255',Rule::unique("arch_doc_types")->whereNull("deleted_at")],
             'is_valid' => ['required', Rule::in(['1', '0'])],
         ];
     }

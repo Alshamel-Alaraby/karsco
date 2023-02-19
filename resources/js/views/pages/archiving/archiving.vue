@@ -71,6 +71,7 @@ export default {
       images: [],
       media: {},
       saveImageName: [],
+      child_doc_types: [],
       showPhoto: "/images/img-1.png",
       root: [],
       per_page: 6,
@@ -85,6 +86,7 @@ export default {
       enabled3: false,
       isLoader: false,
       currentNode: null,
+      currentDocument: null,
       archive_id: null,
       fileFields: [],
       from: 0,
@@ -97,6 +99,8 @@ export default {
       secondLevelNodes: [],
       fields: [],
       properties: [],
+      treePropId: null,
+      arch_doc_type_id: null,
       create: {
         timestamp: null,
         job_file_number: null,
@@ -134,7 +138,7 @@ export default {
       mouseEnter: null,
       isActiveFile: false,
       isSearch: false,
-      lockupTableObject: {},
+      lockupTableObject: null,
     };
   },
   validations: {
@@ -185,28 +189,106 @@ export default {
     this.getSecondLevelNodes();
   },
   methods: {
-    getProperties() {
-      let filterRes = this.fields.filter((field) => {
-        return field.doc_field_id.tree_property_id;
-      });
-      let dropListTreePropId = filterRes.length
-        ? filterRes[0].doc_field_id.tree_property_id
-        : null;
-      if (dropListTreePropId) {
-        adminApi.get(`tree-properties/child-nodes/${dropListTreePropId}`).then((res) => {
-          let l = res.data;
-          l.unshift({ id: 0, name: "اضف خاصية", name_e: "Add property" });
-          this.properties = l;
-          this.dropListPopup = false;
-        });
+    async getArchiveFiles(docId) {
+      this.arch_doc_type_id = docId;
+      if(!this.currentNode.archive_file){
+        return;
       }
+      await adminApi
+        .get(
+          `/arch-archive-files/valueMedia?value=${
+            this.currentNode.name_e
+          }&department_id=${
+            this.currentNode.archive_file.arch_department_id
+          }&arch_doc_type_id=${this.arch_doc_type_id ? this.arch_doc_type_id : ""}`
+        )
+        .then((res) => {
+          let l = res.data;
+          this.archiveFiles = l.data;
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: `${this.$t("general.Error")}`,
+            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+          });
+        })
+        .finally(() => {
+          this.isLoader = false;
+        });
+    },
+    getDocumentFields(node) {
+      this.lockups = [];
+      node.doc_type_field.sort((a, b) =>
+        parseInt(a.field_order) > parseInt(b.field_order) ? 1 : -1
+      );
+      this.nodeFields = [...node.doc_type_field].map((field) => {
+        if (field.doc_field_id.data_type.name_e == "Lookup (table)") {
+          this.getLookup(
+            field.doc_field_id.lookup_table,
+            field.doc_field_id.lookup_table_column,
+            field.doc_field_id.name_e
+          );
+        }
+        return {
+          ...field,
+          value: "",
+        };
+      });
+    },
+    getCurrentTreeProps(treePropertyId) {
+      let res = this.properties.filter((prop) => {
+        return prop.tree_property_id == treePropertyId;
+      });
+      return res.length ? res[0].list : [];
+    },
+    getProperties() {
+      let props = [];
+      let filterRes = this.fields.filter((field) => {
+        return (
+          field.doc_field_id.tree_property_id &&
+          field.doc_field_id.data_type.name_e == "ENUM (droplist)"
+        );
+      });
+      filterRes.forEach((element) => {
+        adminApi
+          .get(`tree-properties/child-nodes/${element.doc_field_id.tree_property_id}`)
+          .then((res) => {
+            let l = res.data;
+            l.unshift({ id: 0, name: "اضف خاصية", name_e: "Add property" });
+            let prop = {
+              tree_property_id: element.doc_field_id.tree_property_id,
+              list: l,
+            };
+            props.push(prop);
+          });
+      });
+      this.properties = props;
+    },
+    updateCurrentPropertyTreeList() {
+      adminApi.get(`tree-properties/child-nodes/${this.treePropId}`).then((res) => {
+        let l = res.data;
+        l.unshift({ id: 0, name: "اضف خاصية", name_e: "Add property" });
+        let currProp = null;
+        let treePropId = this.treePropId;
+        this.properties.forEach((prop) => {
+          if (prop.tree_property_id == treePropId) {
+            currProp = prop;
+            return;
+          }
+        });
+        currProp.list = l;
+        this.dropListPopup = false;
+        this.treePropId = null;
+      });
     },
     print() {
       window.print();
     },
-    showPropertyModal(property) {
+    showPropertyModal(property, treePropId) {
       if (property.id == 0) {
         this.dropListPopup = true;
+        this.treePropId = treePropId;
         this.$bvModal.show("property-create");
         this.nodeFields.forEach((field, index) => {
           if (field.doc_field_id.tree_property_id) {
@@ -266,37 +348,30 @@ export default {
       this.$bvModal.show("show-file");
     },
     showModal(node) {
-      this.currentNode = node;
-      this.lockups = [];
-      node.doc_type_field.sort((a, b) => (parseInt(a.field_order) > parseInt(b.field_order) ? 1 : -1));
-      this.nodeFields = [...node.doc_type_field].map((field) => {
-        if (field.doc_field_id.data_type.name_e == "Lookup (table)") {
-          this.lockupTableObject = field;
-          this.getLookup(
-            field.doc_field_id.lookup_table,
-            field.doc_field_id.lookup_table_column,
-            field.doc_field_id.name_e
-          );
-        }
-        return {
-          ...field,
-          value: "",
-        };
-      });
+      this.currentDocument = null;
       this.$bvModal.show("create");
+      console.log("dbl clicked");
     },
     async getLookup(table, column, field_name) {
       await adminApi
         .get(`/document-field/column-data/${table}/${column}`)
         .then((res) => {
           let l = res.data;
-          l.data.unshift({ id: 0, name: "اضف", name_e: "Add" });
-          this.lockups.push({
-            field_name: field_name,
-            column: column,
-            table: table,
-            field_data: l.data,
-          });
+          l.data.unshift({ id:this.$i18n.locale=='ar'?"اضف":"Add", name: "اضف", name_e: "Add" });
+          let result = null;
+          if (this.lockupTableObject) {
+            result = this.lockups.find(
+              (e) => this.lockupTableObject.lookup_table == e.table
+            );
+            result.field_data = l.data;
+          } else {
+            this.lockups.push({
+              field_name: field_name,
+              column: column,
+              table: table,
+              field_data: l.data,
+            });
+          }
         })
         .catch((err) => {
           Swal.fire({
@@ -311,6 +386,11 @@ export default {
     },
     showComponentModal(chose, table, index) {
       if (chose == "Add" || chose == "اضف" || chose == 0) {
+        this.lockupTableObject = {
+          lookup_table: this.nodeFields[index].doc_field_id.lookup_table,
+          lookup_table_column: this.nodeFields[index].doc_field_id.lookup_table_column,
+          name_e: this.nodeFields[index].doc_field_id.name_e,
+        };
         if (table == "general_employees") {
           this.$bvModal.show("employee-create");
           this.nodeFields[index].value = "";
@@ -343,12 +423,25 @@ export default {
           this.$bvModal.show("branch-create-general");
           this.nodeFields[index].value = "";
         }
+        if (table == "general_avenues") {
+          this.$bvModal.show("avenues-create-general");
+          this.nodeFields[index].value = "";
+        }
       }
     },
     nodeWasClicked(result) {
       this.currentNode = result;
-      this.filterSetting = [this.currentNode.id];
-      this.getData();
+      this.child_doc_types =
+        this.currentNode &&
+        this.currentNode.parent_doc_type_children &&
+        this.currentNode.parent_doc_type_children.length
+          ? [ { id: 0, name: "الكل", name_e: "All" },
+              ...this.currentNode.parent_doc_type_children
+            ]
+          : [];
+      this.arch_doc_type_id = null;
+      this.getArchiveFiles();
+      // this.getData();
       this.isActiveFile = !this.isActiveFile;
       this.$store.commit("archiving/archiveFileEmity");
       this.$store.commit("archiving/objectActiveEmity");
@@ -365,7 +458,7 @@ export default {
     async getTree() {
       this.isLoader = true;
       await adminApi
-        .get(`/arch-doc-type/tree`)
+        .get(`/arch-department/tree`)
         .then((res) => {
           let root = res.data.data;
           root.forEach((node) => {
@@ -373,7 +466,7 @@ export default {
               node.children.forEach((child) => {
                 if (child.doc_type_field) {
                   child.doc_type_field.sort((a, b) =>
-                   parseInt(a.field_order) >parseInt(b.field_order) ? 1 : -1
+                    parseInt(a.field_order) > parseInt(b.field_order) ? 1 : -1
                   );
                 }
               });
@@ -396,7 +489,9 @@ export default {
       if (!id) return;
       await adminApi
         .get(`/arch-archive-files/pdf/${id}`)
-        .then((res) => {})
+        .then((res) => {
+          console.log(res);
+        })
         .catch((err) => {
           Swal.fire({
             icon: "error",
@@ -424,7 +519,11 @@ export default {
       }
       await adminApi
         .get(
-          `/arch-archive-files?page=${page}&per_page=${this.per_page}&search=${this.search}&arch_doc_type_id=${this.filterSetting}&favourite=${this.favourite}`,
+          `/arch-archive-files?page=${page}&per_page=${this.per_page}&search=${
+            this.search
+          }&arch_doc_type_id=${this.currentNode ? this.currentNode.id : ""}&favourite=${
+            this.favourite
+          }`,
           {
             params: this.currentField
               ? {
@@ -658,9 +757,10 @@ export default {
      *  reset Modal (create)
      */
     async resetModalHidden() {
-      await this.getTree();
+      // await this.getTree();
       await this.getPdf(this.archive_id);
-      await this.getData();
+      await this.getArchiveFiles();
+      // await this.getData();
       this.create = {
         job_file_number: null,
         document_type_id: null,
@@ -676,7 +776,7 @@ export default {
       this.images = [];
       this.errors = {};
       this.archive_id = null;
-      this.lockupTableObject = {};
+      this.lockupTableObject = null;
       this.type = "";
     },
     /**
@@ -703,7 +803,7 @@ export default {
      *  create screen
      */
     resetForm() {
-      this.lockupTableObject = {};
+      this.lockupTableObject = null;
       this.create = {
         data_type_value: null,
         data_type_id: null,
@@ -719,7 +819,7 @@ export default {
     AddSubmit() {
       this.errors = {};
       this.is_disabled = false;
-      let currentNode = this.currentNode;
+      let currentDocument = this.currentDocument;
       let dataTypeValue = [];
       this.nodeFields.forEach((field) => {
         dataTypeValue.push({
@@ -743,7 +843,8 @@ export default {
       this.isLoader = true;
       adminApi
         .post(`/arch-archive-files`, {
-          arch_doc_type_id: currentNode.id,
+          arch_doc_type_id: currentDocument.id,
+          arch_department_id: this.currentNode.arch_department_id,
           data_type_value: dataTypeValue,
         })
         .then((res) => {
@@ -1123,14 +1224,15 @@ export default {
     <PageHeader />
     <General
       :currentNode="currentNode"
-      :companyKeys="companyKeys" :defaultsKeys="defaultsKeys"
+      :companyKeys="companyKeys"
+      :defaultsKeys="defaultsKeys"
       @created="
         dropListPopup
-          ? getProperties()
+          ? updateCurrentPropertyTreeList()
           : getLookup(
-              lockupTableObject.doc_field_id.lookup_table,
-              lockupTableObject.doc_field_id.lookup_table_column,
-              lockupTableObject.doc_field_id.name_e
+              lockupTableObject.lookup_table,
+              lockupTableObject.lookup_table_column,
+              lockupTableObject.name_e
             )
       "
     />
@@ -1465,280 +1567,312 @@ export default {
                   </div>
                   <b-tabs nav-class="nav-tabs nav-bordered">
                     <b-tab :title="$t('general.DataEntry')" active>
-                      <div v-if="currentNode" class="row">
-                        <div
-                          v-for="(field, index) in nodeFields"
-                          :key="field.id"
-                          class="col-lg-6"
-                        >
-                          <div
-                            v-if="field.doc_field_id.data_type.name_e == 'DATE'"
-                            class="form-group"
-                          >
-                            <label class="control-label">
-                              {{
-                                $i18n.locale == "ar"
-                                  ? field.doc_field_id.name
-                                  : field.doc_field_id.name_e
-                              }}
-                              <span v-if="field.is_required == 1" class="text-danger"
-                                >*</span
-                              >
-                            </label>
-                            <date-picker
-                              v-model="field.value"
-                              type="date"
-                              confirm
-                            ></date-picker>
-                          </div>
-                          <div
-                            v-else-if="
-                              field.doc_field_id.data_type.name_e == 'Lookup (table)'
-                            "
-                            class="form-group"
-                          >
-                            <label class="control-label">
-                              {{
-                                $i18n.locale == "ar"
-                                  ? field.doc_field_id.name
-                                  : field.doc_field_id.name_e
-                              }}</label
-                            >
-                            <span v-if="field.is_required == 1" class="text-danger"
-                              >*</span
-                            >
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div class="form-group">
+                            <label class="my-1 mr-2">{{ $t("general.document") }}</label>
                             <multiselect
-                              v-model="$v.nodeFields.$each[index].value.$model"
-                              @input="
-                                showComponentModal(
-                                  $v.nodeFields.$each[index].value.$model,
-                                  lockups.find(
-                                    (e) => field.doc_field_id.name_e == e.field_name
-                                  ).table,
-                                  index
-                                )
-                              "
-                              :options="
-                                lockups.length > 0 &&
-                                lockups.find(
-                                  (e) => field.doc_field_id.name_e == e.field_name
-                                )
-                                  ? lockups
-                                      .find(
-                                        (e) => field.doc_field_id.name_e == e.field_name
-                                      )
-                                      .field_data.map(
-                                        (type) =>
-                                          type[
-                                            lockups.find(
-                                              (e) =>
-                                                field.doc_field_id.name_e == e.field_name
-                                            ).column
-                                          ]
-                                      )
-                                  : []
-                              "
-                              :class="{
-                                'is-invalid':
-                                  field.is_required == 1 &&
-                                  $v.nodeFields.$each[index].value.$error,
-                                'is-valid':
-                                  field.is_required != 1 ||
-                                  !$v.nodeFields.$each[index].value.$invalid,
-                              }"
-                            >
-                            </multiselect>
-                          </div>
-                          <div
-                            v-else-if="
-                              field.doc_field_id.data_type.name_e == 'ENUM (droplist)'
-                            "
-                            class="form-group"
-                          >
-                            <label class="control-label">
-                              {{
-                                $i18n.locale == "ar"
-                                  ? field.doc_field_id.name
-                                  : field.doc_field_id.name_e
-                              }}</label
-                            >
-                            <span v-if="field.is_required == 1" class="text-danger"
-                              >*</span
-                            >
-                            <multiselect
-                              @input="showPropertyModal"
-                              v-model="$v.nodeFields.$each[index].value.$model"
-                              :options="properties"
+                              @select="getDocumentFields"
+                              v-model="currentDocument"
+                              :options="currentNode ? currentNode.sub_docs : []"
                               :custom-label="
                                 (opt) => ($i18n.locale == 'ar' ? opt.name : opt.name_e)
                               "
-                              :class="{
-                                'is-invalid':
-                                  field.is_required == 1 &&
-                                  $v.nodeFields.$each[index].value.$error,
-                                'is-valid':
-                                  field.is_required != 1 ||
-                                  !$v.nodeFields.$each[index].value.$invalid,
-                              }"
                             >
                             </multiselect>
                           </div>
-                          <div
-                            v-else-if="field.doc_field_id.data_type.name_e == 'TIME'"
-                            class="form-group"
-                          >
-                            <label class="control-label">
-                              {{
-                                $i18n.locale == "ar"
-                                  ? field.doc_field_id.name
-                                  : field.doc_field_id.name_e
-                              }}
-                              <span v-if="field.is_required == 1" class="text-danger"
-                                >*</span
-                              >
-                            </label>
-                            <b-form-timepicker v-model="field.value"></b-form-timepicker>
-                          </div>
-                          <div
-                            v-else-if="field.doc_field_id.data_type.name_e == 'TIMESTAMP'"
-                            class="form-group"
-                          >
-                            <label class="control-label">
-                              {{
-                                $i18n.locale == "ar"
-                                  ? field.doc_field_id.name
-                                  : field.doc_field_id.name_e
-                              }}
-                              <span v-if="field.is_required == 1" class="text-danger"
-                                >*</span
-                              >
-                            </label>
-                            <date-picker
-                              v-model="field.value"
-                              confirm
-                              type="datetime"
-                            ></date-picker>
-                          </div>
-                          <div
-                            v-else-if="field.doc_field_id.data_type.name_e == 'INTEGER'"
-                            class="form-group"
-                          >
-                            <label class="control-label">
-                              {{
-                                $i18n.locale == "ar"
-                                  ? field.doc_field_id.name
-                                  : field.doc_field_id.name_e
-                              }}
-                              <span v-if="field.is_required == 1" class="text-danger"
-                                >*</span
-                              >
-                            </label>
-                            <input
-                              type="number"
-                              class="form-control"
-                              data-create="9"
-                              step="1"
-                              v-model="$v.nodeFields.$each[index].value.$model"
-                              :class="{
-                                'is-invalid':
-                                  field.is_required == 1 &&
-                                  $v.nodeFields.$each[index].value.$error,
-                                'is-valid':
-                                  field.is_required != 1 ||
-                                  !$v.nodeFields.$each[index].value.$invalid,
-                              }"
-                            />
-                          </div>
-                          <div
-                            v-else-if="field.doc_field_id.data_type.name_e == 'BOOLEAN'"
-                            class="form-group"
-                          >
-                            <label class="control-label">
-                              {{
-                                $i18n.locale == "ar"
-                                  ? field.doc_field_id.name
-                                  : field.doc_field_id.name_e
-                              }}
-                              <span v-if="field.is_required == 1" class="text-danger"
-                                >*</span
-                              >
-                            </label>
-                            <select
-                              class="form-control"
-                              v-model="$v.nodeFields.$each[index].value.$model"
-                              :class="{
-                                'is-invalid':
-                                  field.is_required == 1 &&
-                                  $v.nodeFields.$each[index].value.$error,
-                                'is-valid':
-                                  field.is_required != 1 ||
-                                  !$v.nodeFields.$each[index].value.$invalid,
-                              }"
-                            >
-                              <option value="true">{{ $t("general.true") }}</option>
-                              <option value="false">{{ $t("general.false") }}</option>
-                            </select>
-                          </div>
-                          <div
-                            v-else-if="
-                              field.doc_field_id.data_type.name_e == 'FLOAT' ||
-                              field.doc_field_id.data_type.name_e == 'DOUBLE'
-                            "
-                            class="form-group"
-                          >
-                            <label class="control-label">
-                              {{
-                                $i18n.locale == "ar"
-                                  ? field.doc_field_id.name
-                                  : field.doc_field_id.name_e
-                              }}
-                              <span v-if="field.is_required == 1" class="text-danger"
-                                >*</span
-                              >
-                            </label>
-                            <input
-                              type="number"
-                              class="form-control"
-                              data-create="9"
-                              step="0.001"
-                              v-model="$v.nodeFields.$each[index].value.$model"
-                              :class="{
-                                'is-invalid':
-                                  field.is_required == 1 &&
-                                  $v.nodeFields.$each[index].value.$error,
-                                'is-valid':
-                                  field.is_required != 1 ||
-                                  !$v.nodeFields.$each[index].value.$invalid,
-                              }"
-                            />
-                          </div>
-                          <div v-else class="form-group">
-                            <label class="control-label">
-                              {{
-                                $i18n.locale == "ar"
-                                  ? field.doc_field_id.name
-                                  : field.doc_field_id.name_e
-                              }}
-                              <span v-if="field.is_required == 1" class="text-danger"
-                                >*</span
-                              >
-                            </label>
-                            <input
-                              type="text"
-                              class="form-control"
-                              data-create="9"
-                              v-model="$v.nodeFields.$each[index].value.$model"
-                              :class="{
-                                'is-invalid':
-                                  field.is_required == 1 &&
-                                  $v.nodeFields.$each[index].value.$error,
-                                'is-valid':
-                                  field.is_required != 1 ||
-                                  !$v.nodeFields.$each[index].value.$invalid,
-                              }"
-                            />
-                          </div>
                         </div>
+                        <template v-if="currentDocument">
+                          <div
+                            v-for="(field, index) in nodeFields"
+                            :key="field.id"
+                            class="col-lg-6"
+                          >
+                            <div
+                              v-if="field.doc_field_id.data_type.name_e == 'DATE'"
+                              class="form-group"
+                            >
+                              <label class="control-label">
+                                {{
+                                  $i18n.locale == "ar"
+                                    ? field.doc_field_id.name
+                                    : field.doc_field_id.name_e
+                                }}
+                                <span v-if="field.is_required == 1" class="text-danger"
+                                  >*</span
+                                >
+                              </label>
+                              <date-picker
+                                v-model="field.value"
+                                type="date"
+                                confirm
+                              ></date-picker>
+                            </div>
+                            <div
+                              v-else-if="
+                                field.doc_field_id.data_type.name_e == 'Lookup (table)'
+                              "
+                              class="form-group"
+                            >
+                              <label class="control-label">
+                                {{
+                                  $i18n.locale == "ar"
+                                    ? field.doc_field_id.name
+                                    : field.doc_field_id.name_e
+                                }}</label
+                              >
+                              <span v-if="field.is_required == 1" class="text-danger"
+                                >*</span
+                              >
+                              <multiselect
+                                v-model="$v.nodeFields.$each[index].value.$model"
+                                @input="
+                                  showComponentModal(
+                                    $v.nodeFields.$each[index].value.$model,
+                                    lockups.find(
+                                      (e) => field.doc_field_id.name_e == e.field_name
+                                    ).table,
+                                    index
+                                  )
+                                "
+                                :options="
+                                  lockups.length > 0 &&
+                                  lockups.find(
+                                    (e) => field.doc_field_id.name_e == e.field_name
+                                  )
+                                    ? lockups
+                                        .find(
+                                          (e) => field.doc_field_id.name_e == e.field_name
+                                        )
+                                        .field_data.map(
+                                          (type) =>
+                                            type[
+                                              lockups.find(
+                                                (e) =>
+                                                  field.doc_field_id.name_e ==
+                                                  e.field_name
+                                              ).column
+                                            ]
+                                        )
+                                    : []
+                                "
+                                :class="{
+                                  'is-invalid':
+                                    field.is_required == 1 &&
+                                    $v.nodeFields.$each[index].value.$error,
+                                  'is-valid':
+                                    field.is_required != 1 ||
+                                    !$v.nodeFields.$each[index].value.$invalid,
+                                }"
+                              >
+                              </multiselect>
+                            </div>
+                            <template
+                              v-else-if="
+                                field.doc_field_id.data_type.name_e == 'ENUM (droplist)'
+                              "
+                            >
+                              <div class="form-group">
+                                <label class="control-label">
+                                  {{
+                                    $i18n.locale == "ar"
+                                      ? field.doc_field_id.name
+                                      : field.doc_field_id.name_e
+                                  }}</label
+                                >
+                                <span v-if="field.is_required == 1" class="text-danger"
+                                  >*</span
+                                >
+                                <multiselect
+                                  @input="
+                                    showPropertyModal(
+                                      $event,
+                                      field.doc_field_id.tree_property_id
+                                    )
+                                  "
+                                  v-model="$v.nodeFields.$each[index].value.$model"
+                                  :options="
+                                    getCurrentTreeProps(
+                                      field.doc_field_id.tree_property_id
+                                    )
+                                  "
+                                  :custom-label="
+                                    (opt) =>
+                                      $i18n.locale == 'ar' ? opt.name : opt.name_e
+                                  "
+                                  :class="{
+                                    'is-invalid':
+                                      field.is_required == 1 &&
+                                      $v.nodeFields.$each[index].value.$error,
+                                    'is-valid':
+                                      field.is_required != 1 ||
+                                      !$v.nodeFields.$each[index].value.$invalid,
+                                  }"
+                                >
+                                </multiselect>
+                              </div>
+                            </template>
+                            <div
+                              v-else-if="field.doc_field_id.data_type.name_e == 'TIME'"
+                              class="form-group"
+                            >
+                              <label class="control-label">
+                                {{
+                                  $i18n.locale == "ar"
+                                    ? field.doc_field_id.name
+                                    : field.doc_field_id.name_e
+                                }}
+                                <span v-if="field.is_required == 1" class="text-danger"
+                                  >*</span
+                                >
+                              </label>
+                              <b-form-timepicker
+                                v-model="field.value"
+                              ></b-form-timepicker>
+                            </div>
+                            <div
+                              v-else-if="
+                                field.doc_field_id.data_type.name_e == 'TIMESTAMP'
+                              "
+                              class="form-group"
+                            >
+                              <label class="control-label">
+                                {{
+                                  $i18n.locale == "ar"
+                                    ? field.doc_field_id.name
+                                    : field.doc_field_id.name_e
+                                }}
+                                <span v-if="field.is_required == 1" class="text-danger"
+                                  >*</span
+                                >
+                              </label>
+                              <date-picker
+                                v-model="field.value"
+                                confirm
+                                type="datetime"
+                              ></date-picker>
+                            </div>
+                            <div
+                              v-else-if="field.doc_field_id.data_type.name_e == 'INTEGER'"
+                              class="form-group"
+                            >
+                              <label class="control-label">
+                                {{
+                                  $i18n.locale == "ar"
+                                    ? field.doc_field_id.name
+                                    : field.doc_field_id.name_e
+                                }}
+                                <span v-if="field.is_required == 1" class="text-danger"
+                                  >*</span
+                                >
+                              </label>
+                              <input
+                                type="number"
+                                class="form-control"
+                                data-create="9"
+                                step="1"
+                                v-model="$v.nodeFields.$each[index].value.$model"
+                                :class="{
+                                  'is-invalid':
+                                    field.is_required == 1 &&
+                                    $v.nodeFields.$each[index].value.$error,
+                                  'is-valid':
+                                    field.is_required != 1 ||
+                                    !$v.nodeFields.$each[index].value.$invalid,
+                                }"
+                              />
+                            </div>
+                            <div
+                              v-else-if="field.doc_field_id.data_type.name_e == 'BOOLEAN'"
+                              class="form-group"
+                            >
+                              <label class="control-label">
+                                {{
+                                  $i18n.locale == "ar"
+                                    ? field.doc_field_id.name
+                                    : field.doc_field_id.name_e
+                                }}
+                                <span v-if="field.is_required == 1" class="text-danger"
+                                  >*</span
+                                >
+                              </label>
+                              <select
+                                class="form-control"
+                                v-model="$v.nodeFields.$each[index].value.$model"
+                                :class="{
+                                  'is-invalid':
+                                    field.is_required == 1 &&
+                                    $v.nodeFields.$each[index].value.$error,
+                                  'is-valid':
+                                    field.is_required != 1 ||
+                                    !$v.nodeFields.$each[index].value.$invalid,
+                                }"
+                              >
+                                <option value="true">{{ $t("general.true") }}</option>
+                                <option value="false">{{ $t("general.false") }}</option>
+                              </select>
+                            </div>
+                            <div
+                              v-else-if="
+                                field.doc_field_id.data_type.name_e == 'FLOAT' ||
+                                field.doc_field_id.data_type.name_e == 'DOUBLE'
+                              "
+                              class="form-group"
+                            >
+                              <label class="control-label">
+                                {{
+                                  $i18n.locale == "ar"
+                                    ? field.doc_field_id.name
+                                    : field.doc_field_id.name_e
+                                }}
+                                <span v-if="field.is_required == 1" class="text-danger"
+                                  >*</span
+                                >
+                              </label>
+                              <input
+                                type="number"
+                                class="form-control"
+                                data-create="9"
+                                step="0.001"
+                                v-model="$v.nodeFields.$each[index].value.$model"
+                                :class="{
+                                  'is-invalid':
+                                    field.is_required == 1 &&
+                                    $v.nodeFields.$each[index].value.$error,
+                                  'is-valid':
+                                    field.is_required != 1 ||
+                                    !$v.nodeFields.$each[index].value.$invalid,
+                                }"
+                              />
+                            </div>
+                            <div v-else class="form-group">
+                              <label class="control-label">
+                                {{
+                                  $i18n.locale == "ar"
+                                    ? field.doc_field_id.name
+                                    : field.doc_field_id.name_e
+                                }}
+                                <span v-if="field.is_required == 1" class="text-danger"
+                                  >*</span
+                                >
+                              </label>
+                              <input
+                                type="text"
+                                class="form-control"
+                                data-create="9"
+                                v-model="$v.nodeFields.$each[index].value.$model"
+                                :class="{
+                                  'is-invalid':
+                                    field.is_required == 1 &&
+                                    $v.nodeFields.$each[index].value.$error,
+                                  'is-valid':
+                                    field.is_required != 1 ||
+                                    !$v.nodeFields.$each[index].value.$invalid,
+                                }"
+                              />
+                            </div>
+                          </div>
+                        </template>
                       </div>
                     </b-tab>
                     <b-tab :disabled="!archive_id" :title="$t('general.Uploads')">
@@ -1975,13 +2109,32 @@ export default {
               <div class="col-lg-3">
                 <div class="references border">
                   <TreeBrowser
+                    @onClick="nodeWasClicked"
                     @onDoubleClicked="showModal"
                     :nodes="root"
-                    @onClick="nodeWasClicked"
                   />
                 </div>
               </div>
               <div class="col-lg-5">
+                <div v-if="currentNode && currentNode.archive_file" class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label class="my-1 mr-2">{{ $t("general.document") }}</label>
+                      <multiselect
+                        v-model="arch_doc_type_id"
+                        @select="getArchiveFiles"
+                        :options="child_doc_types.map((type) => type.id)"
+                        :custom-label="
+                          (opt) =>
+                            $i18n.locale == 'ar'
+                              ? child_doc_types.find((x) => x.id == opt).name
+                              : child_doc_types.find((x) => x.id == opt).name_e
+                        "
+                      >
+                      </multiselect>
+                    </div>
+                  </div>
+                </div>
                 <Files
                   @onDoubleClicked="showFileModal"
                   :archiveFiles="archiveFiles"
@@ -2078,8 +2231,8 @@ export default {
   }
 }
 .references {
-  padding: 10px;
-  margin: 10px;
+  width: 260px;
+  padding: 5px 0;
   background: #f8fcff;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
   height: 420px;

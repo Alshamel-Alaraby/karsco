@@ -20,6 +20,7 @@ class EditBranchRequest extends FormRequest
         return [
             'name' => ["required"],
             'name_e' => ["required"],
+            'is_active' => ["required"],
             "company_id" => "required",
         ];
     }

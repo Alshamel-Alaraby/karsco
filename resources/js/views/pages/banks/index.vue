@@ -12,6 +12,7 @@ import { dynamicSortString, dynamicSortNumber } from "../../../helper/tableSort"
 import Multiselect from "vue-multiselect";
 import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
+import {arabicValue,englishValue} from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -58,6 +59,7 @@ export default {
       debounce: {},
       banksPagination: {},
       banks: [],
+        enabled3: true,
       is_disabled: false,
       isLoader: false,
       create: {
@@ -92,6 +94,10 @@ export default {
         "swift_code",
         this.$i18n.locale == "ar" ? "country.name" : "country.name_e",
       ],
+        printLoading: true,
+        printObj: {
+            id: "printData",
+        }
     };
   },
   validations: {
@@ -144,24 +150,24 @@ export default {
     this.getData();
   },
   updated() {
-    $(function () {
-      $(".englishInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return true;
-        if (65 <= ew && ew <= 90) return true;
-        if (97 <= ew && ew <= 122) return true;
-        return false;
-      });
-      $(".arabicInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return true;
-        if (65 <= ew && ew <= 90) return false;
-        if (97 <= ew && ew <= 122) return false;
-        return true;
-      });
-    });
+    // $(function () {
+    //   $(".englishInput").keypress(function (event) {
+    //     var ew = event.which;
+    //     if (ew == 32) return true;
+    //     if (48 <= ew && ew <= 57) return true;
+    //     if (65 <= ew && ew <= 90) return true;
+    //     if (97 <= ew && ew <= 122) return true;
+    //     return false;
+    //   });
+    //   $(".arabicInput").keypress(function (event) {
+    //     var ew = event.which;
+    //     if (ew == 32) return true;
+    //     if (48 <= ew && ew <= 57) return true;
+    //     if (65 <= ew && ew <= 90) return false;
+    //     if (97 <= ew && ew <= 122) return false;
+    //     return true;
+    //   });
+    // });
   },
   methods: {
     showScreen(module, screen) {
@@ -594,6 +600,32 @@ export default {
           });
       }
     },
+
+      /**
+       *   Export Excel
+       */
+      ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('Banks' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      },
+      arabicValue(txt){
+          this.create.name = arabicValue(txt);
+          this.edit.name = arabicValue(txt);
+      } ,
+
+      englishValue(txt){
+          this.create.name_e = englishValue(txt);
+          this.edit.name_e = englishValue(txt);
+      }
   },
 };
 </script>
@@ -673,12 +705,12 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
-                    <i class="fas fa-file-download"></i>
-                  </button>
-                  <button class="custom-btn-dowonload">
-                    <i class="fe-printer"></i>
-                  </button>
+                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button v-print="'#printData'" class="custom-btn-dowonload">
+                        <i class="fe-printer"></i>
+                    </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -916,6 +948,7 @@ export default {
                             'is-invalid': $v.create.name.$error || errors.name,
                             'is-valid': !$v.create.name.$invalid && !errors.name,
                           }"
+                          @keyup="arabicValue(create.name)"
                           id="field-1"
                         />
                       </div>
@@ -956,6 +989,7 @@ export default {
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
                             'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
                           }"
+                          @keyup="englishValue(create.name_e)"
                           id="field-2"
                         />
                       </div>
@@ -989,10 +1023,11 @@ export default {
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
 
-              <table class="table table-borderless table-hover table-centered m-0">
+              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                     id="printData">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th v-if="enabled3" class="do-not-print" scope="col" style="width: 0">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -1070,10 +1105,10 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="banks.length > 0">
@@ -1084,7 +1119,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -1111,7 +1146,7 @@ export default {
                     <td v-if="setting.swift_code">
                       <h5 class="m-0 font-weight-normal">{{ data.swift_code }}</h5>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1254,7 +1289,7 @@ export default {
                             </div>
                             <div class="col-md-6">
                               <div class="form-group">
-                                <label for="field-1" class="control-label">
+                                <label for="field-u-1" class="control-label">
                                   {{ getCompanyKey("bank_name_ar") }}
                                   <span class="text-danger">*</span>
                                 </label>
@@ -1269,7 +1304,8 @@ export default {
                                       'is-invalid': $v.edit.name.$error || errors.name,
                                       'is-valid': !$v.edit.name.$invalid && !errors.name,
                                     }"
-                                    id="field-1"
+                                    @keyup="arabicValue(edit.name)"
+                                    id="field-u-1"
                                   />
                                 </div>
                                 <div
@@ -1300,7 +1336,7 @@ export default {
                             </div>
                             <div class="col-md-6">
                               <div class="form-group">
-                                <label for="field-2" class="control-label">
+                                <label for="field-u-2" class="control-label">
                                   {{ getCompanyKey("bank_name_en") }}
                                   <span class="text-danger">*</span>
                                 </label>
@@ -1317,7 +1353,8 @@ export default {
                                       'is-valid':
                                         !$v.edit.name_e.$invalid && !errors.name_e,
                                     }"
-                                    id="field-2"
+                                    @keyup="englishValue(edit.name_e)"
+                                    id="field-u-2"
                                   />
                                 </div>
                                 <div
@@ -1350,7 +1387,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mousemove="log(data.id)"
                         @mouseover="log(data.id)"

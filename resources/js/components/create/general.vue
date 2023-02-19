@@ -8,11 +8,13 @@
         <country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'country-create-general'" @created="$emit('created')" />
         <city :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'city-create-general'" @created="$emit('created')" />
         <propertyTree :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="$emit('created')" />
+        <avenue :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" :id="'avenues-create-general'" @created="$emit('created')" />
     </div>
 </template>
 
 <script>
 import employee from "../../components/create/employee.vue";
+import avenue from "../../components/create/avenue";
 import bank from "../../components/create/bank";
 import bankAccount from "../../components/create/bankAccount";
 import branch from "../../components/create/branch";
@@ -42,7 +44,9 @@ export default {
         country,
         city,
         bank,
-        bankAccount
+        bankAccount,
+        branch,
+        avenue
     },
 
     props:[

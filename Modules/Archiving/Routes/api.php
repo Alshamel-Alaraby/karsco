@@ -58,6 +58,8 @@ Route::group(['prefix' => 'archive-closed-reference'], function () {
 Route::group(['prefix' => 'arch-department'], function () {
     Route::controller(DepartmentController::class)->group(function () {
         Route::get('/', 'all')->name('archDepartment.index');
+        Route::get('/tree', 'tree');
+        Route::get('/only-has-key', 'onlyHasKey');
         Route::get('/{id}', 'find');
         Route::post('/', 'create')->name('archDepartment.create');
         Route::put('/{id}', 'update')->name('archDepartment.update');
@@ -151,6 +153,8 @@ Route::group(['prefix' => 'arch-doc-type-department'], function () {
 //  archive files  routes
 Route::group(['prefix' => 'arch-archive-files'], function () {
     Route::controller(ArchiveFileController::class)->group(function () {
+        Route::get('valueMedia', 'valueMedia');
+        Route::get("/value/{value}", "searchValue");
         Route::get("pdf/{id}", "pdf");
         Route::put("toggle-favourite", "toggleFavourite");
         Route::get('/', 'all')->name(' archive.files.index');
@@ -161,7 +165,7 @@ Route::group(['prefix' => 'arch-archive-files'], function () {
         Route::delete('/{id}', 'delete')->name(' archive.files.destroy');
         Route::get('logs/{id}', 'logs');
         Route::post('bulk-delete', 'bulkDelete');
-        Route::post('file-notify', 'sendArchvingNotification');
+        Route::post('file-noartify', 'sendArchvingNotification');
     });
 });
 

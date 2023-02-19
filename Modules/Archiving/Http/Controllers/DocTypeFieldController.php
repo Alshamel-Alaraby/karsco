@@ -4,6 +4,7 @@ namespace Modules\Archiving\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Archiving\Entities\DocType;
 use Modules\Archiving\Entities\DocTypeField;
 use Modules\Archiving\Http\Requests\DocTypeFieldRequest;
 use Modules\Archiving\Repositories\DocTypeFieldInterface;
@@ -68,10 +69,30 @@ class DocTypeFieldController extends Controller
 
     public function bulkUpdate(Request $request)
     {
+        $parentChildren = DocTypeField::where('parent_id', $request->all()[0]['doc_type_id'])->get();
+        $nonRepeatParentChild = [];
+        foreach ($parentChildren as $child) {
+            if (!in_array($child->doc_type_id, $nonRepeatParentChild))
+                $nonRepeatParentChild[] = $child->doc_type_id;
+        }
         foreach ($request->all() as $item) {
             DocTypeField::query()->where('doc_type_id', $item['doc_type_id'])->forceDelete();
+            DocTypeField::where("parent_id", $item['doc_type_id'])->forceDelete();
         }
         DocTypeField::query()->insert($request->all());
+        if (count($nonRepeatParentChild) > 0) {
+            foreach ($nonRepeatParentChild as $child) {
+                foreach ($request->all() as $item) {
+                    DocTypeField::query()->insert([
+                        "doc_type_id"=>$child,
+                        "doc_field_id"=>$item["doc_field_id"],
+                        "field_order"=>$item["field_order"],
+                        "is_required"=>$item["is_required"],
+                        "parent_id"=>$item["doc_type_id"]
+                    ]);
+                }
+            }
+        }
         return responseJson(200, __('Done'));
     }
 

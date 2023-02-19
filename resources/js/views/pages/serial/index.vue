@@ -35,6 +35,7 @@ export default {
       per_page: 1,
       search: "",
       debounce: {},
+        enabled3: true,
       serialsPagination: {},
       serials: [],
       is_disabled: false,
@@ -49,7 +50,7 @@ export default {
         restart_period: "",
         branch_id: null,
         store_id: null,
-        is_default: "active",
+        is_default: 1,
       },
       edit: {
         start_no: null,
@@ -58,7 +59,7 @@ export default {
         restart_period: "",
         branch_id: null,
         store_id: null,
-        is_default: "active",
+        is_default: 1,
       },
       setting: {
         start_no: true,
@@ -80,6 +81,10 @@ export default {
           this.$i18n.locale  == 'ar'?'branch.name':'branch.name_e',
           this.$i18n.locale  == 'ar'?'store.name':'store.name_e'
       ],
+        printLoading: true,
+        printObj: {
+            id: "printData",
+        }
     };
   },
   validations: {
@@ -184,7 +189,7 @@ export default {
         restart_period: "",
         branch_id: null,
         store_id: null,
-        is_default: "active",
+        is_default: 1,
       };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -316,7 +321,7 @@ export default {
         restart_period: "",
         branch_id: null,
         store_id: null,
-        is_default: "active",
+        is_default: 1,
       };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -336,7 +341,7 @@ export default {
         restart_period: "",
         branch_id: null,
         store_id: null,
-        is_default: "active",
+        is_default: 1,
       };
       this.getBranch(this.company_id);
       this.$nextTick(() => {
@@ -442,7 +447,7 @@ export default {
       this.edit.suffix = serial.suffix;
       this.edit.restart_period = serial.restart_period;
       this.edit.branch_id = serial.branch_id;
-      this.edit.is_default = serial.is_default;
+      this.edit.is_default = parseInt(serial.is_default) ;
       await this.getStore(this.edit.branch_id);
       this.edit.store_id = serial.store_id;
       this.errors = {};
@@ -459,7 +464,7 @@ export default {
         restart_period: "",
         branch_id: null,
         store_id: null,
-        is_default: "active",
+        is_default: 1,
       };
       this.branches = [];
       this.stores = [];
@@ -536,6 +541,22 @@ export default {
           this.isLoader = false;
         });
     },
+      /**
+       *   Export Excel
+       */
+      ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('Serials' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      },
   },
 };
 </script>
@@ -622,12 +643,12 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
-                    <i class="fas fa-file-download"></i>
-                  </button>
-                  <button class="custom-btn-dowonload">
-                    <i class="fe-printer"></i>
-                  </button>
+                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button v-print="'#printData'" class="custom-btn-dowonload">
+                        <i class="fe-printer"></i>
+                    </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -1005,36 +1026,41 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="mr-2">
-                        {{ $t("general.Default") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <select
-                        class="custom-select mr-sm-2"
-                        data-create="7"
-                        @keypress.enter.prevent="moveInput('input', 'create', 1)"
-                        v-model="$v.create.is_default.$model"
-                        :class="{
-                          'is-invalid': $v.create.is_default.$error || errors.is_default,
-                          'is-valid':
-                            !$v.create.is_default.$invalid && !errors.is_default,
-                        }"
-                      >
-                        <option value="" selected>{{ $t("general.Choose") }}...</option>
-                        <option value="active">{{ $t("general.Default") }}</option>
-                        <option value="inactive">{{ $t("general.Nondefault") }}</option>
-                      </select>
-                      <template v-if="errors.is_default">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.is_default"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="mr-2">
+                                {{ $t("general.Default") }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            <b-form-group :class="{
+                                     'is-invalid': $v.create.is_default.$error || errors.is_default,
+                                      'is-valid':!$v.create.is_default.$invalid && !errors.is_default,
+                                    }"
+                            >
+                                <b-form-radio
+                                    class="d-inline-block"
+                                    v-model="$v.create.is_default.$model"
+                                    name="some-radios"
+                                    value="1"
+                                >{{ $t("general.Yes") }}</b-form-radio
+                                >
+                                <b-form-radio
+                                    class="d-inline-block m-1"
+                                    v-model="$v.create.is_default.$model"
+                                    name="some-radios"
+                                    value="0"
+                                >{{ $t("general.No") }}</b-form-radio
+                                >
+                            </b-form-group>
+                            <template v-if="errors.is_default">
+                                <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.is_default"
+                                    :key="index"
+                                >{{ errorMessage }}</ErrorMessage
+                                >
+                            </template>
+                        </div>
                     </div>
-                  </div>
                 </div>
               </form>
             </b-modal>
@@ -1046,10 +1072,11 @@ export default {
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
 
-              <table class="table table-borderless table-hover table-centered m-0">
+              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                     id="printData">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th v-if="enabled3" class="do-not-print" scope="col" style="width: 0">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -1170,10 +1197,10 @@ export default {
                         <span>{{ $t("general.Default") }}</span>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="serials.length > 0">
@@ -1184,7 +1211,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -1220,18 +1247,18 @@ export default {
                     <td v-if="setting.is_default">
                       <span
                         :class="[
-                          data.is_default == 'active' ? 'text-success' : 'text-danger',
+                          parseInt(data.is_default) == 1 ? 'text-success' : 'text-danger',
                           'badge',
                         ]"
                       >
                         {{
-                          data.is_default == "active"
+                         parseInt(data.is_default)  == 1
                             ? `${$t("general.Yes")}`
                             : `${$t("general.No")}`
                         }}
                       </span>
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1533,49 +1560,47 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
-                              <div class="form-group">
-                                <label class="mr-2">
-                                  {{ $t("general.Default") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <select
-                                  class="custom-select mr-sm-2"
-                                  data-edit="7"
-                                  @keypress.enter.prevent="moveInput('input', 'edit', 1)"
-                                  v-model="$v.edit.is_default.$model"
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.is_default.$error || errors.is_default,
-                                    'is-valid':
-                                      !$v.edit.is_default.$invalid && !errors.is_default,
-                                  }"
-                                >
-                                  <option value="" selected>
-                                    {{ $t("general.Choose") }}...
-                                  </option>
-                                  <option value="active">
-                                    {{ $t("general.Default") }}
-                                  </option>
-                                  <option value="inactive">
-                                    {{ $t("general.Nondefault") }}
-                                  </option>
-                                </select>
-                                <template v-if="errors.is_default">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.is_default"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
+                              <div class="col-md-6">
+                                  <div class="form-group">
+                                      <label class="mr-2">
+                                          {{ $t("general.Default") }}
+                                          <span class="text-danger">*</span>
+                                      </label>
+                                      <b-form-group :class="{
+                                     'is-invalid': $v.edit.is_default.$error || errors.is_default,
+                                      'is-valid':!$v.edit.is_default.$invalid && !errors.is_default,
+                                    }"
+                                      >
+                                          <b-form-radio
+                                              class="d-inline-block"
+                                              v-model="$v.edit.is_default.$model"
+                                              name="some-radios"
+                                              value="1"
+                                          >{{ $t("general.Yes") }}</b-form-radio
+                                          >
+                                          <b-form-radio
+                                              class="d-inline-block m-1"
+                                              v-model="$v.edit.is_default.$model"
+                                              name="some-radios"
+                                              value="0"
+                                          >{{ $t("general.No") }}</b-form-radio
+                                          >
+                                      </b-form-group>
+                                      <template v-if="errors.is_default">
+                                          <ErrorMessage
+                                              v-for="(errorMessage, index) in errors.is_default"
+                                              :key="index"
+                                          >{{ errorMessage }}</ErrorMessage
+                                          >
+                                      </template>
+                                  </div>
                               </div>
-                            </div>
                           </div>
                         </form>
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mouseover="log(data.id)"
                         @mousemove="log(data.id)"
@@ -1606,3 +1631,24 @@ export default {
     </div>
   </Layout>
 </template>
+
+<style>
+@media print {
+    .do-not-print {
+        display: none;
+    }
+    .arrow-sort {
+        display: none;
+    }
+    .text-success{
+        background-color:unset;
+        color: #6c757d !important;
+        border: unset;
+    }
+    .text-danger{
+        background-color:unset;
+        color: #6c757d !important;
+        border: unset;
+    }
+}
+</style>

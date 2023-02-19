@@ -16,4 +16,8 @@ class RpScreenSubContactGroup extends Model
     {
         return \Modules\RecievablePayable\Database\factories\RpScreenSubContactGroupFactory::new();
     }
+
+    public function subContactGroup(){
+        return $this->belongsTo(RpSubContactGroup::class,"sub_contract_group_id");
+    }
 }

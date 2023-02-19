@@ -37,6 +37,7 @@ class DocTypeController extends Controller
     public function create(DocTypeRequest $request)
     {
         $model = $this->modelInterface->create($request);
+        $model->refresh();
         return responseJson(200, 'success', new DocTypeResource($model));
 
     }

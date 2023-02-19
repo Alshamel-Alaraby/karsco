@@ -12,7 +12,7 @@ import Multiselect from "vue-multiselect";
 import {formatDateOnly} from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
 import Saleman from "../../../components/create/saleman.vue";
-import Customer from "../../../components/create/customer.vue";
+import customerGeneral from "../../../components/create/customerGeneral";
 
 /**
  * Advanced Table component
@@ -49,7 +49,7 @@ export default {
         ErrorMessage,
         loader,
         Multiselect,
-        Customer
+        customerGeneral
     },
     data() {
         return {
@@ -164,13 +164,13 @@ export default {
         },
         showCustomerModal() {
             if (this.create.customer_id == 0) {
-                this.$bvModal.show("customer-create");
+                this.$bvModal.show("customer-general-create");
                 this.create.customer_id = null;
             }
         },
         showCustomerModalEdit() {
             if (this.edit.customer_id == 0) {
-                this.$bvModal.show("customer-create");
+                this.$bvModal.show("customer-general-create");
                 this.edit.customer_id = null;
             }
         },
@@ -384,7 +384,7 @@ export default {
          */
         async resetModal() {
             await this.getCustomers();
-            await this.getPaymentPlans();
+            // await this.getPaymentPlans();
             await this.getSalesmen();
             this.create = {
                 customer_id: null,
@@ -498,7 +498,7 @@ export default {
         async getCustomers() {
             this.isLoader = true;
             await adminApi
-                .get(`/real-estate/customers`)
+                .get(`/general-customer`)
                 .then((res) => {
                     this.isLoader = false;
                     let l = res.data.data;
@@ -555,7 +555,7 @@ export default {
         async resetModalEdit(id) {
             let reservation = this.reservations.find((e) => id == e.id);
             await this.getCustomers();
-            await this.getPaymentPlans();
+            // await this.getPaymentPlans();
             await this.getSalesmen();
             this.edit.date = reservation.date;
             this.edit.customer_id = reservation.customer.id;
@@ -640,7 +640,7 @@ export default {
     <Layout>
         <PageHeader/>
         <Saleman :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getSalesmen"/>
-        <Customer :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCustomers"/>
+        <customerGeneral :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCustomers"/>
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -880,7 +880,6 @@ export default {
                                                 type="date"
                                                 class="form-control"
                                                 data-create="9"
-                                                @keypress.enter="moveInput('select', 'create', 10)"
                                                 v-model="$v.create.date.$model"
                                                 :class="{
                                                   'is-invalid': $v.create.date.$error || errors.date,
@@ -970,21 +969,18 @@ export default {
                                     </div>
                                     <div class="col-md-12 position-relative">
                                         <div class="form-group">
-                                            <label class="my-1 mr-2">{{
-                                                getCompanyKey("payment_plan")
-                                                }}</label>
-                                            <multiselect
-                                                v-model="create.payment_plan_id"
-                                                :options="paymentPlans.map((type) => type.id)"
-                                                :custom-label="
-                                                  (opt) => paymentPlans.find((x) => x.id == opt).date
-                                                "
-                                                                        :class="{
+                                            <label class="my-1 mr-2">
+                                                {{getCompanyKey("payment_plan") }}
+                                            </label>
+                                            <input
+                                                v-model="$v.create.payment_plan_id.$model"
+                                                class="form-control"
+                                                type="number"
+                                                 :class="{
                                                   'is-invalid':
                                                     $v.create.payment_plan_id.$error || errors.payment_plan_id,
                                                 }"
-                                            >
-                                            </multiselect>
+                                            />
                                             <div
                                                 v-if="!$v.create.payment_plan_id.required"
                                                 class="invalid-feedback"
@@ -1357,19 +1353,28 @@ export default {
                                                             <label class="my-1 mr-2">{{
                                                                 getCompanyKey("payment_plan")
                                                                 }}</label>
-                                                            <multiselect
-                                                                v-model="edit.payment_plan_id"
-                                                                :options="paymentPlans.map((type) => type.id)"
-                                                                :custom-label="
-                                                                    (opt) => paymentPlans.find((x) => x.id == opt).date
-                                                                  "
-                                                                                                :class="{
-                                                                    'is-invalid':
-                                                                      $v.edit.payment_plan_id.$error ||
-                                                                      errors.payment_plan_id,
-                                                                  }"
-                                                            >
-                                                            </multiselect>
+<!--                                                            <multiselect-->
+<!--                                                                v-model="edit.payment_plan_id"-->
+<!--                                                                :options="paymentPlans.map((type) => type.id)"-->
+<!--                                                                :custom-label="-->
+<!--                                                                    (opt) => paymentPlans.find((x) => x.id == opt).date-->
+<!--                                                                  "-->
+<!--                                                                                                :class="{-->
+<!--                                                                    'is-invalid':-->
+<!--                                                                      $v.edit.payment_plan_id.$error ||-->
+<!--                                                                      errors.payment_plan_id,-->
+<!--                                                                  }"-->
+<!--                                                            >-->
+<!--                                                            </multiselect>-->
+                                                            <input
+                                                                v-model="$v.edit.payment_plan_id.$model"
+                                                                class="form-control"
+                                                                type="number"
+                                                                :class="{
+                                                                  'is-invalid':
+                                                                    $v.edit.payment_plan_id.$error || errors.payment_plan_id,
+                                                                }"
+                                                            />
                                                             <div
                                                                 v-if="!$v.edit.payment_plan_id.required"
                                                                 class="invalid-feedback"

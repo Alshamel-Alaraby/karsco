@@ -67,6 +67,7 @@
                   'is-invalid': $v.create.name.$error || errors.name,
                   'is-valid': !$v.create.name.$invalid && !errors.name,
                 }"
+                @keyup="arabicValue(create.name)"
                 id="field-1"
               />
               <div v-if="!$v.create.name.minLength" class="invalid-feedback">
@@ -100,6 +101,7 @@
                   'is-invalid': $v.create.name_e.$error || errors.name_e,
                   'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
                 }"
+                @keyup="englishValue(create.name_e)"
                 id="field-2"
               />
               <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
@@ -200,6 +202,7 @@ import Swal from "sweetalert2";
 import { maxLength, minLength, required } from "vuelidate/lib/validators";
 import loader from "../../loader";
 import transMixinComp from "../../../helper/translation-comp-mixin";
+import {arabicValue, englishValue} from "../../../helper/langTransform";
 
 export default {
   name: "gen-arch-doc-type",
@@ -330,6 +333,14 @@ export default {
           });
       }
     },
+
+      arabicValue(txt){
+          this.create.name = arabicValue(txt);
+      },
+
+      englishValue(txt){
+          this.create.name_e = englishValue(txt);
+      }
   },
 };
 </script>

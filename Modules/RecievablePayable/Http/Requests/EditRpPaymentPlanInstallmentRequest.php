@@ -28,6 +28,8 @@ class EditRpPaymentPlanInstallmentRequest extends FormRequest
             'module_id' => 'required',
             'ref_id' => 'required',
             'rp_code' => 'required',
+            'note_a' => 'nullable|string',
+            'note_e' => 'nullable|string',
         ];
     }
 

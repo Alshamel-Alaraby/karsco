@@ -35,6 +35,8 @@ class StoreCountryRequest extends FormRequest
             'is_active' => 'nullable|in:active,inactive',
             // "media" => "nullable|array",
             // "media.*" => ["nullable", "exists:media,id", new \App\Rules\MediaRule()],
+
+
         ];
     }
 
@@ -71,9 +73,6 @@ class StoreCountryRequest extends FormRequest
             'media.array' => __('message.field must be array'),
             'media.*.exists' => __('message.field must be exists in media table'),
             'media.*.media' => __('message.field must be media'),
-
-
-
 
         ];
     }

@@ -15,9 +15,10 @@ return new class extends Migration
     {
         Schema::create('rp_sub_contact_groups', function (Blueprint $table) {
             $table->id();
+            $table->unsignedTinyInteger('rp_main_contact_group_id')->nullable()->default (0);
             $table->string ('name')->nullable ();
             $table->string ('name_e')->nullable ();
-            $table->unsignedTinyInteger('gl_acc_no')->nullable ()->default (0);
+            $table->unsignedTinyInteger('gl_acc_no')->nullable()->default (0);
             $table->timestamps();
         });
     }

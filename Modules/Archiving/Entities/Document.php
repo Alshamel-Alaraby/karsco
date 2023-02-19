@@ -22,11 +22,16 @@ class Document extends Model
         return $this->belongsTo(DocStatus::class, 'doc_status', 'id');
     }
 
-
+    public function children()
+    {
+        return $this->hasMany(Document::class, 'parent_id');
+    }
 
     public function hasChildren()
     {
-        return $this->departments()->count() > 0;
+        return $this->departments()->count() > 0 ||
+        $this->children()->count() > 0 ||
+        $this->archDocType()->count() > 0;
     }
 
 }

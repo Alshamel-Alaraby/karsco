@@ -78130,4 +78130,23 @@ td i.fe-info {
   .arrow-sort {
     display: none;
   }
+  .text-success {
+    background-color: unset;
+    color: #6c757d !important;
+    border: unset;
+  }
+  .text-danger {
+    background-color: unset;
+    color: #6c757d !important;
+    border: unset;
+  }
+}
+#sidebar-menu > ul > li > a {
+  color: #0a8fc0 !important;
+  background-color: #e1f0fd;
+  margin-bottom: 3px;
+}
+
+#sidebar-menu > ul > li > a.router-link-exact-active, #sidebar-menu > ul > li > a.router-link-active {
+  color: #000 !important;
 }

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class RpInstallmentPaymentPlan extends Model
 {
-    use HasFactory,LogTrait;
+    use HasFactory, LogTrait;
 
     protected $guarded = ['id'];
 
@@ -16,4 +16,5 @@ class RpInstallmentPaymentPlan extends Model
     {
         return \Modules\RecievablePayable\Database\factories\RpInstallmentPaymentPlanFactory::new();
     }
+
 }

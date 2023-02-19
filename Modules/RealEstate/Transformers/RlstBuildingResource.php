@@ -34,7 +34,7 @@ class RlstBuildingResource extends JsonResource
             "lat" => $this->lat,
             "properties" => $this->properties,
             "attachments" => $this->attachments,
-            "module_id" => $this->module_id,
+            "module" => $this->module,
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
         ];

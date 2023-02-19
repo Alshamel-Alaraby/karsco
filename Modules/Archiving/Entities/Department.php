@@ -11,11 +11,7 @@ class Department extends Model
 {
     use HasFactory, LogTrait, SoftDeletes;
     protected $table = 'arch_departments';
-    protected $fillable = [
-        'name',
-        'name_e',
-        'parent_id',
-    ];
+    protected $guarded = ["id"];
 
     protected $casts = [
         'parent_id' => 'integer',
@@ -27,6 +23,11 @@ class Department extends Model
         return $this->hasMany(Department::class, 'parent_id', 'id');
     }
 
+    public function archiveFile()
+    {
+        return $this->hasOne(ArchiveFile::class, 'arch_department_id', 'id');
+    }
+
     public function parent()
     {
         return $this->belongsTo(Department::class, 'parent_id', 'id');
@@ -34,12 +35,19 @@ class Department extends Model
 
     public function documents()
     {
-        return $this->belongsToMany(Document::class, 'arch_doc_type_department', 'arch_department_id', 'arch_doc_type_id')
-        ;
+        return $this->belongsToMany(DocType::class, 'arch_type_department', 'arch_department_id', 'arch_doc_type_id');
+    }
+
+    public function arch_documents()
+    {
+        return $this->belongsToMany(DocType::class, 'arch_type_department', 'arch_department_id', 'arch_doc_type_id')
+            ->distinct()->whereNull('arch_doc_types.parent_id');
     }
 
     public function hasChildren()
     {
-        return $this->children()->count() > 0;
+        return $this->children()->count() > 0 ||
+        $this->documents()->count() > 0 ||
+        $this->archiveFile()->count() > 0;
     }
 }

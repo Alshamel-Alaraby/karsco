@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Archiving\Entities\ArchiveFile;
 use Modules\Archiving\Http\Requests\ArchiveFileRequest;
 use Modules\Archiving\Http\Requests\ToggleFavouriteRequest;
+use Modules\Archiving\Transformers\ArchiveFileRelationResource;
 use Modules\Archiving\Transformers\ArchiveFileResource;
 use niklasravnsborg\LaravelPdf\Facades\Pdf;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -193,7 +194,7 @@ class ArchiveFileController extends Controller
             if (!$model) {
                 return responseJson(404, 'not found');
             }
-            $path = public_path(is_object($model->data_type_value[0]->value)?$model->data_type_value[0]->value->name_e:$model->data_type_value[0]->value . "-" . rand(1111, 999) . '.pdf');
+            $path = public_path(is_object($model->data_type_value[0]->value) ? $model->data_type_value[0]->value->name_e : $model->data_type_value[0]->value . "-" . rand(1111, 999) . '.pdf');
             $data = [
                 'id' => $model->id,
                 "data_type_value" => $model->data_type_value,
@@ -280,4 +281,49 @@ class ArchiveFileController extends Controller
 
         return responseJson(200, 'success notification');
     }
+    public function valueMedia(Request $request)
+    {
+        $model = $this->model->
+        where('arch_department_id',$request->department_id)->
+        where('data_type_value','like','%"value":'.$request->value.'%')
+        ->where(function ($q) use ($request){
+            $q->when($request->arch_doc_type_id,function ($q) use ($request){
+                $q->where('arch_doc_type_id',$request->arch_doc_type_id);
+            });
+        })->get();
+<<<<<<< HEAD
+
+=======
+        
+>>>>>>> dev-test
+        if (!$model) {
+            return responseJson(404, 'not found');
+        }
+        return responseJson(200, 'done', ArchiveFileResource::collection($model));
+
+    }
+    public function searchValue($value)
+    {
+        $model = collect($this->model->all());
+        // search data_type_value
+        $model = $model->filter(function ($model) use ($value) {
+            $data_type_value = collect($model->data_type_value);
+            $data_type_value = $data_type_value->filter(function ($data_type_value) use ($value) {
+                if (is_object($data_type_value->value)) {
+                    return false;
+                }
+                return strpos($data_type_value->value, $value) !== false;
+            });
+            return $data_type_value->count() > 0;
+        });
+
+        if (count($model) <= 0) {
+            return responseJson(404, 'not found');
+        }
+        $model = $model->first();
+        return responseJson(200, 'done', new ArchiveFileRelationResource($model));
+    }
+
+
+
 }

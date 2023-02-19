@@ -21,8 +21,6 @@ return new class extends Migration
             $table->unsignedTinyInteger ('is_active')->default (0)->comment ('1=Active, 0=Not Active');
             $table->text ('description')->nullable ();
             $table->text ('description_e')->nullable ();
-            $table->date ('start_date')->nullable ()->comment ('تاريخ بداية تنفيذ الخطة');
-            $table->unsignedTinyInteger ('installment_payment_type_id')->default (0);
             $table->timestamps();
         });
     }

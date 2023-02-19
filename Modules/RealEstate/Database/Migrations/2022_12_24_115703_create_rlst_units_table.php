@@ -38,7 +38,7 @@ return new class extends Migration
             $table->unsignedInteger('rank')->nullable()->default(0);
             $table->json('properties')->nullable();
             $table->json('attachments')->nullable();
-            $table->foreignId("module_id");
+            $table->string("module");
             $table->softDeletes();
             $table->timestamps();
         });

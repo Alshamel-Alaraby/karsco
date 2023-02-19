@@ -13,6 +13,7 @@ import { dynamicSortString, dynamicSortNumber } from "../../../helper/tableSort"
 import translation from "../../../helper/translation-mixin";
 import senderHoverHelper from "../../../helper/senderHoverHelper";
 import { formatDateOnly } from "../../../helper/startDate";
+import { arabicValue, englishValue } from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -121,26 +122,26 @@ export default {
     this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
-  updated() {
-    $(function () {
-      $(".englishInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return true;
-        if (65 <= ew && ew <= 90) return true;
-        if (97 <= ew && ew <= 122) return true;
-        return false;
-      });
-      $(".arabicInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return false;
-        if (65 <= ew && ew <= 90) return false;
-        if (97 <= ew && ew <= 122) return false;
-        return true;
-      });
-    });
-  },
+  // updated() {
+  //   $(function () {
+  //     $(".englishInput").keypress(function (event) {
+  //       var ew = event.which;
+  //       if (ew == 32) return true;
+  //       if (48 <= ew && ew <= 57) return true;
+  //       if (65 <= ew && ew <= 90) return true;
+  //       if (97 <= ew && ew <= 122) return true;
+  //       return false;
+  //     });
+  //     $(".arabicInput").keypress(function (event) {
+  //       var ew = event.which;
+  //       if (ew == 32) return true;
+  //       if (48 <= ew && ew <= 57) return false;
+  //       if (65 <= ew && ew <= 90) return false;
+  //       if (97 <= ew && ew <= 122) return false;
+  //       return true;
+  //     });
+  //   });
+  // },
   beforeRouteEnter(to, from, next) {
         next((vm) => {
                     if (vm.$store.state.auth.work_flow_trees.includes("real estate-e")) {
@@ -160,6 +161,14 @@ export default {
         });
     },
   methods: {
+        arabicValue(txt) {
+      this.create.name = arabicValue(txt);
+      this.edit.name = arabicValue(txt);
+    },
+    englishValue(txt) {
+      this.create.name_e = englishValue(txt);
+      this.edit.name_e = englishValue(txt);
+    },
     formatDate(value) {
       return formatDateOnly(value);
     },
@@ -820,8 +829,9 @@ export default {
                       </label>
                       <div dir="rtl">
                         <input
+                        @keyup="arabicValue(create.name)"
                           type="text"
-                          class="form-control arabicInput"
+                          class="form-control"
                           data-create="1"
                           @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
@@ -859,6 +869,7 @@ export default {
                       </label>
                       <div dir="ltr">
                         <input
+@keyup="englishValue(create.name_e)"
                           type="text"
                           class="form-control englishInput"
                           data-create="2"
@@ -1184,8 +1195,9 @@ export default {
                                 </label>
                                 <div dir="rtl">
                                   <input
+                                  @keyup="arabicValue(edit.name)"
                                     type="text"
-                                    class="form-control arabicInput"
+                                    class="form-control"
                                     data-edit="1"
                                     @keypress.enter="moveInput('input', 'edit', 2)"
                                     v-model="$v.edit.name.$model"
@@ -1229,6 +1241,7 @@ export default {
                                 </label>
                                 <div dir="ltr">
                                   <input
+                                  @keyup="englishValue(edit.name_e)"
                                     type="text"
                                     class="form-control englishInput"
                                     data-edit="2"

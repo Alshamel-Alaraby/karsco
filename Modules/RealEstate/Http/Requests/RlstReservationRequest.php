@@ -16,8 +16,8 @@ class RlstReservationRequest extends FormRequest
     {
         return [
             "date" => "required|date",
-            "salesman_id" => "required|exists:general_salesmen,id,deleted_at,null",
-            "customer_id" => "required|exists:rlst_customers,id,deleted_at,null",
+            "salesman_id" => "required|exists:general_salesmen,id",
+            "customer_id" => "required|exists:rlst_customers,id",
             "payment_plan_id" => "required|numeric",
         ];
     }

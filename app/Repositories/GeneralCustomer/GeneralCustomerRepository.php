@@ -4,6 +4,7 @@ namespace App\Repositories\GeneralCustomer;
 
 use App\Models\GeneralCustomer;
 use App\Models\UserSettingScreen;
+use App\Traits\CustomTableTrait;
 use Illuminate\Support\Facades\DB;
 
 class GeneralCustomerRepository implements GeneralCustomerRepositoryInterface

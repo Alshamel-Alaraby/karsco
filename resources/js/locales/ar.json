@@ -589,6 +589,12 @@
         }
     },
     "general": {
+        "ScreenSubContactGroupTable":"جدول شاشات جروبات التواصل الفرعي",
+        "ScreenSubcontactGroup":"شاشات التواصل الفرعي",
+        "documentPlansTable":"جدول خطط الوثائق",
+        "DocumentPlan":"خطة المستند",
+        "document":"الوثيقة",
+        "customTable":"اعدادات الجدول",
         "Uploads":"تحميل",
         "FileUploads":"تحميل الملف",
         "from":"من",
@@ -879,6 +885,11 @@
         "DocumentName": "اسم المستند",
         "thisFieldIsUniq": "هذا الحقل متكرر",
         "true": "صحيح",
-        "false": "غير صحيح"
+        "false": "غير صحيح",
+        "is_key": "المفتاح",
+        "Table":"الجدول",
+        "is_required":"مطلوب",
+        "is_visible":"مرئي",
+        "Column": "عمود"
     }
 }

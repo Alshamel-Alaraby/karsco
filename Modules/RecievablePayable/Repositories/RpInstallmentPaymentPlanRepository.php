@@ -51,7 +51,6 @@ class RpInstallmentPaymentPlanRepository implements RpInstallmentPaymentPlanRepo
         DB::transaction(function () use ($id, $request) {
             $model = $this->model->find($id);
             $model->update($request->all());
-
             $this->forget($id);
 
         });

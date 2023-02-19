@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('rp_document_plans', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger ('document_id')->default (0);
-            $table->unsignedInteger ('plan_id')->default (0);
+            $table->unsignedInteger ('document_id')->default(0);
+            $table->unsignedInteger ('plan_id')->default(0);
             $table->timestamps();
         });
     }

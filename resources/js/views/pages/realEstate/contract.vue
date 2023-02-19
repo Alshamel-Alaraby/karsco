@@ -2,7 +2,6 @@
 import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
-import outerAxios from "../../../api/outerAxios";
 import { required } from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
@@ -12,7 +11,8 @@ import Multiselect from "vue-multiselect";
 import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
 import Saleman from "../../../components/create/saleman.vue";
-import Customer from "../../../components/create/customer.vue";
+import customerGeneral from "../../../components/create/customerGeneral";
+import Reservation from "../../../components/create/realEstate/reservation";
 
 /**
  * Advanced Table component
@@ -49,7 +49,8 @@ export default {
     ErrorMessage,
     loader,
     Multiselect,
-    Customer,
+    customerGeneral,
+    Reservation
   },
   data() {
     return {
@@ -163,16 +164,28 @@ export default {
     },
     showCustomerModal() {
       if (this.create.customer_id == 0) {
-        this.$bvModal.show("customer-create");
+        this.$bvModal.show("customer-general-create");
         this.create.customer_id = null;
       }
     },
     showCustomerModalEdit() {
       if (this.edit.customer_id == 0) {
-        this.$bvModal.show("customer-create");
+        this.$bvModal.show("customer-general-create");
         this.edit.customer_id = null;
       }
     },
+    showReservationModal() {
+          if (this.create.reservation_id == 0) {
+              this.$bvModal.show("reservation-create");
+              this.create.reservation_id = null;
+          }
+      },
+    showReservationModalEdit() {
+          if (this.edit.reservation_id == 0) {
+              this.$bvModal.show("reservation-create");
+              this.edit.reservation_id = null;
+          }
+      },
 
     /**
      *  get Data contracts
@@ -497,7 +510,7 @@ export default {
     async getCustomers() {
       this.isLoader = true;
       await adminApi
-        .get(`/real-estate/customers`)
+        .get(`/general-customer`)
         .then((res) => {
           this.isLoader = false;
           let l = res.data.data;
@@ -538,6 +551,7 @@ export default {
         .get(`/real-estate/reservations`)
         .then((res) => {
           this.isLoader = false;
+          res.data.data.unshift({ id: 0, date: "اضافة حجز" });
           this.reservations = res.data.data;
         })
         .catch((err) => {
@@ -639,7 +653,8 @@ export default {
   <Layout>
     <PageHeader />
     <Saleman :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getSalesmen" />
-    <Customer :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCustomers" />
+    <Reservation :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCustomers" />
+    <customerGeneral :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCustomers" />
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -968,6 +983,7 @@ export default {
                         getCompanyKey("reservation_date")
                       }}</label>
                       <multiselect
+                        @input="showReservationModal"
                         v-model="create.reservation_id"
                         :options="reservations.map((type) => type.id)"
                         :custom-label="
@@ -1344,6 +1360,7 @@ export default {
                                   getCompanyKey("reservation_date")
                                 }}</label>
                                 <multiselect
+                                  @input="showReservationModalEdit"
                                   v-model="edit.reservation_id"
                                   :options="reservations.map((type) => type.id)"
                                   :custom-label="

@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Country;
 
+use App\Traits\CustomTableTrait;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -17,7 +18,6 @@ class CountryRepository implements CountryInterface
     public function all($request)
     {
         $models = $this->model->filter($request)->orderBy($request->order ? $request->order : 'updated_at', $request->sort ? $request->sort : 'DESC');
-
         if ($request->per_page) {
             return ['data' => $models->paginate($request->per_page), 'paginate' => true];
         } else {
@@ -32,7 +32,8 @@ class CountryRepository implements CountryInterface
 
     public function create($request)
     {
-        return DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request){
+
             $model = $this->model->create($request->all());
             if ($request->media) {
                 foreach ($request->media as $media) {

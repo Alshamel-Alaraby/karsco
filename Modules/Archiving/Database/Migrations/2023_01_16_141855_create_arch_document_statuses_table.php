@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('arch_document_statuses', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger ('document_id');
-            $table->unsignedBigInteger ('status_id');
+            $table->unsignedBigInteger('document_id');
+            $table->unsignedBigInteger('status_id');
             $table->timestamps();
         });
     }

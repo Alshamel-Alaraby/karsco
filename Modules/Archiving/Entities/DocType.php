@@ -35,18 +35,38 @@ class DocType extends Model
     }
     public function archiveFiles()
     {
-        return $this->hasMany(ArchiveFile::class,"arch_doc_type_id");
+        return $this->hasMany(ArchiveFile::class, "arch_doc_type_id");
     }
 
-    //    public function fields()
-    //    {
-    //        return $this->belongsToMany(DocField::class, 'arch_doc_type_fields', 'doc_type_id', 'doc_field_id')->withPivot('field_order', 'is_required', 'field_characters');
-    //    }
+    public function getEmployees()
+    {
+        $e = $this->archiveFiles()->where('data_type_value', 'like', '');
+    }
+
+    //        public function fields()
+    //        {
+    //            return $this->belongsToMany(DocField::class, 'arch_doc_type_fields', 'doc_type_id', 'doc_field_id')->withPivot('field_order', 'is_required', 'field_characters');
+    //        }
 
     public function hasChildren()
     {
-        return $this->children()->count() > 0;
-        //        ||
-        //        $this->files()->count() > 0;
+        return $this->children()->count() > 0 ||
+        $this->statuses()->count() > 0 ||
+        $this->archiveFiles()->count() > 0;
+    }
+    public function departments()
+    {
+        return $this->belongsToMany(Department::class, 'arch_type_department', 'arch_doc_type_id', 'arch_department_id')
+            ->whereNotNull("key_value");
+    }
+
+    public function getKeyAttribute()
+    {
+        $key = $this->departments()->first();
+        if ($key) {
+            return DocumentField::where("id", $key->key_value)->first();
+        } else {
+            return null;
+        }
     }
 }

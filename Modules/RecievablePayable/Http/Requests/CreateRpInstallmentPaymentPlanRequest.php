@@ -22,8 +22,6 @@ class CreateRpInstallmentPaymentPlanRequest extends FormRequest
             'is_active' => [],
             'description' => [],
             'description_e' => [],
-            'start_date' => [],
-            'installment_payment_type_id' => [],
         ];
     }
 

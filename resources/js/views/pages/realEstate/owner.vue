@@ -14,6 +14,7 @@ import City from "../../../components/city";
 import bankAccount from "../../../components/create/bankAccount";
 import Multiselect from "vue-multiselect";
 import translation from "../../../helper/translation-mixin";
+import {arabicValue,englishValue} from "../../../helper/langTransform";
 
 // require styles
 import 'quill/dist/quill.core.css'
@@ -69,13 +70,14 @@ export default {
             cities: [],
             countries: [],
             bank_accounts: [],
+            nationalities: [],
             isLoader: false,
             create: {
                 name: '',
                 name_e: '',
                 phone: '',
                 email: '',
-                rp_code: null,
+                rb_code: null,
                 nationality_id: null,
                 contact_person: '',
                 contact_phones:'',
@@ -90,7 +92,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
-                rp_code: null,
+                rb_code: null,
                 nationality_id: null,
                 contact_person: '',
                 contact_phones:'',
@@ -110,7 +112,7 @@ export default {
                 name_e: true,
                 phone : true,
                 email : true,
-                rp_code: true,
+                rb_code: true,
                 nationality_id: true,
                 contact_person: true,
                 contact_phones: true,
@@ -126,7 +128,7 @@ export default {
                 'name_e',
                 'phone',
                 'email',
-                'rp_code',
+                'rb_code',
                 'nationality_id',
                 'contact_person',
                 'contact_phones',
@@ -151,7 +153,7 @@ export default {
             name_e: {required,minLength: minLength(2),maxLength: maxLength(100),},
             phone: {required,maxLength: maxLength(100)},
             email: {required,maxLength: maxLength(100),email},
-            rp_code: {required,integer,maxLength: maxLength(9),},
+            rb_code: {required,integer,maxLength: maxLength(9),},
             nationality_id: {required,integer,maxLength: maxLength(40),},
             contact_person: {required,maxLength: maxLength(100)},
             contact_phones: {required,integer,maxLength: maxLength(100)},
@@ -159,14 +161,14 @@ export default {
             country_id: {required},
             city_id: {required},
             bank_account_id: {required},
-            whatsapp: {numeric}
+            whatsapp: {required,integer}
         },
         edit: {
             name: {required,minLength: minLength(2),maxLength: maxLength(100),},
             name_e: {required,minLength: minLength(2),maxLength: maxLength(100),},
             phone: {required,maxLength: maxLength(100)},
             email: {required,maxLength: maxLength(100),email},
-            rp_code: {required,integer,maxLength: maxLength(9),},
+            rb_code: {required,integer,maxLength: maxLength(9),},
             nationality_id: {required,integer,maxLength: maxLength(40),},
             contact_person: {required,maxLength: maxLength(100)},
             contact_phones: {required,integer,maxLength: maxLength(100)},
@@ -174,7 +176,7 @@ export default {
             country_id: {required},
             city_id: {required},
             bank_account_id: {required},
-            whatsapp: {numeric}
+            whatsapp: {required,integer}
         },
     },
     watch: {
@@ -213,7 +215,7 @@ export default {
     },
     updated(){
         $(function(){
-            $(".englishInput").keypress(function(event){
+            $("").keypress(function(event){
                 var ew = event.which;
                 if(ew == 32)
                     return true;
@@ -240,6 +242,15 @@ export default {
         });
     },
     methods: {
+                arabicValue(txt) {
+      this.create.name = arabicValue(txt);
+      this.edit.name = arabicValue(txt);
+    },
+    englishValue(txt) {
+      this.create.name_e = englishValue(txt);
+      this.edit.name_e = englishValue(txt);
+    },
+
         /**
          *  start get Data owners && pagination
          */
@@ -276,7 +287,7 @@ export default {
                     filter += `columns[${i}]=${this.filterSetting[i]}&`;
                 }
 
-                adminApi.get(`/real-estate/buildings?page=${page}&per_page=${this.per_page}&search=${this.search}&${filter}`)
+                adminApi.get(`/real-estate/owners?page=${page}&per_page=${this.per_page}&search=${this.search}&${filter}`)
                     .then((res) => {
                         let l = res.data;
                         this.owners = l.data;
@@ -366,7 +377,7 @@ export default {
                         this.isLoader = true;
 
                         adminApi
-                            .delete(`/real-estate/buildings/${id}`)
+                            .delete(`/real-estate/owners/${id}`)
                             .then((res) => {
                                 this.checkAll = [];
                                 this.getData();
@@ -413,7 +424,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
-                rp_code: null,
+                rb_code: null,
                 nationality_id: null,
                 contact_person: '',
                 contact_phones:'',
@@ -438,7 +449,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
-                rp_code: null,
+                rb_code: null,
                 nationality_id: null,
                 contact_person: '',
                 contact_phones:'',
@@ -462,7 +473,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
-                rp_code: null,
+                rb_code: null,
                 nationality_id: null,
                 contact_person: '',
                 contact_phones:'',
@@ -481,8 +492,6 @@ export default {
 
             if(!this.create.name){ this.create.name = this.create.name_e}
             if(!this.create.name_e){ this.create.name_e = this.create.name}
-            if(!this.create.description){ this.create.description = this.create.description_e}
-            if(!this.create.description_e){ this.create.description_e = this.create.description}
 
             this.$v.create.$touch();
 
@@ -492,7 +501,7 @@ export default {
                 this.isLoader = true;
                 this.errors = {};
 
-                adminApi.post(`/real-estate/buildings`,this.create)
+                adminApi.post(`/real-estate/owners`,this.create)
                     .then((res) => {
                         this.is_disabled = true;
                         this.getData();
@@ -528,8 +537,6 @@ export default {
 
             if(!this.edit.name){ this.edit.name = this.edit.name_e}
             if(!this.edit.name_e){ this.edit.name_e = this.edit.name}
-            if(!this.edit.description){ this.edit.description = this.edit.description_e}
-            if(!this.edit.description_e){ this.edit.description_e = this.edit.description}
             this.$v.edit.$touch();
 
             if (this.$v.edit.$invalid) {
@@ -538,7 +545,7 @@ export default {
                 this.isLoader = true;
                 this.errors = {};
 
-                adminApi.put(`/real-estate/buildings/${id}`,this.edit)
+                adminApi.put(`/real-estate/owners/${id}`,this.edit)
                     .then((res) => {
                         this.$bvModal.hide(`modal-edit-${id}`);
                         this.getData();
@@ -570,22 +577,23 @@ export default {
          *   show Modal (edit)
          */
         async resetModalEdit(id){
-            await this.getCategory();
-            await this.getBankAcount();
             let build = this.owners.find(e => id == e.id );
+            await this.getCategory();
+            await this.getCity(build.country.id);
+            await this.getBankAcount();
             this.edit.name = build.name;
             this.edit.name_e = build.name_e;
-            this.edit.description = build.description;
-            this.edit.description_e = build.description_e;
-            this.edit.building_area = build.building_area ?? 0;
-            this.edit.land_area = build.land_area ?? 0;
-            this.edit.construction_year = build.construction_year ?? '';
-            this.edit.module_id = build.module_id;
-            this.edit.country_id = build.country.id;
+            this.edit.phone = build.phone;
             this.edit.city_id = build.city.id;
-            this.edit.avenue_id = build.avenue.id;
-            this.edit.lng = build.lng;
-            this.edit.lat = build.lat;
+            this.edit.country_id = build.country.id;
+            this.edit.bank_account_id = build.ban1k_account.id
+            this.edit.nationality_id = build.nationality.id ;
+            this.edit.email = build.email;
+            this.edit.rb_code = build.rb_code;
+            this.edit.contact_person = build.contact_person;
+            this.edit.whatsapp = build.whatsapp;
+            this.edit.contact_phones = build.contact_phones;
+            this.edit.national_id = build.national_id;
             this.errors = {};
         },
         /**
@@ -598,7 +606,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
-                rp_code: null,
+                rb_code: null,
                 nationality_id: null,
                 contact_person: '',
                 contact_phones:'',
@@ -639,7 +647,7 @@ export default {
                 this.Tooltip = "";
                 this.mouseEnter = id;
                 adminApi
-                    .get(`/real-estate/buildings/logs/${id}`)
+                    .get(`/real-estate/owners/logs/${id}`)
                     .then((res) => {
                         let l = res.data.data;
                         l.forEach((e) => {
@@ -660,9 +668,6 @@ export default {
                     });
             }
         },
-        getCurrentYear() {
-            return new Date().getFullYear();
-        },
         async getCategory() {
             this.create.city_id = null;
             this.edit.city_id = null;
@@ -670,8 +675,10 @@ export default {
                 .get(`/countries?is_active=active`)
                 .then((res) => {
                     let l = res.data.data;
+                    this.nationalities = l;
                     l.unshift({ id: 0, name: "اضافة دولة", name_e: "Add Country" });
                     this.countries = l;
+                    this.nationalities = l.slice(1);
                 })
                 .catch((err) => {
                     Swal.fire({
@@ -682,11 +689,10 @@ export default {
                 });
         },
         async getBankAcount() {
-            this.bank_accounts = [];
-            await adminApi.get(`/bank-accounts?`)
+            await adminApi.get(`/bank-accounts`)
                 .then((res) => {
                     let l = res.data.data;
-                    l.unshift({ id: 0, name: "اضافة حساب بنكي", name_e: "Add Bank Account" });
+                    l.unshift({ id: 0, account_number: "Add Bank Account" });
                     this.bank_accounts = l;
 
                 })
@@ -708,7 +714,6 @@ export default {
                 this.edit.city_id = null;
             }
             if (id) {
-                this.cities = [];
                 this.create.city_id = null;
                 this.edit.city_id = null;
                 await adminApi
@@ -776,9 +781,9 @@ export default {
 <template>
     <Layout>
         <PageHeader />
+        <bankAccount :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getBankAcount" />
         <Country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCategory" />
         <City :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCity(create.country_id ? create.country_id: edit.country_id)" />
-        <bankAccount :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getBankAcount" />
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -795,7 +800,7 @@ export default {
                                         <b-form-checkbox v-model="filterSetting" value="name_e" class="mb-1">{{ getCompanyKey('owner_name_en') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="phone" class="mb-1">{{ getCompanyKey('owner_phone') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="email" class="mb-1">{{ getCompanyKey('owner_email') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="rp_code" class="mb-1">{{ getCompanyKey('owner_code') }}</b-form-checkbox>
+                                        <b-form-checkbox v-model="filterSetting" value="rb_code" class="mb-1">{{ getCompanyKey('owner_code') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="nationality_id" class="mb-1">{{ getCompanyKey('owner_nationality') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="contact_person" class="mb-1">{{ getCompanyKey('owner_contact_person') }}</b-form-checkbox>
                                         <b-form-checkbox v-model="filterSetting" value="contact_phones" class="mb-1">{{ getCompanyKey('owner_contact_phones') }}</b-form-checkbox>
@@ -900,7 +905,7 @@ export default {
                                             <b-form-checkbox v-model="setting.name_e" class="mb-1">{{ getCompanyKey('owner_name_en') }}</b-form-checkbox>
                                             <b-form-checkbox v-model="setting.phone" class="mb-1">{{getCompanyKey('owner_phone') }}</b-form-checkbox>
                                             <b-form-checkbox v-model="setting.email" class="mb-1">{{ getCompanyKey('owner_email') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.rp_code" class="mb-1">{{getCompanyKey('owner_code') }}</b-form-checkbox>
+                                            <b-form-checkbox v-model="setting.rb_code" class="mb-1">{{getCompanyKey('owner_code') }}</b-form-checkbox>
                                             <b-form-checkbox v-model="setting.contact_person" class="mb-1">{{ getCompanyKey('owner_contact_person') }}</b-form-checkbox>
                                             <b-form-checkbox v-model="setting.contact_phones" class="mb-1">{{getCompanyKey('owner_contact_phones') }}</b-form-checkbox>
                                             <b-form-checkbox v-model="setting.nationality_id" class="mb-1">{{ getCompanyKey('owner_nationality') }}</b-form-checkbox>
@@ -994,7 +999,34 @@ export default {
                                     </b-button>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
+                                        <div class="form-group position-relative">
+                                            <label class="control-label">
+                                                {{ getCompanyKey('owner_nationality') }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <multiselect
+                                                v-model="$v.create.nationality_id.$model"
+                                                :options="nationalities.map((type) => type.id)"
+                                                :custom-label="(opt) => nationalities.find((x) => x.id == opt).name"
+                                            >
+                                            </multiselect>
+                                            <div
+                                                v-if="$v.create.nationality_id.$error || errors.nationality_id"
+                                                class="text-danger"
+                                            >
+                                                {{ $t("general.fieldIsRequired") }}
+                                            </div>
+                                            <template v-if="errors.nationality_id">
+                                                <ErrorMessage
+                                                    v-for="(errorMessage, index) in errors.nationality_id"
+                                                    :key="index"
+                                                >{{ errorMessage }}</ErrorMessage
+                                                >
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
                                         <div class="form-group position-relative">
                                             <label class="control-label">
                                                 {{ getCompanyKey('country') }}
@@ -1022,7 +1054,7 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="form-group position-relative">
                                             <label class="control-label">
                                                 {{ getCompanyKey('city') }}
@@ -1050,7 +1082,7 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="form-group position-relative">
                                             <label class="control-label">
                                                 {{ getCompanyKey('bank_account') }}
@@ -1060,7 +1092,7 @@ export default {
                                                 @input="showBankAccountModal"
                                                 v-model="$v.create.bank_account_id.$model"
                                                 :options="bank_accounts.map((type) => type.id)"
-                                                :custom-label="(opt) => bank_accounts.find((x) => x.id == opt).name"
+                                                :custom-label="(opt) => bank_accounts.find((x) => x.id == opt).account_number"
                                             >
                                             </multiselect>
                                             <div
@@ -1086,8 +1118,9 @@ export default {
                                             </label>
                                             <div dir="rtl">
                                                 <input
+                                                @keyup="arabicValue(create.name)"
                                                     type="text"
-                                                    class="form-control arabicInput"
+                                                    class="form-control"
                                                     data-create="1"
                                                     @keypress.enter="moveInput('input','create',2)"
                                                     v-model="$v.create.name.$model"
@@ -1113,8 +1146,9 @@ export default {
                                             </label>
                                             <div dir="ltr">
                                                 <input
+                                                @keyup="englishValue(create.name_e)"
                                                     type="text"
-                                                    class="form-control englishInput"
+                                                    class="form-control"
                                                     data-create="2"
                                                     @keypress.enter="moveInput('input','create',3)"
                                                     v-model="$v.create.name_e.$model"
@@ -1209,14 +1243,14 @@ export default {
                                                 class="form-control"
                                                 data-create="9"
                                                 @keypress.enter="moveInput('select','create',10)"
-                                                v-model="$v.create.rp_code.$model"
+                                                v-model="$v.create.rb_code.$model"
                                                 :class="{
-                                                'is-invalid':$v.create.rp_code.$error || errors.rp_code,
-                                                'is-valid':!$v.create.rp_code.$invalid && !errors.rp_code
+                                                'is-invalid':$v.create.rb_code.$error || errors.rb_code,
+                                                'is-valid':!$v.create.rb_code.$invalid && !errors.rb_code
                                             }"
                                             />
-                                            <template v-if="errors.rp_code">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.rp_code" :key="index">{{ errorMessage }}</ErrorMessage>
+                                            <template v-if="errors.rb_code">
+                                                <ErrorMessage v-for="(errorMessage,index) in errors.rb_code" :key="index">{{ errorMessage }}</ErrorMessage>
                                             </template>
                                         </div>
                                     </div>
@@ -1401,7 +1435,7 @@ export default {
                                             <span>{{ getCompanyKey('owner_whatsapp') }}</span>
                                         </div>
                                     </th>
-                                    <th v-if="setting.rp_code">
+                                    <th v-if="setting.rb_code">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('owner_code') }}</span>
                                         </div>
@@ -1439,15 +1473,15 @@ export default {
                                     </td>
                                     <td v-if="setting.phone">{{ data.phone }}</td>
                                     <td v-if="setting.email">{{ data.email }}</td>
-                                    <td v-if="setting.nationality_id">{{ data.nationality_id }}</td>
+                                    <td v-if="setting.nationality_id">{{ $i18n.locale == 'ar' ? data.nationality.name : data.nationality.name_e }}</td>
                                     <td v-if="setting.national_id">{{ data.national_id }}</td>
                                     <td v-if="setting.contact_person">{{ data.contact_person }}</td>
                                     <td v-if="setting.contact_phones">{{ data.contact_phones }}</td>
-                                    <td v-if="setting.country_id">{{ data.country_id }}</td>
-                                    <td v-if="setting.city_id">{{ data.city_id }}</td>
-                                    <td v-if="setting.bank_account_id">{{ data.bank_account_id }}</td>
+                                    <td v-if="setting.country_id">{{ $i18n.locale == 'ar' ? data.country.name : data.country.name_e }}</td>
+                                    <td v-if="setting.city_id">{{ $i18n.locale == 'ar' ? data.city.name : data.city.name_e }}</td>
+                                    <td v-if="setting.bank_account_id">{{  data.ban1k_account.account_number }}</td>
                                     <td v-if="setting.whatsapp">{{ data.whatsapp }}</td>
-                                    <td v-if="setting.rp_code">{{ data.rp_code }}</td>
+                                    <td v-if="setting.rb_code">{{ data.rb_code }}</td>
                                     <td v-if="enabled3" class="do-not-print">
                                         <div class="btn-group">
                                             <button
@@ -1521,7 +1555,34 @@ export default {
                                                     </b-button>
                                                 </div>
                                                 <div class="row">
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-3">
+                                                        <div class="form-group position-relative">
+                                                            <label class="control-label">
+                                                                {{ getCompanyKey('owner_nationality') }}
+                                                                <span class="text-danger">*</span>
+                                                            </label>
+                                                            <multiselect
+                                                                v-model="$v.edit.nationality_id.$model"
+                                                                :options="nationalities.map((type) => type.id)"
+                                                                :custom-label="(opt) => nationalities.find((x) => x.id == opt).name"
+                                                            >
+                                                            </multiselect>
+                                                            <div
+                                                                v-if="$v.edit.nationality_id.$error || errors.nationality_id"
+                                                                class="text-danger"
+                                                            >
+                                                                {{ $t("general.fieldIsRequired") }}
+                                                            </div>
+                                                            <template v-if="errors.nationality_id">
+                                                                <ErrorMessage
+                                                                    v-for="(errorMessage, index) in errors.nationality_id"
+                                                                    :key="index"
+                                                                >{{ errorMessage }}</ErrorMessage
+                                                                >
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
                                                         <div class="form-group position-relative">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('country') }}
@@ -1549,7 +1610,7 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-3">
                                                         <div class="form-group position-relative">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('city') }}
@@ -1577,7 +1638,7 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-3">
                                                         <div class="form-group position-relative">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('bank_account') }}
@@ -1587,7 +1648,7 @@ export default {
                                                                 @input="showBankAccountEdit"
                                                                 v-model="$v.edit.bank_account_id.$model"
                                                                 :options="bank_accounts.map((type) => type.id)"
-                                                                :custom-label="(opt) => bank_accounts.find((x) => x.id == opt).name"
+                                                                :custom-label="(opt) => bank_accounts.find((x) => x.id == opt).account_number"
                                                             >
                                                             </multiselect>
                                                             <div
@@ -1613,8 +1674,9 @@ export default {
                                                             </label>
                                                             <div dir="rtl">
                                                                 <input
+                                                                @keyup="arabicValue(edit.name)"
                                                                     type="text"
-                                                                    class="form-control arabicInput"
+                                                                    class="form-control"
                                                                     data-edit="1"
                                                                     @keypress.enter="moveInput('input','edit',2)"
                                                                     v-model="$v.edit.name.$model"
@@ -1639,8 +1701,9 @@ export default {
                                                             </label>
                                                             <div dir="ltr">
                                                                 <input
+                                                                @keyup="englishValue(edit.name_e)"
                                                                     type="text"
-                                                                    class="form-control englishInput"
+                                                                    class="form-control"
                                                                     data-edit="2"
                                                                     @keypress.enter="moveInput('input','edit',3)"
                                                                     v-model="$v.edit.name_e.$model"
@@ -1734,14 +1797,14 @@ export default {
                                                                 class="form-control"
                                                                 data-edit="9"
                                                                 @keypress.enter="moveInput('select','edit',10)"
-                                                                v-model="$v.edit.rp_code.$model"
+                                                                v-model="$v.edit.rb_code.$model"
                                                                 :class="{
-                                                'is-invalid':$v.edit.rp_code.$error || errors.rp_code,
-                                                'is-valid':!$v.edit.rp_code.$invalid && !errors.rp_code
+                                                'is-invalid':$v.edit.rb_code.$error || errors.rb_code,
+                                                'is-valid':!$v.edit.rb_code.$invalid && !errors.rb_code
                                             }"
                                                             />
-                                                            <template v-if="errors.rp_code">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.rp_code" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                            <template v-if="errors.rb_code">
+                                                                <ErrorMessage v-for="(errorMessage,index) in errors.rb_code" :key="index">{{ errorMessage }}</ErrorMessage>
                                                             </template>
                                                         </div>
                                                     </div>
@@ -1856,8 +1919,3 @@ export default {
     height: 300px;
 }
 </style>
-
-
-
-
-

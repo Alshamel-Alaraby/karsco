@@ -12,10 +12,7 @@ class ArchDocumentStatus extends Model
 
     protected $guarded = ['id'];
 
-    protected static function newFactory()
-    {
-        return \Modules\Archiving\Database\factories\ArchDocumentStatusFactory::new();
-    }
+
 
     public function document(){
         return $this->belongsTo (Document::class,'document_id');

@@ -36,6 +36,7 @@ class DocumentField extends Model
 
     public function hasChildren()
     {
-        return $this->archiveClosedReference()->count() > 0;
+        return $this->archiveClosedReference()->count() > 0 || $this->dataTye()->count() > 0 || $this->docTypeField()->count() > 0
+            || $this->treeProperty()->count() > 0 || $this->docTypeField()->count() > 0;
     }
 }

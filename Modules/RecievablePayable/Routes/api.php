@@ -26,30 +26,48 @@ Route::prefix ('recievable-payable')->group (function (){
 //    Route::middleware ('auth:sanctum')->group (function (){
 //
 //    });
+    Route ::resource ( 'rp_installment_condation' , 'RpInstallmentCondationController' ) -> except ( 'edit' , 'create' );
+    Route ::get ( 'rp_installment_condation/logs/{id}' , 'RpInstallmentCondationController@logs' );
+    Route ::post ( 'rp_installment_condation/logs/bulk-delete' , 'RpInstallmentCondationController@bulkDelete' );
+
     Route ::resource ( 'rp_installment_p_plan_details' , 'RpInstallmentPaymentPlanDetailController' ) -> except ( 'edit' , 'create' );
     Route ::get ( 'rp_installment_p_plan_details/logs/{id}' , 'RpInstallmentPaymentPlanDetailController@logs' );
+    Route ::post ( 'rp_installment_p_plan_details/bulk-delete' , 'RpInstallmentPaymentPlanDetailController@bulkDelete' );
 
     Route ::resource ( 'rp_installment_payment_types' , 'RpInstallmentPaymentTypeController' ) -> except ( 'edit' , 'create' );
     Route ::get ( 'rp_installment_payment_types/logs/{id}' , 'RpInstallmentPaymentTypeController@logs' );
+    Route ::post ( 'rp_installment_payment_types/bulk-delete' , 'RpInstallmentPaymentTypeController@bulkDelete' );
 
     Route ::resource ( 'rp_installment_status' , 'RpInstallmentStatusController' ) -> except ( 'edit' , 'create' );
     Route ::get ( 'rp_installment_status/logs/{id}' , 'RpInstallmentStatusController@logs' );
+    Route ::post ( 'rp_installment_status/bulk-delete' , 'RpInstallmentStatusController@bulkDelete' );
 
     Route ::resource ( 'rp_payment_plan_installment' , 'RpPaymentPlanInstallmentController' ) -> except ( 'edit' , 'create' );
     Route ::get ( 'rp_payment_plan_installment/logs/{id}' , 'RpPaymentPlanInstallmentController@logs' );
+    Route ::post ( 'rp_payment_plan_installment/bulk-delete' , 'RpPaymentPlanInstallmentController@bulkDelete' );
 
     Route ::resource ( 'rp_main_contact_group' , 'RpMainContactGroupController' ) -> except ( 'edit' , 'create' );
     Route ::get ( 'rp_main_contact_group/logs/{id}' , 'RpMainContactGroupController@logs' );
+    Route ::post ( 'rp_main_contact_group/bulk-delete' , 'RpMainContactGroupController@bulkDelete' );
 
     Route ::resource ( 'rp_sub_contact_group' , 'RpSubContactGroupController' ) -> except ( 'edit' , 'create' );
     Route ::get ( 'rp_sub_contact_group/logs/{id}' , 'RpSubContactGroupController@logs' );
+    Route ::post ( 'rp_sub_contact_group/bulk-delete' , 'RpSubContactGroupController@bulkDelete' );
 
     Route ::resource ( 'rp_installment_p_plan' , 'RpInstallmentPaymentPlanController' ) -> except ( 'edit' , 'create' );
     Route ::get ( 'rp_installment_p_plan/logs/{id}' , 'RpInstallmentPaymentPlanController@logs' );
+    Route ::post ( 'rp_installment_p_plan/bulk-delete' , 'RpInstallmentPaymentPlanController@bulkDelete' );
 
     Route ::resource ( 'rp_screen_sub_contact_group' , 'RpScreenSubContactGroupController' ) -> except ( 'edit' , 'create' );
     Route ::get ( 'rp_screen_sub_contact_group/logs/{id}' , 'RpScreenSubContactGroupController@logs' );
+    Route ::post ( 'rp_screen_sub_contact_group/bulk-delete' , 'RpScreenSubContactGroupController@bulkDelete' );
 
     Route ::resource ( 'rp_document_plan' , 'RpDocumentPlanController' ) -> except ( 'edit' , 'create' );
     Route ::get ( 'rp_document_plan/logs/{id}' , 'RpDocumentPlanController@logs' );
+    Route ::post ( 'rp_document_plan/logs/bulk-delete' , 'RpDocumentPlanController@bulkDelete' );
+
+
+
+
+
 });

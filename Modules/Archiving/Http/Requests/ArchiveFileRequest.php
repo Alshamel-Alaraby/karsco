@@ -27,6 +27,7 @@ class ArchiveFileRequest extends FormRequest
     {
         return [
             "arch_doc_type_id" => "required|exists:arch_doc_types,id",
+            "arch_department_id" => "nullable|exists:arch_departments,id",
             "data_type_value" => "required",
             "user_id" => "nullable|exists:users,id",
             // "media.*" => ["exists:media,id", new \App\Rules\MediaRule()],

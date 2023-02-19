@@ -13,6 +13,7 @@ import { dynamicSortString, dynamicSortNumber } from "../../../helper/tableSort"
 import translation from "../../../helper/translation-mixin";
 import senderHoverHelper from "../../../helper/senderHoverHelper";
 import { formatDateOnly } from "../../../helper/startDate";
+import {arabicValue,englishValue} from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -35,6 +36,7 @@ export default {
       per_page: 50,
       search: "",
       debounce: {},
+        enabled3: true,
       branchesPagination: {},
       branches: [],
       isLoader: false,
@@ -62,6 +64,10 @@ export default {
       },
       is_disabled: false,
       filterSetting: ["name", "name_e"],
+        printLoading: true,
+        printObj: {
+            id: "printData",
+        }
     };
   },
   validations: {
@@ -112,24 +118,24 @@ export default {
     this.getData();
   },
   updated() {
-    $(function () {
-      $(".englishInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return true;
-        if (65 <= ew && ew <= 90) return true;
-        if (97 <= ew && ew <= 122) return true;
-        return false;
-      });
-      $(".arabicInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return false;
-        if (65 <= ew && ew <= 90) return false;
-        if (97 <= ew && ew <= 122) return false;
-        return true;
-      });
-    });
+    // $(function () {
+    //   $(".englishInput").keypress(function (event) {
+    //     var ew = event.which;
+    //     if (ew == 32) return true;
+    //     if (48 <= ew && ew <= 57) return true;
+    //     if (65 <= ew && ew <= 90) return true;
+    //     if (97 <= ew && ew <= 122) return true;
+    //     return false;
+    //   });
+    //   $(".arabicInput").keypress(function (event) {
+    //     var ew = event.which;
+    //     if (ew == 32) return true;
+    //     if (48 <= ew && ew <= 57) return false;
+    //     if (65 <= ew && ew <= 90) return false;
+    //     if (97 <= ew && ew <= 122) return false;
+    //     return true;
+    //   });
+    // });
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -538,6 +544,31 @@ export default {
     moveInput(tag, c, index) {
       document.querySelector(`${tag}[data-${c}='${index}']`).focus();
     },
+      /**
+       *   Export Excel
+       */
+      ExportExcel(type, fn, dl) {
+          this.enabled3 = false;
+          setTimeout(() => {
+              let elt = this.$refs.exportable_table;
+              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
+              if (dl) {
+                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
+              } else {
+                  XLSX.writeFile(wb, fn || (('Branch' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
+              }
+              this.enabled3 = true;
+          }, 100);
+      },
+      arabicValue(txt){
+          this.create.name = arabicValue(txt);
+          this.edit.name = arabicValue(txt);
+      } ,
+
+      englishValue(txt){
+          this.create.name_e = englishValue(txt);
+          this.edit.name_e = englishValue(txt);
+      }
   },
 };
 </script>
@@ -607,12 +638,12 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                  <button class="custom-btn-dowonload">
-                    <i class="fas fa-file-download"></i>
-                  </button>
-                  <button class="custom-btn-dowonload">
-                    <i class="fe-printer"></i>
-                  </button>
+                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                        <i class="fas fa-file-download"></i>
+                    </button>
+                    <button v-print="'#printData'" class="custom-btn-dowonload">
+                        <i class="fe-printer"></i>
+                    </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -789,6 +820,7 @@ export default {
                             'is-invalid': $v.create.name.$error || errors.name,
                             'is-valid': !$v.create.name.$invalid && !errors.name,
                           }"
+                          @keyup="arabicValue(create.name)"
                           id="field-1"
                         />
                       </div>
@@ -828,6 +860,7 @@ export default {
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
                             'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
                           }"
+                          @keyup="englishValue(create.name_e)"
                           id="field-2"
                         />
                       </div>
@@ -896,10 +929,11 @@ export default {
               <!--       start loader       -->
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
-              <table class="table table-borderless table-hover table-centered m-0">
+              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
+                     id="printData">
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0">
+                    <th v-if="enabled3" class="do-not-print" scope="col" style="width: 0">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -944,10 +978,10 @@ export default {
                         <span>{{ getCompanyKey("branch_status") }}</span>
                       </div>
                     </th>
-                    <th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
                   </tr>
                 </thead>
                 <tbody v-if="branches.length > 0">
@@ -958,7 +992,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -976,7 +1010,7 @@ export default {
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
                     <td v-if="setting.is_active">{{ data.is_active }}</td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1070,6 +1104,7 @@ export default {
                                       'is-invalid': $v.edit.name.$error || errors.name,
                                       'is-valid': !$v.edit.name.$invalid && !errors.name,
                                     }"
+                                    @keyup="arabicValue(edit.name)"
                                     id="edit-1"
                                   />
                                 </div>
@@ -1117,6 +1152,7 @@ export default {
                                       'is-valid':
                                         !$v.edit.name_e.$invalid && !errors.name_e,
                                     }"
+                                    @keyup="englishValue(edit.name_e)"
                                     id="edit-2"
                                   />
                                 </div>
@@ -1188,7 +1224,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td>
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mouseover="log(data.id)"
                         @mousemove="log(data.id)"
@@ -1219,3 +1255,14 @@ export default {
     </div>
   </Layout>
 </template>
+
+<style scoped>
+@media print {
+    .do-not-print {
+        display: none;
+    }
+    .arrow-sort {
+        display: none;
+    }
+}
+</style>

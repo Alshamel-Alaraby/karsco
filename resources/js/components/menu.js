@@ -19,18 +19,11 @@ export const menuItems = [
         link: '/dashboard/branch'
     },
     {
-        id: 10127,
-        label: 'general.subcontactgroup',
-        icon: 'fas fa-code-branch',
-        name: 'sub contact group',
-        link: '/dashboard/sub-contact-groups'
-    },
-    {
         id: 1222,
-        label: 'general.payemntPlanInstallment',
+        label: 'general.customTable',
         icon: 'fas fa-code-branch',
-        name: 'payment plan installment',
-        link: '/dashboard/payment-plan-installments'
+        name: 'custom table',
+        link: '/dashboard/custom-table'
     },
     {
         id: 10008,
@@ -371,6 +364,12 @@ export const menuItems = [
                 link: '/dashboard/MainContactGroups'
             },
             {
+                id: 387192,
+                name: 'subContactGroup',
+                label: 'general.subcontactgroup',
+                link: '/dashboard/sub-contact-group'
+            },
+            {
                 id: 387193,
                 name: 'installment payment plan detail',
                 label: 'general.InstallmentPaymentPlanDetail',
@@ -381,6 +380,27 @@ export const menuItems = [
                 name: 'installment payment plan',
                 label: 'general.installmentPaymentPlan',
                 link: '/dashboard/installment-payment-plan'
+            },
+            {
+                id: 1222,
+                label: 'general.payemntPlanInstallment',
+                icon: 'fas fa-code-branch',
+                name: 'payment plan installment',
+                link: '/dashboard/payment-plan-installments'
+            },
+            {
+                id: 1222,
+                label: 'general.DocumentPlan',
+                icon: 'fas fa-code-branch',
+                name: 'installment document plan',
+                link: '/dashboard/installment-document-plan'
+            },
+            {
+                id: 1222,
+                label: 'general.ScreenSubcontactGroup',
+                icon: 'fas fa-code-branch',
+                name: 'screen subcontact group',
+                link: '/dashboard/screen-subcontact-group'
             },
         ]
     },

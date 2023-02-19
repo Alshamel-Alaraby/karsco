@@ -30,6 +30,8 @@ class DepartmentRequest extends FormRequest
                 "name_e" => ["required", "string", "max:100"],
                 "parent_id" => ['nullable', 'integer'],
                 "is_active" => "nullable|in:active,inactive",
+                "is_key"=>[],
+                "key_value"=>[]
             ];
         }
         return [
@@ -37,6 +39,8 @@ class DepartmentRequest extends FormRequest
             "name_e" => ["required", "string", "max:100", "unique:arch_departments,name_e"],
             "parent_id" => ['nullable', 'integer'],
             "is_active" => "nullable|in:active,inactive",
+            "is_key"=>[],
+            "key_value"=>[]
         ];
     }
 

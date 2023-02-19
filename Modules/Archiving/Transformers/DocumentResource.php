@@ -19,6 +19,7 @@ class DocumentResource extends JsonResource
             'arch_doc_type' => new DocRelationResource($this->archDocType),
             'doc_status' => new DocStatusRelationResource($this->docStatus),
             // "arc_department" => DepartmentResource::collection($this->documents),
+            'children'=>$this->children,
             'doc_description' => $this->doc_description,
             'url_reference' => $this->url_reference,
             'created_at' => $this->created_at,

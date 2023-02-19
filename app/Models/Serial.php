@@ -11,10 +11,10 @@ use Spatie\Activitylog\LogOptions;
 
 class Serial extends Model
 {
-    use HasFactory, LogTrait,ConnTrait, CompanyScopeTrait;
+    use HasFactory, LogTrait, CompanyScopeTrait;
 
     protected $guarded = ['id'];
-
+    protected $table = "general_serials";
     protected $casts = [
         'is_default' => 'App\Enums\IsDefault',
     ];

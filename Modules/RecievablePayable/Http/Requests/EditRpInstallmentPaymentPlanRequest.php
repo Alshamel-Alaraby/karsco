@@ -4,6 +4,7 @@ namespace Modules\RecievablePayable\Http\Requests;
 
 use App\Traits\ValidationTrait;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class EditRpInstallmentPaymentPlanRequest extends FormRequest
 {
@@ -16,14 +17,12 @@ class EditRpInstallmentPaymentPlanRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|unique:rp_installment_payment_plans,name,'.$this->id,
-            'name_e' => 'required|unique:rp_installment_payment_plans,name_e,'.$this->id,
+            'name' => ['required','string','max:255','unique:rp_installment_payment_plans,name,'.$this->rp_installment_p_plan],
+            'name_e' => ['required','string','max:255','unique:rp_installment_payment_plans,name_e,'.$this->rp_installment_p_plan],
             'is_default' => 'required',
             'is_active' => [],
             'description' => [],
             'description_e' => [],
-            'start_date' => [],
-            'installment_payment_type_id' => [],
         ];
     }
 
