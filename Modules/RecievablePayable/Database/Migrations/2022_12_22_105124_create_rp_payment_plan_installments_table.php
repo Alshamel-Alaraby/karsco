@@ -27,6 +27,8 @@ return new class extends Migration
             $table->unsignedInteger ('module_id')->default (0)->comment ('from SYS_modules (leaf)');
             $table->unsignedInteger ('ref_id')->default (0)->comment ('رقم المستند (رقم عقد البيع - رقم بيع سيارة)');
             $table->string ('rp_code')->default (0)->comment ('الحساب اللي عليه اقساط');
+            $table->longText('note_a')->nullable();
+            $table->longText('note_e')->nullable();
             $table->timestamps();
         });
     }

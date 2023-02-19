@@ -22,9 +22,6 @@ class RpInstallmentPaymentPlanResource extends JsonResource
             "is_active"=>$this->is_active,
             "description"=>$this->description,
             "description_e"=>$this->description_e,
-            "start_date"=>$this->start_date,
-            "installment_payment_type_id"=>$this->installment_payment_type_id,
-            "installment_payment_type"=>$this->installment_payment_type,
         ];
     }
 }

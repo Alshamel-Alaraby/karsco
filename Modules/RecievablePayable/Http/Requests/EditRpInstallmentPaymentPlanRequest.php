@@ -17,14 +17,12 @@ class EditRpInstallmentPaymentPlanRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required','string','max:255','unique:rp_installment_payment_plans,id,'.$this->id],
-            'name_e' => ['required','string','max:255','unique:rp_installment_payment_plans,id,'.$this->id],
+            'name' => ['required','string','max:255','unique:rp_installment_payment_plans,name,'.$this->rp_installment_p_plan],
+            'name_e' => ['required','string','max:255','unique:rp_installment_payment_plans,name_e,'.$this->rp_installment_p_plan],
             'is_default' => 'required',
             'is_active' => [],
             'description' => [],
             'description_e' => [],
-            'start_date' => [],
-            'installment_payment_type_id' => [],
         ];
     }
 

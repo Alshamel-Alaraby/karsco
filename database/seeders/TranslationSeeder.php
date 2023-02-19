@@ -6224,6 +6224,60 @@ class TranslationSeeder extends Seeder
                 "new_en" => "",
                 "company_id" => 0,
                 "screen" => "receivable payable"
+            ],
+            [
+                "key" => "is_passed",
+                "default_en" => "Is passed",
+                "default_ar" => "تم تمريره",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "is_passed_all",
+                "default_en" => "Is passed all",
+                "default_ar" => "تم تمريره بالكامل",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "freq_period",
+                "default_en" => "Freq period",
+                "default_ar" => "فترة التكرار",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "day_month",
+                "default_en" => "Day mounth",
+                "default_ar" => "يوم الشهر",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "is_conditional",
+                "default_en" => "Is conditional",
+                "default_ar" => "شرطي",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "condition",
+                "default_en" => "Condition name",
+                "default_ar" => "اسم الشرط",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
             ]
         ]);
         //Main Contact Groups

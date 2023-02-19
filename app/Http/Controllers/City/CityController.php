@@ -42,7 +42,6 @@ class CityController extends Controller
         //     cachePut('cities', $data);
         // }
         $data = $this->repository->getAll($request);
-
         return responseJson(200, 'success', ($this->resource)::collection($data['data']), $data['paginate'] ? getPaginates($data['data']) : null);
     }
 

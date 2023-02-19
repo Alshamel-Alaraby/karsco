@@ -17,8 +17,8 @@ class EditRpMainContactGroupRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required','string','max:255','unique:rp_main_contact_groups,id,'.$this->id],
-            'name_e' => ['required','string','max:255','unique:rp_main_contact_groups,id,'.$this->id],
+            'name' => ['required','string','max:255','unique:rp_main_contact_groups,name,'.$this->rp_main_contact_group],
+            'name_e' => ['required','string','max:255','unique:rp_main_contact_groups,name_e,'.$this->rp_main_contact_group],
         ];
     }
 

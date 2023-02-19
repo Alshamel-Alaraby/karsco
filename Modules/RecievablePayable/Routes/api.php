@@ -26,6 +26,10 @@ Route::prefix ('recievable-payable')->group (function (){
 //    Route::middleware ('auth:sanctum')->group (function (){
 //
 //    });
+    Route ::resource ( 'rp_installment_condation' , 'RpInstallmentCondationController' ) -> except ( 'edit' , 'create' );
+    Route ::get ( 'rp_installment_condation/logs/{id}' , 'RpInstallmentCondationController@logs' );
+    Route ::post ( 'rp_installment_condation/logs/bulk-delete' , 'RpInstallmentCondationController@bulkDelete' );
+
     Route ::resource ( 'rp_installment_p_plan_details' , 'RpInstallmentPaymentPlanDetailController' ) -> except ( 'edit' , 'create' );
     Route ::get ( 'rp_installment_p_plan_details/logs/{id}' , 'RpInstallmentPaymentPlanDetailController@logs' );
     Route ::post ( 'rp_installment_p_plan_details/bulk-delete' , 'RpInstallmentPaymentPlanDetailController@bulkDelete' );
@@ -61,5 +65,9 @@ Route::prefix ('recievable-payable')->group (function (){
     Route ::resource ( 'rp_document_plan' , 'RpDocumentPlanController' ) -> except ( 'edit' , 'create' );
     Route ::get ( 'rp_document_plan/logs/{id}' , 'RpDocumentPlanController@logs' );
     Route ::post ( 'rp_document_plan/logs/bulk-delete' , 'RpDocumentPlanController@bulkDelete' );
+
+
+
+
+
 });
-    

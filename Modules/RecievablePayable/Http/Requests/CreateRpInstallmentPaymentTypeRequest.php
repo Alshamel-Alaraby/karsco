@@ -18,8 +18,14 @@ class CreateRpInstallmentPaymentTypeRequest extends FormRequest
         return [
             'name' => 'required|string|max:255|unique:rp_installment_payment_types,name',
             'name_e' => 'required|string|max:255|unique:rp_installment_payment_types,name_e',
-            'auto_freq' => [],
-            'is_partially' => [],
+            'auto_freq' => ['required','in:0,1'],
+            'is_partially' => ['required_if:auto_freq,==,1'],
+            'is_passed' => ['required_if:auto_freq,==,1'],
+            'is_passed_all' => ['required_if:auto_freq,==,1'],
+            'freq_period' => [],
+            'day_month' => ['required_if:auto_freq,==,1'],
+            'is_conditional' => ['required_if:auto_freq,==,1'],
+            'installment_condation_id' => ['required_if:auto_freq,==,1'],
         ];
     }
 

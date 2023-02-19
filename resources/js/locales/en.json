@@ -901,6 +901,10 @@
         "thisFieldIsUniq": "this Field Is Unique",
         "true": "true",
         "false": "false",
-        "is_key": "key"
+        "is_key": "key",
+        "Table":"Table",
+        "is_required":"Is required",
+        "is_visible":"Is visible",
+        "Column": "Column"
     }
 }

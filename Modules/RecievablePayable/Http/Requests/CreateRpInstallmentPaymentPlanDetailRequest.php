@@ -20,10 +20,8 @@ class CreateRpInstallmentPaymentPlanDetailRequest extends FormRequest
             'ln_no' => 'required',
             'is_fixed' => [],
             'installment_payment_type_per' => [],
-            'installment_payment_type_amount' => [],
             'installment_payment_type_freq' => [],
             'interest_per' => [],
-            'interest_value' => [],
         ];
     }
 

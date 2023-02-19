@@ -10,6 +10,7 @@ import loader from "../../../components/loader";
 import { dynamicSortString, dynamicSortNumber } from "../../../helper/tableSort";
 import translation from "../../../helper/translation-mixin";
 import { formatDateOnly } from "../../../helper/startDate";
+import Multiselect from "vue-multiselect";
 
 /**
  * Advanced Table component
@@ -26,6 +27,7 @@ export default {
     Switches,
     ErrorMessage,
     loader,
+    Multiselect,
   },
   data() {
     return {
@@ -34,30 +36,13 @@ export default {
       debounce: {},
       customTablesPagination: {},
       branches: [],
+      tables: [],
       isLoader: false,
       Tooltip: "",
       mouseEnter: "",
       create: {
         table_name: "",
-        columns: [
-          {
-            name: "",
-            name_e: "",
-            is_required: 1,
-            is_visible: 1,
-          },
-        ],
-      },
-      create: {
-        table_name: "",
-        columns: [
-          {
-            name: "",
-            name_e: "",
-            is_required: 1,
-            is_visible: 1,
-          },
-        ],
+        columns: [],
       },
       company_id: null,
       errors: {},
@@ -74,26 +59,10 @@ export default {
   },
   validations: {
     create: {
-      table_name: { required, minLength: minLength(2), maxLength: maxLength(255) },
-      columns: {
-        required,
-        $each: {
-          name: { required, minLength: minLength(2), maxLength: maxLength(255) },
-          name_e: { required, minLength: minLength(2), maxLength: maxLength(255) },
-          is_required: { required },
-        },
-      },
+      table_name: { required },
     },
     edit: {
-      table_name: { required, minLength: minLength(2), maxLength: maxLength(255) },
-      columns: {
-        required,
-        $each: {
-          name: { required, minLength: minLength(2), maxLength: maxLength(255) },
-          name_e: { required, minLength: minLength(2), maxLength: maxLength(255) },
-          is_required: { required },
-        },
-      },
+      table_name: { required },
     },
   },
   watch: {
@@ -131,26 +100,6 @@ export default {
     this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
   },
-  updated() {
-    $(function () {
-      $(".englishInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return true;
-        if (65 <= ew && ew <= 90) return true;
-        if (97 <= ew && ew <= 122) return true;
-        return false;
-      });
-      $(".arabicInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return false;
-        if (65 <= ew && ew <= 90) return false;
-        if (97 <= ew && ew <= 122) return false;
-        return true;
-      });
-    });
-  },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       if (
@@ -164,6 +113,52 @@ export default {
     });
   },
   methods: {
+    async getTables() {
+      this.isLoader = true;
+
+      await adminApi
+        .get(`/document-field/tables`)
+        .then((res) => {
+          let l = res.data.data;
+          this.tables = l;
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: `${this.$t("general.Error")}`,
+            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+          });
+        })
+        .finally(() => {
+          this.isLoader = false;
+        });
+    },
+    async getColumns(table) {
+      this.isLoader = true;
+
+      await adminApi
+        .get(`/document-field/columns/${table}`)
+        .then((res) => {
+          let l = res.data.data;
+          this.create.columns = l.map((column) => {
+            return {
+              name: column,
+              is_required: 1,
+              is_visible: 1,
+            };
+          });
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: `${this.$t("general.Error")}`,
+            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+          });
+        })
+        .finally(() => {
+          this.isLoader = false;
+        });
+    },
     addNewField() {
       this.create.columns.push({
         name: "",
@@ -271,6 +266,7 @@ export default {
           });
       }
     },
+
     /**
      *  end get Data countrie && pagination
      */
@@ -405,17 +401,7 @@ export default {
      *  hidden Modal (create)
      */
     resetModal() {
-      this.create = {
-        table_name: "",
-        columns: [
-          {
-            name: "",
-            name_e: "",
-            is_required: 1,
-            is_visible: 1,
-          },
-        ],
-      };
+      this.getTables();
       this.$nextTick(() => {
         this.$v.$reset();
       });
@@ -443,12 +429,6 @@ export default {
       this.is_disabled = false;
     },
     AddSubmit() {
-      if (!this.create.name) {
-        this.create.name = this.create.name_e;
-      }
-      if (!this.create.name_e) {
-        this.create.name_e = this.create.name;
-      }
       this.$v.create.$touch();
 
       if (this.$v.create.$invalid) {
@@ -457,7 +437,7 @@ export default {
         this.isLoader = true;
         this.errors = {};
         adminApi
-          .post(`/branches`, { ...this.create, company_id: this.company_id })
+          .post(`/customTable`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.is_disabled = true;
             this.getData();
@@ -773,7 +753,7 @@ export default {
 
             <!--  create   -->
             <b-modal
-              dialog-class="modal-full-width"
+              size="lg"
               id="create"
               :title="getCompanyKey('branch_create_form')"
               title-class="font-18"
@@ -787,17 +767,7 @@ export default {
                   <div class="card">
                     <div class="card-body">
                       <form>
-                        <div class="mb-3 d-flex justify-content-between">
-                          <!-- Start Add New Record Button -->
-                          <b-button
-                            @click.prevent="addNewField"
-                            style="background-color: rgb(218 220 222); color: #000"
-                            type="button"
-                            :class="['font-weight-bold px-2', is_disabled ? 'mx-2' : '']"
-                          >
-                            + {{ $t("general.AddNewRecord") }}
-                          </b-button>
-
+                        <div class="mb-3 d-flex justify-content-end">
                           <b-button
                             variant="success"
                             type="button"
@@ -812,169 +782,96 @@ export default {
                           </b-button>
                           <!-- End Cancel Button Modal -->
                         </div>
+                        <div class="row mb-4">
+                          <div class="col-md-6">
+                            <div class="form-group position-relative">
+                              <label class="control-label">
+                                {{ $t("general.Table") }}
+                                <span class="text-danger">*</span>
+                              </label>
+                              <multiselect
+                                @input="getColumns"
+                                v-model="create.table_name"
+                                :options="tables"
+                              >
+                              </multiselect>
+                              <div
+                                v-if="$v.create.table_name.$error || errors.table_name"
+                                class="text-danger"
+                              >
+                                {{ $t("general.fieldIsRequired") }}
+                              </div>
+                              <template v-if="errors.table_name">
+                                <ErrorMessage
+                                  v-for="(errorMessage, index) in errors.table_name"
+                                  :key="index"
+                                  >{{ errorMessage }}</ErrorMessage
+                                >
+                              </template>
+                            </div>
+                          </div>
+                        </div>
                         <template v-for="(item, index) in create.columns">
-                          <div class="row">
-                            <div class="col-md-3">
+                          <div class="row" :key="index">
+                            <div class="col-md-4">
                               <div class="form-group">
-                                <label for="field-1" class="control-label">
-                                  {{ getCompanyKey("branch_name_ar") }}
-                                  <span class="text-danger">*</span>
+                                <label class="control-label">
+                                  {{ $t("general.Column") }}
                                 </label>
-                                <div dir="rtl">
-                                  <input
-                                    type="text"
-                                    class="form-control arabicInput"
-                                    data-create="1"
-                                    @keypress.enter="moveInput('input', 'create', 2)"
-                                    v-model="$v.create.columns.$each[index].name.$model"
-                                    :class="{
-                                      'is-invalid':
-                                        $v.create.columns.$each[index].name.$error ||
-                                        errors.name,
-                                      'is-valid':
-                                        !$v.create.columns.$each[index].name.$invalid &&
-                                        !errors.name,
-                                    }"
-                                    id="field-1"
-                                  />
-                                </div>
-                                <div
-                                  v-if="!$v.create.columns.$each[index].name.minLength"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.Itmustbeatleast") }}
-                                  {{
-                                    $v.create.columns.$each[index].name.$params.minLength
-                                      .min
-                                  }}
-                                  {{ $t("general.letters") }}
-                                </div>
-                                <div
-                                  v-if="!$v.create.columns.$each[index].name.maxLength"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.Itmustbeatmost") }}
-                                  {{
-                                    $v.create.columns.$each[index].name.$params.maxLength
-                                      .max
-                                  }}
-                                  {{ $t("general.letters") }}
-                                </div>
-                                <template v-if="errors.name">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.name"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
+                                <input
+                                  readonly
+                                  type="text"
+                                  class="form-control arabicInput"
+                                  data-create="1"
+                                  @keypress.enter="moveInput('input', 'create', 2)"
+                                  v-model="create.columns[index].name"
+                                  id="field-1"
+                                />
                               </div>
                             </div>
-                            <div class="col-md-3">
-                              <div class="form-group">
-                                <label for="field-2" class="control-label">
-                                  {{ getCompanyKey("branch_name_en") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <div dir="ltr">
-                                  <input
-                                    type="text"
-                                    class="form-control englishInput"
-                                    data-create="2"
-                                    @keypress.enter="moveInput('select', 'create', 3)"
-                                    v-model="$v.create.columns.$each[index].name_e.$model"
-                                    :class="{
-                                      'is-invalid':
-                                        $v.create.columns.$each[index].name_e.$error ||
-                                        errors.name_e,
-                                      'is-valid':
-                                        !$v.create.columns.$each[index].name_e.$invalid &&
-                                        !errors.name_e,
-                                    }"
-                                    id="field-2"
-                                  />
-                                </div>
-                                <div
-                                  v-if="!$v.create.columns.$each[index].name_e.minLength"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.Itmustbeatleast") }}
-                                  {{
-                                    $v.create.columns.$each[index].name_e.$params
-                                      .minLength.min
-                                  }}
-                                  {{ $t("general.letters") }}
-                                </div>
-                                <div
-                                  v-if="!$v.create.columns.$each[index].name_e.maxLength"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.Itmustbeatmost") }}
-                                  {{
-                                    $v.create.columns.$each[index].name_e.$params
-                                      .maxLength.max
-                                  }}
-                                  {{ $t("general.letters") }}
-                                </div>
-                                <template v-if="errors.name_e">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.name_e"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-
-                            <div class="col-md-2">
+                            <div class="col-md-4">
                               <div class="form-group">
                                 <label class="mr-2">
-                                  {{ getCompanyKey("is_required") }}
+                                  {{ $t("general.is_required") }}
                                   <span class="text-danger">*</span>
                                 </label>
-                                <b-form-group
-                                  :class="{
-                                    'is-invalid':
-                                      $v.create.columns.$each[index].is_required.$error ||
-                                      errors.is_required,
-                                    'is-valid':
-                                      !$v.create.columns.$each[index].is_required
-                                        .$invalid && !errors.is_required,
-                                  }"
-                                >
+                                <b-form-group>
                                   <b-form-radio
                                     class="d-inline-block"
-                                    v-model="
-                                      $v.create.columns.$each[index].is_required.$model
-                                    "
+                                    v-model="create.columns[index].is_required"
                                     value="1"
-                                    >{{ $t("general.isReferenceYes") }}
+                                    >{{ $t("general.Yes") }}
                                   </b-form-radio>
                                   <b-form-radio
                                     class="d-inline-block m-1"
-                                    v-model="
-                                      $v.create.columns.$each[index].is_required.$model
-                                    "
+                                    v-model="create.columns[index].is_required"
                                     value="0"
-                                    >{{ $t("general.isReferenceNo") }}
+                                    >{{ $t("general.No") }}
                                   </b-form-radio>
                                 </b-form-group>
-                                <template v-if="errors.is_required">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.is_required"
-                                    :key="index"
-                                    >{{ errorMessage }}
-                                  </ErrorMessage>
-                                </template>
                               </div>
                             </div>
-                            <div class="col-md-1 p-0 pt-3" v-if="create.length > 1">
-                              <button
-                                type="button"
-                                @click.prevent="removeNewField(index)"
-                                class="custom-btn-dowonload"
-                              >
-                                <i class="fas fa-trash-alt"></i>
-                              </button>
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label class="mr-2">
+                                  {{ $t("general.is_visible") }}
+                                  <span class="text-danger">*</span>
+                                </label>
+                                <b-form-group>
+                                  <b-form-radio
+                                    class="d-inline-block"
+                                    v-model="create.columns[index].is_visible"
+                                    value="1"
+                                    >{{ $t("general.Yes") }}
+                                  </b-form-radio>
+                                  <b-form-radio
+                                    class="d-inline-block m-1"
+                                    v-model="create.columns[index].is_visible"
+                                    value="0"
+                                    >{{ $t("general.No") }}
+                                  </b-form-radio>
+                                </b-form-group>
+                              </div>
                             </div>
                           </div>
                         </template>
@@ -1154,20 +1051,18 @@ export default {
                                   {{ getCompanyKey("branch_name_ar") }}
                                   <span class="text-danger">*</span>
                                 </label>
-                                <div dir="rtl">
-                                  <input
-                                    type="text"
-                                    class="form-control arabicInput"
-                                    data-edit="1"
-                                    @keypress.enter="moveInput('input', 'edit', 2)"
-                                    v-model="$v.edit.name.$model"
-                                    :class="{
-                                      'is-invalid': $v.edit.name.$error || errors.name,
-                                      'is-valid': !$v.edit.name.$invalid && !errors.name,
-                                    }"
-                                    id="edit-1"
-                                  />
-                                </div>
+                                <input
+                                  type="text"
+                                  class="form-control arabicInput"
+                                  data-edit="1"
+                                  @keypress.enter="moveInput('input', 'edit', 2)"
+                                  v-model="$v.edit.name.$model"
+                                  :class="{
+                                    'is-invalid': $v.edit.name.$error || errors.name,
+                                    'is-valid': !$v.edit.name.$invalid && !errors.name,
+                                  }"
+                                  id="edit-1"
+                                />
                                 <div
                                   v-if="!$v.edit.name.minLength"
                                   class="invalid-feedback"

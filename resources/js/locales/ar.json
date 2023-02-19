@@ -886,6 +886,10 @@
         "thisFieldIsUniq": "هذا الحقل متكرر",
         "true": "صحيح",
         "false": "غير صحيح",
-        "is_key": "المفتاح"
+        "is_key": "المفتاح",
+        "Table":"الجدول",
+        "is_required":"مطلوب",
+        "is_visible":"مرئي",
+        "Column": "عمود"
     }
 }

@@ -16,8 +16,5 @@ class RpInstallmentPaymentPlan extends Model
     {
         return \Modules\RecievablePayable\Database\factories\RpInstallmentPaymentPlanFactory::new();
     }
-    public function installment_payment_type()
-    {
-        return $this->belongsTo(RpInstallmentPaymentType::class, "installment_payment_type_id");
-    }
+
 }

@@ -17,9 +17,10 @@ class EditRpInstallmentStatusRequest extends FormRequest
 
     public function rules()
     {
+
         return [
-            'name' => ['required','string','max:255','unique:rp_installment_statuses,id,'.$this->id],
-            'name_e' => ['required','string','max:255','unique:rp_installment_statuses,id,'.$this->id],
+            'name' => ['required','string','max:255','unique:rp_installment_statuses,name,'.$this->rp_installment_status],
+            'name_e' => ['required','string','max:255','unique:rp_installment_statuses,name_e,'.$this->rp_installment_status],
             'is_default'=>[]
         ];
     }

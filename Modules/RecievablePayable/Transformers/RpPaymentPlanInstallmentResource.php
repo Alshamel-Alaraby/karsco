@@ -30,6 +30,8 @@ class RpPaymentPlanInstallmentResource extends JsonResource
             "rp_code"=>$this->rp_code,
             "installment_payment_plan"=>$this->installment_payment_plan,
             "installment_status"=>$this->installment_status,
+            "note_a"=>$this->note_a,
+            "note_e"=>$this->note_e,
         ];
     }
 }

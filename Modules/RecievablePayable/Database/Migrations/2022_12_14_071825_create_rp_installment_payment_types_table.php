@@ -19,6 +19,12 @@ return new class extends Migration
             $table->string ('name_e',100);
             $table->unsignedTinyInteger ('auto_freq')->nullable ()->default (1)->comment ('1=Yes, 0=No (default 1)');
             $table->unsignedTinyInteger ('is_partially')->nullable ()->default (1)->comment ('1=Yes, 0=No (default 1)');
+            $table->unsignedTinyInteger ('is_passed')->nullable ()->default (1)->comment ('1=Yes, 0=No (default 1)');
+            $table->unsignedTinyInteger ('is_passed_all')->nullable ()->default (1)->comment ('1=Yes, 0=No (default 1)');
+            $table->unsignedTinyInteger ('freq_period')->nullable ()->default (1)->comment ('1=Yes, 0=No (default 1)');
+            $table->unsignedTinyInteger ('day_month')->nullable();
+            $table->unsignedTinyInteger ('is_conditional')->nullable ()->default (1)->comment ('1=Yes, 0=No (default 1)');
+            $table->unsignedTinyInteger ('installment_condation_id')->nullable();
             $table->timestamps();
         });
     }
