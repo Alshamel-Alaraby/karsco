@@ -16,12 +16,15 @@ class CreateRpInstallmentPaymentPlanDetailRequest extends FormRequest
     public function rules()
     {
         return [
-            'installment_payment_type_id' => 'required',
-            'ln_no' => 'required',
-            'is_fixed' => [],
-            'installment_payment_type_per' => [],
-            'installment_payment_type_freq' => [],
-            'interest_per' => [],
+            "installment_payment_plan_details"    => "required|array",
+            "installment_payment_plan_details.*.installment_payment_plan_id" => "required",
+            "installment_payment_plan_details.*.installment_payment_type_id" => "required",
+            "installment_payment_plan_details.*.ln_no" => "required",
+            "installment_payment_plan_details.*.is_fixed" => [],
+            "installment_payment_plan_details.*.installment_payment_type_per" => [],
+            "installment_payment_plan_details.*.installment_payment_type_freq" => [],
+            "installment_payment_plan_details.*.interest_per" => [],
+
         ];
     }
 

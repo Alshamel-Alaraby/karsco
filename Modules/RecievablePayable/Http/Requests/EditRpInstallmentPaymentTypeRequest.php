@@ -26,7 +26,7 @@ class EditRpInstallmentPaymentTypeRequest extends FormRequest
             'freq_period' => [],
             'day_month' => ['required_if:auto_freq,==,1'],
             'is_conditional' => ['required_if:auto_freq,==,1'],
-            'installment_condation_id' => ['required_if:auto_freq,==,1'],
+            'installment_condation_id' => ['required_if:is_conditional,==,1'],
         ];
     }
 

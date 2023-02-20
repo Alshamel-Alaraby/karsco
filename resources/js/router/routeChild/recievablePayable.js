@@ -11,6 +11,14 @@ export default [
         component: () => import('../../views/pages/recievablePayable/installmentStatus'),
     },
     {
+        path: '/dashboard/installment-condition',
+        name: 'installmentCondition',
+        meta: {
+            middleware: [auth,checkAuth]
+        },
+        component: () => import('../../views/pages/recievablePayable/instalmentcondation'),
+    },
+    {
         path: '/dashboard/installment-payment-type',
         name: 'installmentPaymentType',
         meta: {

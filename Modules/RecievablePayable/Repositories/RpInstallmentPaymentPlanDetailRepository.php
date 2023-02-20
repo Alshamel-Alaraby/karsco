@@ -5,6 +5,7 @@ namespace Modules\RecievablePayable\Repositories;
 use App\Models\UserSettingScreen;
 use Illuminate\Support\Facades\DB;
 use Modules\RealEstate\Entities\PropertyType;
+use Modules\RecievablePayable\Entities\RpInstallmentPaymentPlan;
 use Modules\RecievablePayable\Entities\RpInstallmentPaymentPlanDetail;
 
 class RpInstallmentPaymentPlanDetailRepository implements RpInstallmentPaymentPlanDetailRepositoryInterface
@@ -12,11 +13,26 @@ class RpInstallmentPaymentPlanDetailRepository implements RpInstallmentPaymentPl
 
     private $model;
     private $setting;
+    private $modelPlan;
 
-    public function __construct(RpInstallmentPaymentPlanDetail $model, UserSettingScreen $setting)
+    public function __construct(RpInstallmentPaymentPlanDetail $model, UserSettingScreen $setting ,RpInstallmentPaymentPlan $modelPlan)
     {
         $this->model = $model;
         $this->setting = $setting;
+        $this->modelPlan = $modelPlan;
+    }
+
+    public function allPlan($request)
+    {
+        $models = $this->modelPlan->withCount('installment_payment_plan_details as count_installment_payment_Plan_Detail')->where(function ($q) use ($request) {
+            $this->modelPlan->scopeFilter($q , $request);
+        })->orderBy($request->order ? $request->order : 'updated_at', $request->sort ? $request->sort : 'DESC');
+
+        if ($request->per_page) {
+            return ['data' => $models->paginate($request->per_page), 'paginate' => true];
+        } else {
+            return ['data' => $models->get(), 'paginate' => false];
+        }
     }
 
     public function all($request)
@@ -37,10 +53,18 @@ class RpInstallmentPaymentPlanDetailRepository implements RpInstallmentPaymentPl
         return $this->model->find($id);
     }
 
+    public function findPlan($id)
+    {
+        return $this->modelPlan->find($id);
+    }
+
+
     public function create($request)
     {
         DB::transaction(function () use ($request) {
-            $model = $this->model->create($request->all());
+            foreach ($request->installment_payment_plan_details as  $details):
+                $model = $this->model->create($details);
+            endforeach;
             cacheForget("RpInstallmentPaymentPlanDetail");
         });
     }
@@ -48,11 +72,13 @@ class RpInstallmentPaymentPlanDetailRepository implements RpInstallmentPaymentPl
     public function update($request, $id)
     {
         DB::transaction(function () use ($id, $request) {
-            $model = $this->model->find($id);
-            $model->update($request->all());
-
-            $this->forget($id);
-
+            $model = $this->model->where('installment_payment_plan_id',$id)->get();
+            foreach ($model as $value):
+                $value->delete();
+            endforeach;
+            foreach ($request->installment_payment_plan_details as  $details):
+                $model = $this->model->create($details);
+            endforeach;
         });
 
     }

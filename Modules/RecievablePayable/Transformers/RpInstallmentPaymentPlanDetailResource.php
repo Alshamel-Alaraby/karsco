@@ -24,6 +24,8 @@ class RpInstallmentPaymentPlanDetailResource extends JsonResource
             "installment_payment_type_per"=>$this->installment_payment_type_per,
             "installment_payment_type_freq"=>$this->installment_payment_type_freq,
             "interest_per"=>$this->interest_per,
+            "installment_payment_plan_id"=>$this->installment_payment_plan_id,
+            "installment_payment_plan"=>$this->installment_payment_plan,
 ٍ        ];
     }
 }

@@ -78,7 +78,7 @@ export default {
   methods: {
     getAppropriateNodes(node){
       if(node.arch_documents && node.arch_documents.length){
-        return node.arch_documents; 
+        return node.arch_documents;
       }
       else if(node.key && node.key.length){
         return node.key;

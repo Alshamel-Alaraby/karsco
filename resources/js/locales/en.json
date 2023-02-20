@@ -896,15 +896,19 @@
         "AddedToFavoritesSuccessfully": "Added to favorites successfully",
         "DeletedFromFavoritesSuccessfully":"Deleted from favorites successfully",
         "favorite": "Favorite",
+        "currentNode":"Current node",
         "Showfavorite": "Show Favorite",
         "DocumentName": "Document name",
         "thisFieldIsUniq": "this Field Is Unique",
         "true": "true",
         "false": "false",
         "is_key": "key",
+        "conditionsTable": "installment Condition Table",
+        "installmentCondition": "installment Condition",
         "Table":"Table",
         "is_required":"Is required",
         "is_visible":"Is visible",
-        "Column": "Column"
+        "Column": "Column",
+        "rows": "Rows"
     }
 }

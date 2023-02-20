@@ -887,9 +887,13 @@
         "true": "صحيح",
         "false": "غير صحيح",
         "is_key": "المفتاح",
+        "conditionsTable": " جدول شروط التقسيط",
+        "installmentCondition": "شروط التقسيط",
         "Table":"الجدول",
         "is_required":"مطلوب",
         "is_visible":"مرئي",
-        "Column": "عمود"
+        "Column": "عمود",
+        "currentNode":"النود الحالي",
+        "rows": "الصفوف"
     }
 }

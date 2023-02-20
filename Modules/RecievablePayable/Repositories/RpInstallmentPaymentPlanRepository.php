@@ -22,7 +22,13 @@ class RpInstallmentPaymentPlanRepository implements RpInstallmentPaymentPlanRepo
 
     public function all($request)
     {
-        $models = $this->model->where(function ($q) use ($request) {
+        $models = $this->model->withCount('installment_payment_plan_details as count_installment_payment_Plan_Detail')->
+            where(function ($q) use ($request){
+            $q->when($request->plan_details, function ($q){
+                $q->withWhereHas('installment_payment_plan_details');
+            });
+        })->
+        where(function ($q) use ($request) {
             $this->model->scopeFilter($q , $request);
         })->orderBy($request->order ? $request->order : 'updated_at', $request->sort ? $request->sort : 'DESC');
 

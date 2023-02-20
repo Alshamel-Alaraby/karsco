@@ -352,34 +352,28 @@ export const menuItems = [
                 link: '/dashboard/installment-status'
             },
             {
+                id: 387171,
+                name: 'Installment Condition',
+                label: 'general.installmentCondition',
+                link: '/dashboard/installment-condition'
+            },
+            {
                 id: 3874261,
                 name: 'installment payment type',
                 label: 'general.installmentPaymentType',
                 link: '/dashboard/installment-payment-type',
             },
             {
-                id: 387192,
-                name: 'main contact groups',
-                label: 'general.MainContactGroups',
-                link: '/dashboard/MainContactGroups'
-            },
-            {
-                id: 387192,
-                name: 'subContactGroup',
-                label: 'general.subcontactgroup',
-                link: '/dashboard/sub-contact-group'
+                id: 3243193,
+                name: 'installment payment plan',
+                label: 'general.installmentPaymentPlan',
+                link: '/dashboard/installment-payment-plan'
             },
             {
                 id: 387193,
                 name: 'installment payment plan detail',
                 label: 'general.InstallmentPaymentPlanDetail',
                 link: '/dashboard/InstallmentPaymentPlanDetail'
-            },
-            {
-                id: 3243193,
-                name: 'installment payment plan',
-                label: 'general.installmentPaymentPlan',
-                link: '/dashboard/installment-payment-plan'
             },
             {
                 id: 1222,
@@ -396,9 +390,20 @@ export const menuItems = [
                 link: '/dashboard/installment-document-plan'
             },
             {
+                id: 387192,
+                name: 'main contact groups',
+                label: 'general.MainContactGroups',
+                link: '/dashboard/MainContactGroups'
+            },
+            {
+                id: 387192,
+                name: 'subContactGroup',
+                label: 'general.subcontactgroup',
+                link: '/dashboard/sub-contact-group'
+            },
+            {
                 id: 1222,
                 label: 'general.ScreenSubcontactGroup',
-                icon: 'fas fa-code-branch',
                 name: 'screen subcontact group',
                 link: '/dashboard/screen-subcontact-group'
             },

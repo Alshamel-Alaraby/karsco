@@ -40,15 +40,15 @@ class RpInstallmentPaymentPlanController extends Controller
 
     public function index(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('RpInstallmentPaymentPlan');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('RpInstallmentPaymentPlan', $models);
-            }
-        } else {
+//        if (count($_GET) == 0) {
+//            $models = cacheGet('RpInstallmentPaymentPlan');
+//            if (!$models) {
+//                $models = $this->modelInterface->all($request);
+//                cachePut('RpInstallmentPaymentPlan', $models);
+//            }
+//        } else {
             $models = $this->modelInterface->all($request);
-        }
+//        }
 
         return responseJson(200, 'success', RpInstallmentPaymentPlanResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }

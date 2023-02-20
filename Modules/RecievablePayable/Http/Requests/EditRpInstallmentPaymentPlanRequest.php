@@ -23,6 +23,7 @@ class EditRpInstallmentPaymentPlanRequest extends FormRequest
             'is_active' => [],
             'description' => [],
             'description_e' => [],
+
         ];
     }
 

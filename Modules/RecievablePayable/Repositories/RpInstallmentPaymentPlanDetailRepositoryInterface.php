@@ -7,6 +7,7 @@ interface RpInstallmentPaymentPlanDetailRepositoryInterface
 
     public function all($request);
 
+
     public function logs($id);
 
     public function find($id);
@@ -20,5 +21,12 @@ interface RpInstallmentPaymentPlanDetailRepositoryInterface
     public function setting($request);
 
     public function getSetting($user_id, $screen_id);
+
+    // new  function
+
+    public function allPlan($request);
+
+    public function findPlan($id);
+
 
 }

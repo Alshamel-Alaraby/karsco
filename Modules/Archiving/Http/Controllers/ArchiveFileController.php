@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Modules\Archiving\Entities\ArchiveFile;
+use Modules\Archiving\Entities\DocType;
 use Modules\Archiving\Http\Requests\ArchiveFileRequest;
 use Modules\Archiving\Http\Requests\ToggleFavouriteRequest;
 use Modules\Archiving\Transformers\ArchiveFileRelationResource;
@@ -100,12 +101,14 @@ class ArchiveFileController extends Controller
 
         return responseJson(200, 'success', ArchiveFileResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
+
     public function create(ArchiveFileRequest $request)
     {
         $model = $this->model->create($request->validated());
         $model->refresh();
         return responseJson(200, 'created', new ArchiveFileResource($model));
     }
+
     public function update($id, UpdateArchiveFileRequest $request)
     {
         $model = $this->model->find($id);
@@ -222,7 +225,6 @@ class ArchiveFileController extends Controller
                 $model->refresh();
                 return responseJson(200, 'done', new ArchiveFileResource($model));
             }
-
         });
     }
 
@@ -283,19 +285,34 @@ class ArchiveFileController extends Controller
     }
     public function valueMedia(Request $request)
     {
-        $model = $this->model->
-        where('arch_department_id',$request->department_id)->
-        where('data_type_value','like','%"value":'.$request->value.'%')
-        ->where(function ($q) use ($request){
-            $q->when($request->arch_doc_type_id,function ($q) use ($request){
-                $q->where('arch_doc_type_id',$request->arch_doc_type_id);
-            });
-        })->get();
+        $model = $this->model->where('arch_department_id', $request->department_id)
+            ->where('data_type_value', 'like', '%"value":"' . $request->value . '"%')
+            ->whereHas('docType', function ($q) use ($request) {
+                $q->where('parent_id', $request->parent_arch_doc_type_id);
+            })->when($request->arch_doc_type_id, function ($q) use ($request) {
+                $q->where("arch_doc_type_id", $request->arch_doc_type_id);
+            })
+            ->get();
         if (!$model) {
             return responseJson(404, 'not found');
         }
         return responseJson(200, 'done', ArchiveFileResource::collection($model));
+    }
 
+    public function files_Department_Doc_Type(Request $request)
+    {
+        $model = $this->model->where(function ($q) use ($request) {
+            $q->when($request->arch_department_id, function ($q) use ($request) {
+                $q->where('arch_department_id', $request->arch_department_id);
+            });
+        })->where(function ($q) use ($request) {
+            $q->when($request->arch_doc_type_id, function ($q) use ($request) {
+                $q->whereHas('docType', function ($q) use ($request) {
+                    $q->where('parent_id', $request->arch_doc_type_id);
+                });
+            });
+        })->get();
+        return responseJson(200, 'done', ArchiveFileResource::collection($model));
     }
     public function searchValue($value)
     {
@@ -318,7 +335,4 @@ class ArchiveFileController extends Controller
         $model = $model->first();
         return responseJson(200, 'done', new ArchiveFileRelationResource($model));
     }
-
-
-
 }

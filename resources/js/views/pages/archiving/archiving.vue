@@ -191,16 +191,38 @@ export default {
   methods: {
     async getArchiveFiles(docId) {
       this.arch_doc_type_id = docId;
-      if(!this.currentNode.archive_file){
+      if (!this.currentNode.archive_file) {
         return;
       }
       await adminApi
         .get(
           `/arch-archive-files/valueMedia?value=${
             this.currentNode.name_e
-          }&department_id=${
-            this.currentNode.archive_file.arch_department_id
-          }&arch_doc_type_id=${this.arch_doc_type_id ? this.arch_doc_type_id : ""}`
+          }&department_id=${this.currentNode.archive_file.arch_department_id}
+          &parent_arch_doc_type_id=${this.currentNode.parent_doc_id}
+          &arch_doc_type_id=${this.arch_doc_type_id ? this.arch_doc_type_id : ""}`
+        )
+        .then((res) => {
+          let l = res.data;
+          this.archiveFiles = l.data;
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: `${this.$t("general.Error")}`,
+            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+          });
+        })
+        .finally(() => {
+          this.isLoader = false;
+        });
+    },
+    async getArchiveFilesByDepartmentDocument(departmentId, parentDocumentId) {
+      await adminApi
+        .get(
+          `arch-archive-files/files_Department_Doc_Type?arch_department_id=${departmentId}&arch_doc_type_id=${
+            parentDocumentId ? parentDocumentId : ""
+          }`
         )
         .then((res) => {
           let l = res.data;
@@ -230,11 +252,15 @@ export default {
             field.doc_field_id.name_e
           );
         }
+        // if (field.doc_field_id.data_type.name_e == "ENUM (droplist)") {
+        //    this.getProperties();
+        // }
         return {
           ...field,
           value: "",
         };
       });
+      this.getProperties();
     },
     getCurrentTreeProps(treePropertyId) {
       let res = this.properties.filter((prop) => {
@@ -244,7 +270,7 @@ export default {
     },
     getProperties() {
       let props = [];
-      let filterRes = this.fields.filter((field) => {
+      let filterRes = this.nodeFields.filter((field) => {
         return (
           field.doc_field_id.tree_property_id &&
           field.doc_field_id.data_type.name_e == "ENUM (droplist)"
@@ -357,7 +383,11 @@ export default {
         .get(`/document-field/column-data/${table}/${column}`)
         .then((res) => {
           let l = res.data;
-          l.data.unshift({ id:this.$i18n.locale=='ar'?"اضف":"Add", name: "اضف", name_e: "Add" });
+          l.data.unshift({
+            id: this.$i18n.locale == "ar" ? "اضف" : "Add",
+            name: "اضف",
+            name_e: "Add",
+          });
           let result = null;
           if (this.lockupTableObject) {
             result = this.lockups.find(
@@ -435,13 +465,25 @@ export default {
         this.currentNode &&
         this.currentNode.parent_doc_type_children &&
         this.currentNode.parent_doc_type_children.length
-          ? [ { id: 0, name: "الكل", name_e: "All" },
-              ...this.currentNode.parent_doc_type_children
+          ? [
+              { id: 0, name: "الكل", name_e: "All" },
+              ...this.currentNode.parent_doc_type_children,
             ]
           : [];
       this.arch_doc_type_id = null;
-      this.getArchiveFiles();
-      // this.getData();
+      if (this.currentNode.parent_doc_type_children) {
+        //If node selected is key value
+        this.getArchiveFiles();
+      } else if (this.currentNode.arch_documents) {
+        //If node selected department
+        this.getArchiveFilesByDepartmentDocument(this.currentNode.id, null);
+      } else if (this.currentNode.key) {
+        //If node selected parent document
+        this.getArchiveFilesByDepartmentDocument(
+          this.currentNode.arch_department_id,
+          this.currentNode.id
+        );
+      }
       this.isActiveFile = !this.isActiveFile;
       this.$store.commit("archiving/archiveFileEmity");
       this.$store.commit("archiving/objectActiveEmity");
@@ -757,8 +799,9 @@ export default {
      *  reset Modal (create)
      */
     async resetModalHidden() {
-      // await this.getTree();
-      await this.getPdf(this.archive_id);
+      if (this.images.length > 0) {
+        await this.getPdf(this.archive_id);
+      }
       await this.getArchiveFiles();
       // await this.getData();
       this.create = {
@@ -848,6 +891,28 @@ export default {
           data_type_value: dataTypeValue,
         })
         .then((res) => {
+          //Update tree
+          if (this.currentNode && this.currentNode.key && this.currentNode.key.length) {
+            let archFileKeyValue = res.data.data.data_type_value.filter((field) => {
+              return field.name_e == this.currentNode.key[0].name_e;
+            });
+            archFileKeyValue = archFileKeyValue.length > 0 ? archFileKeyValue[0] : null;
+            if (archFileKeyValue) {
+              let check = this.currentNode.key[0].children.filter((element) => {
+                return archFileKeyValue.value == element.name_e;
+              });
+              if (check.length == 0) {
+                this.currentNode.key[0].children.push({
+                  name: archFileKeyValue.value,
+                  name_e: archFileKeyValue.value,
+                  archive_file: res.data.data,
+                  parent_doc_type_children: this.currentNode.sub_docs,
+                  parent_doc_id: res.data.data.parent_doc_id,
+                });
+              }
+            }
+          }
+          //Update tree
           this.archive_id = res.data.data.id;
           this.is_disabled = true;
           setTimeout(() => {
@@ -1378,6 +1443,27 @@ export default {
                   <i v-if="favourite" class="fa fa-star"></i>
                   <i v-else class="far fa-star"></i>
                 </b-button>
+                <div
+                  style="width: 60%; position: relative; top: 3px"
+                  v-if="currentNode && currentNode.parent_doc_type_children"
+                >
+                  <div>
+                    <div class="form-group">
+                      <multiselect
+                        v-model="arch_doc_type_id"
+                        @select="getArchiveFiles"
+                        :options="child_doc_types.map((type) => type.id)"
+                        :custom-label="
+                          (opt) =>
+                            $i18n.locale == 'ar'
+                              ? child_doc_types.find((x) => x.id == opt).name
+                              : child_doc_types.find((x) => x.id == opt).name_e
+                        "
+                      >
+                      </multiselect>
+                    </div>
+                  </div>
+                </div>
                 <!--                <b-button-->
                 <!--                  v-b-modal.create-->
                 <!--                  variant="primary"-->
@@ -2107,6 +2193,16 @@ export default {
 
             <div class="row">
               <div class="col-lg-3">
+                <div class="p-1">
+                  <template v-if="this.currentNode">
+                    {{ $t("general.currentNode") }} :
+                    {{
+                      $i18n.locale == "ar"
+                        ? this.currentNode.name
+                        : this.currentNode.name_e
+                    }}
+                  </template>
+                </div>
                 <div class="references border">
                   <TreeBrowser
                     @onClick="nodeWasClicked"
@@ -2116,25 +2212,6 @@ export default {
                 </div>
               </div>
               <div class="col-lg-5">
-                <div v-if="currentNode && currentNode.archive_file" class="row">
-                  <div class="col-md-12">
-                    <div class="form-group">
-                      <label class="my-1 mr-2">{{ $t("general.document") }}</label>
-                      <multiselect
-                        v-model="arch_doc_type_id"
-                        @select="getArchiveFiles"
-                        :options="child_doc_types.map((type) => type.id)"
-                        :custom-label="
-                          (opt) =>
-                            $i18n.locale == 'ar'
-                              ? child_doc_types.find((x) => x.id == opt).name
-                              : child_doc_types.find((x) => x.id == opt).name_e
-                        "
-                      >
-                      </multiselect>
-                    </div>
-                  </div>
-                </div>
                 <Files
                   @onDoubleClicked="showFileModal"
                   :archiveFiles="archiveFiles"

@@ -22,6 +22,8 @@ class RpInstallmentPaymentPlanResource extends JsonResource
             "is_active"=>$this->is_active,
             "description"=>$this->description,
             "description_e"=>$this->description_e,
+            "count_installment_payment_Plan_Detail"=> $this->count_installment_payment_Plan_Detail,
+            "installment_payment_plan_details" => $this->installment_payment_plan_details
         ];
     }
 }

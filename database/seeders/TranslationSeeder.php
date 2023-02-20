@@ -6340,6 +6340,15 @@ class TranslationSeeder extends Seeder
                 "screen" => "receivable payable"
             ],
             [
+                "key" => "installment_payment_plan_id",
+                "default_en" => "installment payment plan",
+                "default_ar" => "خطه الدفع بالتقسيط",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
                 "key" => "installment_payment_type_id",
                 "default_en" => "installment payment type",
                 "default_ar" => "نوع الدفع بالتقسيط",
@@ -6359,7 +6368,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "is_fixed",
-                "default_en" => "is fixed",
+                "default_en" => "is fixed day",
                 "default_ar" => "تم إصلاحه",
                 "new_ar" => "",
                 "new_en" => "",
@@ -6368,7 +6377,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "installment_payment_type_per",
-                "default_en" => "installment payment type per",
+                "default_en" => "payment type per",
                 "default_ar" => "لكل",
                 "new_ar" => "",
                 "new_en" => "",
@@ -6376,17 +6385,8 @@ class TranslationSeeder extends Seeder
                 "screen" => "receivable payable"
             ],
             [
-                "key" => "installment_payment_type_amount",
-                "default_en" => "installment payment type amount",
-                "default_ar" => "المبلغ",
-                "new_ar" => "",
-                "new_en" => "",
-                "company_id" => 0,
-                "screen" => "receivable payable"
-            ],
-            [
                 "key" => "installment_payment_type_freq",
-                "default_en" => "installment payment type freq",
+                "default_en" => "payment type freq",
                 "default_ar" => "عدد الاقساط",
                 "new_ar" => "",
                 "new_en" => "",
@@ -6613,6 +6613,54 @@ class TranslationSeeder extends Seeder
                 "screen" => "receivable payable"
             ],
         ]);
+        //Installment Status
+        Translation::insert([
+            [
+                "key" => "installment_condition_create_form",
+                "default_en" => "Add new Installment Condition",
+                "default_ar" => "اضافة شرط للتقسيط جديدة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "installment status"
+            ],
+            [
+                "key" => "installment_condition_edit_form",
+                "default_en" => "Edit  Installment Condition",
+                "default_ar" => "نموذج تعديل شرط التقسيط",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "installment status"
+            ],
+            [
+                "key" => "installment_condition_name",
+                "default_en" => "Installment Condition name (arabic)",
+                "default_ar" => "اسم شرط تقسيط (عربي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "installment status"
+            ],
+            [
+                "key" => "installment_condition_name_e",
+                "default_en" => "Installment Condition name (english)",
+                "default_ar" => "اسم شرط تقسيط (انجليزي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "installment status"
+            ],
+            [
+                "key" => "installment_condition_default",
+                "default_en" => "Installment Condition Default",
+                "default_ar" => "الحالة الافتراضية لشرط تقسيط",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "installment status"
+            ],
+        ]);
     }
-    
+
 }

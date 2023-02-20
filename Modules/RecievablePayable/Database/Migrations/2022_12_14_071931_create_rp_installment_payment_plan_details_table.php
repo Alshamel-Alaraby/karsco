@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('rp_installment_payment_plan_details', function (Blueprint $table) {
             $table->id();
+            $table->unsignedInteger('installment_payment_plan_id')->comment('from RP_InstallmentPaymentPlan');
             $table->unsignedInteger ('installment_payment_type_id');
             $table->unsignedInteger ('ln_no');
             $table->unsignedTinyInteger ('is_fixed')->nullable ()->default (0)->comment ('1= predefined date, 0= Undefined date (دفعة انتهاء تدريب)');

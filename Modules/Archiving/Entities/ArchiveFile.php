@@ -22,7 +22,7 @@ class ArchiveFile extends Model implements HasMedia
 
     public function docType()
     {
-        return $this->belongsTo(DocType::class);
+        return $this->belongsTo(DocType::class ,'arch_doc_type_id');
     }
     public function department(){
         return $this->belongsTo(Department::class);

@@ -154,6 +154,7 @@ Route::group(['prefix' => 'arch-doc-type-department'], function () {
 Route::group(['prefix' => 'arch-archive-files'], function () {
     Route::controller(ArchiveFileController::class)->group(function () {
         Route::get('valueMedia', 'valueMedia');
+        Route::get('files_Department_Doc_Type', 'files_Department_Doc_Type');
         Route::get("/value/{value}", "searchValue");
         Route::get("pdf/{id}", "pdf");
         Route::put("toggle-favourite", "toggleFavourite");
@@ -165,7 +166,6 @@ Route::group(['prefix' => 'arch-archive-files'], function () {
         Route::delete('/{id}', 'delete')->name(' archive.files.destroy');
         Route::get('logs/{id}', 'logs');
         Route::post('bulk-delete', 'bulkDelete');
-        Route::post('file-noartify', 'sendArchvingNotification');
     });
 });
 

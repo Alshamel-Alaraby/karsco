@@ -245,18 +245,14 @@ export default {
           });
       }
     },
-
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     formatDate(value) {
       return formatDateOnly(value);
     },
-    arabicValue(txt) {
+      arabicValueName(txt) {
       this.create.name = arabicValue(txt);
     },
 
-    englishValue(txt) {
+    englishValueName(txt) {
       this.create.name_e = englishValue(txt);
     },
   },
@@ -266,35 +262,35 @@ export default {
 <template>
   <!--  create   -->
   <b-modal
-    id="installment_payment_type_create"
-    :title="getCompanyKey('installment_payment_type_create_form')"
-    title-class="font-18"
-    body-class="p-4 "
-    :hide-footer="true"
-    @show="resetModal"
-    @hidden="resetModalHidden"
-  >
-    <form>
+        id="installment_payment_type_create"
+        :title="getCompanyKey('installment_payment_type_create_form')"
+        title-class="font-18"
+        body-class="p-4 "
+        :hide-footer="true"
+        @show="resetModal"
+        @hidden="resetModalHidden"
+    >
+        <form>
       <div class="mb-3 d-flex justify-content-end">
-        <b-button
-          variant="success"
-          :disabled="!is_disabled"
-          @click.prevent="resetForm"
-          type="button"
-          :class="['font-weight-bold px-2', is_disabled ? 'mx-2' : '']"
-        >
-          {{ $t("general.AddNewRecord") }}
-        </b-button>
-        <template v-if="!is_disabled">
-          <b-button
-            variant="success"
-            type="button"
-            class="mx-1"
-            v-if="!isLoader"
-            @click.prevent="AddSubmit"
-          >
-            {{ $t("general.Add") }}
-          </b-button>
+                <b-button
+                    variant="success"
+                    :disabled="!is_disabled"
+                    @click.prevent="resetForm"
+                    type="button"
+                    :class="['font-weight-bold px-2', is_disabled ? 'mx-2' : '']"
+                >
+                    {{ $t("general.AddNewRecord") }}
+                </b-button>
+                <template v-if="!is_disabled">
+                    <b-button
+                        variant="success"
+                        type="button"
+                        class="mx-1"
+                        v-if="!isLoader"
+                        @click.prevent="AddSubmit"
+                    >
+                        {{ $t("general.Add") }}
+                    </b-button>
 
           <b-button variant="success" class="mx-1" disabled v-else>
             <b-spinner small></b-spinner>

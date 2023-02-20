@@ -19,6 +19,7 @@ import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
 import { arabicValue, englishValue } from "../../../helper/langTransform";
 import Multiselect from "vue-multiselect";
+import InstallmentCond from "../../../components/create/receivablePayment/installmentCondition.vue";
 
 /**
  * Advanced Table component
@@ -36,6 +37,7 @@ export default {
     ErrorMessage,
     loader,
     Multiselect,
+    InstallmentCond,
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -143,8 +145,7 @@ export default {
         required: requiredIf(function (model) {
           return this.create.auto_freq == 1;
         }),
-                maxValue: maxValue(30)
-
+        maxValue: maxValue(30),
       },
       is_conditional: {
         required: requiredIf(function (model) {
@@ -185,8 +186,7 @@ export default {
         required: requiredIf(function (model) {
           return this.edit.auto_freq == 1;
         }),
-                maxValue: maxValue(30)
-
+        maxValue: maxValue(30),
       },
       is_conditional: {
         required: requiredIf(function (model) {
@@ -255,11 +255,29 @@ export default {
     this.getData();
   },
   methods: {
+    showConditionModal() {
+      if (this.create.Condition_id == 0) {
+        this.$bvModal.show("install_condition_create");
+        this.create.Condition_id = null;
+      }
+    },
+    showConditionModalEdit() {
+      if (this.edit.Condition_id == 0) {
+        this.$bvModal.show("install_condition_create");
+        this.edit.Condition_id = null;
+      }
+    },
     getConditions() {
       adminApi
         .get(`/recievable-payable/rp_installment_condation`)
         .then((res) => {
-          this.conditions = res.data.data;
+          let l = res.data.data;
+          l.unshift({
+            id: 0,
+            name: "اضف شرط",
+            name_e: "Add condition",
+          });
+          this.conditions = l;
         })
         .catch((err) => {
           Swal.fire({
@@ -736,6 +754,11 @@ export default {
 <template>
   <Layout>
     <PageHeader />
+    <InstallmentCond
+      :companyKeys="companyKeys"
+      :defaultsKeys="defaultsKeys"
+      @created="getConditions"
+    />
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -1297,15 +1320,15 @@ export default {
                         </template>
                       </div>
                     </div>
-                    <template v-if="create.is_conditional==1">
+                    <template v-if="create.is_conditional == 1">
                       <div class="col-md-12">
                         <div class="form-group">
                           <label class="my-1 mr-2">
                             {{ getCompanyKey("condition") }}
-                        <span class="text-danger">*</span>
-
+                            <span class="text-danger">*</span>
                           </label>
                           <multiselect
+                            @input="showConditionModal"
                             v-model="create.Condition_id"
                             :options="conditions.map((type) => type.id)"
                             :custom-label="
@@ -1906,15 +1929,15 @@ export default {
                                   </template>
                                 </div>
                               </div>
-                              <template v-if="edit.is_conditional==1">
+                              <template v-if="edit.is_conditional == 1">
                                 <div class="col-md-12">
                                   <div class="form-group">
                                     <label class="my-1 mr-2">
                                       {{ getCompanyKey("condition") }}
-                        <span class="text-danger">*</span>
-
+                                      <span class="text-danger">*</span>
                                     </label>
                                     <multiselect
+                                      @input="showConditionModalEdit"
                                       v-model="edit.Condition_id"
                                       :options="conditions.map((type) => type.id)"
                                       :custom-label="
