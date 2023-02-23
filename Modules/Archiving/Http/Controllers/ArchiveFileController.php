@@ -285,19 +285,24 @@ class ArchiveFileController extends Controller
     }
     public function valueMedia(Request $request)
     {
-        $model = $this->model->where('arch_department_id', $request->department_id)
-            ->where('data_type_value', 'like', '%"value":"' . $request->value . '"%')
-            ->whereHas('docType', function ($q) use ($request) {
-                $q->where('parent_id', $request->parent_arch_doc_type_id);
-            })->when($request->arch_doc_type_id, function ($q) use ($request) {
-                $q->where("arch_doc_type_id", $request->arch_doc_type_id);
-            })
-            ->get();
+        $model = $this->model->
+        where('arch_department_id',$request->department_id)->
+        where('data_type_value','like','%"value":"'.$request->value.'"%')
+        ->whereHas('docType',function ($q) use ($request){
+                $q->where('parent_id',$request->parent_arch_doc_type_id);
+        })->where(function ($q) use ($request){
+            $q->when($request->arch_doc_type_id,function ($q) use ($request){
+                $q->where('arch_doc_type_id',$request->arch_doc_type_id);
+            });
+        })->get();
+
+
         if (!$model) {
             return responseJson(404, 'not found');
         }
         return responseJson(200, 'done', ArchiveFileResource::collection($model));
     }
+
 
     public function files_Department_Doc_Type(Request $request)
     {

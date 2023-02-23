@@ -21,7 +21,7 @@ export const menuItems = [
     {
         id: 1222,
         label: 'general.customTable',
-        icon: 'fas fa-code-branch',
+        icon: 'fas fa-tasks',
         name: 'custom table',
         link: '/dashboard/custom-table'
     },
@@ -420,8 +420,15 @@ export const menuItems = [
         id: 223,
         name: 'users',
         label: 'general.Users',
-        icon: 'fas fa-network-wired',
+        icon: 'fas fa-user',
         link: '/dashboard/users'
+    },
+    {
+        id: 2224,
+        name: 'general customer',
+        label: 'general.customer',
+        icon: 'fas fa-user-friends',
+        link: '/dashboard/customer'
     },
     {
         id: 5,
@@ -434,7 +441,7 @@ export const menuItems = [
         id: 6,
         name: 'employees',
         label: 'menuitems.employee.text',
-        icon: 'fas fa-user-friends',
+        icon: 'fas fa-briefcase',
         link: '/dashboard/employee'
     },
     {

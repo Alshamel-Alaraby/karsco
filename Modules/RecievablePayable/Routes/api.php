@@ -30,13 +30,6 @@ Route::prefix ('recievable-payable')->group (function (){
     Route ::get ( 'rp_installment_condation/logs/{id}' , 'RpInstallmentCondationController@logs' );
     Route ::post ( 'rp_installment_condation/logs/bulk-delete' , 'RpInstallmentCondationController@bulkDelete' );
 
-    Route ::resource ( 'rp_installment_p_plan_details' , 'RpInstallmentPaymentPlanDetailController' ) -> except ( 'edit' , 'create' );
-    Route ::get ( 'rp_installment_p_plan_details/allPlan' , 'RpInstallmentPaymentPlanDetailController@allPlan' );
-    Route ::get ( 'rp_installment_p_plan_details/logs/{id}' , 'RpInstallmentPaymentPlanDetailController@logs' );
-    Route ::post ( 'rp_installment_p_plan_details/bulk-delete' , 'RpInstallmentPaymentPlanDetailController@bulkDelete' );
-
-
-
     Route ::resource ( 'rp_installment_payment_types' , 'RpInstallmentPaymentTypeController' ) -> except ( 'edit' , 'create' );
     Route ::get ( 'rp_installment_payment_types/logs/{id}' , 'RpInstallmentPaymentTypeController@logs' );
     Route ::post ( 'rp_installment_payment_types/bulk-delete' , 'RpInstallmentPaymentTypeController@bulkDelete' );

@@ -31,6 +31,7 @@ import propertyTrees from  "./routeChild/property-tree";
 import realEstate from  "./routeChild/realEstate";
 import archiving from "./routeChild/archiving";
 import recievablePayable from "./routeChild/recievablePayable";
+import customer from "./routeChild/customer";
 
 
 export default [
@@ -65,6 +66,7 @@ export default [
     ...realEstate,
     ...archiving,
     ...recievablePayable,
+    ...customer,
     {
         path: '/dashboard/notifications',
         name: 'notifications',

@@ -91,7 +91,7 @@
               <div dir="rtl">
                 <input
                   type="text"
-                  class="form-control arabicInput"
+                  class="form-control"
                   data-create="1"
                   @keypress.enter="moveInput('input', 'create', 2)"
                   v-model="$v.create.name.$model"
@@ -130,7 +130,7 @@
               <div dir="ltr">
                 <input
                   type="text"
-                  class="form-control englishInput"
+                  class="form-control"
                   data-create="2"
                   @keypress.enter="moveInput('input', 'create', 3)"
                   v-model="$v.create.name_e.$model"

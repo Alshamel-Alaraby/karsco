@@ -120,13 +120,13 @@ Route::group(['prefix' => 'employees'], function () {
 Route::group(['prefix' => 'customTable'], function () {
     Route::controller(\App\Http\Controllers\CustomTable\GeneralCustomTableController::class)->group(function () {
         Route::get('/', 'all')->name('customTable.index');
+        Route::get('/table-columns/{tableName}', 'getCustomTableFields');
         Route::get('logs/{id}', 'logs')->name('customTable.logs');
         Route::get('/{id}', 'find');
         Route::post('/', 'create')->name('customTable.create');
         Route::put('/{id}', 'update')->name('customTable.update');
         Route::delete('/{id}', 'delete')->name('customTable.destroy');
         Route::post("bulk-delete", "bulkDelete");
-
 //        Route::get('/', 'all')->name('countries.index');
 //        Route::get('logs/{id}', 'logs')->name('countries.logs');
 //        Route::get('/{id}', 'find');

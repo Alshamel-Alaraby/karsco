@@ -16,9 +16,9 @@ class RpInstallmentPaymentPlan extends Model
     {
         return \Modules\RecievablePayable\Database\factories\RpInstallmentPaymentPlanFactory::new();
     }
-    public function installment_payment_plan_details()
+    public function payment_plan_installments()
     {
-        return $this->hasMany(RpInstallmentPaymentPlanDetail::class, "installment_payment_plan_id");
+        return $this->hasMany(RpPaymentPlanInstallment::class, "installment_payment_plan_id");
     }
 
 }

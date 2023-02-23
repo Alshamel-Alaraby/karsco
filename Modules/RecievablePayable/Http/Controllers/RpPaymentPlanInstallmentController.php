@@ -61,7 +61,7 @@ class RpPaymentPlanInstallmentController extends Controller
 
     public function update(EditRpPaymentPlanInstallmentRequest $request, $id)
     {
-        $model = $this->modelInterface->find($id);
+        $model = $this->modelInterface->findPlan($id);
         if (!$model) {
             return responseJson(404, __('message.data not found'));
         }
@@ -98,7 +98,7 @@ class RpPaymentPlanInstallmentController extends Controller
 
     public function destroy($id)
     {
-        $model = $this->modelInterface->find($id);
+        $model = $this->modelInterface->findPlan($id);
         if (!$model) {
             return responseJson(404, __('message.data not found'));
         }

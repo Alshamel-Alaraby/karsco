@@ -3,7 +3,13 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength, integer } from "vuelidate/lib/validators";
+import {
+  required,
+  minLength,
+  maxLength,
+  integer,
+  requiredIf,
+} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -13,7 +19,7 @@ import { dynamicSortString, dynamicSortNumber } from "../../../helper/tableSort"
 import translation from "../../../helper/translation-mixin";
 import senderHoverHelper from "../../../helper/senderHoverHelper";
 import { formatDateOnly } from "../../../helper/startDate";
-import {arabicValue,englishValue} from "../../../helper/langTransform";
+import { arabicValue, englishValue } from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -36,12 +42,13 @@ export default {
       per_page: 50,
       search: "",
       debounce: {},
-        enabled3: true,
+      enabled3: true,
       branchesPagination: {},
       branches: [],
       isLoader: false,
       Tooltip: "",
       mouseEnter: "",
+      fields: [],
       create: {
         name: "",
         name_e: "",
@@ -64,22 +71,54 @@ export default {
       },
       is_disabled: false,
       filterSetting: ["name", "name_e"],
-        printLoading: true,
-        printObj: {
-            id: "printData",
-        }
+      printLoading: true,
+      printObj: {
+        id: "printData",
+      },
     };
   },
   validations: {
     create: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      name_e: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      is_active: { required },
+      name: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name");
+        }),
+        minLength: minLength(2),
+        maxLength: maxLength(100),
+      },
+      name_e: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name_e");
+        }),
+        minLength: minLength(2),
+        maxLength: maxLength(100),
+      },
+      is_active: {
+        required: requiredIf(function (model) {
+          return this.isRequired("is_active");
+        }),
+      },
     },
     edit: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      name_e: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      is_active: { required },
+      name: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name");
+        }),
+        minLength: minLength(2),
+        maxLength: maxLength(100),
+      },
+      name_e: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name_e");
+        }),
+        minLength: minLength(2),
+        maxLength: maxLength(100),
+      },
+      is_active: {
+        required: requiredIf(function (model) {
+          return this.isRequired("is_active");
+        }),
+      },
     },
   },
   watch: {
@@ -94,7 +133,7 @@ export default {
      */
     search(after, befour) {
       clearTimeout(this.debounce);
-      this  .debounce = setTimeout(() => {
+      this.debounce = setTimeout(() => {
         this.getData();
       }, 400);
     },
@@ -116,6 +155,7 @@ export default {
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
     this.getData();
+    this.getCustomTableFields();
   },
   updated() {
     // $(function () {
@@ -139,7 +179,10 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
-      if (vm.$store.state.auth.work_flow_trees.includes('branch') || vm.$store.state.auth.user.type == 'super_admin') {
+      if (
+        vm.$store.state.auth.work_flow_trees.includes("branch") ||
+        vm.$store.state.auth.user.type == "super_admin"
+      ) {
         return true;
       } else {
         return vm.$router.push({ name: "home" });
@@ -206,6 +249,35 @@ export default {
         .finally(() => {
           this.isLoader = false;
         });
+    },
+    getCustomTableFields() {
+      adminApi
+        .get(`/customTable/table-columns/general_branches`)
+        .then((res) => {
+          this.fields = res.data;
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: `${this.$t("general.Error")}`,
+            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+          });
+        })
+        .finally(() => {
+          this.isLoader = false;
+        });
+    },
+    isVisible(fieldName) {
+      let res = this.fields.filter((field) => {
+        return field.column_name == fieldName;
+      });
+      return res.length > 0 && res[0].is_visible == 1 ? true : false;
+    },
+    isRequired(fieldName) {
+      let res = this.fields.filter((field) => {
+        return field.column_name == fieldName;
+      });
+      return res.length > 0 && res[0].is_required == 1 ? true : false;
     },
     getDataCurrentPage(page = 1) {
       if (
@@ -544,31 +616,34 @@ export default {
     moveInput(tag, c, index) {
       document.querySelector(`${tag}[data-${c}='${index}']`).focus();
     },
-      /**
-       *   Export Excel
-       */
-      ExportExcel(type, fn, dl) {
-          this.enabled3 = false;
-          setTimeout(() => {
-              let elt = this.$refs.exportable_table;
-              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
-              if (dl) {
-                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
-              } else {
-                  XLSX.writeFile(wb, fn || (('Branch' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
-              }
-              this.enabled3 = true;
-          }, 100);
-      },
-      arabicValue(txt){
-          this.create.name = arabicValue(txt);
-          this.edit.name = arabicValue(txt);
-      } ,
+    /**
+     *   Export Excel
+     */
+    ExportExcel(type, fn, dl) {
+      this.enabled3 = false;
+      setTimeout(() => {
+        let elt = this.$refs.exportable_table;
+        let wb = XLSX.utils.table_to_book(elt, { sheet: "Sheet JS" });
+        if (dl) {
+          XLSX.write(wb, { bookType: type, bookSST: true, type: "base64" });
+        } else {
+          XLSX.writeFile(
+            wb,
+            fn || ("Branch" + "." || "SheetJSTableExport.") + (type || "xlsx")
+          );
+        }
+        this.enabled3 = true;
+      }, 100);
+    },
+    arabicValue(txt) {
+      this.create.name = arabicValue(txt);
+      this.edit.name = arabicValue(txt);
+    },
 
-      englishValue(txt){
-          this.create.name_e = englishValue(txt);
-          this.edit.name_e = englishValue(txt);
-      }
+    englishValue(txt) {
+      this.create.name_e = englishValue(txt);
+      this.edit.name_e = englishValue(txt);
+    },
   },
 };
 </script>
@@ -592,10 +667,15 @@ export default {
                     ref="dropdown"
                     class="btn-block setting-search"
                   >
-                    <b-form-checkbox v-model="filterSetting" value="name" class="mb-1">{{
-                      getCompanyKey("branch_name_ar")
-                    }}</b-form-checkbox>
                     <b-form-checkbox
+                      v-if="isVisible('name')"
+                      v-model="filterSetting"
+                      value="name"
+                      class="mb-1"
+                      >{{ getCompanyKey("branch_name_ar") }}</b-form-checkbox
+                    >
+                    <b-form-checkbox
+                      v-if="isVisible('name_e')"
                       v-model="filterSetting"
                       value="name_e"
                       class="mb-1"
@@ -638,12 +718,12 @@ export default {
                   <i class="fas fa-plus"></i>
                 </b-button>
                 <div class="d-inline-flex">
-                    <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
-                        <i class="fas fa-file-download"></i>
-                    </button>
-                    <button v-print="'#printData'" class="custom-btn-dowonload">
-                        <i class="fe-printer"></i>
-                    </button>
+                  <button @click="ExportExcel('xlsx')" class="custom-btn-dowonload">
+                    <i class="fas fa-file-download"></i>
+                  </button>
+                  <button v-print="'#printData'" class="custom-btn-dowonload">
+                    <i class="fe-printer"></i>
+                  </button>
                   <button
                     class="custom-btn-dowonload"
                     @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
@@ -693,14 +773,25 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.name" class="mb-1"
+                      <b-form-checkbox
+                        v-if="isVisible('name')"
+                        v-model="setting.name"
+                        class="mb-1"
                         >{{ getCompanyKey("branch_name_ar") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.name_e" class="mb-1">
+                      <b-form-checkbox
+                        v-if="isVisible('name_e')"
+                        v-model="setting.name_e"
+                        class="mb-1"
+                      >
                         {{ getCompanyKey("branch_name_en") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.is_active" class="mb-1">
-                        {{ getCompanyKey("branch_status")}}
+                      <b-form-checkbox
+                        v-if="isVisible('is_active')"
+                        v-model="setting.is_active"
+                        class="mb-1"
+                      >
+                        {{ getCompanyKey("branch_status") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
                         <a href="javascript:void(0)" class="btn btn-primary btn-sm"
@@ -803,11 +894,11 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-12">
+                  <div v-if="isVisible('name')" class="col-md-12">
                     <div class="form-group">
                       <label for="field-1" class="control-label">
                         {{ getCompanyKey("branch_name_ar") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name')" class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
                         <input
@@ -843,11 +934,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div v-if="isVisible('name_e')" class="col-md-12">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
                         {{ getCompanyKey("branch_name_en") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name_e')" class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
                         <input
@@ -883,11 +974,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div v-if="isVisible('is_active')" class="col-md-12">
                     <div class="form-group">
                       <label class="mr-2">
                         {{ getCompanyKey("branch_status") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('is_active')" class="text-danger">*</span>
                       </label>
                       <b-form-group
                         :class="{
@@ -929,8 +1020,11 @@ export default {
               <!--       start loader       -->
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
-              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
-                     id="printData">
+              <table
+                class="table table-borderless table-hover table-centered m-0"
+                ref="exportable_table"
+                id="printData"
+              >
                 <thead>
                   <tr>
                     <th v-if="enabled3" class="do-not-print" scope="col" style="width: 0">
@@ -943,7 +1037,7 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.name">
+                    <th v-if="setting.name && isVisible('name')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("branch_name_ar") }}</span>
                         <div class="arrow-sort">
@@ -958,7 +1052,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.name_e">
+                    <th v-if="setting.name_e && isVisible('name_e')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("branch_name_en") }}</span>
                         <div class="arrow-sort">
@@ -973,7 +1067,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.is_active">
+                    <th v-if="setting.is_active && isVisible('is_active')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("branch_status") }}</span>
                       </div>
@@ -981,7 +1075,9 @@ export default {
                     <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </th>
                   </tr>
                 </thead>
                 <tbody v-if="branches.length > 0">
@@ -1003,13 +1099,15 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.name">
+                    <td v-if="setting.name && isVisible('name')">
                       <h5 class="m-0 font-weight-normal">{{ data.name }}</h5>
                     </td>
-                    <td v-if="setting.name_e">
+                    <td v-if="setting.name_e && isVisible('name_e')">
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
-                    <td v-if="setting.is_active">{{ data.is_active }}</td>
+                    <td v-if="setting.is_active && isVisible('is_active')">
+                      {{ data.is_active }}
+                    </td>
                     <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
@@ -1087,7 +1185,7 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-12">
+                            <div v-if="isVisible('name')" class="col-md-12">
                               <div class="form-group">
                                 <label for="edit-1" class="control-label">
                                   {{ getCompanyKey("branch_name_ar") }}
@@ -1133,7 +1231,7 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div v-if="isVisible('name_e')" class="col-md-12">
                               <div class="form-group">
                                 <label for="edit-2" class="control-label">
                                   {{ getCompanyKey("branch_name_en") }}
@@ -1181,7 +1279,7 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div v-if="isVisible('is_active')" class="col-md-12">
                               <div class="form-group">
                                 <label class="mr-2">
                                   {{ getCompanyKey("branch_status") }}
@@ -1258,11 +1356,11 @@ export default {
 
 <style scoped>
 @media print {
-    .do-not-print {
-        display: none;
-    }
-    .arrow-sort {
-        display: none;
-    }
+  .do-not-print {
+    display: none;
+  }
+  .arrow-sort {
+    display: none;
+  }
 }
 </style>

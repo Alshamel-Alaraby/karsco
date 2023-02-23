@@ -8,8 +8,6 @@ use Modules\RecievablePayable\Repositories\RpDocumentPlanRepository;
 use Modules\RecievablePayable\Repositories\RpDocumentPlanRepositoryInterface;
 use Modules\RecievablePayable\Repositories\RpInstallmentCondationRepository;
 use Modules\RecievablePayable\Repositories\RpInstallmentCondationRepositoryInterface;
-use Modules\RecievablePayable\Repositories\RpInstallmentPaymentPlanDetailRepository;
-use Modules\RecievablePayable\Repositories\RpInstallmentPaymentPlanDetailRepositoryInterface;
 use Modules\RecievablePayable\Repositories\RpInstallmentPaymentPlanRepository;
 use Modules\RecievablePayable\Repositories\RpInstallmentPaymentPlanRepositoryInterface;
 use Modules\RecievablePayable\Repositories\RpInstallmentPaymentTypeRepository;
@@ -49,7 +47,6 @@ class RecievablePayableServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
 
-        $this->app->bind (RpInstallmentPaymentPlanDetailRepositoryInterface::class,RpInstallmentPaymentPlanDetailRepository::class);
         $this->app->bind (RpInstallmentPaymentTypeRepositoryInterface::class,RpInstallmentPaymentTypeRepository::class);
         $this->app->bind (RpInstallmentStatusRepositoryInterface::class,RpInstallmentStatusRepository::class);
         $this->app->bind (RpPaymentPlanInstallmentRepositoryInterface::class,RpPaymentPlanInstallmentRepository::class);

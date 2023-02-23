@@ -17,7 +17,7 @@ import Multiselect from "vue-multiselect";
  */
 export default {
   page: {
-    title: "Custome table",
+    title: "customers",
     meta: [{ name: "description", content: "Custom table" }],
   },
   mixins: [translation],
@@ -40,7 +40,12 @@ export default {
       isLoader: false,
       Tooltip: "",
       mouseEnter: "",
+      invisibleColumns: ["id", "company_id", "deleted_at", "created_at", "updated_at"],
       create: {
+        table_name: "",
+        columns: [],
+      },
+      edit: {
         table_name: "",
         columns: [],
       },
@@ -50,11 +55,10 @@ export default {
       checkAll: [],
       current_page: 1,
       setting: {
-        name: true,
-        name_e: true,
+        table_name: true,
       },
       is_disabled: false,
-      filterSetting: ["name", "name_e"],
+      filterSetting: ["table_name"],
     };
   },
   validations: {
@@ -115,7 +119,6 @@ export default {
   methods: {
     async getTables() {
       this.isLoader = true;
-
       await adminApi
         .get(`/document-field/tables`)
         .then((res) => {
@@ -142,7 +145,7 @@ export default {
           let l = res.data.data;
           this.create.columns = l.map((column) => {
             return {
-              name: column,
+              column_name: column,
               is_required: 1,
               is_visible: 1,
             };
@@ -161,8 +164,7 @@ export default {
     },
     addNewField() {
       this.create.columns.push({
-        name: "",
-        name_e: "",
+        column_name: "",
         is_required: 1,
         is_visible: 1,
       });
@@ -180,7 +182,7 @@ export default {
         this.Tooltip = "";
         this.mouseEnter = id;
         adminApi
-          .get(`/branches/logs/${id}`)
+          .get(`/customTable/logs/${id}`)
           .then((res) => {
             let l = res.data.data;
             l.forEach((e) => {
@@ -213,7 +215,7 @@ export default {
 
       adminApi
         .get(
-          `/branches?page=${page}&per_page=${this.per_page}&company_id=${this.company_id}&search=${this.search}&${filter}`
+          `/customTable?page=${page}&per_page=${this.per_page}&company_id=${this.company_id}&search=${this.search}&${filter}`
         )
         .then((res) => {
           let l = res.data;
@@ -246,7 +248,7 @@ export default {
 
         adminApi
           .get(
-            `/branches?page=${page}&per_page=${this.per_page}&search=${this.search}&${filter}&company_id=${this.company_id}`
+            `/customTable?page=${page}&per_page=${this.per_page}&search=${this.search}&${filter}&company_id=${this.company_id}`
           )
           .then((res) => {
             let l = res.data;
@@ -289,7 +291,7 @@ export default {
           if (result.value) {
             this.isLoader = true;
             adminApi
-              .post(`/branches/bulk-delete`, { ids: id })
+              .post(`/customTable/bulk-delete`, { ids: id })
               .then((res) => {
                 this.checkAll = [];
                 this.getData();
@@ -338,7 +340,7 @@ export default {
             this.isLoader = true;
 
             adminApi
-              .delete(`/branches/${id}`)
+              .delete(`/customTable/${id}`)
               .then((res) => {
                 this.checkAll = [];
                 this.getData();
@@ -384,8 +386,7 @@ export default {
         table_name: "",
         columns: [
           {
-            name: "",
-            name_e: "",
+            column_name: "",
             is_required: 1,
             is_visible: 1,
           },
@@ -396,6 +397,7 @@ export default {
       });
       this.errors = {};
       this.$bvModal.hide(`create`);
+      this.is_disabled = false;
     },
     /**
      *  hidden Modal (create)
@@ -415,8 +417,7 @@ export default {
         table_name: "",
         columns: [
           {
-            name: "",
-            name_e: "",
+            column_name: "",
             is_required: 1,
             is_visible: 1,
           },
@@ -470,12 +471,6 @@ export default {
      *  edit countrie
      */
     editSubmit(id) {
-      if (!this.create.name) {
-        this.create.name = this.create.name_e;
-      }
-      if (!this.create.name_e) {
-        this.create.name_e = this.create.name;
-      }
       this.$v.edit.$touch();
 
       if (this.$v.edit.$invalid) {
@@ -484,7 +479,7 @@ export default {
         this.isLoader = true;
         this.errors = {};
         adminApi
-          .put(`/branches/${id}`, { ...this.edit, company_id: this.company_id })
+          .put(`/customTable/${id}`, { ...this.edit, company_id: this.company_id })
           .then((res) => {
             this.$bvModal.hide(`modal-edit-${id}`);
             this.getData();
@@ -531,8 +526,7 @@ export default {
         table_name: "",
         columns: [
           {
-            name: "",
-            name_e: "",
+            column_name: "",
             is_required: 1,
             is_visible: 1,
           },
@@ -588,14 +582,11 @@ export default {
                     ref="dropdown"
                     class="btn-block setting-search"
                   >
-                    <b-form-checkbox v-model="filterSetting" value="name" class="mb-1">{{
-                      getCompanyKey("branch_name_ar")
-                    }}</b-form-checkbox>
                     <b-form-checkbox
                       v-model="filterSetting"
-                      value="name_e"
+                      value="table_name"
                       class="mb-1"
-                      >{{ getCompanyKey("branch_name_en") }}</b-form-checkbox
+                      >{{ getCompanyKey("custom_table_name") }}</b-form-checkbox
                     >
                   </b-dropdown>
                   <!-- Basic dropdown -->
@@ -689,14 +680,8 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.name" class="mb-1"
-                        >{{ getCompanyKey("branch_name_ar") }}
-                      </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.name_e" class="mb-1">
-                        {{ getCompanyKey("branch_name_en") }}
-                      </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.is_active" class="mb-1">
-                        {{ getCompanyKey("branch_status") }}
+                      <b-form-checkbox v-model="setting.table_name" class="mb-1"
+                        >{{ getCompanyKey("custom_table_name") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
                         <a href="javascript:void(0)" class="btn btn-primary btn-sm"
@@ -755,131 +740,159 @@ export default {
             <b-modal
               size="lg"
               id="create"
-              :title="getCompanyKey('branch_create_form')"
+              :title="getCompanyKey('custom_table_create_form')"
               title-class="font-18"
               body-class="p-4 "
               :hide-footer="true"
               @show="resetModal"
               @hidden="resetModalHidden"
             >
-              <div class="row">
-                <div class="col-12">
-                  <div class="card">
-                    <div class="card-body">
-                      <form>
-                        <div class="mb-3 d-flex justify-content-end">
-                          <b-button
-                            variant="success"
-                            type="button"
-                            v-if="!isLoader"
-                            @click.prevent="AddSubmit"
-                          >
-                            {{ $t("general.Add") }}
-                          </b-button>
-                          <b-button variant="success" class="mx-1" disabled v-else>
-                            <b-spinner small></b-spinner>
-                            <span class="sr-only">{{ $t("login.Loading") }}...</span>
-                          </b-button>
-                          <!-- End Cancel Button Modal -->
-                        </div>
-                        <div class="row mb-4">
-                          <div class="col-md-6">
-                            <div class="form-group position-relative">
-                              <label class="control-label">
-                                {{ $t("general.Table") }}
-                                <span class="text-danger">*</span>
-                              </label>
-                              <multiselect
-                                @input="getColumns"
-                                v-model="create.table_name"
-                                :options="tables"
-                              >
-                              </multiselect>
-                              <div
-                                v-if="$v.create.table_name.$error || errors.table_name"
-                                class="text-danger"
-                              >
-                                {{ $t("general.fieldIsRequired") }}
-                              </div>
-                              <template v-if="errors.table_name">
-                                <ErrorMessage
-                                  v-for="(errorMessage, index) in errors.table_name"
-                                  :key="index"
-                                  >{{ errorMessage }}</ErrorMessage
-                                >
-                              </template>
-                            </div>
-                          </div>
-                        </div>
-                        <template v-for="(item, index) in create.columns">
-                          <div class="row" :key="index">
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="control-label">
-                                  {{ $t("general.Column") }}
-                                </label>
-                                <input
-                                  readonly
-                                  type="text"
-                                  class="form-control arabicInput"
-                                  data-create="1"
-                                  @keypress.enter="moveInput('input', 'create', 2)"
-                                  v-model="create.columns[index].name"
-                                  id="field-1"
-                                />
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="mr-2">
-                                  {{ $t("general.is_required") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <b-form-group>
-                                  <b-form-radio
-                                    class="d-inline-block"
-                                    v-model="create.columns[index].is_required"
-                                    value="1"
-                                    >{{ $t("general.Yes") }}
-                                  </b-form-radio>
-                                  <b-form-radio
-                                    class="d-inline-block m-1"
-                                    v-model="create.columns[index].is_required"
-                                    value="0"
-                                    >{{ $t("general.No") }}
-                                  </b-form-radio>
-                                </b-form-group>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="mr-2">
-                                  {{ $t("general.is_visible") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <b-form-group>
-                                  <b-form-radio
-                                    class="d-inline-block"
-                                    v-model="create.columns[index].is_visible"
-                                    value="1"
-                                    >{{ $t("general.Yes") }}
-                                  </b-form-radio>
-                                  <b-form-radio
-                                    class="d-inline-block m-1"
-                                    v-model="create.columns[index].is_visible"
-                                    value="0"
-                                    >{{ $t("general.No") }}
-                                  </b-form-radio>
-                                </b-form-group>
-                              </div>
-                            </div>
-                          </div>
-                        </template>
-                      </form>
+              <form>
+                <div class="mb-3 d-flex justify-content-end">
+                  <b-button
+                    variant="success"
+                    :disabled="!is_disabled"
+                    @click.prevent="resetForm"
+                    type="button"
+                    :class="['font-weight-bold px-2', is_disabled ? 'mx-2' : '']"
+                  >
+                    {{ $t("general.AddNewRecord") }}
+                  </b-button>
+                  <!-- Emulate built in modal footer ok and cancel button actions -->
+                  <template v-if="!is_disabled">
+                    <b-button
+                      variant="success"
+                      type="submit"
+                      class="mx-1"
+                      v-if="!isLoader"
+                      @click.prevent="AddSubmit"
+                    >
+                      {{ $t("general.Add") }}
+                    </b-button>
+
+                    <b-button variant="success" class="mx-1" disabled v-else>
+                      <b-spinner small></b-spinner>
+                      <span class="sr-only">{{ $t("login.Loading") }}...</span>
+                    </b-button>
+                  </template>
+                  <b-button
+                    variant="danger"
+                    type="button"
+                    @click.prevent="$bvModal.hide('create')"
+                  >
+                    {{ $t("general.Cancel") }}
+                  </b-button>
+                </div>
+                <div class="row mb-4">
+                  <div class="col-md-6">
+                    <div class="form-group position-relative">
+                      <label class="control-label">
+                        {{ getCompanyKey("custom_table_name") }}
+                        <span class="text-danger">*</span>
+                      </label>
+                      <multiselect
+                        @input="getColumns"
+                        v-model="create.table_name"
+                        :options="tables"
+                      >
+                      </multiselect>
+                      <div
+                        v-if="$v.create.table_name.$error || errors.table_name"
+                        class="text-danger"
+                      >
+                        {{ $t("general.fieldIsRequired") }}
+                      </div>
+                      <template v-if="errors.table_name">
+                        <ErrorMessage
+                          v-for="(errorMessage, index) in errors.table_name"
+                          :key="index"
+                          >{{ errorMessage }}</ErrorMessage
+                        >
+                      </template>
                     </div>
                   </div>
                 </div>
-              </div>
+                <template v-for="(item, index) in create.columns">
+                  <div
+                    v-if="!invisibleColumns.includes(item.column_name)"
+                    class="row"
+                    :key="index"
+                  >
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="control-label">
+                          {{ getCompanyKey("custom_column") }}
+                        </label>
+                        <input
+                          readonly
+                          type="text"
+                          class="form-control arabicInput"
+                          data-create="1"
+                          @keypress.enter="moveInput('input', 'create', 2)"
+                          v-model="create.columns[index].column_name"
+                          id="field-1"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="mr-2">
+                          {{ getCompanyKey("custom_is_visible") }}
+                          <span class="text-danger">*</span>
+                        </label>
+                        <b-form-group>
+                          <b-form-radio
+                            @change="
+                              create.columns[index].is_visible == 0
+                                ? (create.columns[index].is_required = 0)
+                                : null
+                            "
+                            class="d-inline-block"
+                            v-model="create.columns[index].is_visible"
+                            value="1"
+                            >{{ $t("general.Yes") }}
+                          </b-form-radio>
+                          <b-form-radio
+                            @change="
+                              create.columns[index].is_visible == 0
+                                ? (create.columns[index].is_required = 0)
+                                : null
+                            "
+                            class="d-inline-block m-1"
+                            v-model="create.columns[index].is_visible"
+                            value="0"
+                            >{{ $t("general.No") }}
+                          </b-form-radio>
+                        </b-form-group>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="mr-2">
+                          {{ getCompanyKey("custom_is_required") }}
+                          <span class="text-danger">*</span>
+                        </label>
+                        <b-form-group>
+                          <b-form-radio
+                            :disabled="create.columns[index].is_visible == 0"
+                            class="d-inline-block"
+                            v-model="create.columns[index].is_required"
+                            value="1"
+                            >{{ $t("general.Yes") }}
+                          </b-form-radio>
+                          <b-form-radio
+                            :disabled="create.columns[index].is_visible == 0"
+                            class="d-inline-block m-1"
+                            v-model="create.columns[index].is_required"
+                            value="0"
+                            >{{ $t("general.No") }}
+                          </b-form-radio>
+                        </b-form-group>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </form>
             </b-modal>
             <!--  /create   -->
 
@@ -901,9 +914,9 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.name">
+                    <th v-if="setting.table_name">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("branch_name_ar") }}</span>
+                        <span>{{ getCompanyKey("custom_table_name") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -914,26 +927,6 @@ export default {
                             @click="branches.sort(sortString('-name'))"
                           ></i>
                         </div>
-                      </div>
-                    </th>
-                    <th v-if="setting.name_e">
-                      <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("branch_name_en") }}</span>
-                        <div class="arrow-sort">
-                          <i
-                            class="fas fa-arrow-up"
-                            @click="branches.sort(sortString('name_e'))"
-                          ></i>
-                          <i
-                            class="fas fa-arrow-down"
-                            @click="branches.sort(sortString('-name_e'))"
-                          ></i>
-                        </div>
-                      </div>
-                    </th>
-                    <th v-if="setting.is_active">
-                      <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("branch_status") }}</span>
                       </div>
                     </th>
                     <th>
@@ -961,13 +954,9 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.name">
-                      <h5 class="m-0 font-weight-normal">{{ data.name }}</h5>
+                    <td v-if="setting.table_name">
+                      <h5 class="m-0 font-weight-normal">{{ data.table_name }}</h5>
                     </td>
-                    <td v-if="setting.name_e">
-                      <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
-                    </td>
-                    <td v-if="setting.is_active">{{ data.is_active }}</td>
                     <td>
                       <div class="btn-group">
                         <button
@@ -1009,8 +998,9 @@ export default {
 
                       <!--  edit   -->
                       <b-modal
+                        size="lg"
                         :id="`modal-edit-${data.id}`"
-                        :title="getCompanyKey('branch_edit_form')"
+                        :title="getCompanyKey('custom_table_edit_form')"
                         title-class="font-18"
                         body-class="p-4"
                         :ref="`edit-${data.id}`"
@@ -1044,129 +1034,28 @@ export default {
                               {{ $t("general.Cancel") }}
                             </b-button>
                           </div>
-                          <div class="row">
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <label for="edit-1" class="control-label">
-                                  {{ getCompanyKey("branch_name_ar") }}
+                          <div class="row mb-4">
+                            <div class="col-md-6">
+                              <div class="form-group position-relative">
+                                <label class="control-label">
+                                  {{ getCompanyKey("custom_table_name") }}
                                   <span class="text-danger">*</span>
                                 </label>
-                                <input
-                                  type="text"
-                                  class="form-control arabicInput"
-                                  data-edit="1"
-                                  @keypress.enter="moveInput('input', 'edit', 2)"
-                                  v-model="$v.edit.name.$model"
-                                  :class="{
-                                    'is-invalid': $v.edit.name.$error || errors.name,
-                                    'is-valid': !$v.edit.name.$invalid && !errors.name,
-                                  }"
-                                  id="edit-1"
-                                />
-                                <div
-                                  v-if="!$v.edit.name.minLength"
-                                  class="invalid-feedback"
+                                <multiselect
+                                  @input="getColumns"
+                                  v-model="edit.table_name"
+                                  :options="tables"
                                 >
-                                  {{ $t("general.Itmustbeatleast") }}
-                                  {{ $v.edit.name.$params.minLength.min }}
-                                  {{ $t("general.letters") }}
-                                </div>
+                                </multiselect>
                                 <div
-                                  v-if="!$v.edit.name.maxLength"
-                                  class="invalid-feedback"
+                                  v-if="$v.edit.table_name.$error || errors.table_name"
+                                  class="text-danger"
                                 >
-                                  {{ $t("general.Itmustbeatmost") }}
-                                  {{ $v.edit.name.$params.maxLength.max }}
-                                  {{ $t("general.letters") }}
+                                  {{ $t("general.fieldIsRequired") }}
                                 </div>
-                                <template v-if="errors.name">
+                                <template v-if="errors.table_name">
                                   <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.name"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <label for="edit-2" class="control-label">
-                                  {{ getCompanyKey("branch_name_en") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <div dir="ltr">
-                                  <input
-                                    type="text"
-                                    class="form-control englishInput"
-                                    data-edit="2"
-                                    @keypress.enter="moveInput('select', 'edit', 3)"
-                                    v-model="$v.edit.name_e.$model"
-                                    :class="{
-                                      'is-invalid':
-                                        $v.edit.name_e.$error || errors.name_e,
-                                      'is-valid':
-                                        !$v.edit.name_e.$invalid && !errors.name_e,
-                                    }"
-                                    id="edit-2"
-                                  />
-                                </div>
-                                <div
-                                  v-if="!$v.edit.name_e.minLength"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.Itmustbeatleast") }}
-                                  {{ $v.edit.name_e.$params.minLength.min }}
-                                  {{ $t("general.letters") }}
-                                </div>
-                                <div
-                                  v-if="!$v.edit.name_e.maxLength"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.Itmustbeatmost") }}
-                                  {{ $v.edit.name_e.$params.maxLength.max }}
-                                  {{ $t("general.letters") }}
-                                </div>
-                                <template v-if="errors.name_e">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.name_e"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <label class="mr-2">
-                                  {{ getCompanyKey("branch_status") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <b-form-group
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.is_active.$error || errors.is_active,
-                                    'is-valid':
-                                      !$v.edit.is_active.$invalid && !errors.is_active,
-                                  }"
-                                >
-                                  <b-form-radio
-                                    class="d-inline-block"
-                                    v-model="$v.edit.is_active.$model"
-                                    name="some-radios"
-                                    value="active"
-                                    >{{ $t("general.Active") }}</b-form-radio
-                                  >
-                                  <b-form-radio
-                                    class="d-inline-block m-1"
-                                    v-model="$v.edit.is_active.$model"
-                                    name="some-radios"
-                                    value="inactive"
-                                    >{{ $t("general.Inactive") }}</b-form-radio
-                                  >
-                                </b-form-group>
-                                <template v-if="errors.is_active">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.is_active"
+                                    v-for="(errorMessage, index) in errors.table_name"
                                     :key="index"
                                     >{{ errorMessage }}</ErrorMessage
                                   >
@@ -1174,6 +1063,85 @@ export default {
                               </div>
                             </div>
                           </div>
+                          <template v-for="(item, index) in edit.columns">
+                            <div
+                              v-if="!invisibleColumns.includes(item.column_name)"
+                              class="row"
+                              :key="index"
+                            >
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="control-label">
+                                    {{ getCompanyKey("custom_column") }}
+                                  </label>
+                                  <input
+                                    readonly
+                                    type="text"
+                                    class="form-control arabicInput"
+                                    data-create="1"
+                                    @keypress.enter="moveInput('input', 'create', 2)"
+                                    v-model="edit.columns[index].column_name"
+                                  />
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="mr-2">
+                                    {{ getCompanyKey("custom_is_visible") }}
+                                    <span class="text-danger">*</span>
+                                  </label>
+                                  <b-form-group>
+                                    <b-form-radio
+                                    @change="
+                                        edit.columns[index].is_visible == 0
+                                          ? (edit.columns[index].is_required = 0)
+                                          : null
+                                      "
+                                      class="d-inline-block"
+                                      v-model="edit.columns[index].is_visible"
+                                      value="1"
+                                      >{{ $t("general.Yes") }}
+                                    </b-form-radio>
+                                    <b-form-radio
+                                    @change="
+                                        edit.columns[index].is_visible == 0
+                                          ? (edit.columns[index].is_required = 0)
+                                          : null
+                                      "
+                                      class="d-inline-block m-1"
+                                      v-model="edit.columns[index].is_visible"
+                                      value="0"
+                                      >{{ $t("general.No") }}
+                                    </b-form-radio>
+                                  </b-form-group>
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="mr-2">
+                                    {{ getCompanyKey("custom_is_required") }}
+                                    <span class="text-danger">*</span>
+                                  </label>
+                                  <b-form-group>
+                                    <b-form-radio
+                                      :disabled="edit.columns[index].is_visible == 0"
+                                      class="d-inline-block"
+                                      v-model="edit.columns[index].is_required"
+                                      value="1"
+                                      >{{ $t("general.Yes") }}
+                                    </b-form-radio>
+                                    <b-form-radio
+                                      :disabled="edit.columns[index].is_visible == 0"
+                                      class="d-inline-block m-1"
+                                      v-model="edit.columns[index].is_required"
+                                      value="0"
+                                      >{{ $t("general.No") }}
+                                    </b-form-radio>
+                                  </b-form-group>
+                                </div>
+                              </div>
+                            </div>
+                          </template>
                         </form>
                       </b-modal>
                       <!--  /edit   -->

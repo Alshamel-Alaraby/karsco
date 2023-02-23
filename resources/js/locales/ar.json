@@ -893,6 +893,7 @@
         "is_required":"مطلوب",
         "is_visible":"مرئي",
         "Column": "عمود",
+        "tableName": "اسم الجدول",
         "currentNode":"النود الحالي",
         "rows": "الصفوف"
     }

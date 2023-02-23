@@ -49,7 +49,7 @@ class DocTypeResource extends JsonResource
         $key["children"] = collect($subIds)->map(function ($id) use ($arch_file) {
             return [
                 "name" => $id, "name_e" => $id, "archive_file" => $arch_file, "parent_doc_type_children" => $this->children,
-                "parent_doc_id"=>$this->id,
+                "parent_doc_id"=>$this->id
             ];
         });
         return [

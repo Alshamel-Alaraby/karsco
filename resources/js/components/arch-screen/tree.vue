@@ -34,8 +34,8 @@
               ? node.doc_field_id.name
               : node.doc_field_id.name_e
             : $i18n.locale == "ar"
-            ? node.name
-            : node.name_e
+            ? (typeof node.name === 'object'?($i18n.locale == "ar"?node.name.name:node.name.name_e):node.name)
+            : (typeof node.name_e==='object'?($i18n.locale == "ar"?node.name_e.name:node.name_e.name_e):node.name_e)
         }}
         <!-- <span v-if="depth > 1 && !node.parent_id">({{ node.files_count }})</span> -->
       </span>

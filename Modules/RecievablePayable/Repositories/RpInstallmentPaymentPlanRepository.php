@@ -22,13 +22,15 @@ class RpInstallmentPaymentPlanRepository implements RpInstallmentPaymentPlanRepo
 
     public function all($request)
     {
-        $models = $this->model->withCount('installment_payment_plan_details as count_installment_payment_Plan_Detail')->
+        $models = $this->model->withCount('payment_plan_installments as count_payment_plan_installment')->
             where(function ($q) use ($request){
-            $q->when($request->plan_details, function ($q){
-                $q->withWhereHas('installment_payment_plan_details');
+            $q->when($request->plan_installments, function ($q){
+                $q->withWhereHas('payment_plan_installments');
+            })->where(function ($q) use ($request){
+                $q->when($request->null_payment_plan_installment, function ($q){
+                    $q->doesntHave('payment_plan_installments');
+                });
             });
-        })->
-        where(function ($q) use ($request) {
             $this->model->scopeFilter($q , $request);
         })->orderBy($request->order ? $request->order : 'updated_at', $request->sort ? $request->sort : 'DESC');
 
@@ -66,7 +68,6 @@ class RpInstallmentPaymentPlanRepository implements RpInstallmentPaymentPlanRepo
     public function delete($id)
     {
         $model = $this->find($id);
-        $this->forget($id);
         $model->delete();
     }
 

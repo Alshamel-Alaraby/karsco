@@ -13,7 +13,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class GeneralCustomTableController extends Controller
 {
 
-    public function __construct(private \App\Repositories\CustomTable\CustomTableInterface$modelInterface)
+    public function __construct(private \App\Repositories\CustomTable\CustomTableInterface $modelInterface)
     {
         $this->modelInterface = $modelInterface;
     }
@@ -48,12 +48,11 @@ class GeneralCustomTableController extends Controller
     {
         $model = $this->modelInterface->find($id);
         if (!$model) {
-            return responseJson( 404 , __('message.data not found'));
+            return responseJson(404, __('message.data not found'));
         }
-        $this->modelInterface->update($request->validated(),$id);
+        $this->modelInterface->update($request->validated(), $id);
         $model->refresh();
         return responseJson(200, 'success', new CustomTableResource($model));
-
     }
     public function logs($id)
     {
@@ -72,7 +71,7 @@ class GeneralCustomTableController extends Controller
         if (!$model) {
             return responseJson(404, __('message.data not found'));
         }
-        $this->model->delete($id);
+        $this->modelInterface->delete($id);
         return responseJson(200, 'success');
     }
 
@@ -82,7 +81,11 @@ class GeneralCustomTableController extends Controller
             $this->modelInterface->delete($id);
         }
         return responseJson(200, __('Done'));
+    }
 
-
+    public function getCustomTableFields($tableName)
+    {
+        $customTable = GeneralCustomTable::where("table_name", $tableName)->first();
+        return $customTable ? $customTable->columns : [];
     }
 }

@@ -20,6 +20,11 @@ class RpPaymentPlanInstallment extends Model
     {
         return $this->belongsTo(RpInstallmentPaymentPlan::class, "installment_payment_plan_id");
     }
+
+    public function installment_payment_type()
+    {
+        return $this->belongsTo(RpInstallmentPaymentType::class, "installment_payment_type_id");
+    }
     public function installment_status()
     {
         return $this->belongsTo(RpInstallmentStatus::class, "installment_status_id");

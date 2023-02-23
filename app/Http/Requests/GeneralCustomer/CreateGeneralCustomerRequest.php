@@ -30,12 +30,12 @@ class CreateGeneralCustomerRequest extends FormRequest
             'national_id'=>[],
             'whatsapp'=>[],
             'passport_no'=>[],
+            'contact_person'=>[],
             'note1'=>[],
             'note2'=>[],
             'note3'=>[],
             'note4'=>[],
-            'city_id'=>['numeric'],
-
+            'company_id'=>[],
         ];
     }
 
