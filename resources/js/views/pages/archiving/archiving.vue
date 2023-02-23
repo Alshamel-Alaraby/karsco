@@ -197,7 +197,7 @@ export default {
       await adminApi
         .get(
           `/arch-archive-files/valueMedia?value=${
-            this.currentNode.name_e
+            typeof this.currentNode.name_e === 'object' ?this.currentNode.name_e.name_e:this.currentNode.name_e 
           }&department_id=${this.currentNode.archive_file.arch_department_id}
           &parent_arch_doc_type_id=${this.currentNode.parent_doc_id}
           &arch_doc_type_id=${this.arch_doc_type_id ? this.arch_doc_type_id : ""}`
@@ -866,7 +866,7 @@ export default {
       let dataTypeValue = [];
       this.nodeFields.forEach((field) => {
         dataTypeValue.push({
-          value: field.value,
+          value:typeof field.value === 'object'?field.value.name_e: field.value,
           name_e: field.doc_field_id.name_e,
           name: field.doc_field_id.name,
           is_reference: field.doc_field_id.is_reference,
@@ -2198,7 +2198,15 @@ export default {
                     {{ $t("general.currentNode") }} :
                     {{
                       $i18n.locale == "ar"
-                        ? this.currentNode.name
+                        ? typeof this.currentNode.name === "object"
+                          ? $i18n.locale == "ar"
+                            ? this.currentNode.name.name
+                            : this.currentNode.name.name_e
+                          : this.currentNode.name
+                        : typeof this.currentNode.name_e === "object"
+                        ? $i18n.locale == "ar"
+                          ? this.currentNode.name_e.name
+                          : this.currentNode.name_e.name_e
                         : this.currentNode.name_e
                     }}
                   </template>

@@ -243,7 +243,7 @@ export default {
             doc_type_id: el.doc_type_id,
             doc_field_id: el.doc_field_id,
             field_order: el.field_order,
-            is_required: el.is_required
+            is_required: el.is_required,
           });
         });
         this.isLoader = true;
@@ -521,7 +521,7 @@ export default {
                       <span class="text-danger">*</span>
                     </label>
                     <b-form-group
-                     :disabled="item.parent_id"
+                      :disabled="item.parent_id"
                       :class="{
                         'is-invalid':
                           $v.edit.$each[index].is_required.$error || errors.is_required,
@@ -580,7 +580,9 @@ export default {
     display: none;
   }
 }
-
+.card {
+  height: 400px !important;
+}
 .closeField {
   font-size: 48px !important;
   width: 38px !important;

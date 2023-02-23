@@ -36,7 +36,7 @@ class ArchiveFile extends Model implements HasMedia
     protected function dataTypeValue(): Attribute
     {
         return Attribute::make(
-            set:fn($value) => json_encode($value),
+            set:fn($value) => json_encode($value,JSON_UNESCAPED_UNICODE),
             get:fn($value) => json_decode($value)
         );
     }
