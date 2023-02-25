@@ -9142,7 +9142,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var dataTypeValue = [];
       this.nodeFields.forEach(function (field) {
         dataTypeValue.push({
-          value: _typeof(field.value) === 'object' ? field.value.name_e : field.value,
+          value: _typeof(field.value) === 'object' && field.value.name_e ? field.value.name_e : field.value,
           name_e: field.doc_field_id.name_e,
           name: field.doc_field_id.name,
           is_reference: field.doc_field_id.is_reference,
