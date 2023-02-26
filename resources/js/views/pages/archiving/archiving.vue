@@ -866,7 +866,7 @@ export default {
       let dataTypeValue = [];
       this.nodeFields.forEach((field) => {
         dataTypeValue.push({
-          value:typeof field.value==='object' &&field.value.name_e?field.value.name_e: field.value,
+          value:typeof field.value === 'object' && field.value.name_e?field.value.name_e: field.value,
           name_e: field.doc_field_id.name_e,
           name: field.doc_field_id.name,
           is_reference: field.doc_field_id.is_reference,
