@@ -1,162 +1,178 @@
 <template>
   <!--  create   -->
   <b-modal
-    id="sales-man-type-create"
-    :title="getCompanyKey('sale_man_type_create_form')"
-    title-class="font-18"
-    body-class="p-4 "
-    :hide-footer="true"
-    @show="resetModal"
-    @hidden="resetModalHidden"
-  >
-    <form>
-      <div class="mb-3 d-flex justify-content-end">
-        <b-button
-          variant="success"
-          :disabled="!is_disabled"
-          @click.prevent="resetForm"
-          type="button"
-          :class="['font-weight-bold px-2', is_disabled ? 'mx-2' : '']"
-        >
-          {{ $t("general.AddNewRecord") }}
-        </b-button>
-        <template v-if="!is_disabled">
-          <b-button
-            variant="success"
-            type="button"
-            class="mx-1"
-            v-if="!isLoader"
-            @click.prevent="AddSubmit"
-          >
-            {{ $t("general.Add") }}
-          </b-button>
+        :id="id"
+        :title="getCompanyKey('sale_man_type_create_form')"
+        title-class="font-18"
+        body-class="p-4 "
+        :hide-footer="true"
+        @show="resetModal"
+        @hidden="resetModalHidden"
+    >
+        <form>
+            <div class="mb-3 d-flex justify-content-end">
+                <b-button
+                    variant="success"
+                    :disabled="!is_disabled"
+                    @click.prevent="resetForm"
+                    type="button"
+                    :class="['font-weight-bold px-2', is_disabled ? 'mx-2' : '']"
+                >
+                    {{ $t("general.AddNewRecord") }}
+                </b-button>
+                <template v-if="!is_disabled">
+                    <b-button
+                        variant="success"
+                        type="button"
+                        class="mx-1"
+                        v-if="!isLoader"
+                        @click.prevent="AddSubmit"
+                    >
+                        {{ $t("general.Add") }}
+                    </b-button>
 
-          <b-button variant="success" class="mx-1" disabled v-else>
-            <b-spinner small></b-spinner>
-            <span class="sr-only">{{ $t("login.Loading") }}...</span>
-          </b-button>
-        </template>
-        <!-- Emulate built in modal footer ok and cancel button actions -->
+                    <b-button variant="success" class="mx-1" disabled v-else>
+                        <b-spinner small></b-spinner>
+                        <span class="sr-only">{{ $t("login.Loading") }}...</span>
+                    </b-button>
+                </template>
+                <!-- Emulate built in modal footer ok and cancel button actions -->
 
-        <b-button
-          variant="danger"
-          type="button"
-          @click.prevent="$bvModal.hide(`sales-man-type-create`)"
-        >
-          {{ $t("general.Cancel") }}
-        </b-button>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="field-1" class="control-label">
-              {{ getCompanyKey("sale_man_type_name_ar") }}
-              <span class="text-danger">*</span>
-            </label>
-            <div dir="rtl">
-              <input
-                type="text"
-                class="form-control arabicInput"
-                data-create="1"
-                @keypress.enter="moveInput('input', 'create', 2)"
-                v-model="$v.create.name.$model"
-                :class="{
-                  'is-invalid': $v.create.name.$error || errors.name,
-                  'is-valid': !$v.create.name.$invalid && !errors.name,
-                }"
-                @keyup="arabicValue(create.name)"
-                id="field-1"
-              />
+                <b-button
+                    variant="danger"
+                    type="button"
+                    @click.prevent="resetModalHidden"
+                >
+                    {{ $t("general.Cancel") }}
+                </b-button>
             </div>
-            <div v-if="!$v.create.name.minLength" class="invalid-feedback">
-              {{ $t("general.Itmustbeatleast") }}
-              {{ $v.create.name.$params.minLength.min }} {{ $t("general.letters") }}
+            <div class="row">
+                <div class="col-md-12" v-if="isVisible('name')">
+                    <div class="form-group">
+                        <label for="field-1" class="control-label">
+                            {{ getCompanyKey("sale_man_type_name_ar") }}
+                            <span v-if="isRequired('name')" class="text-danger">*</span>
+                        </label>
+                        <div dir="rtl">
+                            <input
+                                type="text"
+                                class="form-control arabicInput"
+                                data-create="1"
+                                @keypress.enter="moveInput('input', 'create', 2)"
+                                v-model="$v.create.name.$model"
+                                :class="{
+                            'is-invalid': $v.create.name.$error || errors.name,
+                            'is-valid': !$v.create.name.$invalid && !errors.name,
+                          }"
+                                @keyup="arabicValue(create.name)"
+                                id="field-1"
+                            />
+                        </div>
+                        <div v-if="!$v.create.name.minLength" class="invalid-feedback">
+                            {{ $t("general.Itmustbeatleast") }}
+                            {{ $v.create.name.$params.minLength.min }}
+                            {{ $t("general.letters") }}
+                        </div>
+                        <div v-if="!$v.create.name.maxLength" class="invalid-feedback">
+                            {{ $t("general.Itmustbeatmost") }}
+                            {{ $v.create.name.$params.maxLength.max }}
+                            {{ $t("general.letters") }}
+                        </div>
+                        <template v-if="errors.name">
+                            <ErrorMessage
+                                v-for="(errorMessage, index) in errors.name"
+                                :key="index"
+                            >
+                                {{ errorMessage }}
+                            </ErrorMessage>
+                        </template>
+                    </div>
+                </div>
+                <div class="col-md-12"  v-if="isVisible('name_e')">
+                    <div class="form-group">
+                        <label for="field-2" class="control-label">
+                            {{ getCompanyKey("sale_man_type_name_en") }}
+                            <span  v-if="isRequired('name_e')" class="text-danger">*</span>
+                        </label>
+                        <div dir="ltr">
+                            <input
+                                type="text"
+                                class="form-control"
+                                data-create="2"
+                                @keypress.enter="moveInput('select', 'create', 3)"
+                                v-model="$v.create.name_e.$model"
+                                :class="{
+                            'is-invalid': $v.create.name_e.$error || errors.name_e,
+                            'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
+                          }"
+                                @keyup="englishValue(create.name_e)"
+                                id="field-2"
+                            />
+                        </div>
+                        <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
+                            {{ $t("general.Itmustbeatleast") }}
+                            {{ $v.create.name_e.$params.minLength.min }}
+                            {{ $t("general.letters") }}
+                        </div>
+                        <div v-if="!$v.create.name_e.maxLength" class="invalid-feedback">
+                            {{ $t("general.Itmustbeatmost") }}
+                            {{ $v.create.name_e.$params.maxLength.max }}
+                            {{ $t("general.letters") }}
+                        </div>
+                        <template v-if="errors.name_e">
+                            <ErrorMessage
+                                v-for="(errorMessage, index) in errors.name_e"
+                                :key="index"
+                            >{{ errorMessage }}
+                            </ErrorMessage>
+                        </template>
+                    </div>
+                </div>
+                <div class="col-md-12" v-if="isVisible('is_employee')" >
+                    <div class="form-group">
+                        <label class="mr-2">
+                            {{ getCompanyKey("is_employee") }}
+                            <span v-if="isRequired('is_employee')"  class="text-danger">*</span>
+                        </label>
+                        <b-form-group :class="{
+                                      'is-invalid':
+                                        $v.create.is_employee.$error || errors.is_employee,
+                                      'is-valid':
+                                        !$v.create.is_employee.$invalid && !errors.is_employee,
+                                    }"
+                        >
+                            <b-form-radio
+                                class="d-inline-block"
+                                v-model="$v.create.is_employee.$model"
+                                name="some-radios"
+                                value="1"
+                            >{{ $t("general.Yes") }}</b-form-radio
+                            >
+                            <b-form-radio
+                                class="d-inline-block m-1"
+                                v-model="$v.create.is_employee.$model"
+                                name="some-radios"
+                                value="0"
+                            >{{ $t("general.No") }}</b-form-radio
+                            >
+                        </b-form-group>
+                        <template v-if="errors.is_employee">
+                            <ErrorMessage
+                                v-for="(errorMessage, index) in errors.is_employee"
+                                :key="index"
+                            >{{ errorMessage }}</ErrorMessage
+                            >
+                        </template>
+                    </div>
+                </div>
             </div>
-            <div v-if="!$v.create.name.maxLength" class="invalid-feedback">
-              {{ $t("general.Itmustbeatmost") }}
-              {{ $v.create.name.$params.maxLength.max }} {{ $t("general.letters") }}
-            </div>
-            <template v-if="errors.name">
-              <ErrorMessage v-for="(errorMessage, index) in errors.name" :key="index">
-                {{ errorMessage }}
-              </ErrorMessage>
-            </template>
-          </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="field-2" class="control-label">
-              {{ getCompanyKey("sale_man_type_name_en") }}
-              <span class="text-danger">*</span>
-            </label>
-            <div dir="ltr">
-              <input
-                type="text"
-                class="form-control"
-                data-create="2"
-                @keypress.enter="moveInput('select', 'create', 3)"
-                v-model="$v.create.name_e.$model"
-                :class="{
-                  'is-invalid': $v.create.name_e.$error || errors.name_e,
-                  'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
-                }"
-                @keyup="englishValue(create.name_e)"
-                id="field-2"
-              />
-            </div>
-            <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
-              {{ $t("general.Itmustbeatleast") }}
-              {{ $v.create.name_e.$params.minLength.min }} {{ $t("general.letters") }}
-            </div>
-            <div v-if="!$v.create.name_e.maxLength" class="invalid-feedback">
-              {{ $t("general.Itmustbeatmost") }}
-              {{ $v.create.name_e.$params.maxLength.max }} {{ $t("general.letters") }}
-            </div>
-            <template v-if="errors.name_e">
-              <ErrorMessage v-for="(errorMessage, index) in errors.name_e" :key="index"
-                >{{ errorMessage }}
-              </ErrorMessage>
-            </template>
-          </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label class="my-1 mr-2" for="inlineFormCustomSelectPref">
-              {{ getCompanyKey("is_employee") }}
-              <span class="text-danger">*</span>
-            </label>
-            <select
-              class="custom-select my-1 mr-sm-2"
-              id="inlineFormCustomSelectPref"
-              data-create="3"
-              @keypress.enter.prevent="moveInput('input', 'create', 4)"
-              v-model="$v.create.is_employee.$model"
-              :class="{
-                'is-invalid': $v.create.is_employee.$error || errors.is_employee,
-                'is-valid': !$v.create.is_employee.$invalid && !errors.is_employee,
-              }"
-            >
-              <option value="" selected>{{ $t("general.Choose") }}...</option>
-              <option value="1">{{ $t("general.Yes") }}</option>
-              <option value="0">{{ $t("general.No") }}</option>
-            </select>
-            <template v-if="errors.is_employee">
-              <ErrorMessage
-                v-for="(errorMessage, index) in errors.is_employee"
-                :key="index"
-                >{{ errorMessage }}
-              </ErrorMessage>
-            </template>
-          </div>
-        </div>
-      </div>
-    </form>
-  </b-modal>
+        </form>
+    </b-modal>
   <!--  /create   -->
 </template>
 
 <script>
-import { maxLength, minLength, required } from "vuelidate/lib/validators";
+import {maxLength, minLength, required, requiredIf} from "vuelidate/lib/validators";
 import Switches from "vue-switches";
 import Multiselect from "vue-multiselect";
 import ErrorMessage from "../widgets/errorMessage";
@@ -174,11 +190,21 @@ export default {
     ErrorMessage,
     loader,
   },
-
   mounted() {
+      this.getCustomTableFields();
     this.company_id = this.$store.getters["auth/company_id"];
   },
-  props: ["companyKeys", "defaultsKeys"],
+    props: {
+        id: {
+            default: "sales-man-type-create",
+        },
+        companyKeys:{
+            default:[]
+        },
+        defaultsKeys:{
+            default:[]
+        },
+    },
   updated() {
     // $(function () {
     //   $(".englishInput").keypress(function (event) {
@@ -201,6 +227,7 @@ export default {
   },
   data() {
     return {
+        fields: [],
       create: {
         name: "",
         name_e: "",
@@ -213,12 +240,47 @@ export default {
   },
   validations: {
     create: {
-      name: { required, minLength: minLength(3), maxLength: maxLength(100) },
-      name_e: { required, minLength: minLength(3), maxLength: maxLength(100) },
-      is_employee: { required },
+        name: { required: requiredIf(function (model) {
+                return this.isRequired("name");
+            }), minLength: minLength(3), maxLength: maxLength(100) },
+        name_e: { required: requiredIf(function (model) {
+                return this.isRequired("name_e");
+            }), minLength: minLength(3), maxLength: maxLength(100) },
+        is_employee: { required: requiredIf(function (model) {
+                return this.isRequired("is_employee");
+            }) },
     },
   },
   methods: {
+      getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_salesmen_types`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+      isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+      isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
     moveInput(tag, c, index) {
       document.querySelector(`${tag}[data-${c}='${index}']`).focus();
     },
@@ -231,6 +293,7 @@ export default {
         this.$v.$reset();
       });
       this.errors = {};
+      this.$bvModal.hide(this.id);
     },
     /**
      *  hidden Modal (create)

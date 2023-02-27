@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength, integer } from "vuelidate/lib/validators";
+import {required, minLength, maxLength, integer, requiredIf} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -78,6 +78,7 @@ export default {
   // },
   data() {
     return {
+      fields: [],
       per_page: 50,
       search: "",
       is_disabled: false,
@@ -134,28 +135,52 @@ export default {
   },
   validations: {
     create: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100) },
+      name: { required: requiredIf(function (model) {
+              return this.isRequired("name");
+          }), minLength: minLength(2), maxLength: maxLength(100) },
       name_e: {
-        required,
+          required: requiredIf(function (model) {
+              return this.isRequired("name_e");
+          }),
         minLength: minLength(2),
         maxLength: maxLength(100),
       },
-      country_id: { required },
-      governorate_id: { required },
-      city_id: { required },
-      is_active: { required },
+      country_id: { required: requiredIf(function (model) {
+              return this.isRequired("country_id");
+          }) },
+      governorate_id: { required: requiredIf(function (model) {
+              return this.isRequired("governorate_id");
+          }) },
+      city_id: { required: requiredIf(function (model) {
+              return this.isRequired("city_id");
+          }) },
+      is_active: { required: requiredIf(function (model) {
+              return this.isRequired("is_active");
+          }) },
     },
     edit: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      name_e: {
-        required,
-        minLength: minLength(2),
-        maxLength: maxLength(100),
-      },
-      country_id: { required },
-      governorate_id: { required },
-      city_id: { required },
-      is_active: { required },
+        name: { required: requiredIf(function (model) {
+                return this.isRequired("name");
+            }), minLength: minLength(2), maxLength: maxLength(100) },
+        name_e: {
+            required: requiredIf(function (model) {
+                return this.isRequired("name_e");
+            }),
+            minLength: minLength(2),
+            maxLength: maxLength(100),
+        },
+        country_id: { required: requiredIf(function (model) {
+                return this.isRequired("country_id");
+            }) },
+        governorate_id: { required: requiredIf(function (model) {
+                return this.isRequired("governorate_id");
+            }) },
+        city_id: { required: requiredIf(function (model) {
+                return this.isRequired("city_id");
+            }) },
+        is_active: { required: requiredIf(function (model) {
+                return this.isRequired("is_active");
+            }) },
     },
   },
   watch: {
@@ -190,10 +215,40 @@ export default {
     },
   },
   mounted() {
+    this.getCustomTableFields();
     this.getData();
   },
   methods: {
-                arabicValue(txt) {
+    getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_avenues`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+    isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+    isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
+    arabicValue(txt) {
       this.create.name = arabicValue(txt);
       this.edit.name = arabicValue(txt);
     },
@@ -755,23 +810,26 @@ export default {
                     ref="dropdown"
                     class="btn-block setting-search"
                   >
-                    <b-form-checkbox v-model="filterSetting" value="name" class="mb-1">{{
+                    <b-form-checkbox v-if="isVisible('name')" v-model="filterSetting" value="name" class="mb-1">{{
                       getCompanyKey("avenue_name_ar")
                     }}</b-form-checkbox>
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('name_e')"
                       value="name_e"
                       class="mb-1"
                       >{{ getCompanyKey("avenue_name_en") }}</b-form-checkbox
                     >
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('country_id')"
                       :value="$i18n.locale == 'ar' ? 'country.name' : 'country.name_e'"
                       class="mb-1"
                       >{{ getCompanyKey("country") }}</b-form-checkbox
                     >
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('governorate_id')"
                       :value="
                         $i18n.locale == 'ar' ? 'governorate.name' : 'governorate.name_e'
                       "
@@ -780,6 +838,7 @@ export default {
                     >
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('city_id')"
                       :value="$i18n.locale == 'ar' ? 'city.name' : 'city.name_e'"
                       class="mb-1"
                       >{{ getCompanyKey("city") }}</b-form-checkbox
@@ -876,22 +935,22 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.name" class="mb-1"
+                      <b-form-checkbox  v-if="isVisible('name')" v-model="setting.name" class="mb-1"
                         >{{ getCompanyKey("avenue_name_ar") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.name_e" class="mb-1">
+                      <b-form-checkbox  v-if="isVisible('name_e')" v-model="setting.name_e" class="mb-1">
                         {{ getCompanyKey("avenue_name_en") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.country_id" class="mb-1">
+                      <b-form-checkbox  v-if="isVisible('country_id')" v-model="setting.country_id" class="mb-1">
                         {{ getCompanyKey("country") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.governorate_id" class="mb-1">
+                      <b-form-checkbox  v-if="isVisible('governorate_id')" v-model="setting.governorate_id" class="mb-1">
                         {{ getCompanyKey("governorate") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.city_id" class="mb-1">
+                      <b-form-checkbox  v-if="isVisible('city_id')" v-model="setting.city_id" class="mb-1">
                         {{ getCompanyKey("city") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.is_active" class="mb-1">
+                      <b-form-checkbox  v-if="isVisible('is_active')" v-model="setting.is_active" class="mb-1">
                         {{ getCompanyKey("avenue_status") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
@@ -993,11 +1052,11 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('country_id')">
                     <div class="form-group position-relative">
                       <label class="control-label">
                         {{ getCompanyKey("country") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('country_id')" class="text-danger">*</span>
                       </label>
                       <multiselect
                         @input="getGovernorate(create.country_id)"
@@ -1021,11 +1080,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('governorate_id')">
                     <div class="form-group position-relative">
                       <label class="control-label">
                         {{ getCompanyKey("governorate") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('governorate_id')" class="text-danger">*</span>
                       </label>
                       <multiselect
                         @input="getCity(create.country_id, create.governorate_id)"
@@ -1051,11 +1110,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('city_id')">
                     <div class="form-group position-relative">
                       <label class="control-label">
                         {{ getCompanyKey("city") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('city_id')" class="text-danger">*</span>
                       </label>
                       <multiselect
                         @input="showCityModal(create.city_id)"
@@ -1079,11 +1138,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6 direction" dir="rtl">
+                  <div class="col-md-6 direction" dir="rtl" v-if="isVisible('name')">
                     <div class="form-group">
                       <label for="field-1" class="control-label">
                         {{ getCompanyKey("avenue_name_ar") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name')" class="text-danger">*</span>
                       </label>
                       <input
                       @keyup="arabicValue(create.name)"
@@ -1118,11 +1177,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6 direction-ltr" dir="ltr">
+                  <div class="col-md-6 direction-ltr" dir="ltr" v-if="isVisible('name_e')">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
                         {{ getCompanyKey("avenue_name_en") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name_e')" class="text-danger">*</span>
                       </label>
                       <input
                       @keyup="englishValue(create.name_e)"
@@ -1157,11 +1216,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('is_active')">
                     <div class="form-group">
                       <label class="mr-2" for="inlineFormCustomSelectPref">
                         {{ getCompanyKey("avenue_status") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('is_active')" class="text-danger">*</span>
                       </label>
                       <select
                         class="custom-select mr-sm-2"
@@ -1212,7 +1271,7 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.name">
+                    <th v-if="setting.name && isVisible('name')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("avenue_name_ar") }}</span>
                         <div class="arrow-sort">
@@ -1227,7 +1286,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.name_e">
+                    <th v-if="setting.name_e && isVisible('name_e')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("avenue_name_en") }}</span>
                         <div class="arrow-sort">
@@ -1242,7 +1301,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.country_id">
+                    <th v-if="setting.country_id && isVisible('country_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("country") }}</span>
                         <div class="arrow-sort">
@@ -1257,7 +1316,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.governorate_id">
+                    <th v-if="setting.governorate_id && isVisible('governorate_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("governorate") }}</span>
                         <div class="arrow-sort">
@@ -1272,7 +1331,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.city_id">
+                    <th v-if="setting.city_id && isVisible('city_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("city") }}</span>
                         <div class="arrow-sort">
@@ -1287,7 +1346,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.is_active">
+                    <th v-if="setting.is_active && isVisible('is_active')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("avenue_status") }}</span>
                         <div class="arrow-sort">
@@ -1325,26 +1384,26 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.name">
+                    <td v-if="setting.name && isVisible('name')">
                       <h5 class="m-0 font-weight-normal">{{ data.name }}</h5>
                     </td>
-                    <td v-if="setting.name_e">
+                    <td v-if="setting.name_e && isVisible('name_e')">
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
-                    <td v-if="setting.country_id">
+                    <td v-if="setting.country_id && isVisible('country_id')">
                       {{ $i18n.locale == "ar" ? data.country.name : data.country.name_e }}
                     </td>
-                    <td v-if="setting.governorate_id">
+                    <td v-if="setting.governorate_id && isVisible('governorate_id')">
                       {{
                         $i18n.locale == "ar"
                           ? data.governorate.name
                           : data.governorate.name_e
                       }}
                     </td>
-                    <td v-if="setting.city_id">
+                    <td v-if="setting.city_id && isVisible('city_id')">
                       {{ $i18n.locale == "ar" ? data.city.name : data.city.name_e }}
                     </td>
-                    <td v-if="setting.is_active">
+                    <td v-if="setting.is_active && isVisible('is_active')">
                       <span
                         :class="[
                           data.is_active == 'active' ? 'text-success' : 'text-danger',
@@ -1436,11 +1495,11 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('country_id')">
                               <div class="form-group position-relative">
                                 <label class="control-label">
                                   {{ getCompanyKey("country") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('country_id')" class="text-danger">*</span>
                                 </label>
                                 <multiselect
                                   @input="getGovernorate(edit.country_id)"
@@ -1466,11 +1525,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('governorate_id')" >
                               <div class="form-group position-relative">
                                 <label class="control-label">
                                   {{ getCompanyKey("governorate") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('governorate_id')"  class="text-danger">*</span>
                                 </label>
                                 <multiselect
                                   @input="getCity(edit.country_id, edit.governorate_id)"
@@ -1498,11 +1557,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('city_id')">
                               <div class="form-group position-relative">
                                 <label class="control-label">
                                   {{ getCompanyKey("city") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('city_id')" class="text-danger">*</span>
                                 </label>
                                 <multiselect
                                   @input="showCityModalEdit(edit.city_id)"
@@ -1528,11 +1587,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6 direction" dir="rtl">
+                            <div class="col-md-6 direction" dir="rtl" v-if="isVisible('name')">
                               <div class="form-group">
                                 <label for="edit-1" class="control-label">
                                   {{ getCompanyKey("avenue_name_ar") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('name')" class="text-danger">*</span>
                                 </label>
                                 <input
                                 @keyup="arabicValue(edit.name)"
@@ -1572,11 +1631,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6 direction-ltr" dir="ltr">
+                            <div class="col-md-6 direction-ltr" dir="ltr" v-if="isVisible('name_e')">
                               <div class="form-group">
                                 <label for="edit-2" class="control-label">
                                   {{ getCompanyKey("avenue_name_en") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('name_e')" class="text-danger">*</span>
                                 </label>
                                 <input
                                 @keyup="englishValue(edit.name_e)"
@@ -1618,17 +1677,16 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6"  v-if="isVisible('is_active')">
                               <div class="form-group">
                                 <label class="mr-2" for="edit-6">
                                   {{ getCompanyKey("avenue_status") }}
-                                  <span class="text-danger">*</span>
+                                  <span  v-if="isRequired('is_active')" class="text-danger">*</span>
                                 </label>
                                 <select
                                   class="custom-select mr-sm-2"
                                   id="edit-6"
                                   data-edit="6"
-                                  @keypress.enter.prevent="moveInput('input', 'edit', 1)"
                                   v-model="$v.edit.is_active.$model"
                                   :class="{
                                     'is-invalid':

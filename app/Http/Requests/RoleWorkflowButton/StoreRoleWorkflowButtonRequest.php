@@ -24,9 +24,9 @@ class StoreRoleWorkflowButtonRequest extends FormRequest
     public function rules()
     {
         return [
-            "role_id"       => "required|exists:roles,id" ,
-            "workflow_id"     => "required|numeric" ,
-            "button_id"   => "required|numeric" ,
+            "role_id"       => "nullable|exists:roles,id" ,
+            "workflow_id"     => "nullable|numeric" ,
+            "button_id"   => "nullable|numeric" ,
         ];
     }
 }

@@ -27,10 +27,10 @@ class UpdateBankRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'max:255', 'string', new BankUniqueNameCountryRule($this->country_id, $this->id)],
-            'name_e' => ['required', 'max:255', 'string', new BankUniqueNameCountryRule($this->country_id, $this->id)],
-            "country_id" => "required|exists:general_countries,id",
-            "swift_code" => "required|string",
+            'name' => ['nullable', 'max:255', 'string', new BankUniqueNameCountryRule($this->country_id, $this->id)],
+            'name_e' => ['nullable', 'max:255', 'string', new BankUniqueNameCountryRule($this->country_id, $this->id)],
+            "country_id" => "nullable|exists:general_countries,id",
+            "swift_code" => "nullable|string",
         ];
     }
 

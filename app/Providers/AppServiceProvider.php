@@ -23,6 +23,8 @@ use App\Repositories\Currency\CurrencyRepository;
 use App\Repositories\Currency\CurrencyRepositoryInterface;
 use App\Repositories\CustomTable\CustomTableInterface;
 use App\Repositories\CustomTable\CustomTableRepository;
+use App\Repositories\Document\DocumentInterface;
+use App\Repositories\Document\DocumentIRepository;
 use App\Repositories\Employee\EmployeeInterface;
 use App\Repositories\Employee\EmployeeRepository;
 use App\Repositories\ExternalSalesmen\ExternalSalesmenInterface;
@@ -126,6 +128,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ScreenTreePropertyRepositoryInterface::class, ScreenTreePropertyRepository::class);
         $this->app->bind(GeneralCustomerRepositoryInterface::class, GeneralCustomerRepository::class);
         $this->app->bind(CustomTableInterface::class, CustomTableRepository::class);
+        $this->app->bind(DocumentInterface::class, DocumentIRepository::class);
     }
 
     /**

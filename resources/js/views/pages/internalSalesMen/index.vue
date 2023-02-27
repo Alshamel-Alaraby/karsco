@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength, integer } from "vuelidate/lib/validators";
+import {required, minLength, maxLength, integer, requiredIf} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -53,6 +53,7 @@ export default {
   },
   data() {
     return {
+        fields: [],
       per_page: 50,
       search: "",
       debounce: {},
@@ -92,12 +93,20 @@ export default {
   },
   validations: {
     create: {
-      employee_id: { required },
-      is_active: { required },
+      employee_id: { required: requiredIf(function (model) {
+              return this.isRequired("employee_id");
+          })  },
+      is_active: { required: requiredIf(function (model) {
+              return this.isRequired("is_active");
+          })  },
     },
     edit: {
-      employee_id: { required },
-      is_active: { required },
+      employee_id: { required: requiredIf(function (model) {
+              return this.isRequired("employee_id");
+          })  },
+      is_active: { required: requiredIf(function (model) {
+              return this.isRequired("is_active");
+          })  },
     },
   },
   watch: {
@@ -133,9 +142,39 @@ export default {
   },
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
+    this.getCustomTableFields();
     this.getData();
   },
   methods: {
+      getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_internal_salesman`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+      isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+      isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
     showScreen(module, screen) {
       let filterRes = this.$store.state.auth.allWorkFlow.filter(
         (workflow) => workflow.name_e == module
@@ -587,6 +626,7 @@ export default {
                     class="btn-block setting-search"
                   >
                     <b-form-checkbox
+                       v-if="isVisible('employee_id')"
                       v-model="filterSetting"
                       :value="$i18n.locale == 'ar' ? 'employee.name' : 'employee.name_e'"
                       class="mb-1"
@@ -685,10 +725,10 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.employee_id" class="mb-1"
+                      <b-form-checkbox v-if="isVisible('employee_id')"  v-model="setting.employee_id" class="mb-1"
                         >{{ getCompanyKey("employee") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.is_active" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('is_active')"  v-model="setting.is_active" class="mb-1">
                         {{ getCompanyKey("internal_sale_man_status") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
@@ -792,11 +832,11 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-12">
+                  <div class="col-md-12" v-if="isVisible('employee_id')" >
                     <div class="form-group">
                       <label class="my-1 mr-2">
                         {{ getCompanyKey("employee") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('employee_id')"  class="text-danger">*</span>
                       </label>
                       <multiselect
                         @input="showEmployeeModal"
@@ -820,11 +860,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-12" v-if="isVisible('is_active')" >
                     <div class="form-group">
                       <label class="mr-2">
                         {{ getCompanyKey("internal_sale_man_status") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('is_active')"  class="text-danger">*</span>
                       </label>
                       <b-form-group
                         :class="{
@@ -881,7 +921,7 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.employee_id">
+                    <th v-if="setting.employee_id && isVisible('employee_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("employee") }}</span>
                         <div class="arrow-sort">
@@ -896,7 +936,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.is_active">
+                    <th v-if="setting.is_active && isVisible('is_active')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("internal_sale_man_status") }}</span>
                       </div>
@@ -926,14 +966,14 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.employee_id">
+                    <td v-if="setting.employee_id && isVisible('employee_id')">
                       <h5 class="m-0 font-weight-normal">
                         {{
                           $i18n.locale == "ar" ? data.employee.name : data.employee.name_e
                         }}
                       </h5>
                     </td>
-                    <td v-if="setting.is_active">
+                    <td v-if="setting.is_active && isVisible('is_active')">
                       <span
                         :class="[
                           data.is_active == 'active' ? 'text-success' : 'text-danger',
@@ -1024,11 +1064,11 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-12" v-if="isVisible('employee_id')">
                               <div class="form-group">
                                 <label class="my-1 mr-2">
                                   {{ getCompanyKey("employee") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('employee_id')" class="text-danger">*</span>
                                 </label>
                                 <multiselect
                                   @input="showEmployeeModalEdit"
@@ -1054,11 +1094,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-12" v-if="isVisible('is_active')">
                               <div class="form-group">
                                 <label class="mr-2">
                                   {{ getCompanyKey("internal_sale_man_status") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('is_active')" class="text-danger">*</span>
                                 </label>
                                 <b-form-group
                                   :class="{

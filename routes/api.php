@@ -127,13 +127,23 @@ Route::group(['prefix' => 'customTable'], function () {
         Route::put('/{id}', 'update')->name('customTable.update');
         Route::delete('/{id}', 'delete')->name('customTable.destroy');
         Route::post("bulk-delete", "bulkDelete");
-//        Route::get('/', 'all')->name('countries.index');
-//        Route::get('logs/{id}', 'logs')->name('countries.logs');
-//        Route::get('/{id}', 'find');
-//        Route::post('/', 'create')->name('countries.create');
-//        Route::put('/{id}', 'update')->name('countries.update');
-//        Route::delete('/{id}', 'delete')->name('countries.destroy');
-//        Route::post("bulk-delete", "bulkDelete");
+
+    });
+});
+
+
+
+Route::group(['prefix' => 'document'], function () {
+    Route::controller(\App\Http\Controllers\Document\DocumentController::class)->group(function () {
+        Route::get('/', 'all')->name('document.index');
+        Route::get('logs/{id}', 'logs')->name('document.logs');
+        Route::get('/{id}', 'find');
+        Route::post('/', 'create')->name('document.create');
+        Route::put('/{id}', 'update')->name('document.update');
+        Route::delete('/{id}', 'delete')->name('document.destroy');
+        Route::post("bulk-delete", "bulkDelete");
+
+        Route::post('from_admin', 'createFromAdmin')->name('document.create_from_admin');
     });
 });
 

@@ -33,6 +33,8 @@ class RpPaymentPlanInstallmentResource extends JsonResource
             "installment_payment_plan"=>$this->installment_payment_plan,
             "installment_status"=>$this->installment_status,
             "installment_payment_type"=>$this->installment_payment_type,
+            "document_type" => $this->document,
+
 
         ];
     }

@@ -26,8 +26,8 @@ class StorePaymentTypeRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:general_payment_types,name',
-            'name_e' => 'required|string|max:255|unique:general_payment_types,name_e',
+            'name' => 'nullable|string|max:255|unique:general_payment_types,name',
+            'name_e' => 'nullable|string|max:255|unique:general_payment_types,name_e',
             'is_default' => 'nullable|in:1,0',
         ];
     }

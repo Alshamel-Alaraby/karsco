@@ -22,6 +22,7 @@ class RpInstallmentPaymentPlanRepository implements RpInstallmentPaymentPlanRepo
 
     public function all($request)
     {
+
         $models = $this->model->withCount('payment_plan_installments as count_payment_plan_installment')->
             where(function ($q) use ($request){
             $q->when($request->plan_installments, function ($q){

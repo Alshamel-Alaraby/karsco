@@ -15,12 +15,12 @@ return new class extends Migration
     {
         Schema::create('general_governorates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('country_id');
-            $table->string('name')->unique();
-            $table->string('name_e')->unique();
+            $table->foreignId('country_id')->nullable();
+            $table->string('name')->unique()->nullable();
+            $table->string('name_e')->unique()->nullable();
             $table->tinyInteger('is_default')->default(0);
             $table->string("is_active")->default('active');
-            $table->string("phone_key", 10)->unique();
+            $table->string("phone_key", 10)->unique()->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

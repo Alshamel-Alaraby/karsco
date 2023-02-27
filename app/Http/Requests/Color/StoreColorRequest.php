@@ -24,9 +24,9 @@ class StoreColorRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:general_colors,name',
-            'name_e' => 'required|string|max:255|unique:general_colors,name_e',
-            "is_active" => "required|in:active,inactive",
+            'name' => 'nullable|string|max:255|unique:general_colors,name',
+            'name_e' => 'nullable|string|max:255|unique:general_colors,name_e',
+            "is_active" => "nullable|in:active,inactive",
         ];
     }
 

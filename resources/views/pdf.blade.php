@@ -24,7 +24,6 @@
                 display: inline-block;">
                     {{$field->name_e}}
                 </label>
-                @if($field->value)
                 <input readonly value="{{is_object($field->value)?$field->value->name_e:$field->value}}" type="text" data-create="9" step="0.1" style="
                     margin: 0;
                     font-family: inherit;
@@ -42,7 +41,6 @@
                     border: 1px solid #ced4da;
                     border-radius: 10px;
                 " />
-                @endif
             </div>
             @endforeach
 

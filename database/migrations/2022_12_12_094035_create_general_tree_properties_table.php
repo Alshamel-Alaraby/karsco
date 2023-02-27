@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('general_tree_properties', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
-            $table->string('name_e', 100);
+            $table->string('name', 100)->nullable();
+            $table->string('name_e', 100)->nullable();
             $table->unsignedInteger('parent_id')->nullable()->default(0);
             //            $table->unsignedInteger ('screen_id')->nullable ()->default (0);
             $table->unsignedTinyInteger('required')->nullable()->default(0);

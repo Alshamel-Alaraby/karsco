@@ -31,10 +31,9 @@ class UpdateBankAccountRequest extends FormRequest
             "email" => "nullable|string|max:255",
             "emp_id" => "nullable|string|max:255",
             "rp_code" => "nullable|string|max:255",
-
             "media" => "nullable|array",
-            "media.*" => ["exists:media,id", new \App\Rules\MediaRule()],
-            'old_media.*' => ['exists:media,id', new \App\Rules\MediaRule("App\Models\BankAccount")],
+            "media.*" => ["nullable|exists:media,id", new \App\Rules\MediaRule()],
+            'old_media.*' => ['nullable|exists:media,id', new \App\Rules\MediaRule("App\Models\BankAccount")],
         ];
     }
 

@@ -910,6 +910,8 @@
         "is_visible":"Is visible",
         "Column": "Column",
         "tableName": "Table Name",
-        "rows": "Rows"
+        "rows": "Rows",
+        "documentTable": "Document Table",
+        "document": "Document"
     }
 }

@@ -2,7 +2,7 @@
 import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
-import { required } from "vuelidate/lib/validators";
+import { required,requiredIf } from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -197,7 +197,7 @@ export default {
       await adminApi
         .get(
           `/arch-archive-files/valueMedia?value=${
-            typeof this.currentNode.name_e === 'object' ?this.currentNode.name_e.name_e:this.currentNode.name_e 
+            typeof this.currentNode.name_e === 'object' ?this.currentNode.name_e.name_e:this.currentNode.name_e
           }&department_id=${this.currentNode.archive_file.arch_department_id}
           &parent_arch_doc_type_id=${this.currentNode.parent_doc_id}
           &arch_doc_type_id=${this.arch_doc_type_id ? this.arch_doc_type_id : ""}`

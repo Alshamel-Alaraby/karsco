@@ -2766,7 +2766,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "installment_payment_plan",
-                "default_en" => "installment payment plan name",
+                "default_en" => " payment plan name",
                 "default_ar" => "اسم خطة الدفع بالتقسيط",
                 "new_ar" => "",
                 "new_en" => "",
@@ -2774,27 +2774,35 @@ class TranslationSeeder extends Seeder
                 "screen" => "payment plan installment"
             ],
             [
-                "key" => "installment_payment_plan_detail",
-                "default_en" => "Installment payment plan detail",
-                "default_ar" => "تفاصيل خطة الدفع بالتقسيط",
+                "key" => "installment_payment_plan_v_date",
+                "default_en" => "payment plan v-date",
+                "default_ar" => "التاريخ الخاس لخطة الدفع",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
                 "screen" => "payment plan installment"
             ],
             [
-                "key" => "installment_payment_plan_v_date",
-                "default_en" => "Installment payment plan v-date",
-                "default_ar" => "التاريخ الخامس لتفاصيل خطة الدفع",
+                "key" => "installment_payment_plan_note_a",
+                "default_en" => "note (arabic)",
+                "default_ar" => "ملاحظه (بالعربي)",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
                 "screen" => "payment plan installment"
             ],
-
+            [
+                "key" => "installment_payment_plan_note_e",
+                "default_en" => " note (english)",
+                "default_ar" => "ملاحظه (بالانجليزي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "payment plan installment"
+            ],
             [
                 "key" => "installment_payment_plan_due_date",
-                "default_en" => "Installment payment plan due date",
+                "default_en" => "payment plan due date",
                 "default_ar" => "تاريخ استحقاق خطة الدفع",
                 "new_ar" => "",
                 "new_en" => "",
@@ -2803,7 +2811,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "installment_payment_plan_total_amount",
-                "default_en" => "Installment payment plan total amount",
+                "default_en" => "payment plan total amount",
                 "default_ar" => "المبلغ الاجمالي لخطة الدفع",
                 "new_ar" => "",
                 "new_en" => "",
@@ -2812,7 +2820,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "installment_payment_plan_paid_amount",
-                "default_en" => "Installment payment plan paid amount",
+                "default_en" => "payment plan paid amount",
                 "default_ar" => "المبلغ المدفوع لخطة الدفع",
                 "new_ar" => "",
                 "new_en" => "",
@@ -2837,24 +2845,6 @@ class TranslationSeeder extends Seeder
                 "company_id" => 0,
                 "screen" => "payment plan installment"
             ],
-            [
-                "key" => "module",
-                "default_en" => "Module name",
-                "default_ar" => "اسم الوحدة",
-                "new_ar" => "",
-                "new_en" => "",
-                "company_id" => 0,
-                "screen" => "payment plan installment"
-            ],
-            // [
-            //     "key" => "screen",
-            //     "default_en" => "Screen name",
-            //     "default_ar" => "اسم الشاشة",
-            //     "new_ar" => "",
-            //     "new_en" => "",
-            //     "company_id" => 0,
-            //     "screen" => "payment plan installment"
-            // ],
             [
                 "key" => "ref_id",
                 "default_en" => "Ref ID",
@@ -6031,7 +6021,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "installment_payment_plan_v_date",
-                "default_en" => "Installment payment plan v-date",
+                "default_en" => "payment plan v-date",
                 "default_ar" => "التاريخ الخامس لتفاصيل خطة الدفع",
                 "new_ar" => "",
                 "new_en" => "",
@@ -6041,7 +6031,7 @@ class TranslationSeeder extends Seeder
 
             [
                 "key" => "installment_payment_plan_due_date",
-                "default_en" => "Installment payment plan due date",
+                "default_en" => "payment plan due date",
                 "default_ar" => "تاريخ استحقاق خطة الدفع",
                 "new_ar" => "",
                 "new_en" => "",
@@ -6050,8 +6040,8 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "installment_payment_plan_total_amount",
-                "default_en" => "Installment payment plan total amount",
-                "default_ar" => "المبلغ الاجمالي لخطة الدفع",
+                "default_en" => "total amount",
+                "default_ar" => "المبلغ الاجمالي ",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
@@ -6059,8 +6049,8 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "installment_payment_plan_paid_amount",
-                "default_en" => "Installment payment plan paid amount",
-                "default_ar" => "المبلغ المدفوع لخطة الدفع",
+                "default_en" => "paid amount",
+                "default_ar" => "المبلغ المدفوع",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
@@ -6288,7 +6278,7 @@ class TranslationSeeder extends Seeder
                 "company_id" => 0,
                 "screen" => "receivable payable"
             ],
-            
+
             [
                 "key" => "is_conditional",
                 "default_en" => "Is conditional",
@@ -6895,6 +6885,59 @@ class TranslationSeeder extends Seeder
                 "new_en" => "",
                 "company_id" => 0,
                 "screen" => "general customer"
+
+            ],
+        ]);
+
+        //document
+        Translation::insert([
+            [
+                "key" => "document_create_form",
+                "default_en" => "Add new document",
+                "default_ar" => "اضف لون جديد",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "document"
+            ],
+            [
+                "key" => "document_edit_form",
+                "default_en" => "Edit document form",
+                "default_ar" => "نموذج تعديل اللون",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "document"
+
+            ],
+            [
+                "key" => "document_name_ar",
+                "default_en" => "Document name (arabic)",
+                "default_ar" => "اسم اللون (عربي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "document"
+
+            ],
+            [
+                "key" => "document_name_en",
+                "default_en" => "Document name (english)",
+                "default_ar" => "اسم اللون (انجليزي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "document"
+
+            ],
+            [
+                "key" => "document_status",
+                "default_en" => "Document default",
+                "default_ar" => "الحالة الافتراضية للمستند",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "document"
 
             ],
         ]);

@@ -6,6 +6,7 @@ use App\Traits\BulkDeleteTrait;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\RecievablePayable\Entities\RpPaymentPlanInstallment;
 use Modules\RecievablePayable\Http\Requests\CreateRpInstallmentPaymentPlanDetailRequest;
 use Modules\RecievablePayable\Http\Requests\CreateRpPaymentPlanInstallmentRequest;
 use Modules\RecievablePayable\Http\Requests\EditRpInstallmentPaymentPlanDetailRequest;
@@ -40,15 +41,15 @@ class RpPaymentPlanInstallmentController extends Controller
 
     public function index(Request $request)
     {
-        if (count($_GET) == 0) {
-            $models = cacheGet('RpPaymentPlanInstallment');
-            if (!$models) {
-                $models = $this->modelInterface->all($request);
-                cachePut('RpPaymentPlanInstallment', $models);
-            }
-        } else {
+//        if (count($_GET) == 0) {
+//            $models = cacheGet('RpPaymentPlanInstallment');
+//            if (!$models) {
+//                $models = $this->modelInterface->all($request);
+//                cachePut('RpPaymentPlanInstallment', $models);
+//            }
+//        } else {
             $models = $this->modelInterface->all($request);
-        }
+//        }
 
         return responseJson(200, 'success', RpPaymentPlanInstallmentResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }

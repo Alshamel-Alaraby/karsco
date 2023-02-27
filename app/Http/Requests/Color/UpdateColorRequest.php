@@ -24,9 +24,9 @@ class UpdateColorRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:general_colors,name,' . $this->id,
-            'name_e' => 'required|string|max:255|unique:general_colors,name_e,' . $this->id,
-            "is_active" => "required|in:active,inactive",
+            'name' => 'nullable|string|max:255|unique:general_colors,name,' . $this->id,
+            'name_e' => 'nullable|string|max:255|unique:general_colors,name_e,' . $this->id,
+            "is_active" => "nullable|in:active,inactive",
         ];
     }
 

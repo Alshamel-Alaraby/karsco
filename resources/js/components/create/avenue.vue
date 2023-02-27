@@ -50,7 +50,7 @@
                         </b-button>
                     </template>
                     <b-button
-                        @click.prevent="$bvModal.hide(`${id}`)"
+                        @click.prevent="resetModalHidden"
                         variant="danger"
                         type="button"
                     >
@@ -58,11 +58,11 @@
                     </b-button>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-6" v-if="isVisible('country_id')">
                         <div class="form-group position-relative">
                             <label class="control-label">
                                 {{ getCompanyKey("country") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('country_id')" class="text-danger">*</span>
                             </label>
                             <multiselect
                                 @input="getGovernorate(create.country_id)"
@@ -86,11 +86,11 @@
                             </template>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" v-if="isVisible('governorate_id')">
                         <div class="form-group position-relative">
                             <label class="control-label">
                                 {{ getCompanyKey("governorate") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('governorate_id')" class="text-danger">*</span>
                             </label>
                             <multiselect
                                 @input="getCity(create.country_id, create.governorate_id)"
@@ -116,11 +116,11 @@
                             </template>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" v-if="isVisible('city_id')">
                         <div class="form-group position-relative">
                             <label class="control-label">
                                 {{ getCompanyKey("city") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('city_id')" class="text-danger">*</span>
                             </label>
                             <multiselect
                                 @input="showCityModal(create.city_id)"
@@ -144,15 +144,17 @@
                             </template>
                         </div>
                     </div>
-                    <div class="col-md-6 direction" dir="rtl">
+                    <div class="col-md-6 direction" dir="rtl" v-if="isVisible('name')">
                         <div class="form-group">
                             <label for="field-1" class="control-label">
                                 {{ getCompanyKey("avenue_name_ar") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('name')" class="text-danger">*</span>
                             </label>
                             <input
+                                @keyup="arabicValue(create.name)"
+
                                 type="text"
-                                class="form-control arabicInput"
+                                class="form-control"
                                 data-create="1"
                                 @keypress.enter="moveInput('input', 'create', 2)"
                                 v-model="$v.create.name.$model"
@@ -160,7 +162,6 @@
                           'is-invalid': $v.create.name.$error || errors.name,
                           'is-valid': !$v.create.name.$invalid && !errors.name,
                         }"
-                                @keyup="arabicValue(create.name)"
                                 id="field-1"
                             />
                             <div v-if="!$v.create.name.minLength" class="invalid-feedback">
@@ -182,15 +183,17 @@
                             </template>
                         </div>
                     </div>
-                    <div class="col-md-6 direction-ltr" dir="ltr">
+                    <div class="col-md-6 direction-ltr" dir="ltr" v-if="isVisible('name_e')">
                         <div class="form-group">
                             <label for="field-2" class="control-label">
                                 {{ getCompanyKey("avenue_name_en") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('name_e')" class="text-danger">*</span>
                             </label>
                             <input
+                                @keyup="englishValue(create.name_e)"
+
                                 type="text"
-                                class="form-control englishInput"
+                                class="form-control"
                                 data-create="2"
                                 @keypress.enter="moveInput('input', 'create', 3)"
                                 v-model="$v.create.name_e.$model"
@@ -198,7 +201,6 @@
                           'is-invalid': $v.create.name_e.$error || errors.name_e,
                           'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
                         }"
-                                @keyup="englishValue(create.name_e)"
                                 id="field-2"
                             />
                             <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
@@ -220,11 +222,11 @@
                             </template>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" v-if="isVisible('is_active')">
                         <div class="form-group">
                             <label class="mr-2" for="inlineFormCustomSelectPref">
                                 {{ getCompanyKey("avenue_status") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('is_active')" class="text-danger">*</span>
                             </label>
                             <select
                                 class="custom-select mr-sm-2"
@@ -259,7 +261,7 @@
 
 <script>
 import adminApi from "../../api/adminAxios";
-import { required, minLength, maxLength, integer, alpha } from "vuelidate/lib/validators";
+import {required, minLength, maxLength, integer, alpha, requiredIf} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import Switches from "vue-switches";
 import ErrorMessage from "../../components/widgets/errorMessage";
@@ -277,7 +279,6 @@ export default {
     components: {
         Switches,
         Multiselect,
-
         ErrorMessage,
         loader,
         governate,
@@ -297,9 +298,9 @@ export default {
         },
     },
     mounted() {
+        this.getCustomTableFields();
         this.company_id = this.$store.getters["auth/company_id"];
     },
-
     updated() {
         // $(function () {
         //     $(".englishInput").keypress(function (event) {
@@ -322,39 +323,33 @@ export default {
     },
     validations: {
         create: {
-            name: { required, minLength: minLength(2), maxLength: maxLength(100) },
+            name: { required: requiredIf(function (model) {
+                    return this.isRequired("name");
+                }), minLength: minLength(2), maxLength: maxLength(100) },
             name_e: {
-                required,
+                required: requiredIf(function (model) {
+                    return this.isRequired("name_e");
+                }),
                 minLength: minLength(2),
                 maxLength: maxLength(100),
             },
-            country_id: { required },
-            governorate_id: { required },
-            city_id: { required },
-            is_active: { required },
-        },
-        edit: {
-            name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-            name_e: {
-                required,
-                minLength: minLength(2),
-                maxLength: maxLength(100),
-            },
-            country_id: { required },
-            governorate_id: { required },
-            city_id: { required },
-            is_active: { required },
-        },
+            country_id: { required: requiredIf(function (model) {
+                    return this.isRequired("country_id");
+                }) },
+            governorate_id: { required: requiredIf(function (model) {
+                    return this.isRequired("governorate_id");
+                }) },
+            city_id: { required: requiredIf(function (model) {
+                    return this.isRequired("city_id");
+                }) },
+            is_active: { required: requiredIf(function (model) {
+                    return this.isRequired("is_active");
+                }) },
+        }
     },
-
     data() {
         return {
-            per_page: 50,
-            search: "",
             is_disabled: false,
-            debounce: {},
-            avenuesPagination: {},
-            avenues: [],
             isLoader: false,
             create: {
                 name: "",
@@ -364,41 +359,46 @@ export default {
                 city_id: null,
                 is_active: "active",
             },
-            edit: {
-                name: "",
-                name_e: "",
-                country_id: null,
-                governorate_id: null,
-                city_id: null,
-                is_active: "active",
-            },
-            setting: {
-                name: true,
-                name_e: true,
-                country_id: true,
-                governorate_id: true,
-                city_id: true,
-                is_active: true,
-            },
             errors: {},
             isCheckAll: false,
             checkAll: [],
             current_page: 1,
-            filterSetting: [
-                "name",
-                "name_e",
-                this.$i18n.locale == "ar" ? "country.name" : "country.name_e",
-                this.$i18n.locale == "ar" ? "governorate.name" : "governorate.name_e",
-                this.$i18n.locale == "ar" ? "city.name" : "city.name_e",
-            ],
             countries: [],
             governorates: [],
             cities: [],
-            Tooltip: "",
-            mouseEnter: null,
+            fields: []
         };
     },
     methods: {
+        getCustomTableFields() {
+            adminApi
+                .get(`/customTable/table-columns/general_avenues`)
+                .then((res) => {
+                    this.fields = res.data;
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: `${this.$t("general.Error")}`,
+                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                    });
+                })
+                .finally(() => {
+                    this.isLoader = false;
+                });
+        },
+        isVisible(fieldName) {
+            let res = this.fields.filter((field) => {
+                return field.column_name == fieldName;
+            });
+            return res.length > 0 && res[0].is_visible == 1 ? true : false;
+        },
+        isRequired(fieldName) {
+            let res = this.fields.filter((field) => {
+                return field.column_name == fieldName;
+            });
+            return res.length > 0 && res[0].is_required == 1 ? true : false;
+        },
         showScreen(module, screen) {
             let filterRes = this.$store.state.auth.allWorkFlow.filter(
                 (workflow) => workflow.name_e == module

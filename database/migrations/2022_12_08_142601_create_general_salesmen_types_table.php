@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('general_salesmen_types', function (Blueprint $table) {
             $table->id();
-            $table->string("name", 100);
-            $table->string("name_e", 100);
-            $table->string("is_employee")->default(0);
+            $table->string("name", 100)->nullable();
+            $table->string("name_e", 100)->nullable();
+            $table->string("is_employee")->default(0)->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

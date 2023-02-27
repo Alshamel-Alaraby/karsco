@@ -15,10 +15,10 @@ return new class extends Migration
     {
         Schema::create('general_banks', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('name_e');
-            $table->unsignedInteger('country_id');
-            $table->string('swift_code');
+            $table->string('name')->nullable();
+            $table->string('name_e')->nullable();
+            $table->unsignedInteger('country_id')->nullable();
+            $table->string('swift_code')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

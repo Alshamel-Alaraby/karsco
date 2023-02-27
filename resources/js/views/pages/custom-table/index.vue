@@ -40,7 +40,9 @@ export default {
       isLoader: false,
       Tooltip: "",
       mouseEnter: "",
-      invisibleColumns: ["id", "company_id", "deleted_at", "created_at", "updated_at"],
+      invisibleColumns: ["id", "company_id",'is_admin', "deleted_at", "created_at", "updated_at","email_verified_at"
+          ,"remember_token","country_id",'governorate_id','city_id','bank_id','nationality','employee_id','roletype_id'
+            ,'salesman_type_id','branch_id','store_id','role_id','user_id','hotfield_id','workflow_id','bank_account_id'],
       create: {
         table_name: "",
         columns: [],
@@ -384,13 +386,7 @@ export default {
     resetModalHidden() {
       this.create = {
         table_name: "",
-        columns: [
-          {
-            column_name: "",
-            is_required: 1,
-            is_visible: 1,
-          },
-        ],
+        columns: [],
       };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -415,13 +411,7 @@ export default {
     resetForm() {
       this.create = {
         table_name: "",
-        columns: [
-          {
-            column_name: "",
-            is_required: 1,
-            is_visible: 1,
-          },
-        ],
+        columns: [],
       };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -524,13 +514,7 @@ export default {
       this.errors = {};
       this.edit = {
         table_name: "",
-        columns: [
-          {
-            column_name: "",
-            is_required: 1,
-            is_visible: 1,
-          },
-        ],
+        columns: [],
       };
     },
     /*

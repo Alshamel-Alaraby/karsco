@@ -24,7 +24,7 @@ class CreateInternalSalesmanRequest extends FormRequest
     public function rules()
     {
         return [
-            "employee_id"     => "required|numeric" ,
+            "employee_id"     => "nullable|numeric" ,
             "is_active"   => [] ,
         ];
     }

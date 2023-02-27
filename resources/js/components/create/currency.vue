@@ -1,7 +1,7 @@
 <template>
     <!--  create   -->
     <b-modal
-        id="currency-create"
+        :id="id"
         :title="getCompanyKey('currency_create_form')"
         title-class="font-18"
         dialog-class="modal-full-width"
@@ -48,24 +48,23 @@
                 </b-button>
             </div>
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-3" v-if="isVisible('name')">
                     <div class="form-group">
                         <label for="field-1" class="control-label">
                             {{ getCompanyKey('currency_name_ar') }}
-                            <span class="text-danger">*</span>
+                            <span v-if="isRequired('name')" class="text-danger">*</span>
                         </label>
                         <div dir="rtl">
                             <input
                                 type="text"
                                 class="form-control arabicInput"
                                 data-create="1"
-                                @keypress.enter="moveInput('input', 'create', 2)"
+                                @keyup="arabicValueName(create.name)"
                                 v-model="$v.create.name.$model"
                                 :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
                             'is-valid': !$v.create.name.$invalid && !errors.name,
                           }"
-                                @keyup="arabicValue(create.name)"
                                 id="field-1"
                             />
                         </div>
@@ -88,24 +87,23 @@
                         </template>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" v-if="isVisible('symbol')">
                     <div class="form-group">
                         <label for="field-45" class="control-label">
                             {{ getCompanyKey('currency_symbol_ar') }}
-                            <span class="text-danger">*</span>
+                            <span v-if="isRequired('symbol')" class="text-danger">*</span>
                         </label>
                         <div dir="rtl">
                             <input
                                 type="text"
                                 class="form-control arabicInput"
                                 data-create="3"
-                                @keypress.enter="moveInput('input', 'create', 4)"
+                                @keyup="arabicValueSymbol(create.symbol)"
                                 v-model="$v.create.symbol.$model"
                                 :class="{
                             'is-invalid': $v.create.symbol.$error || errors.symbol,
                             'is-valid': !$v.create.symbol.$invalid && !errors.symbol,
                           }"
-                                @keyup="arabicValueSymbol(create.symbol)"
                                 id="field-45"
                             />
                         </div>
@@ -128,24 +126,23 @@
                         </template>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" v-if="isVisible('code')">
                     <div class="form-group">
                         <label for="field-3" class="control-label">
                             {{ getCompanyKey('currency_code_ar') }}
-                            <span class="text-danger">*</span>
+                            <span v-if="isRequired('code')" class="text-danger">*</span>
                         </label>
                         <div dir="rtl">
                             <input
                                 type="text"
                                 class="form-control arabicInput"
                                 data-create="5"
-                                @keypress.enter="moveInput('input', 'create', 6)"
+                                @keyup="arabicValueCode(create.code)"
                                 v-model="$v.create.code.$model"
                                 :class="{
                             'is-invalid': $v.create.code.$error || errors.code,
                             'is-valid': !$v.create.code.$invalid && !errors.code,
                           }"
-                                @keyup="arabicValueCode(create.code)"
                                 id="field-3"
                             />
                         </div>
@@ -168,24 +165,23 @@
                         </template>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" v-if="isVisible('fraction')">
                     <div class="form-group">
                         <label for="field-5" class="control-label">
                             {{ getCompanyKey('currency_fraction_ar') }}
-                            <span class="text-danger">*</span>
+                            <span v-if="isRequired('fraction')" class="text-danger">*</span>
                         </label>
                         <div dir="rtl">
                             <input
                                 type="text"
                                 class="form-control arabicInput"
                                 data-create="7"
-                                @keypress.enter="moveInput('input', 'create', 8)"
+                                @keyup="arabicValueFraction(create.fraction)"
                                 v-model="$v.create.fraction.$model"
                                 :class="{
                             'is-invalid': $v.create.fraction.$error || errors.fraction,
                             'is-valid': !$v.create.fraction.$invalid && !errors.fraction,
                           }"
-                                @keyup="arabicValueFraction(create.fraction)"
                                 id="field-5"
                             />
                         </div>
@@ -208,24 +204,23 @@
                         </template>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" v-if="isVisible('name_e')">
                     <div class="form-group">
                         <label for="field-2" class="control-label">
                             {{ getCompanyKey('currency_name_en') }}
-                            <span class="text-danger">*</span>
+                            <span v-if="isRequired('name_e')" class="text-danger">*</span>
                         </label>
                         <div dir="ltr">
                             <input
                                 type="text"
                                 class="form-control englishInput"
                                 data-create="2"
-                                @keypress.enter="moveInput('input', 'create', 3)"
+                                @keyup="englishValueName(create.name_e)"
                                 v-model="$v.create.name_e.$model"
                                 :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
                             'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
                           }"
-                                @keyup="englishValue(create.name_e)"
                                 id="field-2"
                             />
                         </div>
@@ -248,24 +243,23 @@
                         </template>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" v-if="isVisible('symbol_e')">
                     <div class="form-group">
                         <label for="field-33" class="control-label">
                             {{ getCompanyKey('currency_symbol_en') }}
-                            <span class="text-danger">*</span>
+                            <span v-if="isRequired('symbol_e')" class="text-danger">*</span>
                         </label>
                         <div dir="ltr">
                             <input
                                 type="text"
                                 class="form-control englishInput"
                                 data-create="4"
-                                @keypress.enter="moveInput('input', 'create', 5)"
+                                @keyup="englishValueSymbol(create.symbol_e)"
                                 v-model="$v.create.symbol_e.$model"
                                 :class="{
                             'is-invalid': $v.create.symbol_e.$error || errors.symbol_e,
                             'is-valid': !$v.create.symbol_e.$invalid && !errors.symbol_e,
                           }"
-                                @keyup="englishValueSymbol(create.symbol_e)"
                                 id="field-33"
                             />
                         </div>
@@ -288,24 +282,24 @@
                         </template>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" v-if="isVisible('code_e')">
                     <div class="form-group">
                         <label for="field-4" class="control-label">
                             {{ getCompanyKey('currency_code_en') }}
-                            <span class="text-danger">*</span>
+                            <span v-if="isRequired('code_e')" class="text-danger">*</span>
                         </label>
                         <div dir="ltr">
                             <input
                                 type="text"
                                 class="form-control englishInput"
                                 data-create="6"
+                                @keyup="englishValueCode(create.code_e)"
                                 @keypress.enter="moveInput('input', 'create', 7)"
                                 v-model="$v.create.code_e.$model"
                                 :class="{
                             'is-invalid': $v.create.code_e.$error || errors.code_e,
                             'is-valid': !$v.create.code_e.$invalid && !errors.code_e,
                           }"
-                                @keyup="englishValueCode(create.code_e)"
                                 id="field-4"
                             />
                         </div>
@@ -328,18 +322,18 @@
                         </template>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" v-if="isVisible('fraction_e')">
                     <div class="form-group">
                         <label for="field-6" class="control-label">
                             {{ getCompanyKey('currency_fraction_en') }}
-                            <span class="text-danger">*</span>
+                            <span v-if="isRequired('fraction_e')" class="text-danger">*</span>
                         </label>
                         <div dir="ltr">
                             <input
                                 type="text"
                                 class="form-control englishInput"
                                 data-create="8"
-                                @keypress.enter="moveInput('input', 'create', 9)"
+                                @keyup="englishValueFraction(create.fraction_e)"
                                 v-model="$v.create.fraction_e.$model"
                                 :class="{
                             'is-invalid':
@@ -347,7 +341,6 @@
                             'is-valid':
                               !$v.create.fraction_e.$invalid && !errors.fraction_e,
                           }"
-                                @keyup="englishValueFraction(create.fraction_e)"
                                 id="field-6"
                             />
                         </div>
@@ -376,11 +369,11 @@
                         </template>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" v-if="isVisible('fraction_no')">
                     <div class="form-group">
                         <label for="field-7" class="control-label">
                             {{ getCompanyKey('currency_fraction_number') }}
-                            <span class="text-danger">*</span>
+                            <span v-if="isRequired('fraction_no')" class="text-danger">*</span>
                         </label>
                         <input
                             type="number"
@@ -406,10 +399,11 @@
                         </template>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" v-if="isVisible('is_default')">
                     <div class="form-group">
                         <label class="mr-2" for="field-11">
                             {{ getCompanyKey('currency_default') }}
+                            <span v-if="isRequired('is_default')" class="text-danger">*</span>
                         </label>
                         <select
                             class="custom-select mr-sm-2"
@@ -436,11 +430,11 @@
                         </template>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" v-if="isVisible('is_active')">
                     <div class="form-group">
                         <label class="mr-2">
                             {{ getCompanyKey('currency_status') }}
-                            <span class="text-danger">*</span>
+                            <span v-if="isRequired('is_active')" class="text-danger">*</span>
                         </label>
                         <b-form-group
                             :class="{
@@ -484,7 +478,7 @@ import PageHeader from "../Page-header";
 import Switches from "vue-switches";
 import ErrorMessage from "../widgets/errorMessage";
 import loader from "../loader";
-import {decimal, integer, maxLength, minLength, required} from "vuelidate/lib/validators";
+import {decimal, integer, maxLength, minLength, required, requiredIf} from "vuelidate/lib/validators";
 import adminApi from "../../api/adminAxios";
 import Swal from "sweetalert2";
 import transMixinComp from "../../helper/translation-comp-mixin";
@@ -493,7 +487,6 @@ import {arabicValue, englishValue} from "../../helper/langTransform";
 export default {
     name: "currency",
     mixins: [transMixinComp],
-    props: ["companyKeys", "defaultsKeys"],
     components: {
         Layout,
         PageHeader,
@@ -503,6 +496,7 @@ export default {
     },
     data() {
         return {
+            fields: [],
             isLoader: false,
             create: {
                 name: "",
@@ -524,17 +518,50 @@ export default {
     },
     validations: {
         create: {
-            name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-            name_e: { required, minLength: minLength(2), maxLength: maxLength(100) },
-            symbol: { required, minLength: minLength(2), maxLength: maxLength(100) },
-            symbol_e: { required, minLength: minLength(2), maxLength: maxLength(100) },
-            code: { required, minLength: minLength(3), maxLength: maxLength(15) },
-            code_e: { required, minLength: minLength(3), maxLength: maxLength(15) },
-            fraction: { required, minLength: minLength(3), maxLength: maxLength(15) },
-            fraction_e: { required, minLength: minLength(3), maxLength: maxLength(100) },
-            fraction_no: { required, decimal },
-            is_default: { required, integer },
-            is_active: { required, integer },
+            name: { required: requiredIf(function (model) {
+                    return this.isRequired("name");
+                }) , minLength: minLength(2), maxLength: maxLength(100) },
+            name_e: { required: requiredIf(function (model) {
+                    return this.isRequired("name_e");
+                }) , minLength: minLength(2), maxLength: maxLength(100) },
+            symbol: { required: requiredIf(function (model) {
+                    return this.isRequired("symbol");
+                }) , minLength: minLength(2), maxLength: maxLength(100) },
+            symbol_e: { required: requiredIf(function (model) {
+                    return this.isRequired("symbol_e");
+                }) , minLength: minLength(2), maxLength: maxLength(100) },
+            code: { required: requiredIf(function (model) {
+                    return this.isRequired("code");
+                }) , minLength: minLength(3), maxLength: maxLength(15) },
+            code_e: { required: requiredIf(function (model) {
+                    return this.isRequired("code_e");
+                }) , minLength: minLength(3), maxLength: maxLength(15) },
+            fraction: { required: requiredIf(function (model) {
+                    return this.isRequired("fraction");
+                }) , minLength: minLength(3), maxLength: maxLength(15) },
+            fraction_e: { required: requiredIf(function (model) {
+                    return this.isRequired("fraction_e");
+                }) , minLength: minLength(3), maxLength: maxLength(100) },
+            fraction_no: { required: requiredIf(function (model) {
+                    return this.isRequired("fraction_no");
+                }) , decimal },
+            is_default: { required: requiredIf(function (model) {
+                    return this.isRequired("is_default");
+                }) , integer },
+            is_active: { required: requiredIf(function (model) {
+                    return this.isRequired("is_active");
+                }) , integer },
+        },
+    },
+    props: {
+        id: {
+            default: "currency-create",
+        },
+        companyKeys:{
+            default:[]
+        },
+        defaultsKeys:{
+            default:[]
         },
     },
     updated() {
@@ -558,9 +585,39 @@ export default {
         // });
     },
     mounted() {
+        this.getCustomTableFields();
         this.company_id = this.$store.getters["auth/company_id"];
     },
     methods: {
+        getCustomTableFields() {
+            adminApi
+                .get(`/customTable/table-columns/general_currencies`)
+                .then((res) => {
+                    this.fields = res.data;
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: `${this.$t("general.Error")}`,
+                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                    });
+                })
+                .finally(() => {
+                    this.isLoader = false;
+                });
+        },
+        isVisible(fieldName) {
+            let res = this.fields.filter((field) => {
+                return field.column_name == fieldName;
+            });
+            return res.length > 0 && res[0].is_visible == 1 ? true : false;
+        },
+        isRequired(fieldName) {
+            let res = this.fields.filter((field) => {
+                return field.column_name == fieldName;
+            });
+            return res.length > 0 && res[0].is_required == 1 ? true : false;
+        },
         resetModalHidden() {
             this.create = {
                 name: "",
@@ -579,7 +636,7 @@ export default {
                 this.$v.$reset();
             });
             this.errors = {};
-            this.$bvModal.hide(`currency-create`);
+            this.$bvModal.hide(this.id);
         },
         /**
          *  hidden Modal (create)

@@ -895,6 +895,8 @@
         "Column": "عمود",
         "tableName": "اسم الجدول",
         "currentNode":"النود الحالي",
-        "rows": "الصفوف"
+        "rows": "الصفوف",
+        "documentTable": "جدول المستندات",
+        "document": "المستندات"
     }
 }

@@ -16,9 +16,9 @@ return new class extends Migration
         Schema::dropIfExists('general_roles_screens_hotfields');
         Schema::create('general_role_screen_hotfields', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('role_id');
-            $table->unsignedInteger('workflow_id');
-            $table->unsignedInteger('hotfield_id');
+            $table->unsignedInteger('role_id')->nullable();
+            $table->unsignedInteger('workflow_id')->nullable();
+            $table->unsignedInteger('hotfield_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

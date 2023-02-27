@@ -38,6 +38,8 @@ class DocType extends Model
         return $this->hasMany(ArchiveFile::class, "arch_doc_type_id");
     }
 
+
+
     public function getEmployees()
     {
         $e = $this->archiveFiles()->where('data_type_value', 'like', '');
@@ -68,6 +70,13 @@ class DocType extends Model
 
     public function getKeyAttribute()
     {
+        $key = $this->departments()->first();
+        if ($key) {
+            return DocumentField::where("id", $key->key_value)->first();
+        } else {
+            return null;
+        }
         return $this->fields()->first();
     }
+
 }

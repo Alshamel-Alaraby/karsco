@@ -26,10 +26,10 @@ class EditCityRequest extends FormRequest
     public function rules()
     {
         return [
-            "name" => "required|unique:general_cities,name," . $this->city,
-            "name_e" => "required|unique:general_cities,name_e," . $this->city,
-            "country_id" => "required|exists:general_countries,id",
-            "governorate_id" => "required|exists:general_governorates,id",
+            "name" => "nullable|unique:general_cities,name," . $this->city,
+            "name_e" => "nullable|unique:general_cities,name_e," . $this->city,
+            "country_id" => "nullable|exists:general_countries,id",
+            "governorate_id" => "nullable|exists:general_governorates,id",
         ];
     }
 

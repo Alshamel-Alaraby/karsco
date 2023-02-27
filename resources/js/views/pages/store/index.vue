@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength, integer } from "vuelidate/lib/validators";
+import {required, minLength, maxLength, integer, requiredIf} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -46,6 +46,7 @@ export default {
     },
   data() {
     return {
+      fields: [],
       per_page: 50,
       search: "",
       debounce: {},
@@ -90,26 +91,33 @@ export default {
   },
   validations: {
     create: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100), alphaArabic },
-      name_e: {
-        required,
-        minLength: minLength(2),
-        maxLength: maxLength(100),
-        alphaEnglish,
-      },
-      branch_id: { required },
-      is_active: { required },
+      name: { required: requiredIf(function (model) {
+              return this.isRequired("name");
+          }), minLength: minLength(2), maxLength: maxLength(100), },
+      name_e: {required: requiredIf(function (model) {
+              return this.isRequired("name_e");
+          }), minLength: minLength(2), maxLength: maxLength(100),},
+      branch_id: { required: requiredIf(function (model) {
+              return this.isRequired("branch_id");
+          }) },
+      is_active: { required: requiredIf(function (model) {
+              return this.isRequired("is_active");
+          }) },
     },
     edit: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100), alphaArabic },
-      name_e: {
-        required,
-        minLength: minLength(2),
-        maxLength: maxLength(100),
-        alphaEnglish,
-      },
-      branch_id: { required },
-      is_active: { required },
+
+        name: { required: requiredIf(function (model) {
+                return this.isRequired("name");
+            }), minLength: minLength(2), maxLength: maxLength(100) },
+        name_e: {required: requiredIf(function (model) {
+                return this.isRequired("name_e");
+            }), minLength: minLength(2), maxLength: maxLength(100),},
+        branch_id: { required: requiredIf(function (model) {
+                return this.isRequired("branch_id");
+            }) },
+        is_active: { required: requiredIf(function (model) {
+                return this.isRequired("is_active");
+            }) },
     },
   },
   watch: {
@@ -145,6 +153,7 @@ export default {
   },
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
+    this.getCustomTableFields();
     this.getData();
   },
   updated() {
@@ -168,6 +177,35 @@ export default {
     // });
   },
   methods: {
+      getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_stores`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+      isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+      isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
     formatDate(value) {
       return formatDateOnly(value);
     },
@@ -660,15 +698,17 @@ export default {
                     ref="dropdown"
                     class="btn-block setting-search"
                   >
-                    <b-form-checkbox v-model="filterSetting" value="name" class="mb-1">{{
+                    <b-form-checkbox v-if="isVisible('name')" v-model="filterSetting" value="name" class="mb-1">{{
                       getCompanyKey("store_name_ar")
                     }}</b-form-checkbox>
                     <b-form-checkbox
+                      v-if="isVisible('name_e')"
                       v-model="filterSetting"
                       value="name_e"
                       class="mb-1"
                       >{{ getCompanyKey("store_name_en") }}</b-form-checkbox>
                       <b-form-checkbox
+                          v-if="isVisible('branch_id')"
                           v-model="filterSetting"
                           :value="$i18n.locale  == 'ar'?'branch.name':'branch.name_e'"
                           class="mb-1"
@@ -765,16 +805,16 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.name" class="mb-1"
+                      <b-form-checkbox v-if="isVisible('name')" v-model="setting.name" class="mb-1"
                         >{{ getCompanyKey("store_name_ar") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.name_e" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('name_e')" v-model="setting.name_e" class="mb-1">
                         {{ getCompanyKey("store_name_en") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.branch_id" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('branch_id')" v-model="setting.branch_id" class="mb-1">
                         {{ getCompanyKey("branch") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.is_active" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('is_active')" v-model="setting.is_active" class="mb-1">
                         {{ getCompanyKey("store_status") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
@@ -875,11 +915,11 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-12">
+                  <div class="col-md-12" v-if="isVisible('branch_id')">
                     <div class="form-group position-relative">
                       <label class="control-label">
                         {{ getCompanyKey("branch") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('branch_id')" class="text-danger">*</span>
                       </label>
                       <multiselect
                         @input="showBranchModal"
@@ -903,18 +943,17 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-12" v-if="isVisible('name')">
                     <div class="form-group">
                       <label for="field-1" class="control-label">
                         {{ getCompanyKey("store_name_ar") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name')" class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
                         <input
                           type="text"
                           class="form-control arabicInput"
                           data-create="1"
-                          @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
                           :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
@@ -943,18 +982,17 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-12" v-if="isVisible('name_e')">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
                         {{ getCompanyKey("store_name_en") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name_e')" class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
                         <input
                           type="text"
                           class="form-control englishInput"
                           data-create="2"
-                          @keypress.enter="moveInput('select', 'create', 4)"
                           v-model="$v.create.name_e.$model"
                           :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -983,11 +1021,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                    <div class="col-md-12">
+                  <div class="col-md-12" v-if="isVisible('is_active')">
                         <div class="form-group">
                             <label class="mr-2">
                                 {{ getCompanyKey("store_status") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('is_active')" class="text-danger">*</span>
                             </label>
                             <b-form-group :class="{
                                       'is-invalid': $v.create.is_active.$error || errors.is_active,
@@ -1043,7 +1081,7 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.name">
+                    <th v-if="setting.name && isVisible('name')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("store_name_ar") }}</span>
                         <div class="arrow-sort">
@@ -1058,7 +1096,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.name_e">
+                    <th v-if="setting.name_e && isVisible('name_e')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("store_name_en") }}</span>
                         <div class="arrow-sort">
@@ -1073,12 +1111,12 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.branch_id">
+                    <th v-if="setting.branch_id && isVisible('branch_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("branch") }}</span>
                       </div>
                     </th>
-                    <th v-if="setting.is_active">
+                    <th v-if="setting.is_active && isVisible('is_active')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("store_status") }}</span>
                         <div class="arrow-sort">
@@ -1118,14 +1156,14 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.name">
+                    <td v-if="setting.name && isVisible('name')">
                       <h5 class="m-0 font-weight-normal">{{ data.name }}</h5>
                     </td>
-                    <td v-if="setting.name_e">
+                    <td v-if="setting.name_e && isVisible('name_e')">
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
-                    <td v-if="setting.branch_id">{{ data.branch.name }}</td>
-                    <td v-if="setting.is_active">
+                    <td v-if="setting.branch_id && isVisible('branch_id')">{{ data.branch.name }}</td>
+                    <td v-if="setting.is_active && isVisible('is_active')">
                       <span
                         :class="[
                           data.is_active == 'active' ? 'text-success' : 'text-danger',
@@ -1216,11 +1254,11 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-12" v-if="isVisible('branch_id')">
                               <div class="form-group position-relative">
                                 <label class="control-label">
                                   {{ getCompanyKey("branch") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('branch_id')" class="text-danger">*</span>
                                 </label>
                                 <multiselect
                                   @input="showBranchModalEdit"
@@ -1246,18 +1284,17 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-12" v-if="isVisible('name')">
                               <div class="form-group">
                                 <label for="edit-1" class="control-label">
                                   {{ getCompanyKey("store_name_ar") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('name')" class="text-danger">*</span>
                                 </label>
                                 <div dir="rtl">
                                   <input
                                     type="text"
                                     class="form-control arabicInput"
                                     data-edit="1"
-                                    @keypress.enter="moveInput('input', 'edit', 2)"
                                     v-model="$v.edit.name.$model"
                                     :class="{
                                       'is-invalid': $v.edit.name.$error || errors.name,
@@ -1292,11 +1329,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-12" v-if="isVisible('name_e')">
                               <div class="form-group">
                                 <label for="edit-2" class="control-label">
                                   {{ getCompanyKey("store_name_en") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('name_e')" class="text-danger">*</span>
                                 </label>
                                 <div dir="ltr">
                                   <input
@@ -1340,11 +1377,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                              <div class="col-md-12">
+                            <div class="col-md-12" v-if="isVisible('is_active')">
                                   <div class="form-group">
                                       <label class="mr-2">
                                           {{ getCompanyKey("store_status") }}
-                                          <span class="text-danger">*</span>
+                                          <span v-if="isRequired('is_active')" class="text-danger">*</span>
                                       </label>
                                       <b-form-group
                                           :class="{

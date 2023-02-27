@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import outerAxios from "../../../api/outerAxios";
-import { required, numeric } from "vuelidate/lib/validators";
+import {required, numeric, integer,maxLength,between,decimal,minValue} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -15,7 +15,9 @@ import translation from "../../../helper/translation-mixin";
 import DatePicker from "vue2-datepicker";
 import InstallmentStatus from "../../../components/create/receivablePayment/installmentStatus";
 import InstallmentPlan from "../../../components/create/receivablePayment/installmentPlan.vue";
-import InstallmentPlanDetails from "../../../components/create/receivablePayment/installmentPlanDetails";
+import Document from "../../../components/create/document";
+import InstallmentPaymentType from "../../../components/create/receivablePayment/installmentPaymentType.vue";
+import {arabicValue, englishValue} from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -34,8 +36,9 @@ export default {
     loader,
     Multiselect,
     DatePicker,
+    Document,
     InstallmentPlan,
-    InstallmentPlanDetails,
+    InstallmentPaymentType
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -59,7 +62,6 @@ export default {
       }
     });
   },
-
   data() {
     return {
       per_page: 50,
@@ -68,70 +70,55 @@ export default {
       payemntPlanInstallmentsPagination: {},
       payment_plan_installments: [],
       installment_payment_plans: [],
-      installment_payment_plan_details: [],
       installment_statuses: [],
       documentTypes: [],
-      screens: [],
-      modules: [],
+      payment_types: [],
       isLoader: false,
       create: {
-        installment_payment_plan_id: null,
-        installment_payment_plan_detail_ln_no: null,
-        v_date: "",
-        due_date: "",
-        custome_v_date: "",
-        custome_due_date: "",
-        total_amount: 0,
-        paid_amount: 0,
-        installment_status_id: null,
-        doc_type: null,
-        screen_id: null,
-        module_id: null,
-        ref_id: 0,
-        rp_code: 0,
+          installment_payment_plan_id: null,
+          payment_plan_installments:
+              [
+                  {
+                      installment_payment_type_id: null,
+                      v_date: '',
+                      due_date: '',
+                      total_amount: 0,
+                      paid_amount: 0,
+                      installment_status_id: null,
+                      doc_type_id: null,
+                      ref_id: null,
+                      rp_code: '',
+                      day_month: 1,
+                      is_fixed: 0,
+                      note_a: '',
+                      note_e: ''
+                  }
+              ]
       },
       edit: {
-        installment_payment_plan_id: null,
-        installment_payment_plan_detail_ln_no: null,
-        v_date: "",
-        due_date: "",
-        custome_v_date: "",
-        custome_due_date: "",
-
-        total_amount: 0,
-        paid_amount: 0,
-        installment_status_id: null,
-        doc_type: null,
-        screen_id: null,
-        module_id: null,
-        ref_id: 0,
-        rp_code: 0,
+          installment_payment_plan_id: null,
+          payment_plan_installments: []
       },
       setting: {
-        installment_payment_plan_id: true,
-        v_date: true,
-        due_date: true,
-        total_amount: true,
-        paid_amount: true,
-        installment_status_id: true,
-        doc_type: true,
-        screen_id: true,
-        module_id: true,
-        ref_id: true,
-        rp_code: true,
+          name: true,
+          name_e: true,
+          is_default: true,
+          is_active: true,
+          rows: true
       },
-        enabled3: true,
-        printLoading: true,
-        printObj: {
+      enabled3: true,
+      multDate: [{start: new Date(),end: new Date()}],
+      multDateEdit: [],
+      printLoading: true,
+      printObj: {
             id: "printCustom",
         },
-      filterSetting: ["installment_payment_plan_id", "installment_status_id"],
+      filterSetting: ["name", "name_e"],
       errors: {},
       isCheckAll: false,
       checkAll: [],
       is_disabled: false,
       current_page: 1,
-      company_id: 48,
       Tooltip: "",
       mouseEnter: null,
     };
@@ -139,31 +126,45 @@ export default {
   validations: {
     create: {
       installment_payment_plan_id: { required },
-      installment_payment_plan_detail_ln_no: { required },
-      v_date: { required },
-      due_date: { required },
-      total_amount: { required, numeric },
-      paid_amount: { required, numeric },
-      installment_status_id: { required },
-      doc_type: { required },
-      screen_id: { required },
-      module_id: { required },
-      ref_id: { required, numeric },
-      rp_code: { required, numeric },
+        payment_plan_installments: {
+          required,
+          $each: {
+              installment_payment_type_id: { required },
+              installment_status_id: { required },
+              doc_type_id: { required },
+              v_date: { required },
+              due_date: { required },
+              total_amount: { required, decimal,minValue: minValue(0.1) },
+              paid_amount: { required, decimal,minValue: minValue(0.1) },
+              day_month: {required,integer,between: between(1,30)},
+              ref_id: { required, decimal,minValue: minValue(0.1) },
+              rp_code: { required, decimal,minValue: minValue(0.1) },
+              is_fixed: { required, integer },
+              note_a: {required,maxLength: maxLength(255)},
+              note_e: {required,maxLength: maxLength(255)}
+          }
+      },
     },
     edit: {
       installment_payment_plan_id: { required },
-      installment_payment_plan_detail_ln_no: { required },
-      v_date: { required },
-      due_date: { required },
-      total_amount: { required },
-      paid_amount: { required },
-      installment_status_id: { required },
-      doc_type: { required },
-      screen_id: { required },
-      module_id: { required },
-      ref_id: { required },
-      rp_code: { required },
+        payment_plan_installments: {
+            required,
+            $each: {
+                installment_payment_type_id: { required },
+                installment_status_id: { required },
+                doc_type_id: { required },
+                v_date: { required },
+                due_date: { required },
+                total_amount: { required, decimal,minValue: minValue(0.1) },
+                paid_amount: { required, decimal,minValue: minValue(0.1) },
+                day_month: {required,integer,between: between(1,30)},
+                ref_id: { required, decimal,minValue: minValue(0.1) },
+                rp_code: { required, decimal,minValue: minValue(0.1) },
+                is_fixed: { required, integer },
+                note_a: {required,maxLength: maxLength(255)},
+                note_e: {required,maxLength: maxLength(255)}
+            }
+        },
     },
   },
   watch: {
@@ -198,23 +199,79 @@ export default {
     },
   },
   async mounted() {
-    this.company_id = this.$store.getters["auth/company_id"];
-    await this.getDocumentTypes();
-    await this.getScreens();
-    await this.getModules();
     await this.getData();
   },
   methods: {
-    showInstallmentStatusModal() {
-      if (this.create.installment_status_id == 0) {
+    arabicValueNoteCreate(txt,index){
+          this.create.payment_plan_installments[index].note_a = arabicValue(txt);
+    },
+    arabicValueNoteEdit(txt,index){
+          this.edit.payment_plan_installments[index].note_a = arabicValue(txt);
+    },
+    englishValueNoteCreate(txt,index){
+          this.create.payment_plan_installments[index].note_e = englishValue(txt);
+    },
+    englishValueNoteEdit(txt,index){
+          this.edit.payment_plan_installments[index].note_e = englishValue(txt);
+    },
+    addNewField(){
+          this.create.payment_plan_installments.push({
+                  installment_payment_type_id: null,
+                  v_date: formatDateTime(new Date()),
+                  due_date: formatDateTime(new Date()),
+                  total_amount: 0,
+                  paid_amount: 0,
+                  installment_status_id: null,
+                  doc_type_id: null,
+                  ref_id: null,
+                  rp_code: '',
+                  day_month: 1,
+                  is_fixed: 0,
+                  note_a: '',
+                  note_e: ''
+              });
+          this.multDate.push({start: new Date(),end: new Date()});
+      },
+    removeNewField(index){
+          if(this.create.payment_plan_installments.length > 1){
+              this.create.payment_plan_installments.splice(index,1);
+              this.multDate.splice(index,1);
+          }
+      },
+    addNewFieldEdit(){
+        this.multDateEdit.push({start: new Date(),end: new Date()});
+          this.edit.payment_plan_installments.push({
+              installment_payment_type_id: null,
+              v_date: formatDateTime(new Date()),
+              due_date: formatDateTime(new Date()),
+              total_amount: 0,
+              paid_amount: 0,
+              installment_status_id: null,
+              doc_type_id: null,
+              ref_id: null,
+              rp_code: '',
+              day_month: 1,
+              is_fixed: 0,
+              note_a: '',
+              note_e: ''
+          });
+      },
+    removeNewFieldEdit(index){
+          if(this.edit.payment_plan_installments.length > 1){
+              this.edit.payment_plan_installments.splice(index,1);
+              this.multDateEdit.splice(index,1);
+          }
+      },
+    showInstallmentStatusModal(index) {
+      if (this.create.payment_plan_installments[index].installment_status_id == 0) {
         this.$bvModal.show("installment-payment-create");
-        this.create.installment_status_id = null;
+        this.create.payment_plan_installments[index].installment_status_id = null;
       }
     },
-    showInstallmentStatusModalEdit() {
-      if (this.edit.installment_status_id == 0) {
+    showInstallmentStatusModalEdit(index) {
+      if (this.edit.payment_plan_installments[index].installment_status_id == 0) {
         this.$bvModal.show("installment-payment-create");
-        this.edit.installment_status_id = null;
+        this.edit.payment_plan_installments[index].installment_status_id = null;
       }
     },
     showInstallmentPlanModal() {
@@ -229,65 +286,46 @@ export default {
         this.edit.installment_payment_plan_id = null;
       }
     },
-    showInstallmentPlanDetailModal() {
-      if (this.create.installment_payment_plan_detail_ln_no == 0) {
-        this.$bvModal.show("installment-payment-details-create");
-        this.create.installment_payment_plan_detail_ln_no = null;
-      }
-    },
-    showInstallmentPlanDetailModalEdit() {
-      if (this.edit.installment_payment_plan_detail_ln_no == 0) {
-        this.$bvModal.show("installment-payment-details-create");
-        this.edit.installment_payment_plan_detail_ln_no = null;
-      }
-    },
-
-    v_date(e) {
+    v_dateCreate(e,index) {
       if (e) {
-        this.create.v_date = formatDateTime(e);
-        this.edit.v_date = formatDateTime(e);
+        this.create.payment_plan_installments[index].v_date = formatDateTime(e);
       } else {
-        this.create.v_date = null;
-        this.edit.v_date = null;
+          this.create.payment_plan_installments[index].v_date = null;
       }
     },
-    due_date(e) {
+    due_dateCreate(e,index) {
       if (e) {
-        this.create.due_date = formatDateTime(e);
-        this.edit.due_date = formatDateTime(e);
+        this.create.payment_plan_installments[index].due_date = formatDateTime(e);
       } else {
-        this.create.due_date = null;
-        this.edit.due_date = null;
+        this.create.payment_plan_installments[index].due_date = null;
       }
     },
-
+    v_dateEdit(e,index) {
+          if (e) {
+              this.edit.payment_plan_installments[index].v_date = formatDateTime(e);
+          } else {
+              this.edit.payment_plan_installments[index].v_date = null;
+          }
+      },
+    due_dateEdit(e,index) {
+          if (e) {
+              this.edit.payment_plan_installments[index].due_date = formatDateTime(e);
+          } else {
+              this.edit.payment_plan_installments[index].due_date = null;
+          }
+      },
     /**
      *  get Data payment_plan_installments
      */
     async getData(page = 1) {
       this.isLoader = true;
-      let _filterSetting = [...this.filterSetting];
-      let index = this.filterSetting.indexOf("installment_payment_plan_id");
-      if (index > -1) {
-        _filterSetting[index] =
-          this.$i18n.locale == "ar"
-            ? "installment_payment_plan.name"
-            : "installment_payment_plan.name_e";
-      }
-      index = this.filterSetting.indexOf("installment_status_id");
-      if (index > -1) {
-        _filterSetting[index] =
-          this.$i18n.locale == "ar"
-            ? "installment_status.name"
-            : "installment_status.name_e";
-      }
       let filter = "";
-      for (let i = 0; i < _filterSetting.length; ++i) {
-        filter += `columns[${i}]=${_filterSetting[i]}&`;
-      }
+        for (let i = 0; i < this.filterSetting.length; ++i) {
+            filter += `columns[${i}]=${this.filterSetting[i]}&`;
+        }
       await adminApi
         .get(
-          `/recievable-payable/rp_payment_plan_installment?page=${page}&per_page=${this.per_page}&search=${this.search}&${filter}`
+          `/recievable-payable/rp_installment_p_plan?plan_installments=true&page=${page}&per_page=${this.per_page}&search=${this.search}&${filter}`
         )
         .then((res) => {
           let l = res.data;
@@ -313,29 +351,14 @@ export default {
         this.current_page
       ) {
         this.isLoader = true;
-        let _filterSetting = [...this.filterSetting];
-        let index = this.filterSetting.indexOf("installment_payment_plan_id");
-        if (index > -1) {
-          _filterSetting[index] =
-            this.$i18n.locale == "ar"
-              ? "installment_payment_plan.name"
-              : "installment_payment_plan.name_e";
-        }
-        index = this.filterSetting.indexOf("installment_status_id");
-        if (index > -1) {
-          _filterSetting[index] =
-            this.$i18n.locale == "ar"
-              ? "installment_status.name"
-              : "installment_status.name_e";
-        }
         let filter = "";
-        for (let i = 0; i < _filterSetting.length; ++i) {
-          filter += `columns[${i}]=${_filterSetting[i]}&`;
-        }
+          for (let i = 0; i < this.filterSetting.length; ++i) {
+              filter += `columns[${i}]=${this.filterSetting[i]}&`;
+          }
 
         adminApi
           .get(
-            `recievable-payable/rp_payment_plan_installment?page=${this.current_page}&per_page=${this.per_page}&search=${this.search}&${filter}`
+            `recievable-payable/rp_installment_p_plan?plan_installments=true&page=${this.current_page}&per_page=${this.per_page}&search=${this.search}&${filter}`
           )
           .then((res) => {
             let l = res.data;
@@ -466,20 +489,30 @@ export default {
     resetModalHidden() {
       this.create = {
         installment_payment_plan_id: null,
-        installment_payment_plan_detail_ln_no: null,
-        v_date: "",
-        due_date: "",
-        custome_v_date: "",
-        custome_due_date: "",
-        total_amount: 0,
-        paid_amount: 0,
-        installment_status_id: null,
-        doc_type: null,
-        screen_id: null,
-        module_id: null,
-        ref_id: 0,
-        rp_code: 0,
+          payment_plan_installments:
+              [
+                  {
+                      installment_payment_type_id: null,
+                      v_date: '',
+                      due_date: '',
+                      total_amount: 0,
+                      paid_amount: 0,
+                      Installment_status_id: null,
+                      doc_type_id: null,
+                      ref_id: null,
+                      rp_code: '',
+                      day_month: 1,
+                      is_fixed: 0,
+                      note_a: '',
+                      note_e: ''
+                  }
+              ]
       };
+      this.installment_payment_plans = [];
+      this.installment_statuses = []
+      this.documentTypes = [];
+      this. payment_types = [];
+     this.multDate = [{start: new Date(),end: new Date()}];
       this.$nextTick(() => {
         this.$v.$reset();
       });
@@ -490,26 +523,29 @@ export default {
      */
     async resetModal() {
       await this.getInstallmentPaymentPlans();
-      await this.getInstallmentPaymentPlanDetails();
       await this.getInstallmentStatuses();
+      await this.getInstallPaymentTypes();
       await this.getDocumentTypes();
-      await this.getScreens();
-      await this.getModules();
       this.create = {
-        installment_payment_plan_id: null,
-        installment_payment_plan_detail_ln_no: null,
-        v_date: "",
-        due_date: "",
-        custome_v_date: "",
-        custome_due_date: "",
-        total_amount: 0,
-        paid_amount: 0,
-        installment_status_id: null,
-        doc_type: null,
-        screen_id: null,
-        module_id: null,
-        ref_id: 0,
-        rp_code: 0,
+          installment_payment_plan_id: null,
+          payment_plan_installments:
+              [
+                  {
+                      installment_payment_type_id: null,
+                      v_date: formatDateTime(new Date()),
+                      due_date: formatDateTime(new Date()),
+                      total_amount: 0,
+                      paid_amount: 0,
+                      installment_status_id: null,
+                      doc_type_id: null,
+                      ref_id: null,
+                      rp_code: '',
+                      day_month: 1,
+                      is_fixed: 0,
+                      note_a: '',
+                      note_e: ''
+                  }
+              ]
       };
       this.is_disabled = false;
       this.$nextTick(() => {
@@ -523,21 +559,26 @@ export default {
     resetForm() {
       this.create = {
         installment_payment_plan_id: null,
-        installment_payment_plan_detail_ln_no: null,
-        v_date: "",
-        due_date: "",
-        custome_v_date: "",
-        custome_due_date: "",
-
-        total_amount: 0,
-        paid_amount: 0,
-        installment_status_id: null,
-        doc_type: null,
-        screen_id: null,
-        module_id: null,
-        ref_id: 0,
-        rp_code: 0,
+          payment_plan_installments:
+              [
+                  {
+                      installment_payment_type_id: null,
+                      v_date: formatDateTime(new Date()),
+                      due_date: formatDateTime(new Date()),
+                      total_amount: 0,
+                      paid_amount: 0,
+                      installment_status_id: null,
+                      doc_type_id: null,
+                      ref_id: null,
+                      rp_code: '',
+                      day_month: 1,
+                      is_fixed: 0,
+                      note_a: '',
+                      note_e: ''
+                  }
+              ]
       };
+      this.multDate = [{start: new Date(),end: new Date()}];
       this.is_disabled = false;
       this.$nextTick(() => {
         this.$v.$reset();
@@ -551,7 +592,8 @@ export default {
         this.isLoader = true;
         this.errors = {};
         this.is_disabled = false;
-        adminApi
+        this.create.payment_plan_installments.map(e => e.installment_payment_plan_id = this.create.installment_payment_plan_id);
+          adminApi
           .post(`recievable-payable/rp_payment_plan_installment`, this.create)
           .then((res) => {
             this.getData();
@@ -592,7 +634,8 @@ export default {
       } else {
         this.isLoader = true;
         this.errors = {};
-        adminApi
+        this.edit.payment_plan_installments.map(e => e.installment_payment_plan_id = this.create.installment_payment_plan_id);
+          adminApi
           .put(`recievable-payable/rp_payment_plan_installment/${id}`, this.edit)
           .then((res) => {
             this.$bvModal.hide(`modal-edit-${id}`);
@@ -626,11 +669,9 @@ export default {
      *  get workflows
      */
     async getInstallmentPaymentPlans() {
-      this.isLoader = true;
       await adminApi
-        .get(`recievable-payable/rp_installment_p_plan`)
+        .get(`recievable-payable/rp_installment_p_plan?null_payment_plan_installment=true`)
         .then((res) => {
-          this.isLoader = false;
           let l = res.data.data;
           l.unshift({
             id: 0,
@@ -647,29 +688,26 @@ export default {
           });
         });
     },
+    async getInstallPaymentPlansEdit() {
+          this.isLoader = true;
 
-    async getInstallmentPaymentPlanDetails() {
-      this.isLoader = true;
-      await adminApi
-        .get(`recievable-payable/rp_installment_p_plan_details`)
-        .then((res) => {
-          this.isLoader = false;
-          let l = res.data.data;
-          l.unshift({
-            id: 0,
-            name: "اضف تفاصيل خطة الدفع",
-            name_e: "Add installment payment plan details",
-          });
-          this.installment_payment_plan_details = l;
-        })
-        .catch((err) => {
-          Swal.fire({
-            icon: "error",
-            title: `${this.$t("general.Error")}`,
-            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
-          });
-        });
-    },
+          await adminApi
+              .get(`/recievable-payable/rp_installment_p_plan`)
+              .then((res) => {
+                  let l = res.data.data;
+                  this.installment_payment_plans = l;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
     async getInstallmentStatuses() {
       this.isLoader = true;
       await adminApi
@@ -693,12 +731,16 @@ export default {
         });
     },
     async getDocumentTypes() {
-      this.isLoader = true;
-      await outerAxios
-        .get(`/document-type`)
+      await adminApi
+        .get(`/document`)
         .then((res) => {
-          this.isLoader = false;
-          this.documentTypes = res.data.data;
+            let l = res.data.data;
+            l.unshift({
+                id: 0,
+                name: "اضف مستند",
+                name_e: "Add Document",
+            });
+          this.documentTypes = l;
         })
         .catch((err) => {
           Swal.fire({
@@ -708,65 +750,59 @@ export default {
           });
         });
     },
-    async getScreens() {
-      this.isLoader = true;
-      await outerAxios
-        .get(`/screens`)
-        .then((res) => {
-          this.isLoader = false;
-          this.screens = res.data.data;
-        })
-        .catch((err) => {
-          Swal.fire({
-            icon: "error",
-            title: `${this.$t("general.Error")}`,
-            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
-          });
-        });
-    },
-    async getModules() {
-      this.isLoader = true;
-      await outerAxios
-        .get(`/modules`)
-        .then((res) => {
-          this.isLoader = false;
-          this.modules = res.data.data;
-        })
-        .catch((err) => {
-          Swal.fire({
-            icon: "error",
-            title: `${this.$t("general.Error")}`,
-            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
-          });
-        });
-    },
+    async getInstallPaymentTypes() {
+          this.isLoader = true;
+
+          await adminApi
+              .get(`/recievable-payable/rp_installment_payment_types`)
+              .then((res) => {
+                  let l = res.data.data;
+                  l.unshift({
+                      id: 0,
+                      name: "اضف نوع دفع",
+                      name_e: "Add installment payment type",
+                  });
+                  this.payment_types = l;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
     /**
      *   show Modal (edit)
      */
     async resetModalEdit(id) {
       let paymentPlanInstallment = this.payment_plan_installments.find((e) => id == e.id);
-      await this.getInstallmentPaymentPlans();
-      await this.getInstallmentPaymentPlanDetails();
+      await this.getInstallPaymentPlansEdit();
       await this.getInstallmentStatuses();
+      await this.getInstallPaymentTypes();
       await this.getDocumentTypes();
-      await this.getScreens();
-      await this.getModules();
-      this.edit.installment_payment_plan_id =
-        paymentPlanInstallment.installment_payment_plan_id;
-      this.edit.installment_payment_plan_detail_ln_no =
-        paymentPlanInstallment.installment_payment_plan_detail_ln_no;
-      this.edit.installment_status_id = paymentPlanInstallment.installment_status_id;
-      this.edit.custom_v_date = new Date(paymentPlanInstallment.v_date);
-      this.edit.custom_due_date = new Date(paymentPlanInstallment.due_date);
-      this.edit.v_date = formatDateTime(paymentPlanInstallment.v_date);
-      this.edit.due_date = formatDateTime(paymentPlanInstallment.due_date);
-      this.edit.total_amount = paymentPlanInstallment.total_amount;
-      this.edit.paid_amount = paymentPlanInstallment.paid_amount;
-      this.edit.doc_type = paymentPlanInstallment.doc_type;
-      this.edit.screen_id = paymentPlanInstallment.screen_id;
-      this.edit.module_id = paymentPlanInstallment.module_id;
-      this.edit.ref_id = paymentPlanInstallment.ref_id;
-      this.edit.rp_code = paymentPlanInstallment.rp_code;
+      this.edit.installment_payment_plan_id = paymentPlanInstallment.payment_plan_installments[0].installment_payment_plan_id;
+      paymentPlanInstallment.payment_plan_installments.forEach((e) => {
+          this.multDateEdit.push({start: new Date(e.v_date),end: new Date(e.due_date)});
+          this.edit.payment_plan_installments.push({
+              installment_payment_type_id: e.installment_payment_type_id,
+              installment_status_id : e.installment_status_id,
+              v_date : e.v_date,
+              due_date : e.due_date,
+              total_amount : e.total_amount,
+              paid_amount : e.paid_amount,
+              doc_type_id : e.doc_type_id,
+              ref_id : e.ref_id,
+              rp_code : e.rp_code,
+              day_month: e.day_month,
+              is_fixed: e.is_fixed,
+              note_a: e.note_a,
+              note_e: e.note_e
+          });
+      });
       this.errors = {};
     },
     /**
@@ -774,22 +810,13 @@ export default {
      */
     resetModalHiddenEdit(id) {
       this.errors = {};
+      this.installment_payment_plans = [];
+      this.installment_statuses = []
+      this.documentTypes = [];
+      this. payment_types = [];
       this.edit = {
         installment_payment_plan_id: null,
-        installment_payment_plan_detail_ln_no: null,
-        v_date: "",
-        due_date: "",
-        custome_v_date: "",
-        custome_due_date: "",
-
-        total_amount: 0,
-        paid_amount: 0,
-        installment_status_id: null,
-        doc_type: null,
-        screen_id: null,
-        module_id: null,
-        ref_id: 0,
-        rp_code: 0,
+          payment_plan_installments: []
       };
     },
 
@@ -839,7 +866,7 @@ export default {
           });
       }
     },
-      ExportExcel(type, fn, dl) {
+    ExportExcel(type, fn, dl) {
           this.enabled3 = false;
           setTimeout(() => {
               let elt = this.$refs.exportable_table;
@@ -851,7 +878,31 @@ export default {
               }
               this.enabled3 = true;
           }, 100);
-      }
+      },
+    showInstallmentPaymentTypeModal(index) {
+          if (this.create.payment_plan_installments[index].installment_payment_type_id == 0) {
+              this.$bvModal.show("installment_payment_type_create");
+              this.create.payment_plan_installments[index].installment_payment_type_id = null;
+          }
+      },
+    showInstallmentPaymentTypeModalEdit(index) {
+          if (this.edit.payment_plan_installments[index].installment_payment_type_id == 0) {
+              this.$bvModal.show("installment_payment_type_create");
+              this.edit.payment_plan_installments[index].installment_payment_type_id = null;
+          }
+      },
+    showDocumentModal(index) {
+          if (this.create.payment_plan_installments[index].doc_type_id == 0) {
+              this.$bvModal.show("create-document");
+              this.create.payment_plan_installments[index].doc_type_id = null;
+          }
+      },
+    showDocumentModalEdit(index) {
+          if (this.edit.payment_plan_installments[index].doc_type_id == 0) {
+              this.$bvModal.show("create-document");
+              this.edit.payment_plan_installments[index].doc_type_id = null;
+          }
+      },
   },
 };
 </script>
@@ -869,12 +920,17 @@ export default {
       :defaultsKeys="defaultsKeys"
       @created="getInstallmentPaymentPlans"
     />
-
-    <InstallmentPlanDetails
+    <InstallmentPaymentType
       :companyKeys="companyKeys"
       :defaultsKeys="defaultsKeys"
-      @created="getInstallmentPaymentPlanDetails"
+      @created="getInstallPaymentTypes"
     />
+    <Document
+        :companyKeys="companyKeys"
+        :defaultsKeys="defaultsKeys"
+        @created="getDocumentTypes"
+    />
+
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -892,18 +948,12 @@ export default {
                     ref="dropdown"
                     class="btn-block setting-search"
                   >
-                    <b-form-checkbox
-                      v-model="filterSetting"
-                      value="installment_payment_plan_id"
-                      class="mb-1"
-                      >{{ getCompanyKey("installment_payment_plan") }}</b-form-checkbox
-                    >
-                    <b-form-checkbox
-                      v-model="filterSetting"
-                      value="installment_status_id"
-                      class="mb-1"
-                      >{{ getCompanyKey("installment_status") }}</b-form-checkbox
-                    >
+                      <b-form-checkbox v-model="filterSetting" value="name" class="mb-1">
+                          {{ getCompanyKey("installment_payment_name_ar") }}
+                      </b-form-checkbox>
+                      <b-form-checkbox v-model="filterSetting" value="name_e" class="mb-1">
+                          {{ getCompanyKey("installment_payment_name_en") }}
+                      </b-form-checkbox>
                   </b-dropdown>
                 </div>
                 <div class="d-inline-block position-relative" style="width: 77%">
@@ -989,47 +1039,18 @@ export default {
                     ref="dropdown"
                     class="dropdown-custom-ali"
                   >
-                    <b-form-checkbox
-                      v-model="setting.installment_payment_plan_id"
-                      class="mb-1"
-                      >{{ getCompanyKey("installment_payment_plan") }}
-                    </b-form-checkbox>
-                    <b-form-checkbox v-model="setting.v_date" class="mb-1">
-                      {{ getCompanyKey("installment_payment_plan_v_date") }}
-                    </b-form-checkbox>
-                    <b-form-checkbox v-model="setting.due_date" class="mb-1">
-                      {{ getCompanyKey("installment_payment_plan_due_date") }}
-                    </b-form-checkbox>
-                    <b-form-checkbox v-model="setting.total_amount" class="mb-1">
-                      {{ getCompanyKey("installment_payment_plan_total_amount") }}
-                    </b-form-checkbox>
-                    <b-form-checkbox v-model="setting.paid_amount" class="mb-1">
-                      {{ getCompanyKey("installment_payment_plan_paid_amount") }}
-                    </b-form-checkbox>
-
-                    <b-form-checkbox v-model="setting.installment_status_id" class="mb-1">
-                      {{ getCompanyKey("installment_status") }}
-                    </b-form-checkbox>
-
-                    <b-form-checkbox v-model="setting.doc_type" class="mb-1">
-                      {{ getCompanyKey("doc_type") }}
-                    </b-form-checkbox>
-
-                    <b-form-checkbox v-model="setting.module_id" class="mb-1">
-                      {{ getCompanyKey("module") }}
-                    </b-form-checkbox>
-
-                    <b-form-checkbox v-model="setting.screen_id" class="mb-1">
-                      {{ getCompanyKey("screen") }}
-                    </b-form-checkbox>
-
-                    <b-form-checkbox v-model="setting.ref_id" class="mb-1">
-                      {{ getCompanyKey("ref_id") }}
-                    </b-form-checkbox>
-
-                    <b-form-checkbox v-model="setting.rp_code" class="mb-1">
-                      {{ getCompanyKey("rp_code") }}
-                    </b-form-checkbox>
+                      <b-form-checkbox v-model="setting.name" class="mb-1"
+                      >{{ getCompanyKey("installment_payment_name_ar") }}
+                      </b-form-checkbox>
+                      <b-form-checkbox v-model="setting.name_e" class="mb-1">
+                          {{ getCompanyKey("installment_payment_name_en") }}
+                      </b-form-checkbox>
+                      <b-form-checkbox v-model="setting.is_default" class="mb-1">
+                          {{ getCompanyKey("is_default") }}
+                      </b-form-checkbox>
+                      <b-form-checkbox v-model="setting.is_active" class="mb-1">
+                          {{ getCompanyKey("is_active") }}
+                      </b-form-checkbox>
 
                     <div class="d-flex justify-content-end">
                       <a href="javascript:void(0)" class="btn btn-primary btn-sm">{{
@@ -1096,7 +1117,7 @@ export default {
               :title="getCompanyKey('payment_plan_installment_create_form')"
               title-class="font-18"
               body-class="p-4 "
-              size="lg"
+              dialog-class="modal-full-width"
               :hide-footer="true"
               @show="resetModal"
               @hidden="resetModalHidden"
@@ -1138,7 +1159,7 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-lg-6">
+                  <div class="col-lg-4">
                     <div class="form-group">
                       <label class="my-1 mr-2">{{
                         getCompanyKey("installment_payment_plan")
@@ -1178,338 +1199,392 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-lg-6">
-                    <div class="form-group">
-                      <label class="my-1 mr-2">{{
-                        getCompanyKey("installment_payment_plan_detail")
-                      }}</label>
-                      <multiselect
-                        @input="showInstallmentPlanDetailModal"
-                        v-model="create.installment_payment_plan_detail_ln_no"
-                        :options="installment_payment_plan_details.map((type) => type.id)"
-                        :custom-label="
-                          (opt) => {
-                            let res = installment_payment_plan_details.find(
-                              (x) => x.id == opt
-                            );
-                            return res.id == 0
-                              ? $i18n.locale == 'ar'
-                                ? res.name
-                                : res.name_e
-                              : res.interest_value;
-                          }
-                        "
-                        :class="{
-                          'is-invalid':
-                            $v.create.installment_payment_plan_detail_ln_no.$error ||
-                            errors.installment_payment_plan_detail_ln_no,
-                        }"
-                      >
-                      </multiselect>
-                      <div
-                        v-if="!$v.create.installment_payment_plan_detail_ln_no.required"
-                        class="invalid-feedback"
-                      >
-                        {{ $t("general.fieldIsRequired") }}
-                      </div>
-                      <template v-if="errors.installment_payment_plan_detail_ln_no">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.button_id"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="form-group">
-                      <label class="my-1 mr-2">{{
-                        getCompanyKey("installment_status")
-                      }}</label>
-                      <multiselect
-                        @input="showInstallmentStatusModal"
-                        v-model="create.installment_status_id"
-                        :options="installment_statuses.map((type) => type.id)"
-                        :custom-label="
-                          (opt) =>
-                            $i18n.locale == 'ar'
-                              ? installment_statuses.find((x) => x.id == opt).name
-                              : installment_statuses.find((x) => x.id == opt).name_e
-                        "
-                        :class="{
-                          'is-invalid':
-                            $v.create.installment_status_id.$error ||
-                            errors.installment_status_id,
-                        }"
-                      >
-                      </multiselect>
-                      <div
-                        v-if="!$v.create.installment_status_id.required"
-                        class="invalid-feedback"
-                      >
-                        {{ $t("general.fieldIsRequired") }}
-                      </div>
+                </div>
+                <div style="height: 350px; overflow-x: scroll;">
+                    <template>
+                        <div class="row" v-for="(item,index) in create.payment_plan_installments">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>{{
+                                            getCompanyKey("installment_payment_type_id")
+                                        }}</label>
+                                    <multiselect
+                                        @input="showInstallmentPaymentTypeModal(index)"
+                                        v-model="create.payment_plan_installments[index].installment_payment_type_id"
+                                        :options="payment_types.map((type) => type.id)"
+                                        :custom-label="
+                                      (opt) =>
+                                        $i18n.locale == 'ar'
+                                          ? payment_types.find((x) => x.id == opt).name
+                                          : payment_types.find((x) => x.id == opt).name_e
+                                    "
+                                    >
+                                    </multiselect>
+                                    <div
+                                        v-if="!$v.create.payment_plan_installments.$each[index].installment_payment_type_id.required"
+                                        class="invalid-feedback"
+                                    >
+                                        {{ $t("general.fieldIsRequired") }}
+                                    </div>
+                                    <template v-if="errors.installment_payment_type_id">
+                                        <ErrorMessage
+                                            v-for="(
+                                        errorMessage, index
+                                      ) in errors.installment_payment_type_id"
+                                            :key="index"
+                                        >{{ errorMessage }}
+                                        </ErrorMessage>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label>{{
+                                            getCompanyKey("installment_status")
+                                        }}</label>
+                                    <multiselect
+                                        @input="showInstallmentStatusModal(index)"
+                                        v-model="create.payment_plan_installments[index].installment_status_id"
+                                        :options="installment_statuses.map((type) => type.id)"
+                                        :custom-label="
+                                          (opt) =>
+                                            $i18n.locale == 'ar'
+                                              ? installment_statuses.find((x) => x.id == opt).name
+                                              : installment_statuses.find((x) => x.id == opt).name_e
+                                        "
+                                    >
+                                    </multiselect>
+                                    <div
+                                        v-if="!$v.create.payment_plan_installments.$each[index].installment_status_id.required"
+                                        class="invalid-feedback"
+                                    >
+                                        {{ $t("general.fieldIsRequired") }}
+                                    </div>
 
-                      <template v-if="errors.installment_status_id">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.installment_status_id"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="form-group">
-                      <label class="my-1 mr-2">{{ getCompanyKey("doc_type") }}</label>
-                      <multiselect
-                        v-model="create.doc_type"
-                        :options="documentTypes.map((type) => type.id)"
-                        :custom-label="
-                          (opt) =>
-                            $i18n.locale == 'ar'
-                              ? documentTypes.find((x) => x.id == opt).name
-                              : documentTypes.find((x) => x.id == opt).name_e
-                        "
-                        :class="{
-                          'is-invalid': $v.create.doc_type.$error || errors.doc_type,
-                        }"
-                      >
-                      </multiselect>
-                      <div v-if="!$v.create.doc_type.required" class="invalid-feedback">
-                        {{ $t("general.fieldIsRequired") }}
-                      </div>
+                                    <template v-if="errors.installment_status_id">
+                                        <ErrorMessage
+                                            v-for="(errorMessage, index) in errors.installment_status_id"
+                                            :key="index"
+                                        >{{ errorMessage }}</ErrorMessage
+                                        >
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label>{{ getCompanyKey("doc_type") }}</label>
+                                    <multiselect
+                                        @input="showDocumentModal(index)"
+                                        v-model="create.payment_plan_installments[index].doc_type_id"
+                                        :options="documentTypes.map((type) => type.id)"
+                                        :custom-label="
+                                          (opt) =>
+                                            $i18n.locale == 'ar'
+                                              ? documentTypes.find((x) => x.id == opt).name
+                                              : documentTypes.find((x) => x.id == opt).name_e
+                                        "
+                                    >
+                                    </multiselect>
+                                    <div v-if="!$v.create.payment_plan_installments.$each[index].doc_type_id.required" class="invalid-feedback">
+                                        {{ $t("general.fieldIsRequired") }}
+                                    </div>
 
-                      <template v-if="errors.doc_type">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.doc_type"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="form-group">
-                      <label class="my-1 mr-2">{{ getCompanyKey("screen") }}</label>
-                      <multiselect
-                        v-model="create.screen_id"
-                        :options="screens.map((type) => type.id)"
-                        :custom-label="
-                          (opt) =>
-                            $i18n.locale == 'ar'
-                              ? screens.find((x) => x.id == opt).name
-                              : screens.find((x) => x.id == opt).name_e
-                        "
-                        :class="{
-                          'is-invalid': $v.create.screen_id.$error || errors.screen_id,
-                        }"
-                      >
-                      </multiselect>
-                      <div v-if="!$v.create.screen_id.required" class="invalid-feedback">
-                        {{ $t("general.fieldIsRequired") }}
-                      </div>
-
-                      <template v-if="errors.screen_id">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.screen_id"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="form-group">
-                      <label class="my-1 mr-2">{{ getCompanyKey("module") }}</label>
-                      <multiselect
-                        v-model="create.module_id"
-                        :options="modules.map((type) => type.id)"
-                        :custom-label="
-                          (opt) =>
-                            $i18n.locale == 'ar'
-                              ? modules.find((x) => x.id == opt).name
-                              : modules.find((x) => x.id == opt).name_e
-                        "
-                        :class="{
-                          'is-invalid': $v.create.module_id.$error || errors.module_id,
-                        }"
-                      >
-                      </multiselect>
-                      <div v-if="!$v.create.module_id.required" class="invalid-feedback">
-                        {{ $t("general.fieldIsRequired") }}
-                      </div>
-
-                      <template v-if="errors.module_id">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.module_id"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="form-group">
-                      <label class="control-label">
-                        {{ getCompanyKey("installment_payment_plan_v_date") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <date-picker
-                        v-model="create.custom_v_date"
-                        type="date"
-                        @change="v_date"
-                        confirm
-                      ></date-picker>
-                      <div v-if="!$v.create.v_date.required" class="invalid-feedback">
-                        {{ $t("general.fieldIsRequired") }}
-                      </div>
-                      <template v-if="errors.v_date">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.v_date"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="form-group">
-                      <label class="control-label">
-                        {{ getCompanyKey("installment_payment_plan_due_date") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <date-picker
-                        v-model="create.custom_due_date"
-                        type="date"
-                        :default-value="create.due_date"
-                        @change="due_date"
-                        confirm
-                      ></date-picker>
-                      <div v-if="!$v.create.due_date.required" class="invalid-feedback">
-                        {{ $t("general.fieldIsRequired") }}
-                      </div>
-                      <template v-if="errors.due_date">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.due_date"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="form-group">
-                      <label class="control-label">
-                        {{ getCompanyKey("installment_payment_plan_total_amount") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        class="form-control"
-                        data-create="9"
-                        step="0.1"
-                        @keypress.enter="moveInput('select', 'create', 10)"
-                        v-model="$v.create.total_amount.$model"
-                        :class="{
-                          'is-invalid':
-                            $v.create.total_amount.$error || errors.total_amount,
-                          'is-valid':
-                            !$v.create.total_amount.$invalid && !errors.total_amount,
-                        }"
-                      />
-                      <template v-if="errors.total_amount">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.total_amount"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="form-group">
-                      <label class="control-label">
-                        {{ getCompanyKey("installment_payment_plan_paid_amount") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        class="form-control"
-                        data-create="9"
-                        step="0.1"
-                        @keypress.enter="moveInput('select', 'create', 10)"
-                        v-model="$v.create.paid_amount.$model"
-                        :class="{
-                          'is-invalid':
-                            $v.create.paid_amount.$error || errors.paid_amount,
-                          'is-valid':
-                            !$v.create.paid_amount.$invalid && !errors.paid_amount,
-                        }"
-                      />
-                      <template v-if="errors.paid_amount">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.paid_amount"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="form-group">
-                      <label class="control-label">
-                        {{ getCompanyKey("ref_id") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        class="form-control"
-                        data-create="9"
-                        step="0.1"
-                        @keypress.enter="moveInput('select', 'create', 10)"
-                        v-model="$v.create.ref_id.$model"
-                        :class="{
-                          'is-invalid': $v.create.ref_id.$error || errors.ref_id,
-                          'is-valid': !$v.create.ref_id.$invalid && !errors.ref_id,
-                        }"
-                      />
-                      <template v-if="errors.ref_id">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.ref_id"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="form-group">
-                      <label class="control-label">
-                        {{ getCompanyKey("rp_code") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        class="form-control"
-                        data-create="9"
-                        step="0.1"
-                        @keypress.enter="moveInput('select', 'create', 10)"
-                        v-model="$v.create.rp_code.$model"
-                        :class="{
-                          'is-invalid': $v.create.rp_code.$error || errors.rp_code,
-                          'is-valid': !$v.create.rp_code.$invalid && !errors.rp_code,
-                        }"
-                      />
-                      <template v-if="errors.rp_code">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.rp_code"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
+                                    <template v-if="errors.doc_type_id">
+                                        <ErrorMessage
+                                            v-for="(errorMessage, index) in errors.doc_type_id"
+                                            :key="index"
+                                        >{{ errorMessage }}</ErrorMessage
+                                        >
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        {{ getCompanyKey("installment_payment_plan_v_date") }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <date-picker
+                                        type="date"
+                                        v-model="multDate[index].start"
+                                        :default-value="new Date()"
+                                        @change="v_dateCreate($event,index)"
+                                        confirm
+                                    ></date-picker>
+                                    <div v-if="!$v.create.payment_plan_installments.$each[index].v_date.required" class="invalid-feedback">
+                                        {{ $t("general.fieldIsRequired") }}
+                                    </div>
+                                    <template v-if="errors.v_date">
+                                        <ErrorMessage
+                                            v-for="(errorMessage, index) in errors.v_date"
+                                            :key="index"
+                                        >{{ errorMessage }}</ErrorMessage
+                                        >
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        {{ getCompanyKey("installment_payment_plan_due_date") }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <date-picker
+                                        type="date"
+                                        v-model="multDate[index].end"
+                                        :default-value="new Date()"
+                                        @change="due_dateCreate($event,index)"
+                                        confirm
+                                    ></date-picker>
+                                    <div v-if="!$v.create.payment_plan_installments.$each[index].due_date.required" class="invalid-feedback">
+                                        {{ $t("general.fieldIsRequired") }}
+                                    </div>
+                                    <template v-if="errors.due_date">
+                                        <ErrorMessage
+                                            v-for="(errorMessage, index) in errors.due_date"
+                                            :key="index"
+                                        >{{ errorMessage }}</ErrorMessage
+                                        >
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        {{ getCompanyKey("installment_payment_plan_total_amount") }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        data-create="9"
+                                        step="0.1"
+                                        v-model="$v.create.payment_plan_installments.$each[index].total_amount.$model"
+                                        :class="{
+                                          'is-invalid':
+                                            $v.create.payment_plan_installments.$each[index].total_amount.$error || errors.total_amount,
+                                          'is-valid':
+                                            !$v.create.payment_plan_installments.$each[index].total_amount.$invalid && !errors.total_amount,
+                                        }"
+                                    />
+                                    <template v-if="errors.total_amount">
+                                        <ErrorMessage
+                                            v-for="(errorMessage, index) in errors.total_amount"
+                                            :key="index"
+                                        >{{ errorMessage }}</ErrorMessage
+                                        >
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        {{ getCompanyKey("installment_payment_plan_paid_amount") }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        step="0.1"
+                                        v-model="$v.create.payment_plan_installments.$each[index].paid_amount.$model"
+                                        :class="{
+                                          'is-invalid':
+                                            $v.create.payment_plan_installments.$each[index].paid_amount.$error || errors.paid_amount,
+                                          'is-valid':
+                                            !$v.create.payment_plan_installments.$each[index].paid_amount.$invalid && !errors.paid_amount,
+                                        }"
+                                    />
+                                    <template v-if="errors.paid_amount">
+                                        <ErrorMessage
+                                            v-for="(errorMessage, index) in errors.paid_amount"
+                                            :key="index"
+                                        >{{ errorMessage }}</ErrorMessage
+                                        >
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        {{ getCompanyKey("ref_id") }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        step="0.1"
+                                        v-model="$v.create.payment_plan_installments.$each[index].ref_id.$model"
+                                        :class="{
+                                          'is-invalid': $v.create.payment_plan_installments.$each[index].ref_id.$error || errors.ref_id,
+                                          'is-valid': !$v.create.payment_plan_installments.$each[index].ref_id.$invalid && !errors.ref_id,
+                                        }"
+                                    />
+                                    <template v-if="errors.ref_id">
+                                        <ErrorMessage
+                                            v-for="(errorMessage, index) in errors.ref_id"
+                                            :key="index"
+                                        >{{ errorMessage }}</ErrorMessage
+                                        >
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        {{ getCompanyKey("rp_code") }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        step="0.1"
+                                        v-model="$v.create.payment_plan_installments.$each[index].rp_code.$model"
+                                        :class="{
+                                          'is-invalid': $v.create.payment_plan_installments.$each[index].rp_code.$error || errors.rp_code,
+                                          'is-valid': !$v.create.payment_plan_installments.$each[index].rp_code.$invalid && !errors.rp_code,
+                                        }"
+                                    />
+                                    <template v-if="errors.rp_code">
+                                        <ErrorMessage
+                                            v-for="(errorMessage, index) in errors.rp_code"
+                                            :key="index"
+                                        >{{ errorMessage }}</ErrorMessage
+                                        >
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        {{ getCompanyKey("day_month") }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        min="1"
+                                        max="30"
+                                        v-model="$v.create.payment_plan_installments.$each[index].day_month.$model"
+                                        :class="{
+                                          'is-invalid': $v.create.payment_plan_installments.$each[index].day_month.$error || errors.day_month,
+                                          'is-valid': !$v.create.payment_plan_installments.$each[index].day_month.$invalid && !errors.day_month,
+                                        }"
+                                    />
+                                    <template v-if="errors.day_month">
+                                        <ErrorMessage
+                                            v-for="(errorMessage, index) in errors.day_month"
+                                            :key="index"
+                                        >{{ errorMessage }}</ErrorMessage
+                                        >
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        {{ getCompanyKey("installment_payment_plan_note_a") }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input
+                                        @input="arabicValueNoteCreate(create.payment_plan_installments[index].note_a,index)"
+                                        type="text"
+                                        class="form-control"
+                                        v-model="$v.create.payment_plan_installments.$each[index].note_a.$model"
+                                        :class="{
+                                          'is-invalid': $v.create.payment_plan_installments.$each[index].note_a.$error || errors.note_a,
+                                          'is-valid': !$v.create.payment_plan_installments.$each[index].note_a.$invalid && !errors.note_a,
+                                        }"
+                                    />
+                                    <template v-if="errors.note_a">
+                                        <ErrorMessage
+                                            v-for="(errorMessage, index) in errors.note_a"
+                                            :key="index"
+                                        >{{ errorMessage }}</ErrorMessage
+                                        >
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        {{ getCompanyKey("installment_payment_plan_note_e") }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input
+                                        @input="englishValueNoteCreate(create.payment_plan_installments[index].note_e,index)"
+                                        type="text"
+                                        class="form-control"
+                                        v-model="$v.create.payment_plan_installments.$each[index].note_e.$model"
+                                        :class="{
+                                          'is-invalid': $v.create.payment_plan_installments.$each[index].note_e.$error || errors.note_e,
+                                          'is-valid': !$v.create.payment_plan_installments.$each[index].note_e.$invalid && !errors.note_e,
+                                        }"
+                                    />
+                                    <template v-if="errors.note_e">
+                                        <ErrorMessage
+                                            v-for="(errorMessage, index) in errors.note_e"
+                                            :key="index"
+                                        >{{ errorMessage }}</ErrorMessage
+                                        >
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-md-2" >
+                                <div class="form-group">
+                                    <label class="mr-2">
+                                        {{ getCompanyKey("is_fixed") }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <b-form-group
+                                        :class="{
+                                  'is-invalid': $v.create.payment_plan_installments.$each[index].is_fixed.$error || errors.is_fixed,
+                                  'is-valid': !$v.create.payment_plan_installments.$each[index].is_fixed.$invalid && !errors.is_fixed,
+                                }"
+                                    >
+                                        <b-form-radio
+                                            class="d-inline-block"
+                                            v-model="$v.create.payment_plan_installments.$each[index].is_fixed.$model"
+                                            :name="`some-radios-${index}`"
+                                            value="1"
+                                        >{{ $t("general.Yes") }}</b-form-radio
+                                        >
+                                        <b-form-radio
+                                            class="d-inline-block m-1"
+                                            v-model="$v.create.payment_plan_installments.$each[index].is_fixed.$model"
+                                            :name="`some-radios-${index}`"
+                                            value="0"
+                                        >{{ $t("general.No") }}</b-form-radio
+                                        >
+                                    </b-form-group>
+                                    <template v-if="errors.is_fixed">
+                                        <ErrorMessage
+                                            v-for="(errorMessage, index) in errors.is_fixed"
+                                            :key="index"
+                                        >{{ errorMessage }}</ErrorMessage
+                                        >
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="col-md-1 p-0 pt-3">
+                                <button
+                                    v-if="(create.payment_plan_installments.length - 1) == index"
+                                    type="button"
+                                    @click.prevent="addNewField"
+                                    class="custom-btn-dowonload"
+                                >
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button
+                                    v-if="create.payment_plan_installments.length > 1"
+                                    type="button"
+                                    @click.prevent="removeNewField(index)"
+                                    class="custom-btn-dowonload"
+                                >
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
                 </div>
               </form>
             </b-modal>
@@ -1524,249 +1599,65 @@ export default {
 
               <table class="table table-borderless table-hover table-centered m-0">
                 <thead>
-                  <tr>
+                    <tr>
                     <th scope="col" style="width: 0" v-if="enabled3" class="do-not-print">
-                      <div class="form-check custom-control">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          v-model="isCheckAll"
-                          style="width: 17px; height: 17px"
-                        />
-                      </div>
-                    </th>
-                    <th v-if="setting.installment_payment_plan_id">
-                      <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("installment_payment_plan") }}</span>
-                        <div class="arrow-sort">
-                          <i
-                            class="fas fa-arrow-up"
-                            @click="
-                              payment_plan_installments.sort(
-                                sortString($i18n.locale == 'ar' ? 'name' : 'name_e')
-                              )
-                            "
-                          ></i>
-                          <i
-                            class="fas fa-arrow-down"
-                            @click="
-                              payment_plan_installments.sort(
-                                sortString($i18n.locale == 'ar' ? '-name' : '-name_e')
-                              )
-                            "
-                          ></i>
+                        <div class="form-check custom-control">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                v-model="isCheckAll"
+                                style="width: 17px; height: 17px"
+                            />
                         </div>
-                      </div>
                     </th>
-                    <th v-if="setting.installment_status_id">
-                      <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("installment_status") }}</span>
-                        <div class="arrow-sort">
-                          <i
-                            class="fas fa-arrow-up"
-                            @click="
-                              payment_plan_installments.sort(
-                                sortString($i18n.locale == 'ar' ? 'name' : 'name_e')
-                              )
-                            "
-                          ></i>
-                          <i
-                            class="fas fa-arrow-down"
-                            @click="
-                              payment_plan_installments.sort(
-                                sortString($i18n.locale == 'ar' ? '-name' : '-name_e')
-                              )
-                            "
-                          ></i>
+                    <th v-if="setting.name">
+                        <div class="d-flex justify-content-center">
+                            <span>{{ getCompanyKey("installment_payment_name_ar") }}</span>
+                            <div class="arrow-sort">
+                                <i
+                                    class="fas fa-arrow-up"
+                                    @click="payment_plan_installments.sort(sortString('name'))"
+                                ></i>
+                                <i
+                                    class="fas fa-arrow-down"
+                                    @click="payment_plan_installments.sort(sortString('-name'))"
+                                ></i>
+                            </div>
                         </div>
-                      </div>
                     </th>
-                    <th v-if="setting.doc_type">
-                      <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("doc_type") }}</span>
-                        <div class="arrow-sort">
-                          <i
-                            class="fas fa-arrow-up"
-                            @click="
-                              payment_plan_installments.sort(
-                                sortString($i18n.locale == 'ar' ? 'name' : 'name_e')
-                              )
-                            "
-                          ></i>
-                          <i
-                            class="fas fa-arrow-down"
-                            @click="
-                              payment_plan_installments.sort(
-                                sortString($i18n.locale == 'ar' ? '-name' : '-name_e')
-                              )
-                            "
-                          ></i>
+                    <th v-if="setting.name_e">
+                        <div class="d-flex justify-content-center">
+                            <span>{{ getCompanyKey("installment_payment_name_en") }}</span>
+                            <div class="arrow-sort">
+                                <i
+                                    class="fas fa-arrow-up"
+                                    @click="payment_plan_installments.sort(sortString('name_e'))"
+                                ></i>
+                                <i
+                                    class="fas fa-arrow-down"
+                                    @click="payment_plan_installments.sort(sortString('-name_e'))"
+                                ></i>
+                            </div>
                         </div>
-                      </div>
                     </th>
-                    <th v-if="setting.screen_id">
-                      <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("screen") }}</span>
-                        <div class="arrow-sort">
-                          <i
-                            class="fas fa-arrow-up"
-                            @click="
-                              payment_plan_installments.sort(
-                                sortString($i18n.locale == 'ar' ? 'name' : 'name_e')
-                              )
-                            "
-                          ></i>
-                          <i
-                            class="fas fa-arrow-down"
-                            @click="
-                              payment_plan_installments.sort(
-                                sortString($i18n.locale == 'ar' ? '-name' : '-name_e')
-                              )
-                            "
-                          ></i>
+                    <th v-if="setting.is_default">
+                        <div class="d-flex justify-content-center">
+                            <span>{{ getCompanyKey("is_default") }}</span>
                         </div>
-                      </div>
                     </th>
-                    <th v-if="setting.module_id">
-                      <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("module") }}</span>
-                        <div class="arrow-sort">
-                          <i
-                            class="fas fa-arrow-up"
-                            @click="
-                              payment_plan_installments.sort(
-                                sortString($i18n.locale == 'ar' ? 'name' : 'name_e')
-                              )
-                            "
-                          ></i>
-                          <i
-                            class="fas fa-arrow-down"
-                            @click="
-                              payment_plan_installments.sort(
-                                sortString($i18n.locale == 'ar' ? '-name' : '-name_e')
-                              )
-                            "
-                          ></i>
+                    <th v-if="setting.is_active">
+                        <div class="d-flex justify-content-center">
+                            <span>{{ getCompanyKey("is_active") }}</span>
                         </div>
-                      </div>
                     </th>
-                    <th v-if="setting.v_date">
-                      <div class="d-flex justify-content-center">
-                        <span>{{
-                          getCompanyKey("installment_payment_plan_v_date")
-                        }}</span>
-                        <div class="arrow-sort">
-                          <i
-                            class="fas fa-arrow-up"
-                            @click="payment_plan_installments.sort(sortString('v_date'))"
-                          ></i>
-                          <i
-                            class="fas fa-arrow-down"
-                            @click="payment_plan_installments.sort(sortString('-v_date'))"
-                          ></i>
-                        </div>
-                      </div>
-                    </th>
-                    <th v-if="setting.due_date">
-                      <div class="d-flex justify-content-center">
-                        <span>{{
-                          getCompanyKey("installment_payment_plan_due_date")
-                        }}</span>
-                        <div class="arrow-sort">
-                          <i
-                            class="fas fa-arrow-up"
-                            @click="
-                              payment_plan_installments.sort(sortString('due_date'))
-                            "
-                          ></i>
-                          <i
-                            class="fas fa-arrow-down"
-                            @click="
-                              payment_plan_installments.sort(sortString('-due_date'))
-                            "
-                          ></i>
-                        </div>
-                      </div>
-                    </th>
-                    <th v-if="setting.total_amount">
-                      <div class="d-flex justify-content-center">
-                        <span>{{
-                          getCompanyKey("installment_payment_plan_total_amount")
-                        }}</span>
-                        <div class="arrow-sort">
-                          <i
-                            class="fas fa-arrow-up"
-                            @click="
-                              payment_plan_installments.sort(sortNumber('total_amount'))
-                            "
-                          ></i>
-                          <i
-                            class="fas fa-arrow-down"
-                            @click="
-                              payment_plan_installments.sort(sortNumber('-total_amount'))
-                            "
-                          ></i>
-                        </div>
-                      </div>
-                    </th>
-                    <th v-if="setting.paid_amount">
-                      <div class="d-flex justify-content-center">
-                        <span>{{
-                          getCompanyKey("installment_payment_plan_paid_amount")
-                        }}</span>
-                        <div class="arrow-sort">
-                          <i
-                            class="fas fa-arrow-up"
-                            @click="
-                              payment_plan_installments.sort(sortNumber('paid_amount'))
-                            "
-                          ></i>
-                          <i
-                            class="fas fa-arrow-down"
-                            @click="
-                              payment_plan_installments.sort(sortNumber('-paid_amount'))
-                            "
-                          ></i>
-                        </div>
-                      </div>
-                    </th>
-                    <th v-if="setting.ref_id">
-                      <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("ref_id") }}</span>
-                        <div class="arrow-sort">
-                          <i
-                            class="fas fa-arrow-up"
-                            @click="payment_plan_installments.sort(sortNumber('ref_id'))"
-                          ></i>
-                          <i
-                            class="fas fa-arrow-down"
-                            @click="payment_plan_installments.sort(sortNumber('-ref_id'))"
-                          ></i>
-                        </div>
-                      </div>
-                    </th>
-                    <th v-if="setting.rp_code">
-                      <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("rp_code") }}</span>
-                        <div class="arrow-sort">
-                          <i
-                            class="fas fa-arrow-up"
-                            @click="payment_plan_installments.sort(sortNumber('rp_code'))"
-                          ></i>
-                          <i
-                            class="fas fa-arrow-down"
-                            @click="
-                              payment_plan_installments.sort(sortNumber('-rp_code'))
-                            "
-                          ></i>
-                        </div>
-                      </div>
+                    <th v-if="setting.rows" class="do-not-print">
+                        {{ $t("general.rows") }}
                     </th>
                     <th v-if="enabled3" class="do-not-print">
-                      {{ $t("general.Action") }}
+                        {{ $t("general.Action") }}
                     </th>
                     <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
-                  </tr>
+                </tr>
                 </thead>
                 <tbody v-if="payment_plan_installments.length > 0">
                   <tr
@@ -1787,94 +1678,43 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.installment_payment_plan_id">
-                      <h5 class="m-0 font-weight-normal">
+                      <td v-if="setting.name">
+                          <h5 class="m-0 font-weight-normal">{{ data.name }}</h5>
+                      </td>
+                      <td v-if="setting.name_e">
+                          <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
+                      </td>
+                      <td v-if="setting.is_default">
+                      <span
+                          :class="[
+                          data.is_default == 1 ? 'text-success' : 'text-danger',
+                          'badge',
+                        ]"
+                      >
                         {{
-                          $i18n.locale == "ar"
-                            ? data.installment_payment_plan.name
-                            : data.installment_payment_plan.name_e
-                        }}
-                      </h5>
-                    </td>
-                    <td v-if="setting.installment_status_id">
-                      <h5 class="m-0 font-weight-normal">
+                              data.is_default == 1
+                                  ? `${$t("general.Active")}`
+                                  : `${$t("general.Inactive")}`
+                          }}
+                      </span>
+                      </td>
+                      <td v-if="setting.is_active">
+                      <span
+                          :class="[
+                          data.is_active == 1 ? 'text-success' : 'text-danger',
+                          'badge',
+                        ]"
+                      >
                         {{
-                          $i18n.locale == "ar"
-                            ? data.installment_status.name
-                            : data.installment_status.name_e
-                        }}
-                      </h5>
-                    </td>
-                    <td v-if="setting.doc_type">
-                      <h5 class="m-0 font-weight-normal">
-                        {{
-                          documentTypes.length > 0
-                            ? $i18n.locale == "ar"
-                              ? documentTypes.find((x) => x.id == data.doc_type).name
-                              : documentTypes.find((x) => x.id == data.doc_type).name_e
-                            : ""
-                        }}
-                      </h5>
-                    </td>
-
-                    <td v-if="setting.screen_id">
-                      <h5 class="m-0 font-weight-normal">
-                        {{
-                          screens.length > 0
-                            ? $i18n.locale == "ar"
-                              ? screens.find((x) => x.id == data.screen_id).name
-                              : screens.find((x) => x.id == data.screen_id).name_e
-                            : ""
-                        }}
-                      </h5>
-                    </td>
-                    <td v-if="setting.module_id">
-                      <h5 class="m-0 font-weight-normal">
-                        {{
-                          modules.length > 0
-                            ? $i18n.locale == "ar"
-                              ? modules.find((x) => x.id == data.module_id).name
-                              : modules.find((x) => x.id == data.module_id).name_e
-                            : ""
-                        }}
-                      </h5>
-                    </td>
-                    <td v-if="setting.v_date">
-                      <h5 class="m-0 font-weight-normal">
-                        {{ formatDate(data.v_date) }}
-                      </h5>
-                    </td>
-
-                    <td v-if="setting.due_date">
-                      <h5 class="m-0 font-weight-normal">
-                        {{ formatDate(data.due_date) }}
-                      </h5>
-                    </td>
-
-                    <td v-if="setting.total_amount">
-                      <h5 class="m-0 font-weight-normal">
-                        {{ data.total_amount }}
-                      </h5>
-                    </td>
-
-                    <td v-if="setting.paid_amount">
-                      <h5 class="m-0 font-weight-normal">
-                        {{ data.paid_amount }}
-                      </h5>
-                    </td>
-
-                    <td v-if="setting.ref_id">
-                      <h5 class="m-0 font-weight-normal">
-                        {{ data.ref_id }}
-                      </h5>
-                    </td>
-
-                    <td v-if="setting.rp_code">
-                      <h5 class="m-0 font-weight-normal">
-                        {{ data.rp_code }}
-                      </h5>
-                    </td>
-
+                              data.is_active == 1
+                                  ? `${$t("general.Active")}`
+                                  : `${$t("general.Inactive")}`
+                          }}
+                      </span>
+                      </td>
+                      <th v-if="setting.rows" class="do-not-print">
+                          {{ data.count_payment_plan_installment }}
+                      </th>
                     <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
@@ -1920,7 +1760,7 @@ export default {
                         :title="getCompanyKey('payment_plan_installment_edit_form')"
                         title-class="font-18"
                         body-class="p-4"
-                        size="lg"
+                        dialog-class="modal-full-width"
                         :ref="`edit-${data.id}`"
                         :hide-footer="true"
                         @show="resetModalEdit(data.id)"
@@ -1952,434 +1792,431 @@ export default {
                               {{ $t("general.Cancel") }}
                             </b-button>
                           </div>
-                          <div class="row">
-                            <div class="col-lg-6">
-                              <div class="form-group">
-                                <label class="my-1 mr-2">{{
-                                  getCompanyKey("installment_payment_plan")
-                                }}</label>
-                                <multiselect
-                                  @input="showInstallmentPlanModalEdit"
-                                  v-model="edit.installment_payment_plan_id"
-                                  :options="
-                                    installment_payment_plans.map((type) => type.id)
-                                  "
-                                  :custom-label="
-                                    (opt) =>
-                                      $i18n.locale == 'ar'
-                                        ? installment_payment_plans.find(
-                                            (x) => x.id == opt
-                                          ).name
-                                        : installment_payment_plans.find(
-                                            (x) => x.id == opt
-                                          ).name_e
-                                  "
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.installment_payment_plan_id.$error ||
-                                      errors.installment_payment_plan_id,
-                                  }"
-                                >
-                                </multiselect>
-                                <div
-                                  v-if="!$v.edit.installment_payment_plan_id.required"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.fieldIsRequired") }}
-                                </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="my-1 mr-2">{{
+                                                getCompanyKey("installment_payment_plan")
+                                            }}</label>
+                                        <multiselect
+                                            :disabled="true"
+                                            v-model="edit.installment_payment_plan_id"
+                                            :options="installment_payment_plans.map((type) => type.id)"
+                                            :custom-label="
+                                              (opt) =>
+                                                $i18n.locale == 'ar'
+                                                  ? installment_payment_plans.find((x) => x.id == opt).name
+                                                  : installment_payment_plans.find((x) => x.id == opt).name_e
+                                            "
+                                            :class="{
+                                              'is-invalid':
+                                                $v.create.installment_payment_plan_id.$error ||
+                                                errors.installment_payment_plan_id,
+                                            }"
+                                        >
+                                        </multiselect>
+                                        <div
+                                            v-if="!$v.create.installment_payment_plan_id.required"
+                                            class="invalid-feedback"
+                                        >
+                                            {{ $t("general.fieldIsRequired") }}
+                                        </div>
 
-                                <template v-if="errors.installment_payment_plan_id">
-                                  <ErrorMessage
-                                    v-for="(
-                                      errorMessage, index
-                                    ) in errors.installment_payment_plan_id"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-lg-6">
-                              <div class="form-group">
-                                <label class="my-1 mr-2">{{
-                                  getCompanyKey("installment_payment_plan_detail")
-                                }}</label>
-                                <multiselect
-                                  @input="showInstallmentPlanDetailModalEdit"
-                                  v-model="edit.installment_payment_plan_detail_ln_no"
-                                  :options="
-                                    installment_payment_plan_details.map(
-                                      (type) => type.id
-                                    )
-                                  "
-                                  :custom-label="
-                                    (opt) => {
-                                      let res = installment_payment_plan_details.find(
-                                        (x) => x.id == opt
-                                      );
-                                      return res.id == 0
-                                        ? $i18n.locale == 'ar'
-                                          ? res.name
-                                          : res.name_e
-                                        : res.interest_value;
-                                    }
-                                  "
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.installment_payment_plan_detail_ln_no
-                                        .$error ||
-                                      errors.installment_payment_plan_detail_ln_no,
-                                  }"
-                                >
-                                </multiselect>
-                                <div
-                                  v-if="
-                                    !$v.edit.installment_payment_plan_detail_ln_no
-                                      .required
-                                  "
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.fieldIsRequired") }}
+                                        <template v-if="errors.installment_payment_plan_id">
+                                            <ErrorMessage
+                                                v-for="(
+                                                        errorMessage, index
+                                                      ) in errors.installment_payment_plan_id"
+                                                :key="index"
+                                            >{{ errorMessage }}</ErrorMessage
+                                            >
+                                        </template>
+                                    </div>
                                 </div>
-                                <template
-                                  v-if="errors.installment_payment_plan_detail_ln_no"
-                                >
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.button_id"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
                             </div>
-                            <div class="col-lg-6">
-                              <div class="form-group">
-                                <label class="my-1 mr-2">{{
-                                  getCompanyKey("installment_status")
-                                }}</label>
-                                <multiselect
-                                  @input="showInstallmentStatusModalEdit"
-                                  v-model="edit.installment_status_id"
-                                  :options="installment_statuses.map((type) => type.id)"
-                                  :custom-label="
-                                    (opt) =>
-                                      $i18n.locale == 'ar'
-                                        ? installment_statuses.find((x) => x.id == opt)
-                                            .name
-                                        : installment_statuses.find((x) => x.id == opt)
-                                            .name_e
-                                  "
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.installment_status_id.$error ||
-                                      errors.installment_status_id,
-                                  }"
-                                >
-                                </multiselect>
-                                <div
-                                  v-if="!$v.edit.installment_status_id.required"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.fieldIsRequired") }}
-                                </div>
+                            <div style="height: 350px; overflow-x: scroll;">
+                                <template>
+                                    <div class="row" v-for="(item,index) in edit.payment_plan_installments">
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label>{{
+                                                        getCompanyKey("installment_payment_type_id")
+                                                    }}</label>
+                                                <multiselect
+                                                    @input="showInstallmentPaymentTypeModalEdit(index)"
+                                                    v-model="edit.payment_plan_installments[index].installment_payment_type_id"
+                                                    :options="payment_types.map((type) => type.id)"
+                                                    :custom-label="
+                                                      (opt) =>
+                                                        $i18n.locale == 'ar'
+                                                          ? payment_types.find((x) => x.id == opt).name
+                                                          : payment_types.find((x) => x.id == opt).name_e
+                                                    "
+                                                >
+                                                </multiselect>
+                                                <div
+                                                    v-if="!$v.create.payment_plan_installments.$each[index].installment_payment_type_id.required"
+                                                    class="invalid-feedback"
+                                                >
+                                                    {{ $t("general.fieldIsRequired") }}
+                                                </div>
+                                                <template v-if="errors.installment_payment_type_id">
+                                                    <ErrorMessage
+                                                        v-for="(
+                                        errorMessage, index
+                                      ) in errors.installment_payment_type_id"
+                                                        :key="index"
+                                                    >{{ errorMessage }}
+                                                    </ErrorMessage>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label>{{
+                                                        getCompanyKey("installment_status")
+                                                    }}</label>
+                                                <multiselect
+                                                    @input="showInstallmentStatusModalEdit(index)"
+                                                    v-model="edit.payment_plan_installments[index].installment_status_id"
+                                                    :options="installment_statuses.map((type) => type.id)"
+                                                    :custom-label="
+                                                      (opt) =>
+                                                        $i18n.locale == 'ar'
+                                                          ? installment_statuses.find((x) => x.id == opt).name
+                                                          : installment_statuses.find((x) => x.id == opt).name_e
+                                                    "
+                                                >
+                                                </multiselect>
+                                                <div
+                                                    v-if="!$v.create.payment_plan_installments.$each[index].installment_status_id.required"
+                                                    class="invalid-feedback"
+                                                >
+                                                    {{ $t("general.fieldIsRequired") }}
+                                                </div>
 
-                                <template v-if="errors.installment_status_id">
-                                  <ErrorMessage
-                                    v-for="(
-                                      errorMessage, index
-                                    ) in errors.installment_status_id"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-lg-6">
-                              <div class="form-group">
-                                <label class="my-1 mr-2">{{
-                                  getCompanyKey("doc_type")
-                                }}</label>
-                                <multiselect
-                                  v-model="edit.doc_type"
-                                  :options="documentTypes.map((type) => type.id)"
-                                  :custom-label="
-                                    (opt) =>
-                                      $i18n.locale == 'ar'
-                                        ? documentTypes.find((x) => x.id == opt).name
-                                        : documentTypes.find((x) => x.id == opt).name_e
-                                  "
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.doc_type.$error || errors.doc_type,
-                                  }"
-                                >
-                                </multiselect>
-                                <div
-                                  v-if="!$v.edit.doc_type.required"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.fieldIsRequired") }}
-                                </div>
+                                                <template v-if="errors.installment_status_id">
+                                                    <ErrorMessage
+                                                        v-for="(errorMessage, index) in errors.installment_status_id"
+                                                        :key="index"
+                                                    >{{ errorMessage }}</ErrorMessage
+                                                    >
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label>{{ getCompanyKey("doc_type") }}</label>
+                                                <multiselect
+                                                    @input="showDocumentModalEdit(index)"
+                                                    v-model="edit.payment_plan_installments[index].doc_type_id"
+                                                    :options="documentTypes.map((type) => type.id)"
+                                                    :custom-label="
+                                                      (opt) =>
+                                                        $i18n.locale == 'ar'
+                                                          ? documentTypes.find((x) => x.id == opt).name
+                                                          : documentTypes.find((x) => x.id == opt).name_e
+                                                    "
+                                                >
+                                                </multiselect>
+                                                <div v-if="!$v.create.payment_plan_installments.$each[index].doc_type_id.required" class="invalid-feedback">
+                                                    {{ $t("general.fieldIsRequired") }}
+                                                </div>
 
-                                <template v-if="errors.doc_type">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.doc_type"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
+                                                <template v-if="errors.doc_type_id">
+                                                    <ErrorMessage
+                                                        v-for="(errorMessage, index) in errors.doc_type_id"
+                                                        :key="index"
+                                                    >{{ errorMessage }}</ErrorMessage
+                                                    >
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="control-label">
+                                                    {{ getCompanyKey("installment_payment_plan_v_date") }}
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <date-picker
+                                                    type="date"
+                                                    v-model="multDateEdit[index].start"
+                                                    @change="v_dateEdit($event,index)"
+                                                    confirm
+                                                ></date-picker>
+                                                <div v-if="!$v.edit.payment_plan_installments.$each[index].v_date.required" class="invalid-feedback">
+                                                    {{ $t("general.fieldIsRequired") }}
+                                                </div>
+                                                <template v-if="errors.v_date">
+                                                    <ErrorMessage
+                                                        v-for="(errorMessage, index) in errors.v_date"
+                                                        :key="index"
+                                                    >{{ errorMessage }}</ErrorMessage
+                                                    >
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="control-label">
+                                                    {{ getCompanyKey("installment_payment_plan_due_date") }}
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <date-picker
+                                                    type="date"
+                                                    v-model="multDateEdit[index].end"
+                                                    @change="due_dateEdit($event,index)"
+                                                    confirm
+                                                ></date-picker>
+                                                <div v-if="!$v.edit.payment_plan_installments.$each[index].due_date.required" class="invalid-feedback">
+                                                    {{ $t("general.fieldIsRequired") }}
+                                                </div>
+                                                <template v-if="errors.due_date">
+                                                    <ErrorMessage
+                                                        v-for="(errorMessage, index) in errors.due_date"
+                                                        :key="index"
+                                                    >{{ errorMessage }}</ErrorMessage
+                                                    >
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="control-label">
+                                                    {{ getCompanyKey("installment_payment_plan_total_amount") }}
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    class="form-control"
+                                                    step="0.1"
+                                                    v-model="$v.edit.payment_plan_installments.$each[index].total_amount.$model"
+                                                    :class="{
+                                                      'is-invalid':
+                                                        $v.edit.payment_plan_installments.$each[index].total_amount.$error || errors.total_amount,
+                                                      'is-valid':
+                                                        !$v.edit.payment_plan_installments.$each[index].total_amount.$invalid && !errors.total_amount,
+                                                    }"
+                                                />
+                                                <template v-if="errors.total_amount">
+                                                    <ErrorMessage
+                                                        v-for="(errorMessage, index) in errors.total_amount"
+                                                        :key="index"
+                                                    >{{ errorMessage }}</ErrorMessage
+                                                    >
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="control-label">
+                                                    {{ getCompanyKey("installment_payment_plan_paid_amount") }}
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    class="form-control"
+                                                    step="0.1"
+                                                    v-model="$v.edit.payment_plan_installments.$each[index].paid_amount.$model"
+                                                    :class="{
+                                          'is-invalid':
+                                            $v.edit.payment_plan_installments.$each[index].paid_amount.$error || errors.paid_amount,
+                                          'is-valid':
+                                            !$v.edit.payment_plan_installments.$each[index].paid_amount.$invalid && !errors.paid_amount,
+                                        }"
+                                                />
+                                                <template v-if="errors.paid_amount">
+                                                    <ErrorMessage
+                                                        v-for="(errorMessage, index) in errors.paid_amount"
+                                                        :key="index"
+                                                    >{{ errorMessage }}</ErrorMessage
+                                                    >
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="control-label">
+                                                    {{ getCompanyKey("ref_id") }}
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    class="form-control"
+                                                    step="0.1"
+                                                    v-model="$v.edit.payment_plan_installments.$each[index].ref_id.$model"
+                                                    :class="{
+                                          'is-invalid': $v.edit.payment_plan_installments.$each[index].ref_id.$error || errors.ref_id,
+                                          'is-valid': !$v.edit.payment_plan_installments.$each[index].ref_id.$invalid && !errors.ref_id,
+                                        }"
+                                                />
+                                                <template v-if="errors.ref_id">
+                                                    <ErrorMessage
+                                                        v-for="(errorMessage, index) in errors.ref_id"
+                                                        :key="index"
+                                                    >{{ errorMessage }}</ErrorMessage
+                                                    >
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="control-label">
+                                                    {{ getCompanyKey("rp_code") }}
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    class="form-control"
+                                                    step="0.1"
+                                                    v-model="$v.edit.payment_plan_installments.$each[index].rp_code.$model"
+                                                    :class="{
+                                          'is-invalid': $v.edit.payment_plan_installments.$each[index].rp_code.$error || errors.rp_code,
+                                          'is-valid': !$v.edit.payment_plan_installments.$each[index].rp_code.$invalid && !errors.rp_code,
+                                        }"
+                                                />
+                                                <template v-if="errors.rp_code">
+                                                    <ErrorMessage
+                                                        v-for="(errorMessage, index) in errors.rp_code"
+                                                        :key="index"
+                                                    >{{ errorMessage }}</ErrorMessage
+                                                    >
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="control-label">
+                                                    {{ getCompanyKey("day_month") }}
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    class="form-control"
+                                                    min="1"
+                                                    max="30"
+                                                    v-model="$v.edit.payment_plan_installments.$each[index].day_month.$model"
+                                                    :class="{
+                                          'is-invalid': $v.edit.payment_plan_installments.$each[index].day_month.$error || errors.day_month,
+                                          'is-valid': !$v.edit.payment_plan_installments.$each[index].day_month.$invalid && !errors.day_month,
+                                        }"
+                                                />
+                                                <template v-if="errors.day_month">
+                                                    <ErrorMessage
+                                                        v-for="(errorMessage, index) in errors.day_month"
+                                                        :key="index"
+                                                    >{{ errorMessage }}</ErrorMessage
+                                                    >
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="control-label">
+                                                    {{ getCompanyKey("installment_payment_plan_note_a") }}
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    @input="arabicValueNoteEdit(edit.payment_plan_installments[index].note_a,index)"
+                                                    type="text"
+                                                    class="form-control"
+                                                    v-model="$v.edit.payment_plan_installments.$each[index].note_a.$model"
+                                                    :class="{
+                                          'is-invalid': $v.edit.payment_plan_installments.$each[index].note_a.$error || errors.note_a,
+                                          'is-valid': !$v.edit.payment_plan_installments.$each[index].note_a.$invalid && !errors.note_a,
+                                        }"
+                                                />
+                                                <template v-if="errors.note_a">
+                                                    <ErrorMessage
+                                                        v-for="(errorMessage, index) in errors.note_a"
+                                                        :key="index"
+                                                    >{{ errorMessage }}</ErrorMessage
+                                                    >
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label class="control-label">
+                                                    {{ getCompanyKey("installment_payment_plan_note_e") }}
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    @input="englishValueNoteEdit(edit.payment_plan_installments[index].note_e,index)"
+                                                    type="text"
+                                                    class="form-control"
+                                                    v-model="$v.edit.payment_plan_installments.$each[index].note_e.$model"
+                                                    :class="{
+                                          'is-invalid': $v.edit.payment_plan_installments.$each[index].note_e.$error || errors.note_e,
+                                          'is-valid': !$v.edit.payment_plan_installments.$each[index].note_e.$invalid && !errors.note_e,
+                                        }"
+                                                />
+                                                <template v-if="errors.note_e">
+                                                    <ErrorMessage
+                                                        v-for="(errorMessage, index) in errors.note_e"
+                                                        :key="index"
+                                                    >{{ errorMessage }}</ErrorMessage
+                                                    >
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2" >
+                                            <div class="form-group">
+                                                <label class="mr-2">
+                                                    {{ getCompanyKey("is_fixed") }}
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <b-form-group
+                                                    :class="{
+                                  'is-invalid': $v.edit.payment_plan_installments.$each[index].is_fixed.$error || errors.is_fixed,
+                                  'is-valid': !$v.edit.payment_plan_installments.$each[index].is_fixed.$invalid && !errors.is_fixed,
+                                }"
+                                                >
+                                                    <b-form-radio
+                                                        class="d-inline-block"
+                                                        v-model="$v.edit.payment_plan_installments.$each[index].is_fixed.$model"
+                                                        :name="`some-radios-${index}`"
+                                                        value="1"
+                                                    >{{ $t("general.Yes") }}</b-form-radio
+                                                    >
+                                                    <b-form-radio
+                                                        class="d-inline-block m-1"
+                                                        v-model="$v.edit.payment_plan_installments.$each[index].is_fixed.$model"
+                                                        :name="`some-radios-${index}`"
+                                                        value="0"
+                                                    >{{ $t("general.No") }}</b-form-radio
+                                                    >
+                                                </b-form-group>
+                                                <template v-if="errors.is_fixed">
+                                                    <ErrorMessage
+                                                        v-for="(errorMessage, index) in errors.is_fixed"
+                                                        :key="index"
+                                                    >{{ errorMessage }}</ErrorMessage
+                                                    >
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1 p-0 pt-3">
+                                            <button
+                                                v-if="(edit.payment_plan_installments.length - 1) == index"
+                                                type="button"
+                                                @click.prevent="addNewFieldEdit"
+                                                class="custom-btn-dowonload"
+                                            >
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                            <button
+                                                v-if="edit.payment_plan_installments.length > 1"
+                                                type="button"
+                                                @click.prevent="removeNewFieldEdit(index)"
+                                                class="custom-btn-dowonload"
+                                            >
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </template>
-                              </div>
                             </div>
-                            <div class="col-lg-6">
-                              <div class="form-group">
-                                <label class="my-1 mr-2">{{
-                                  getCompanyKey("screen")
-                                }}</label>
-                                <multiselect
-                                  v-model="edit.screen_id"
-                                  :options="screens.map((type) => type.id)"
-                                  :custom-label="
-                                    (opt) =>
-                                      $i18n.locale == 'ar'
-                                        ? screens.find((x) => x.id == opt).name
-                                        : screens.find((x) => x.id == opt).name_e
-                                  "
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.screen_id.$error || errors.screen_id,
-                                  }"
-                                >
-                                </multiselect>
-                                <div
-                                  v-if="!$v.edit.screen_id.required"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.fieldIsRequired") }}
-                                </div>
-
-                                <template v-if="errors.screen_id">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.screen_id"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-lg-6">
-                              <div class="form-group">
-                                <label class="my-1 mr-2">{{
-                                  getCompanyKey("module")
-                                }}</label>
-                                <multiselect
-                                  v-model="edit.module_id"
-                                  :options="modules.map((type) => type.id)"
-                                  :custom-label="
-                                    (opt) =>
-                                      $i18n.locale == 'ar'
-                                        ? modules.find((x) => x.id == opt).name
-                                        : modules.find((x) => x.id == opt).name_e
-                                  "
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.module_id.$error || errors.module_id,
-                                  }"
-                                >
-                                </multiselect>
-                                <div
-                                  v-if="!$v.edit.module_id.required"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.fieldIsRequired") }}
-                                </div>
-
-                                <template v-if="errors.module_id">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.module_id"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-lg-6">
-                              <div class="form-group">
-                                <label class="control-label">
-                                  {{ getCompanyKey("installment_payment_plan_v_date") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <date-picker
-                                  v-model="edit.custom_v_date"
-                                  type="date"
-                                  :default-value="edit.v_date"
-                                  @change="v_date"
-                                  confirm
-                                ></date-picker>
-                                <div
-                                  v-if="!$v.edit.v_date.required"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.fieldIsRequired") }}
-                                </div>
-                                <template v-if="errors.v_date">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.v_date"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-lg-6">
-                              <div class="form-group">
-                                <label class="control-label">
-                                  {{ getCompanyKey("installment_payment_plan_due_date") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <date-picker
-                                  v-model="edit.custom_due_date"
-                                  type="date"
-                                  :default-value="edit.due_date"
-                                  @change="due_date"
-                                  confirm
-                                ></date-picker>
-                                <div
-                                  v-if="!$v.edit.due_date.required"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.fieldIsRequired") }}
-                                </div>
-                                <template v-if="errors.due_date">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.due_date"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-lg-6">
-                              <div class="form-group">
-                                <label class="control-label">
-                                  {{
-                                    getCompanyKey("installment_payment_plan_total_amount")
-                                  }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <input
-                                  type="number"
-                                  class="form-control"
-                                  data-create="9"
-                                  step="0.1"
-                                  @keypress.enter="moveInput('select', 'create', 10)"
-                                  v-model="$v.edit.total_amount.$model"
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.total_amount.$error || errors.total_amount,
-                                    'is-valid':
-                                      !$v.edit.total_amount.$invalid &&
-                                      !errors.total_amount,
-                                  }"
-                                />
-                                <template v-if="errors.total_amount">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.total_amount"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-lg-6">
-                              <div class="form-group">
-                                <label class="control-label">
-                                  {{
-                                    getCompanyKey("installment_payment_plan_paid_amount")
-                                  }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <input
-                                  type="number"
-                                  class="form-control"
-                                  data-create="9"
-                                  step="0.1"
-                                  @keypress.enter="moveInput('select', 'create', 10)"
-                                  v-model="$v.edit.paid_amount.$model"
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.paid_amount.$error || errors.paid_amount,
-                                    'is-valid':
-                                      !$v.edit.paid_amount.$invalid &&
-                                      !errors.paid_amount,
-                                  }"
-                                />
-                                <template v-if="errors.paid_amount">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.paid_amount"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-lg-6">
-                              <div class="form-group">
-                                <label class="control-label">
-                                  {{ getCompanyKey("ref_id") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <input
-                                  type="number"
-                                  class="form-control"
-                                  data-create="9"
-                                  step="0.1"
-                                  @keypress.enter="moveInput('select', 'create', 10)"
-                                  v-model="$v.edit.ref_id.$model"
-                                  :class="{
-                                    'is-invalid': $v.edit.ref_id.$error || errors.ref_id,
-                                    'is-valid':
-                                      !$v.edit.ref_id.$invalid && !errors.ref_id,
-                                  }"
-                                />
-                                <template v-if="errors.ref_id">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.ref_id"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-lg-6">
-                              <div class="form-group">
-                                <label class="control-label">
-                                  {{ getCompanyKey("rp_code") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <input
-                                  type="number"
-                                  class="form-control"
-                                  data-create="9"
-                                  step="0.1"
-                                  @keypress.enter="moveInput('select', 'create', 10)"
-                                  v-model="$v.edit.rp_code.$model"
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.rp_code.$error || errors.rp_code,
-                                    'is-valid':
-                                      !$v.edit.rp_code.$invalid && !errors.rp_code,
-                                  }"
-                                />
-                                <template v-if="errors.rp_code">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.rp_code"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                          </div>
                         </form>
                       </b-modal>
                       <!--  /edit   -->

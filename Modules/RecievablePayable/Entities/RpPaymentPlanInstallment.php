@@ -2,6 +2,7 @@
 
 namespace Modules\RecievablePayable\Entities;
 
+use App\Models\Document;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +17,12 @@ class RpPaymentPlanInstallment extends Model
     {
         return \Modules\RecievablePayable\Database\factories\RpPaymentPlanInstallmentFactory::new();
     }
+
+    public function document()
+    {
+        return $this->belongsTo(\App\Models\Document::class,'doc_type_id','id');
+    }
+
     public function installment_payment_plan()
     {
         return $this->belongsTo(RpInstallmentPaymentPlan::class, "installment_payment_plan_id");

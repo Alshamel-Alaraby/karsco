@@ -23,9 +23,9 @@ class UpdateSalesmenTypeRequest extends FormRequest
      */public function rules()
     {
         return [
-            'name' => 'string|max:255',
-            'name_e' => 'string|max:255',
-            "is_employee" => "in:0,1",
+            'name' => 'nullable|string|max:255',
+            'name_e' => 'nullable|string|max:255',
+            "is_employee" => "nullable|in:0,1",
         ];
     }
 

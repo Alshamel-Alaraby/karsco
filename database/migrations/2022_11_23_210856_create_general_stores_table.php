@@ -16,10 +16,10 @@ class CreateGeneralStoresTable extends Migration
 
         Schema::create('general_stores', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('company_id');
-            $table->foreignId('branch_id')->constrained('general_branches')->references("id")->cascadeOnDelete()->cascadeOnUpdate();
-            $table->string("name" , 100)->comment("Name Arabic");
-            $table->string("name_e" , 100)->comment("Name English");
+            $table->unsignedInteger('company_id')->nullable();
+            $table->foreignId('branch_id')->constrained('general_branches')->references("id")->nullable()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->string("name" , 100)->nullable()->comment("Name Arabic");
+            $table->string("name_e" , 100)->nullable()->comment("Name English");
             $table->string('is_active')->default('active');
             $table->softDeletes();
             $table->timestamps();

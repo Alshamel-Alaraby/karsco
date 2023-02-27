@@ -24,13 +24,13 @@ class StoreBankAccountRequest extends FormRequest
     public function rules()
     {
         return [
-            "bank_id" => "required|exists:general_banks,id",
-            "account_number" => "required|string|max:255",
-            "phone" => "required|string|max:255",
-            "address" => "required|string|max:255",
-            "email" => "required|string|max:255",
-            "emp_id" => "required|string|max:255",
-            "rp_code" => "required|string|max:255",
+            "bank_id" => "nullable|exists:general_banks,id",
+            "account_number" => "nullable|string|max:255",
+            "phone" => "nullable|string|max:255",
+            "address" => "nullable|string|max:255",
+            "email" => "nullable|string|max:255",
+            "emp_id" => "nullable|string|max:255",
+            "rp_code" => "nullable|string|max:255",
             "media" => "nullable|array",
             "media.*" => ["nullable", "exists:media,id", new \App\Rules\MediaRule()],
         ];

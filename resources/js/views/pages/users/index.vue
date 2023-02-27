@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength, email } from "vuelidate/lib/validators";
+import {required, minLength, maxLength, email, requiredIf} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -44,6 +44,7 @@ export default {
   },
   data() {
     return {
+        fields: [],
       per_page: 50,
       search: "",
       debounce: {},
@@ -134,6 +135,7 @@ export default {
   },
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
+      this.getCustomTableFields();
     this.getData();
   },
   // updated() {
@@ -159,24 +161,73 @@ export default {
   validations() {
     return {
       create: {
-        name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-        name_e: { required, minLength: minLength(2), maxLength: maxLength(100) },
-        email: { required, email },
-        password: { required, minLength: minLength(8) },
-        is_active: { required },
+        name: { required: requiredIf(function (model) {
+                return this.isRequired("name");
+            }) , minLength: minLength(2), maxLength: maxLength(100) },
+        name_e: { required: requiredIf(function (model) {
+                return this.isRequired("name_e");
+            }) , minLength: minLength(2), maxLength: maxLength(100) },
+        email: { required: requiredIf(function (model) {
+                return this.isRequired("email");
+            }) , email },
+        password: { required: requiredIf(function (model) {
+                return this.isRequired("password");
+            }) , minLength: minLength(8) },
+        is_active: { required: requiredIf(function (model) {
+                return this.isRequired("is_active");
+            })  },
         media: {},
       },
       edit: {
-        name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-        name_e: { required, minLength: minLength(2), maxLength: maxLength(100) },
-        email: { required, email },
-        password: { minLength: minLength(8) },
-        is_active: { required },
-        media: {},
+          name: { required: requiredIf(function (model) {
+                  return this.isRequired("name");
+              }) , minLength: minLength(2), maxLength: maxLength(100) },
+          name_e: { required: requiredIf(function (model) {
+                  return this.isRequired("name_e");
+              }) , minLength: minLength(2), maxLength: maxLength(100) },
+          email: { required: requiredIf(function (model) {
+                  return this.isRequired("email");
+              }) , email },
+          password: { required: requiredIf(function (model) {
+                  return this.isRequired("password");
+              }) , minLength: minLength(8) },
+          is_active: { required: requiredIf(function (model) {
+                  return this.isRequired("is_active");
+              })  },
+          media: {},
       },
     };
   },
   methods: {
+      getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_users`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+      isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+      isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
     /**
      *  start get Data workflow && pagination
      */
@@ -831,16 +882,16 @@ export default {
                     ref="dropdown"
                     class="btn-block setting-search"
                   >
-                    <b-form-checkbox v-model="filterSetting" value="name" class="mb-1">
+                    <b-form-checkbox v-if="isVisible('name')" v-model="filterSetting" value="name" class="mb-1">
                       {{ getCompanyKey('user_name_ar') }}
                     </b-form-checkbox>
-                    <b-form-checkbox v-model="filterSetting" value="name_e" class="mb-1">
+                    <b-form-checkbox v-if="isVisible('name_e')" v-model="filterSetting" value="name_e" class="mb-1">
                       {{ getCompanyKey('user_name_en') }}
                     </b-form-checkbox>
-                    <b-form-checkbox v-model="filterSetting" value="email" class="mb-1">
+                    <b-form-checkbox v-if="isVisible('email')" v-model="filterSetting" value="email" class="mb-1">
                       {{ getCompanyKey("user_email") }}
                     </b-form-checkbox>
-                      <b-form-checkbox v-model="filterSetting" :value="this.$i18n.locale == 'ar'?'employee.name':'employee.name_e'" class="mb-1">
+                    <b-form-checkbox v-if="isVisible('employee_id')" v-model="filterSetting" :value="this.$i18n.locale == 'ar'?'employee.name':'employee.name_e'" class="mb-1">
                           {{ getCompanyKey('employee') }}
                       </b-form-checkbox>
                   </b-dropdown>
@@ -935,19 +986,19 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.name" class="mb-1"
+                      <b-form-checkbox v-if="isVisible('name')" v-model="setting.name" class="mb-1"
                         >{{ getCompanyKey('user_name_ar') }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.name_e" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('name_e')" v-model="setting.name_e" class="mb-1">
                         {{ getCompanyKey('user_name_en') }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.email" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('email')" v-model="setting.email" class="mb-1">
                         {{ getCompanyKey("user_email") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.employee_id" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('employee_id')" v-model="setting.employee_id" class="mb-1">
                         {{ getCompanyKey('employee') }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.is_active" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('is_active')" v-model="setting.is_active" class="mb-1">
                         {{ getCompanyKey('user_status') }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
@@ -1059,11 +1110,11 @@ export default {
                     <b-tab :title="$t('general.DataEntry')" active>
                       <div class="col-lg-6">
                         <div class="row">
-                          <div class="col-md-12">
+                          <div class="col-md-12" v-if="isVisible('employee_id')">
                             <div class="form-group">
                               <label
                                 >{{ getCompanyKey('employee') }}
-                                <span class="text-danger">*</span></label
+                                <span v-if="isRequired('employee_id')" class="text-danger">*</span></label
                               >
 
                               <multiselect
@@ -1080,11 +1131,11 @@ export default {
                               </multiselect>
                             </div>
                           </div>
-                          <div class="col-md-6">
+                          <div class="col-md-6" v-if="isVisible('email')">
                             <div class="form-group">
                               <label for="field-15" class="control-label">
                                 {{ getCompanyKey("user_email") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('email')" class="text-danger">*</span>
                               </label>
                               <input
                                 type="text"
@@ -1096,7 +1147,7 @@ export default {
                                   'is-invalid': $v.create.email.$error || errors.email,
                                   'is-valid': !$v.create.email.$invalid && !errors.email,
                                 }"
-                                id="field-15"
+                                id="field-1s5"
                               />
                               <div v-if="!$v.create.email.email" class="invalid-feedback">
                                 {{ $t("general.notValidEmail") }}
@@ -1110,11 +1161,11 @@ export default {
                               </template>
                             </div>
                           </div>
-                          <div class="col-md-6">
+                          <div class="col-md-6" v-if="isVisible('password')">
                             <div class="form-group">
                               <label for="field-15" class="control-label">
                                 {{ getCompanyKey('user_password') }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('password')" class="text-danger">*</span>
                               </label>
                               <input
                                 type="text"
@@ -1147,11 +1198,11 @@ export default {
                               </template>
                             </div>
                           </div>
-                          <div class="col-md-6">
+                          <div class="col-md-6" v-if="isVisible('name')">
                             <div class="form-group">
                               <label for="field-1" class="control-label">
                                 {{ getCompanyKey('user_name_ar') }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('name')" class="text-danger">*</span>
                               </label>
                               <div dir="rtl">
                                 <input
@@ -1193,11 +1244,11 @@ export default {
                               </template>
                             </div>
                           </div>
-                          <div class="col-md-6">
+                          <div class="col-md-6" v-if="isVisible('name_e')">
                             <div class="form-group">
                               <label for="field-2" class="control-label">
                                 {{ getCompanyKey('user_name_en') }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('name_e')" class="text-danger">*</span>
                               </label>
                               <div dir="ltr">
                                 <input
@@ -1240,11 +1291,11 @@ export default {
                               </template>
                             </div>
                           </div>
-                          <div class="col-md-6">
+                          <div class="col-md-6" v-if="isVisible('is_active')">
                             <div class="form-group">
                               <label class="mr-2">
                                 {{ getCompanyKey('user_status') }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('is_active')" class="text-danger">*</span>
                               </label>
                               <b-form-group
                                 :class="{
@@ -1421,7 +1472,7 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.name">
+                    <th v-if="setting.name && isVisible('name')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('user_name_ar') }}</span>
                         <div class="arrow-sort">
@@ -1436,7 +1487,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.name_e">
+                    <th v-if="setting.name_e && isVisible('name_e')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('user_name_en') }}</span>
                         <div class="arrow-sort">
@@ -1451,7 +1502,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.email">
+                    <th v-if="setting.email && isVisible('email')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("user_email") }}</span>
                         <div class="arrow-sort">
@@ -1466,7 +1517,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.employee_id">
+                    <th v-if="setting.employee_id && isVisible('employee_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('employee') }}</span>
                         <div class="arrow-sort">
@@ -1489,7 +1540,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.is_active">
+                    <th v-if="setting.is_active && isVisible('is_active')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('user_status') }}</span>
                         <div class="arrow-sort">
@@ -1529,23 +1580,23 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.name">
+                    <td v-if="setting.name && isVisible('name')">
                       <h5 class="m-0 font-weight-normal">{{ data.name }}</h5>
                     </td>
-                    <td v-if="setting.name_e">
+                    <td v-if="setting.name_e && isVisible('name_e')">
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
-                    <td v-if="setting.email">
+                    <td v-if="setting.email && isVisible('email')">
                       <h5 class="m-0 font-weight-normal">{{ data.email }}</h5>
                     </td>
-                    <td v-if="setting.employee_id">
+                    <td v-if="setting.employee_id && isVisible('employee_id')">
                       <h5 v-if="data.employee" class="m-0 font-weight-normal">
                         {{
                           $i18n.locale == "ar" ? data.employee.name : data.employee.name_e
                         }}
                       </h5>
                     </td>
-                    <td v-if="setting.is_active">
+                    <td v-if="setting.is_active && isVisible('is_active')">
                       <span
                         :class="[
                           data.is_active == 'active' ? 'text-success' : 'text-danger',
@@ -1643,11 +1694,11 @@ export default {
                             <b-tab :title="$t('general.DataEntry')" active>
                               <div class="col-lg-6">
                                 <div class="row">
-                                  <div class="col-md-12">
+                                  <div class="col-md-12" v-if="isVisible('employee_id')">
                                     <div class="form-group">
                                       <label
                                         >{{ getCompanyKey('employee') }}
-                                        <span class="text-danger">*</span>
+                                        <span  v-if="isRequired('employee_id')" class="text-danger">*</span>
                                       </label>
                                       <multiselect
                                         @input="showEmployeeModalEdit"
@@ -1663,17 +1714,16 @@ export default {
                                       </multiselect>
                                     </div>
                                   </div>
-                                  <div class="col-md-6">
+                                  <div class="col-md-6" v-if="isVisible('email')">
                                     <div class="form-group">
                                       <label for="field-15" class="control-label">
                                         {{ getCompanyKey("user_email") }}
-                                        <span class="text-danger">*</span>
+                                        <span v-if="isRequired('email')" class="text-danger">*</span>
                                       </label>
                                       <input
                                         type="text"
                                         class="form-control"
                                         data-create="1"
-                                        @keypress.enter="moveInput('input', 'create', 2)"
                                         v-model="$v.edit.email.$model"
                                         :class="{
                                           'is-invalid':
@@ -1695,17 +1745,16 @@ export default {
                                       </template>
                                     </div>
                                   </div>
-                                  <div class="col-md-6">
+                                  <div class="col-md-6" v-if="isVisible('password')">
                                     <div class="form-group">
                                       <label for="field-15" class="control-label">
                                         {{ getCompanyKey('user_password') }}
-                                        <span class="text-danger">*</span>
+                                        <span v-if="isRequired('password')" class="text-danger">*</span>
                                       </label>
                                       <input
                                         type="text"
                                         class="form-control"
                                         data-create="1"
-                                        @keypress.enter="moveInput('input', 'create', 2)"
                                         v-model="$v.edit.password.$model"
                                         :class="{
                                           'is-invalid':
@@ -1733,11 +1782,11 @@ export default {
                                       </template>
                                     </div>
                                   </div>
-                                  <div class="col-md-6">
+                                  <div class="col-md-6" v-if="isVisible('name')">
                                         <div class="form-group">
                                             <label for="field-1" class="control-label">
                                                 {{ getCompanyKey('user_name_ar') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('name')" class="text-danger">*</span>
                                             </label>
                                             <div dir="rtl">
                                                 <input
@@ -1779,11 +1828,11 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                  <div class="col-md-6">
+                                  <div class="col-md-6" v-if="isVisible('name_e')">
                                     <div class="form-group">
                                       <label for="field-2" class="control-label">
                                         {{ getCompanyKey('user_name_en') }}
-                                        <span class="text-danger">*</span>
+                                        <span v-if="isRequired('name_e')" class="text-danger">*</span>
                                       </label>
                                       <div dir="ltr">
                                         <input
@@ -1826,11 +1875,11 @@ export default {
                                       </template>
                                     </div>
                                   </div>
-                                  <div class="col-md-6">
+                                  <div class="col-md-6" v-if="isVisible('is_active')">
                                     <div class="form-group">
                                       <label class="mr-2">
                                         {{ getCompanyKey('user_status') }}
-                                        <span class="text-danger">*</span>
+                                        <span v-if="isRequired('is_active')" class="text-danger">*</span>
                                       </label>
                                       <b-form-group
                                         :class="{

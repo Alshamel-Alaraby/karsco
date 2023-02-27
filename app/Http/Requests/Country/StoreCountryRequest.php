@@ -24,14 +24,14 @@ class StoreCountryRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255',
-            'name_e' => 'required|string|max:255',
-            "is_default" => "required|in:0,1",
-            "phone_key" => "required",
-            'national_id_length' => "required|integer",
-            'long_name' => "required|max:100",
-            'long_name_e' => "required|max:100",
-            'short_code' => "required|max:10",
+            'name' => 'nullable|string|max:255',
+            'name_e' => 'nullable|string|max:255',
+            "is_default" => "nullable|in:0,1",
+            "phone_key" => "nullable",
+            'national_id_length' => "nullable|integer",
+            'long_name' => "nullable|max:100",
+            'long_name_e' => "nullable|max:100",
+            'short_code' => "nullable|max:10",
             'is_active' => 'nullable|in:active,inactive',
             // "media" => "nullable|array",
             // "media.*" => ["nullable", "exists:media,id", new \App\Rules\MediaRule()],

@@ -19,13 +19,6 @@ export const menuItems = [
         link: '/dashboard/branch'
     },
     {
-        id: 1222,
-        label: 'general.customTable',
-        icon: 'fas fa-tasks',
-        name: 'custom table',
-        link: '/dashboard/custom-table'
-    },
-    {
         id: 10008,
         label: 'menuitems.store.text',
         name: 'store',
@@ -353,7 +346,7 @@ export const menuItems = [
             },
             {
                 id: 387171,
-                name: 'Installment Condition',
+                name: 'installment condition',
                 label: 'general.installmentCondition',
                 link: '/dashboard/installment-condition'
             },
@@ -459,14 +452,26 @@ export const menuItems = [
         link: '/dashboard/units'
     },
     {
+        id: 100006,
+        name: 'document',
+        label: 'general.document',
+        icon: 'fas fa-file-alt',
+        link: '/dashboard/document'
+    },
+    {
         id: 10005,
         name: 'color',
         label: 'menuitems.colors.text',
         icon: 'fas fa-palette',
         link: '/dashboard/colors'
     },
-
-
+    {
+        id: 1222,
+        label: 'general.customTable',
+        icon: 'fas fa-tasks',
+        name: 'custom table',
+        link: '/dashboard/custom-table'
+    },
 
     // {
     //     id: 1115,

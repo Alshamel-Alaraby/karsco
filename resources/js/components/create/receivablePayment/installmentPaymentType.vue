@@ -1,7 +1,7 @@
 <script>
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, requiredIf, minLength, maxLength, maxValue, integer } from "vuelidate/lib/validators";
+import { required, requiredIf, minLength, maxLength, minValue, integer } from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -212,7 +212,7 @@ export default {
           })
           .then((res) => {
             this.is_disabled = true;
-            this.getData();
+            this.$emit('created');
             setTimeout(() => {
               Swal.fire({
                 icon: "success",
@@ -244,7 +244,6 @@ export default {
     arabicValueName(txt) {
       this.create.name = arabicValue(txt);
     },
-
     englishValueName(txt) {
       this.create.name_e = englishValue(txt);
     },

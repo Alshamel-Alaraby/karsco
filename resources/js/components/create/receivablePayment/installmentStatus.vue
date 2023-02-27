@@ -158,7 +158,7 @@ export default {
 <template>
   <!--  create   -->
     <b-modal
-        id="create"
+        id="installment-payment-create"
         :title="getCompanyKey('installment_status_create_form')"
         title-class="font-18"
         body-class="p-4 "

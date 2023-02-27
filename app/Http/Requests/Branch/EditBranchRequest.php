@@ -18,10 +18,10 @@ class EditBranchRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ["required"],
-            'name_e' => ["required"],
-            'is_active' => ["required"],
-            "company_id" => "required",
+            'name' => ["nullable"],
+            'name_e' => ["nullable"],
+            'is_active' => ["nullable"],
+            "company_id" => "nullable",
         ];
     }
 

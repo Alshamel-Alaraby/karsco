@@ -15,10 +15,10 @@ return new class extends Migration
     {
         Schema::create('general_financial_years', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('name_e');
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->string('name')->nullable();
+            $table->string('name_e')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

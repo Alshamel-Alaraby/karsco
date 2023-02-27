@@ -158,8 +158,8 @@ export default {
   },
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
-    this.getData();
     this.getCustomTableFields();
+    this.getData();
   },
   // updated() {
   //   $(function () {

@@ -15,13 +15,13 @@ return new class extends Migration
     {
         Schema::create('general_external_salesmen', function (Blueprint $table) {
             $table->id();
-            $table->string('phone', '20');
-            $table->string("address", 255);
-            $table->string('rp_code', 20);
-            $table->string('email');
+            $table->string('phone', '20')->nullable();
+            $table->string("address", 255)->nullable();
+            $table->string('rp_code', 20)->nullable();
+            $table->string('email')->nullable();
             $table->string('is_active')->default('active');
-            $table->integer('national_id');
-            $table->bigInteger('country_id');
+            $table->integer('national_id')->nullable();
+            $table->bigInteger('country_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

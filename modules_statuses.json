@@ -6,5 +6,6 @@
     "Archiving": true,
     "GL": true,
     "Custody": true,
-    "Custodyd": true
+    "Custodyd": true,
+    "Stock": true
 }

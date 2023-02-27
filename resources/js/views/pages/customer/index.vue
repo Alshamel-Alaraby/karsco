@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength ,integer, numeric, email } from "vuelidate/lib/validators";
+import {required, minLength, maxLength, integer, numeric, email, requiredIf} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -52,6 +52,7 @@ export default {
     },
     data() {
         return {
+            fields: [],
             per_page: 50,
             search: '',
             debounce: {},
@@ -150,36 +151,92 @@ export default {
     },
     validations: {
         create: {
-            name: {required,minLength: minLength(2),maxLength: maxLength(100),},
-            name_e: {required,minLength: minLength(2),maxLength: maxLength(100),},
-            phone: {required,maxLength: maxLength(20)},
-            email: {required,maxLength: maxLength(100),email},
-            rp_code: {required,maxLength: maxLength(9),},
-            nationality: {required},
-            contact_person: {required,maxLength: maxLength(100)},
-            contact_phone: {required,integer,maxLength: maxLength(100)},
-            national_id: {required,integer,maxLength: maxLength(20)},
-            country_id: {required},
-            city_id: {required},
-            bank_account_id: {required},
-            whatsapp: {integer,maxLength: maxLength(20)},
-            passport_no: {integer,maxLength: maxLength(20)}
+            name: {required: requiredIf(function (model) {
+                    return this.isRequired("name");
+                }),minLength: minLength(2),maxLength: maxLength(100),},
+            name_e: {required: requiredIf(function (model) {
+                    return this.isRequired("name_e");
+                }),minLength: minLength(2),maxLength: maxLength(100),},
+            phone: {required: requiredIf(function (model) {
+                    return this.isRequired("phone");
+                }),maxLength: maxLength(20)},
+            email: {required: requiredIf(function (model) {
+                    return this.isRequired("email");
+                }),maxLength: maxLength(100),email},
+            rp_code: {required: requiredIf(function (model) {
+                    return this.isRequired("rp_code");
+                }),maxLength: maxLength(9),},
+            nationality: {required: requiredIf(function (model) {
+                    return this.isRequired("nationality");
+                })},
+            contact_person: {required: requiredIf(function (model) {
+                    return this.isRequired("contact_person");
+                }),maxLength: maxLength(100)},
+            contact_phone: {required: requiredIf(function (model) {
+                    return this.isRequired("contact_phone");
+                }),integer,maxLength: maxLength(100)},
+            national_id: {required: requiredIf(function (model) {
+                    return this.isRequired("national_id");
+                }),integer,maxLength: maxLength(20)},
+            country_id: {required: requiredIf(function (model) {
+                    return this.isRequired("country_id");
+                })},
+            city_id: {required: requiredIf(function (model) {
+                    return this.isRequired("city_id");
+                })},
+            bank_account_id: {required: requiredIf(function (model) {
+                    return this.isRequired("bank_account_id");
+                })},
+            whatsapp: {required: requiredIf(function (model) {
+                    return this.isRequired("whatsapp");
+                }),integer,maxLength: maxLength(20)},
+            passport_no: {required: requiredIf(function (model) {
+                    return this.isRequired("passport_no");
+                }),integer,maxLength: maxLength(20)}
         },
         edit: {
-            name: {required,minLength: minLength(2),maxLength: maxLength(100),},
-            name_e: {required,minLength: minLength(2),maxLength: maxLength(100),},
-            phone: {required,maxLength: maxLength(100)},
-            email: {required,maxLength: maxLength(100),email},
-            rp_code: {required,maxLength: maxLength(9),},
-            nationality: {required},
-            contact_person: {required,maxLength: maxLength(100)},
-            contact_phone: {required,integer,maxLength: maxLength(100)},
-            national_id: {required,integer,maxLength: maxLength(20)},
-            country_id: {required},
-            city_id: {required},
-            bank_account_id: {required},
-            whatsapp: {integer,maxLength: maxLength(20)},
-            passport_no: {integer,maxLength: maxLength(20)}
+            name: {required: requiredIf(function (model) {
+                    return this.isRequired("name");
+                }),minLength: minLength(2),maxLength: maxLength(100),},
+            name_e: {required: requiredIf(function (model) {
+                    return this.isRequired("name_e");
+                }),minLength: minLength(2),maxLength: maxLength(100),},
+            phone: {required: requiredIf(function (model) {
+                    return this.isRequired("phone");
+                }),maxLength: maxLength(20)},
+            email: {required: requiredIf(function (model) {
+                    return this.isRequired("email");
+                }),maxLength: maxLength(100),email},
+            rp_code: {required: requiredIf(function (model) {
+                    return this.isRequired("rp_code");
+                }),maxLength: maxLength(9),},
+            nationality: {required: requiredIf(function (model) {
+                    return this.isRequired("nationality");
+                })},
+            contact_person: {required: requiredIf(function (model) {
+                    return this.isRequired("contact_person");
+                }),maxLength: maxLength(100)},
+            contact_phone: {required: requiredIf(function (model) {
+                    return this.isRequired("contact_phone");
+                }),integer,maxLength: maxLength(100)},
+            national_id: {required: requiredIf(function (model) {
+                    return this.isRequired("national_id");
+                }),integer,maxLength: maxLength(20)},
+            country_id: {required: requiredIf(function (model) {
+                    return this.isRequired("country_id");
+                })},
+            city_id: {required: requiredIf(function (model) {
+                    return this.isRequired("city_id");
+                })},
+            bank_account_id: {required: requiredIf(function (model) {
+                    return this.isRequired("bank_account_id");
+                })},
+            whatsapp: {required: requiredIf(function (model) {
+                    return this.isRequired("whatsapp");
+                }),integer,maxLength: maxLength(20)},
+            passport_no: {required: requiredIf(function (model) {
+                    return this.isRequired("passport_no");
+                }),integer,maxLength: maxLength(20)}
         },
     },
     watch: {
@@ -214,10 +271,40 @@ export default {
         }
     },
     mounted() {
+        this.getCustomTableFields();
         this.getData();
     },
     methods: {
-        arabicValue(txt) {
+        getCustomTableFields() {
+            adminApi
+                .get(`/customTable/table-columns/general_customers`)
+                .then((res) => {
+                    this.fields = res.data;
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: `${this.$t("general.Error")}`,
+                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                    });
+                })
+                .finally(() => {
+                    this.isLoader = false;
+                });
+        },
+        isVisible(fieldName) {
+            let res = this.fields.filter((field) => {
+                return field.column_name == fieldName;
+            });
+            return res.length > 0 && res[0].is_visible == 1 ? true : false;
+        },
+        isRequired(fieldName) {
+            let res = this.fields.filter((field) => {
+                return field.column_name == fieldName;
+            });
+            return res.length > 0 && res[0].is_required == 1 ? true : false;
+        },
+    arabicValue(txt) {
       this.create.name = arabicValue(txt);
       this.edit.name = arabicValue(txt);
     },
@@ -790,20 +877,20 @@ export default {
                                 <div class="d-inline-block" style="width: 22.2%;">
                                     <!-- Basic dropdown -->
                                     <b-dropdown variant="primary" :text="$t('general.searchSetting')" ref="dropdown" class="btn-block setting-search dropdown-menu-custom-company">
-                                        <b-form-checkbox v-model="filterSetting" value="name" class="mb-1">{{ getCompanyKey('general_customer_name_ar') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="name_e" class="mb-1">{{ getCompanyKey('general_customer_name_en') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="phone" class="mb-1">{{ getCompanyKey('general_customer_phone') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="email" class="mb-1">{{ getCompanyKey('general_customer_email') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="rp_code" class="mb-1">{{ getCompanyKey('general_customer_code') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'nationality': 'nationality'" class="mb-1">{{ getCompanyKey('general_customer_nationality') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="contact_person" class="mb-1">{{ getCompanyKey('general_customer_contact_person') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="contact_phone" class="mb-1">{{ getCompanyKey('general_customer_contact_phones') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'country.name': 'country.name_e'" class="mb-1">{{ getCompanyKey('general_customer_country') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'city.name': 'city.name_e'" class="mb-1">{{ getCompanyKey('general_customer_city') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="national_id" class="mb-1">{{ getCompanyKey('customer_national_id') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" :value="$i18n.locale == 'ar'? 'bankAccount.name': 'bankAccount.name_e'" class="mb-1">{{ getCompanyKey('bank_account') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="whatsapp" class="mb-1">{{ getCompanyKey('general_customer_whatsapp') }}</b-form-checkbox>
-                                        <b-form-checkbox v-model="filterSetting" value="passport_no" class="mb-1">{{ getCompanyKey('general_customer_passport_number') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('name')" v-model="filterSetting" value="name" class="mb-1">{{ getCompanyKey('general_customer_name_ar') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('name_e')" v-model="filterSetting" value="name_e" class="mb-1">{{ getCompanyKey('general_customer_name_en') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('phone')" v-model="filterSetting" value="phone" class="mb-1">{{ getCompanyKey('general_customer_phone') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('email')" v-model="filterSetting" value="email" class="mb-1">{{ getCompanyKey('general_customer_email') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('rp_code')" v-model="filterSetting" value="rp_code" class="mb-1">{{ getCompanyKey('general_customer_code') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('nationality')" v-model="filterSetting" :value="$i18n.locale == 'ar'? 'nationality': 'nationality'" class="mb-1">{{ getCompanyKey('general_customer_nationality') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('contact_person')" v-model="filterSetting" value="contact_person" class="mb-1">{{ getCompanyKey('general_customer_contact_person') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('contact_phone')" v-model="filterSetting" value="contact_phone" class="mb-1">{{ getCompanyKey('general_customer_contact_phones') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('country_id')" v-model="filterSetting" :value="$i18n.locale == 'ar'? 'country.name': 'country.name_e'" class="mb-1">{{ getCompanyKey('general_customer_country') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('city_id')" v-model="filterSetting" :value="$i18n.locale == 'ar'? 'city.name': 'city.name_e'" class="mb-1">{{ getCompanyKey('general_customer_city') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('national_id')" v-model="filterSetting" value="national_id" class="mb-1">{{ getCompanyKey('customer_national_id') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('bank_account_id')" v-model="filterSetting" :value="$i18n.locale == 'ar'? 'bankAccount.name': 'bankAccount.name_e'" class="mb-1">{{ getCompanyKey('bank_account') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('whatsapp')" v-model="filterSetting" value="whatsapp" class="mb-1">{{ getCompanyKey('general_customer_whatsapp') }}</b-form-checkbox>
+                                        <b-form-checkbox v-if="isVisible('passport_no')" v-model="filterSetting" value="passport_no" class="mb-1">{{ getCompanyKey('general_customer_passport_number') }}</b-form-checkbox>
                                     </b-dropdown>
                                     <!-- Basic dropdown -->
                                 </div>
@@ -896,19 +983,19 @@ export default {
                                             :html="`${$t('general.setting')} <i class='fe-settings'></i>`"
                                             ref="dropdown" class="dropdown-custom-ali dropdown-menu-custom-company"
                                         >
-                                            <b-form-checkbox v-model="setting.name" class="mb-1">{{getCompanyKey('general_customer_name_ar') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.name_e" class="mb-1">{{ getCompanyKey('general_customer_name_en') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.phone" class="mb-1">{{getCompanyKey('general_customer_phone') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.email" class="mb-1">{{ getCompanyKey('general_customer_email') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.rp_code" class="mb-1">{{getCompanyKey('general_customer_code') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.contact_person" class="mb-1">{{ getCompanyKey('general_customer_contact_person') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.contact_phone" class="mb-1">{{getCompanyKey('general_customer_contact_phones') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.nationality" class="mb-1">{{ getCompanyKey('general_customer_nationality') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.national_id" class="mb-1">{{ getCompanyKey('general_customer_national_id') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.bank_account_id" class="mb-1">{{getCompanyKey('bank_account') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.country_id" class="mb-1">{{getCompanyKey('general_customer_country') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.city_id" class="mb-1">{{ getCompanyKey('general_customer_city') }}</b-form-checkbox>
-                                            <b-form-checkbox v-model="setting.whatsapp" class="mb-1">{{ getCompanyKey('general_customer_whatsapp') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('name')" v-model="setting.name" class="mb-1">{{getCompanyKey('general_customer_name_ar') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('name_e')" v-model="setting.name_e" class="mb-1">{{ getCompanyKey('general_customer_name_en') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('phone')" v-model="setting.phone" class="mb-1">{{getCompanyKey('general_customer_phone') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('email')" v-model="setting.email" class="mb-1">{{ getCompanyKey('general_customer_email') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('rp_code')" v-model="setting.rp_code" class="mb-1">{{getCompanyKey('general_customer_code') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('contact_person')" v-model="setting.contact_person" class="mb-1">{{ getCompanyKey('general_customer_contact_person') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('contact_phone')" v-model="setting.contact_phone" class="mb-1">{{getCompanyKey('general_customer_contact_phones') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('nationality')" v-model="setting.nationality" class="mb-1">{{ getCompanyKey('general_customer_nationality') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('national_id')" v-model="setting.national_id" class="mb-1">{{ getCompanyKey('general_customer_national_id') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('bank_account_id')" v-model="setting.bank_account_id" class="mb-1">{{getCompanyKey('bank_account') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('country_id')" v-model="setting.country_id" class="mb-1">{{getCompanyKey('general_customer_country') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('city_id')" v-model="setting.city_id" class="mb-1">{{ getCompanyKey('general_customer_city') }}</b-form-checkbox>
+                                            <b-form-checkbox v-if="isVisible('whatsapp')" v-model="setting.whatsapp" class="mb-1">{{ getCompanyKey('general_customer_whatsapp') }}</b-form-checkbox>
                                             <div class="d-flex justify-content-end">
                                                 <a href="javascript:void(0)" class="btn btn-primary btn-sm">Apply</a>
                                             </div>
@@ -994,11 +1081,11 @@ export default {
                                     </b-button>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-4" v-if="isVisible('country_id')">
                                         <div class="form-group position-relative">
                                             <label class="control-label">
                                                 {{ getCompanyKey('general_customer_country') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('country_id')" class="text-danger">*</span>
                                             </label>
                                             <multiselect
                                                 @input="showCountryModal"
@@ -1022,11 +1109,11 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-4" v-if="isVisible('city_id')">
                                         <div class="form-group position-relative">
                                             <label class="control-label">
                                                 {{ getCompanyKey('general_customer_city') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('city_id')" class="text-danger">*</span>
                                             </label>
                                             <multiselect
                                                 @input="getCity()"
@@ -1050,11 +1137,11 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-4"  v-if="isVisible('bank_account_id')">
                                         <div class="form-group position-relative">
                                             <label class="control-label">
                                                 {{ getCompanyKey('bank_account') }}
-                                                <span class="text-danger">*</span>
+                                                <span  v-if="isRequired('bank_account_id')" class="text-danger">*</span>
                                             </label>
                                             <multiselect
                                                 @input="showBankAccountModal"
@@ -1078,11 +1165,11 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" v-if="isVisible('name')">
                                         <div class="form-group">
                                             <label for="field-1" class="control-label">
                                                 {{ getCompanyKey('general_customer_name_ar') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('name')" class="text-danger">*</span>
                                             </label>
                                             <div dir="rtl">
                                                 <input
@@ -1090,7 +1177,6 @@ export default {
                                                     type="text"
                                                     class="form-control"
                                                     data-create="1"
-                                                    @keypress.enter="moveInput('input','create',2)"
                                                     v-model="$v.create.name.$model"
                                                     :class="{
                                                     'is-invalid':$v.create.name.$error || errors.name,
@@ -1106,11 +1192,11 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3"  v-if="isVisible('name_e')">
                                         <div class="form-group">
                                             <label for="field-2" class="control-label">
                                                 {{ getCompanyKey('general_customer_name_en') }}
-                                                <span class="text-danger">*</span>
+                                                <span  v-if="isRequired('name_e')" class="text-danger">*</span>
                                             </label>
                                             <div dir="ltr">
                                                 <input
@@ -1118,7 +1204,6 @@ export default {
                                                     type="text"
                                                     class="form-control"
                                                     data-create="2"
-                                                    @keypress.enter="moveInput('input','create',3)"
                                                     v-model="$v.create.name_e.$model"
                                                     :class="{
                                                         'is-invalid':$v.create.name_e.$error || errors.name_e,
@@ -1134,17 +1219,16 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" v-if="isVisible('phone')">
                                         <div class="form-group">
                                             <label class="control-label">
                                                 {{ getCompanyKey('general_customer_phone') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('phone')" class="text-danger">*</span>
                                             </label>
                                             <input
                                                 type="text"
                                                 class="form-control"
                                                 data-create="9"
-                                                @keypress.enter="moveInput('select','create',10)"
                                                 v-model="$v.create.phone.$model"
                                                 :class="{
                                                 'is-invalid':$v.create.phone.$error || errors.phone,
@@ -1156,17 +1240,16 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" v-if="isVisible('email')">
                                         <div class="form-group">
                                             <label class="control-label">
                                                 {{ getCompanyKey('general_customer_email') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('email')" class="text-danger">*</span>
                                             </label>
                                             <input
                                                 type="text"
                                                 class="form-control"
                                                 data-create="9"
-                                                @keypress.enter="moveInput('select','create',10)"
                                                 v-model="$v.create.email.$model"
                                                 :class="{
                                                 'is-invalid':$v.create.email.$error || errors.email,
@@ -1178,17 +1261,16 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" v-if="isVisible('contact_person')">
                                         <div class="form-group">
                                             <label class="control-label">
                                                 {{ getCompanyKey('general_customer_contact_person') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('contact_person')" class="text-danger">*</span>
                                             </label>
                                             <input
                                                 type="text"
                                                 class="form-control"
                                                 data-create="9"
-                                                @keypress.enter="moveInput('select','create',10)"
                                                 v-model="$v.create.contact_person.$model"
                                                 :class="{
                                                 'is-invalid':$v.create.contact_person.$error || errors.contact_person,
@@ -1200,17 +1282,16 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" v-if="isVisible('rp_code')">
                                         <div class="form-group">
                                             <label  class="control-label">
                                                 {{ getCompanyKey('general_customer_code') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('rp_code')" class="text-danger">*</span>
                                             </label>
                                             <input
                                                 type="text"
                                                 class="form-control"
                                                 data-create="9"
-                                                @keypress.enter="moveInput('select','create',10)"
                                                 v-model="$v.create.rp_code.$model"
                                                 :class="{
                                                 'is-invalid':$v.create.rp_code.$error || errors.rp_code,
@@ -1222,19 +1303,18 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" v-if="isVisible('national_id')">
                                         <div class="form-group">
                                             <label  class="control-label">
                                                 {{ getCompanyKey('general_customer_national_id') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('national_id')" class="text-danger">*</span>
                                             </label>
                                             <input
                                                 type="number"
                                                 class="form-control"
                                                 data-create="9"
                                                 step="0.1"
-                                                @keypress.enter="moveInput('select','create',10)"
-                                                v-model="$v.create.national_id.$model"
+                                                v-model="$v.create.$model"
                                                 :class="{
                                                 'is-invalid':$v.create.national_id.$error || errors.national_id,
                                                 'is-valid':!$v.create.national_id.$invalid && !errors.national_id
@@ -1245,18 +1325,17 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" v-if="isVisible('passport_no')">
                                         <div class="form-group">
                                             <label  class="control-label">
                                                 {{ getCompanyKey('general_customer_passport_number') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('passport_no')" class="text-danger">*</span>
                                             </label>
                                             <input
                                                 type="number"
                                                 class="form-control"
                                                 data-create="9"
                                                 step="0.1"
-                                                @keypress.enter="moveInput('select','create',10)"
                                                 v-model="$v.create.passport_no.$model"
                                                 :class="{
                                                 'is-invalid':$v.create.passport_no.$error || errors.passport_no,
@@ -1268,18 +1347,17 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-4" v-if="isVisible('contact_phone')">
                                         <div class="form-group">
                                             <label  class="control-label">
                                                 {{ getCompanyKey('general_customer_contact_phones') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('contact_phone')" class="text-danger">*</span>
                                             </label>
                                             <input
                                                 type="number"
                                                 class="form-control"
                                                 data-create="9"
                                                 step="0.1"
-                                                @keypress.enter="moveInput('select','create',10)"
                                                 v-model="$v.create.contact_phone.$model"
                                                 :class="{
                                                 'is-invalid':$v.create.contact_phone.$error || errors.contact_phone,
@@ -1291,17 +1369,16 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" v-if="isVisible('whatsapp')">
                                         <div class="form-group">
                                             <label class="control-label">
                                                 {{ getCompanyKey('general_customer_whatsapp') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('whatsapp')" class="text-danger">*</span>
                                             </label>
                                             <input
                                                 type="text"
                                                 class="form-control"
                                                 data-create="9"
-                                                @keypress.enter="moveInput('select','create',10)"
                                                 v-model="$v.create.whatsapp.$model"
                                                 :class="{
                                                 'is-invalid':$v.create.whatsapp.$error || errors.whatsapp,
@@ -1313,11 +1390,11 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" v-if="isVisible('nationality')">
                                         <div class="form-group">
                                             <label class="control-label">
                                                 {{ getCompanyKey('general_customer_nationality') }}
-                                                <span class="text-danger">*</span>
+                                                <span v-if="isRequired('nationality')" class="text-danger">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -1359,7 +1436,7 @@ export default {
                                             >
                                         </div>
                                     </th>
-                                    <th v-if="setting.name">
+                                    <th v-if="setting.name && isVisible('name')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('general_customer_name_ar') }}</span>
                                             <div class="arrow-sort">
@@ -1368,7 +1445,7 @@ export default {
                                             </div>
                                         </div>
                                     </th>
-                                    <th v-if="setting.name_e">
+                                    <th v-if="setting.name_e && isVisible('name_e')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('general_customer_name_en') }}</span>
                                             <div class="arrow-sort">
@@ -1377,7 +1454,7 @@ export default {
                                             </div>
                                         </div>
                                     </th>
-                                    <th v-if="setting.phone">
+                                    <th v-if="setting.phone && isVisible('phone')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('customer_phone') }}</span>
                                             <div class="arrow-sort">
@@ -1386,7 +1463,7 @@ export default {
                                             </div>
                                         </div>
                                     </th>
-                                    <th v-if="setting.email">
+                                    <th v-if="setting.email && isVisible('email')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('general_customer_email') }}</span>
                                             <div class="arrow-sort">
@@ -1395,7 +1472,7 @@ export default {
                                             </div>
                                         </div>
                                     </th>
-                                    <th v-if="setting.nationality">
+                                    <th v-if="setting.nationality && isVisible('nationality')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('general_customer_nationality') }}</span>
                                             <div class="arrow-sort">
@@ -1404,7 +1481,7 @@ export default {
                                             </div>
                                         </div>
                                     </th>
-                                    <th v-if="setting.national_id">
+                                    <th v-if="setting.national_id && isVisible('national_id')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('general_customer_national_id') }}</span>
                                             <div class="arrow-sort">
@@ -1413,7 +1490,7 @@ export default {
                                             </div>
                                         </div>
                                     </th>
-                                    <th v-if="setting.contact_person">
+                                    <th v-if="setting.contact_person && isVisible('contact_person')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('general_customer_contact_person') }}</span>
                                             <div class="arrow-sort">
@@ -1422,32 +1499,32 @@ export default {
                                             </div>
                                         </div>
                                     </th>
-                                    <th v-if="setting.contact_phone">
+                                    <th v-if="setting.contact_phone && isVisible('contact_phone')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('general_customer_contact_phones') }}</span>
                                         </div>
                                     </th>
-                                    <th v-if="setting.country_id">
+                                    <th v-if="setting.country_id && isVisible('country_id')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('general_customer_country') }}</span>
                                         </div>
                                     </th>
-                                    <th v-if="setting.city_id">
+                                    <th v-if="setting.city_id && isVisible('city_id')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('general_customer_city') }}</span>
                                         </div>
                                     </th>
-                                    <th v-if="setting.bank_account_id">
+                                    <th v-if="setting.bank_account_id && isVisible('bank_account_id')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('bank_account') }}</span>
                                         </div>
                                     </th>
-                                    <th v-if="setting.whatsapp">
+                                    <th v-if="setting.whatsapp && isVisible('whatsapp')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('general_customer_whatsapp') }}</span>
                                         </div>
                                     </th>
-                                    <th v-if="setting.rp_code">
+                                    <th v-if="setting.rp_code && isVisible('rp_code')">
                                         <div class="d-flex justify-content-center">
                                             <span>{{ getCompanyKey('general_customer_code') }}</span>
                                         </div>
@@ -1477,23 +1554,23 @@ export default {
                                             >
                                         </div>
                                     </td>
-                                    <td v-if="setting.name">
+                                    <td v-if="setting.name && isVisible('name')">
                                         <h5 class="m-0 font-weight-normal">{{ data.name }}</h5>
                                     </td>
-                                    <td v-if="setting.name_e">
+                                    <td v-if="setting.name_e && isVisible('name_e')">
                                         <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                                     </td>
-                                    <td v-if="setting.phone">{{ data.phone }}</td>
-                                    <td v-if="setting.email">{{ data.email }}</td>
-                                    <td v-if="setting.nationality">{{ data.nationality }}</td>
-                                    <td v-if="setting.national_id">{{ data.national_id }}</td>
-                                    <td v-if="setting.contact_person">{{ data.contact_person }}</td>
-                                    <td v-if="setting.contact_phone">{{ data.contact_phone }}</td>
-                                    <td v-if="setting.country_id">{{ data.country_id }}</td>
-                                    <td v-if="setting.city_id">{{ data.city_id }}</td>
-                                    <td v-if="setting.bank_account_id">{{ data.bank_account_id }}</td>
-                                    <td v-if="setting.whatsapp">{{ data.whatsapp }}</td>
-                                    <td v-if="setting.rp_code">{{ data.rp_code }}</td>
+                                    <td v-if="setting.phone && isVisible('phone')">{{ data.phone }}</td>
+                                    <td v-if="setting.email && isVisible('email')">{{ data.email }}</td>
+                                    <td v-if="setting.nationality && isVisible('nationality')">{{ data.nationality }}</td>
+                                    <td v-if="setting.national_id && isVisible('national_id')">{{ data.national_id }}</td>
+                                    <td v-if="setting.contact_person && isVisible('contact_person')">{{ data.contact_person }}</td>
+                                    <td v-if="setting.contact_phone && isVisible('contact_phone')">{{ data.contact_phone }}</td>
+                                    <td v-if="setting.country_id && isVisible('country_id')">{{ data.country_id }}</td>
+                                    <td v-if="setting.city_id && isVisible('city_id')">{{ data.city_id }}</td>
+                                    <td v-if="setting.bank_account_id && isVisible('bank_account_id')">{{ data.bank_account_id }}</td>
+                                    <td v-if="setting.whatsapp && isVisible('whatsapp')">{{ data.whatsapp }}</td>
+                                    <td v-if="setting.rp_code && isVisible('rp_code')">{{ data.rp_code }}</td>
                                     <td v-if="enabled3" class="do-not-print">
                                         <div class="btn-group">
                                             <button
@@ -1567,11 +1644,11 @@ export default {
                                                     </b-button>
                                                 </div>
                                                 <div class="row">
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4" v-if="isVisible('country_id')">
                                                         <div class="form-group position-relative">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('general_customer_country') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('country_id')" class="text-danger">*</span>
                                                             </label>
                                                             <multiselect
                                                                 @input="showCountryModalEdit"
@@ -1595,14 +1672,14 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4" v-if="isVisible('city_id')">
                                                         <div class="form-group position-relative">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('general_customer_city') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('city_id')" class="text-danger">*</span>
                                                             </label>
                                                             <multiselect
-                                                                @input="getCity()"
+                                                                @input="getCity"
                                                                 v-model="$v.edit.city_id.$model"
                                                                 :options="cities.map((type) => type.id)"
                                                                 :custom-label="(opt) => cities.find((x) => x.id == opt).name"
@@ -1623,11 +1700,11 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4" v-if="isVisible('bank_account_id')">
                                                         <div class="form-group position-relative">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('bank_account') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('bank_account_id')" class="text-danger">*</span>
                                                             </label>
                                                             <multiselect
                                                                 @input="showBankAccountEdit"
@@ -1651,11 +1728,11 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-3" v-if="isVisible('name')">
                                                         <div class="form-group">
                                                             <label for="field-1" class="control-label">
                                                                 {{ getCompanyKey('general_customer_name_ar') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('name')" class="text-danger">*</span>
                                                             </label>
                                                             <div dir="rtl">
                                                                 <input
@@ -1663,7 +1740,6 @@ export default {
                                                                     type="text"
                                                                     class="form-control"
                                                                     data-edit="1"
-                                                                    @keypress.enter="moveInput('input','edit',2)"
                                                                     v-model="$v.edit.name.$model"
                                                                     :class="{
                                                     'is-invalid':$v.edit.name.$error || errors.name,
@@ -1678,11 +1754,11 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-3" v-if="isVisible('name_e')">
                                                         <div class="form-group">
                                                             <label for="field-2" class="control-label">
                                                                 {{ getCompanyKey('general_customer_name_en') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('name_e')" class="text-danger">*</span>
                                                             </label>
                                                             <div dir="ltr">
                                                                 <input
@@ -1690,7 +1766,6 @@ export default {
                                                                     type="text"
                                                                     class="form-control"
                                                                     data-edit="2"
-                                                                    @keypress.enter="moveInput('input','edit',3)"
                                                                     v-model="$v.edit.name_e.$model"
                                                                     :class="{
                                                         'is-invalid':$v.edit.name_e.$error || errors.name_e,
@@ -1705,33 +1780,32 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-3" v-if="isVisible('phone')">
                                                         <div class="form-group">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('general_customer_phone') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('phone')" class="text-danger">*</span>
                                                             </label>
                                                             <input
                                                                 type="text"
                                                                 class="form-control"
                                                                 data-edit="9"
-                                                                @keypress.enter="moveInput('select','edit',10)"
                                                                 v-model="$v.edit.phone.$model"
                                                                 :class="{
-                                                'is-invalid':$v.edit.phone.$error || errors.phone,
-                                                'is-valid':!$v.edit.phone.$invalid && !errors.phone
-                                            }"
+                                                                    'is-invalid':$v.edit.phone.$error || errors.phone,
+                                                                    'is-valid':!$v.edit.phone.$invalid && !errors.phone
+                                                                }"
                                                             />
                                                             <template v-if="errors.phone">
                                                                 <ErrorMessage v-for="(errorMessage,index) in errors.phone" :key="index">{{ errorMessage }}</ErrorMessage>
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-3" v-if="isVisible('email')">
                                                         <div class="form-group">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('general_customer_email') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('email')" class="text-danger">*</span>
                                                             </label>
                                                             <input
                                                                 type="text"
@@ -1749,17 +1823,16 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-3" v-if="isVisible('contact_person')">
                                                         <div class="form-group">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('general_customer_contact_person') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('contact_person')" class="text-danger">*</span>
                                                             </label>
                                                             <input
                                                                 type="text"
                                                                 class="form-control"
                                                                 data-edit="9"
-                                                                @keypress.enter="moveInput('select','edit',10)"
                                                                 v-model="$v.edit.contact_person.$model"
                                                                 :class="{
                                                 'is-invalid':$v.edit.contact_person.$error || errors.contact_person,
@@ -1771,17 +1844,16 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-3" v-if="isVisible('rp_code')">
                                                         <div class="form-group">
                                                             <label  class="control-label">
                                                                 {{ getCompanyKey('general_customer_code') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('rp_code')" class="text-danger">*</span>
                                                             </label>
                                                             <input
                                                                 type="text"
                                                                 class="form-control"
                                                                 data-edit="9"
-                                                                @keypress.enter="moveInput('select','edit',10)"
                                                                 v-model="$v.edit.rp_code.$model"
                                                                 :class="{
                                                                     'is-invalid':$v.edit.rp_code.$error || errors.rp_code,
@@ -1793,18 +1865,17 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-3" v-if="isVisible('national_id')">
                                                         <div class="form-group">
                                                             <label  class="control-label">
                                                                 {{ getCompanyKey('general_customer_national_id') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('national_id')" class="text-danger">*</span>
                                                             </label>
                                                             <input
                                                                 type="number"
                                                                 class="form-control"
                                                                 data-edit="9"
                                                                 step="0.1"
-                                                                @keypress.enter="moveInput('select','edit',10)"
                                                                 v-model="$v.edit.national_id.$model"
                                                                 :class="{
                                                 'is-invalid':$v.edit.national_id.$error || errors.national_id,
@@ -1816,18 +1887,17 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-3" v-if="isVisible('passport_no')">
                                                         <div class="form-group">
                                                             <label  class="control-label">
                                                                 {{ getCompanyKey('general_customer_passport_number') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('passport_no')" class="text-danger">*</span>
                                                             </label>
                                                             <input
                                                                 type="number"
                                                                 class="form-control"
                                                                 data-edit="9"
                                                                 step="0.1"
-                                                                @keypress.enter="moveInput('select','create',10)"
                                                                 v-model="$v.edit.passport_no.$model"
                                                                 :class="{
                                                                     'is-invalid':$v.edit.passport_no.$error || errors.passport_no,
@@ -1839,18 +1909,17 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4" v-if="isVisible('contact_phone')">
                                                         <div class="form-group">
                                                             <label  class="control-label">
                                                                 {{ getCompanyKey('general_customer_contact_phones') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('contact_phone')" class="text-danger">*</span>
                                                             </label>
                                                             <input
                                                                 type="number"
                                                                 class="form-control"
                                                                 data-edit="9"
                                                                 step="0.1"
-                                                                @keypress.enter="moveInput('select','edit',10)"
                                                                 v-model="$v.edit.contact_phone.$model"
                                                                 :class="{
                                                                     'is-invalid':$v.edit.contact_phone.$error || errors.contact_phone,
@@ -1862,17 +1931,16 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-3" v-if="isVisible('whatsapp')">
                                                         <div class="form-group">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('general_customer_whatsapp') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span v-if="isRequired('whatsapp')" class="text-danger">*</span>
                                                             </label>
                                                             <input
                                                                 type="text"
                                                                 class="form-control"
                                                                 data-edit="9"
-                                                                @keypress.enter="moveInput('select','edit',10)"
                                                                 v-model="$v.edit.whatsapp.$model"
                                                                 :class="{
                                                                     'is-invalid':$v.edit.whatsapp.$error || errors.whatsapp,
@@ -1884,11 +1952,11 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-3"  v-if="isVisible('nationality')">
                                                         <div class="form-group">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('general_customer_nationality') }}
-                                                                <span class="text-danger">*</span>
+                                                                <span  v-if="isRequired('nationality')" class="text-danger">*</span>
                                                             </label>
                                                             <input
                                                                 type="text"

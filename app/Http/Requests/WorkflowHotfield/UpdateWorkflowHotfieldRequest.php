@@ -24,8 +24,8 @@ class UpdateWorkflowHotfieldRequest extends FormRequest
     public function rules()
     {
         return [
-            "workflow_id"     => "numeric" ,
-            "hotfield_id"   => "numeric",
+            "workflow_id"     => "nullable|numeric" ,
+            "hotfield_id"   => "nullable|numeric",
             // "workflow_name" => "string" ,
 
         ];

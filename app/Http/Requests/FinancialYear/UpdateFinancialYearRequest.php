@@ -24,10 +24,10 @@ class UpdateFinancialYearRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'string|max:255|unique:general_financial_years,name,'.$this->id,
-            'name_e' => 'string|max:255|unique:general_financial_years,name_e,'.$this->id,
-            "start_date" => 'date_format:Y-m-d H:i:s|after_or_equal:today',
-            "end_date" => 'date_format:Y-m-d H:i:s|after_or_equal:start_date',
+            'name' => 'nullable|string|max:255|unique:general_financial_years,name,'.$this->id,
+            'name_e' => 'nullable|string|max:255|unique:general_financial_years,name_e,'.$this->id,
+            "start_date" => 'nullable|date_format:Y-m-d H:i:s|after_or_equal:today',
+            "end_date" => 'nullable|date_format:Y-m-d H:i:s|after_or_equal:start_date',
         ];
     }
 

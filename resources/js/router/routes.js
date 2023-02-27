@@ -13,6 +13,7 @@ import externalSalesmen from  "./routeChild/externalSalesmen";
 import rolesType from "./routeChild/rolesType";
 import roles from "./routeChild/roles";
 import units from "./routeChild/units";
+import document from "./routeChild/document";
 import banks from "./routeChild/banks";
 import colors from "./routeChild/colors";
 import salesmenTypes from "./routeChild/salesmenTypes";
@@ -67,6 +68,7 @@ export default [
     ...archiving,
     ...recievablePayable,
     ...customer,
+    ...document,
     {
         path: '/dashboard/notifications',
         name: 'notifications',

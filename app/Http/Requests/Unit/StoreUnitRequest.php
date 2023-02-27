@@ -24,8 +24,8 @@ class StoreUnitRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255',
-            'name_e' => 'required|string|max:255',
+            'name' => 'nullable|string|max:255',
+            'name_e' => 'nullable|string|max:255',
             'is_active' => 'nullable|in:active,inactive',
             // "module_id" => "required",
         ];

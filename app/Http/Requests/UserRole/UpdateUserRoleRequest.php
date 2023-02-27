@@ -26,8 +26,8 @@ class UpdateUserRoleRequest extends FormRequest
     public function rules()
     {
         return [
-            "role_id" => "required|exists:general_roles,id",
-            'user_id' => "required|exists:general_users,id",
+            "role_id" => "nullable|exists:general_roles,id",
+            'user_id' => "nullable|exists:general_users,id",
         ];
     }
 

@@ -4,11 +4,11 @@ import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
 import {
-  required,
-  minLength,
-  maxLength,
-  integer,
-  decimal,
+    required,
+    minLength,
+    maxLength,
+    integer,
+    decimal, requiredIf,
 } from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
@@ -46,6 +46,7 @@ export default {
   },
   data() {
     return {
+        fields: [],
       enabled3: true,
       printLoading: true,
       printObj: {
@@ -119,30 +120,74 @@ export default {
   },
   validations: {
     create: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      name_e: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      symbol: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      symbol_e: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      code: { required, minLength: minLength(3), maxLength: maxLength(15) },
-      code_e: { required, minLength: minLength(3), maxLength: maxLength(15) },
-      fraction: { required, minLength: minLength(3), maxLength: maxLength(15) },
-      fraction_e: { required, minLength: minLength(3), maxLength: maxLength(100) },
-      fraction_no: { required, decimal },
-      is_default: { required, integer },
-      is_active: { required, integer },
+      name: { required: requiredIf(function (model) {
+              return this.isRequired("name");
+          }) , minLength: minLength(2), maxLength: maxLength(100) },
+      name_e: { required: requiredIf(function (model) {
+              return this.isRequired("name_e");
+          }) , minLength: minLength(2), maxLength: maxLength(100) },
+      symbol: { required: requiredIf(function (model) {
+              return this.isRequired("symbol");
+          }) , minLength: minLength(2), maxLength: maxLength(100) },
+      symbol_e: { required: requiredIf(function (model) {
+              return this.isRequired("symbol_e");
+          }) , minLength: minLength(2), maxLength: maxLength(100) },
+      code: { required: requiredIf(function (model) {
+              return this.isRequired("code");
+          }) , minLength: minLength(3), maxLength: maxLength(15) },
+      code_e: { required: requiredIf(function (model) {
+              return this.isRequired("code_e");
+          }) , minLength: minLength(3), maxLength: maxLength(15) },
+      fraction: { required: requiredIf(function (model) {
+              return this.isRequired("fraction");
+          }) , minLength: minLength(3), maxLength: maxLength(15) },
+      fraction_e: { required: requiredIf(function (model) {
+              return this.isRequired("fraction_e");
+          }) , minLength: minLength(3), maxLength: maxLength(100) },
+      fraction_no: { required: requiredIf(function (model) {
+              return this.isRequired("fraction_no");
+          }) , decimal },
+      is_default: { required: requiredIf(function (model) {
+              return this.isRequired("is_default");
+          }) , integer },
+      is_active: { required: requiredIf(function (model) {
+              return this.isRequired("is_active");
+          }) , integer },
     },
     edit: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      name_e: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      symbol: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      symbol_e: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      code: { required, minLength: minLength(3), maxLength: maxLength(15) },
-      code_e: { required, minLength: minLength(3), maxLength: maxLength(15) },
-      fraction: { required, minLength: minLength(3), maxLength: maxLength(15) },
-      fraction_e: { required, minLength: minLength(3), maxLength: maxLength(15) },
-      fraction_no: { required, decimal },
-      is_default: { required, integer },
-      is_active: { required, integer },
+        name: { required: requiredIf(function (model) {
+                return this.isRequired("name");
+            }) , minLength: minLength(2), maxLength: maxLength(100) },
+        name_e: { required: requiredIf(function (model) {
+                return this.isRequired("name_e");
+            }) , minLength: minLength(2), maxLength: maxLength(100) },
+        symbol: { required: requiredIf(function (model) {
+                return this.isRequired("symbol");
+            }) , minLength: minLength(2), maxLength: maxLength(100) },
+        symbol_e: { required: requiredIf(function (model) {
+                return this.isRequired("symbol_e");
+            }) , minLength: minLength(2), maxLength: maxLength(100) },
+        code: { required: requiredIf(function (model) {
+                return this.isRequired("code");
+            }) , minLength: minLength(3), maxLength: maxLength(15) },
+        code_e: { required: requiredIf(function (model) {
+                return this.isRequired("code_e");
+            }) , minLength: minLength(3), maxLength: maxLength(15) },
+        fraction: { required: requiredIf(function (model) {
+                return this.isRequired("fraction");
+            }) , minLength: minLength(3), maxLength: maxLength(15) },
+        fraction_e: { required: requiredIf(function (model) {
+                return this.isRequired("fraction_e");
+            }) , minLength: minLength(3), maxLength: maxLength(100) },
+        fraction_no: { required: requiredIf(function (model) {
+                return this.isRequired("fraction_no");
+            }) , decimal },
+        is_default: { required: requiredIf(function (model) {
+                return this.isRequired("is_default");
+            }) , integer },
+        is_active: { required: requiredIf(function (model) {
+                return this.isRequired("is_active");
+            }) , integer },
     },
   },
   watch: {
@@ -178,6 +223,7 @@ export default {
   },
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
+    this.getCustomTableFields();
     this.getData();
   },
   // updated() {
@@ -201,6 +247,35 @@ export default {
   //   });
   // },
   methods: {
+      getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_currencies`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+      isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+      isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
     /**
      *  start get Data currencies && pagination
      */
@@ -733,11 +808,12 @@ export default {
                     ref="dropdown"
                     class="btn-block setting-search"
                   >
-                    <b-form-checkbox v-model="filterSetting" value="name" class="mb-1">{{
+                    <b-form-checkbox v-if="isVisible('name')" v-model="filterSetting" value="name" class="mb-1">{{
                       getCompanyKey('currency_name_ar')
                     }}</b-form-checkbox>
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('name_e')"
                       value="name_e"
                       class="mb-1"
                       >{{ getCompanyKey('currency_name_en') }}</b-form-checkbox
@@ -746,6 +822,7 @@ export default {
                       getCompanyKey('currency_code_ar')
                     }}</b-form-checkbox>
                     <b-form-checkbox
+                        v-if="isVisible('code_e')"
                       v-model="filterSetting"
                       value="code_e"
                       class="mb-1"
@@ -753,11 +830,13 @@ export default {
                     >
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('fraction')"
                       value="fraction"
                       class="mb-1"
                       >{{ getCompanyKey('currency_fraction_ar') }}</b-form-checkbox
                     >
                     <b-form-checkbox
+                      v-if="isVisible('fraction_e')"
                       v-model="filterSetting"
                       value="fraction_e"
                       class="mb-1"
@@ -855,37 +934,37 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.name" class="mb-1">{{
+                      <b-form-checkbox v-if="isVisible('name')" v-model="setting.name" class="mb-1">{{
                         getCompanyKey('currency_name_ar')
                       }}</b-form-checkbox>
-                      <b-form-checkbox v-model="setting.name_e" class="mb-1">{{
+                      <b-form-checkbox v-if="isVisible('name_e')" v-model="setting.name_e" class="mb-1">{{
                         getCompanyKey('currency_name_en')
                       }}</b-form-checkbox>
-                      <b-form-checkbox v-model="setting.fraction" class="mb-1">{{
+                      <b-form-checkbox v-if="isVisible('fraction')" v-model="setting.fraction" class="mb-1">{{
                         getCompanyKey('currency_fraction_ar')
                       }}</b-form-checkbox>
-                      <b-form-checkbox v-model="setting.fraction_e" class="mb-1">{{
+                      <b-form-checkbox v-if="isVisible('fraction_e')" v-model="setting.fraction_e" class="mb-1">{{
                         getCompanyKey('currency_fraction_en')
                       }}</b-form-checkbox>
-                      <b-form-checkbox v-model="setting.symbol" class="mb-1">{{
+                      <b-form-checkbox v-if="isVisible('symbol')" v-model="setting.symbol" class="mb-1">{{
                         getCompanyKey('currency_symbol_ar')
                       }}</b-form-checkbox>
-                      <b-form-checkbox v-model="setting.symbol_e" class="mb-1">{{
+                      <b-form-checkbox v-if="isVisible('symbol_e')" v-model="setting.symbol_e" class="mb-1">{{
                         getCompanyKey('currency_symbol_en')
                       }}</b-form-checkbox>
-                      <b-form-checkbox v-model="setting.code" class="mb-1">{{
+                      <b-form-checkbox v-if="isVisible('code')" v-model="setting.code" class="mb-1">{{
                         getCompanyKey('currency_code_ar')
                       }}</b-form-checkbox>
-                      <b-form-checkbox v-model="setting.code_e" class="mb-1">{{
+                      <b-form-checkbox v-if="isVisible('code_e')" v-model="setting.code_e" class="mb-1">{{
                         getCompanyKey('currency_code_en')
                       }}</b-form-checkbox>
-                      <b-form-checkbox v-model="setting.fraction_no" class="mb-1">{{
+                      <b-form-checkbox v-if="isVisible('fraction_no')" v-model="setting.fraction_no" class="mb-1">{{
                         getCompanyKey('currency_fraction_number')
                       }}</b-form-checkbox>
-                      <b-form-checkbox v-model="setting.is_default" class="mb-1">{{
+                      <b-form-checkbox v-if="isVisible('is_default')" v-model="setting.is_default" class="mb-1">{{
                         getCompanyKey('currency_default')
                       }}</b-form-checkbox>
-                      <b-form-checkbox v-model="setting.is_active" class="mb-1">{{
+                      <b-form-checkbox v-if="isVisible('is_active')" v-model="setting.is_active" class="mb-1">{{
                         getCompanyKey('currency_status')
                       }}</b-form-checkbox>
                       <div class="d-flex justify-content-end">
@@ -990,11 +1069,11 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-3">
+                  <div class="col-md-3" v-if="isVisible('name')">
                     <div class="form-group">
                       <label for="field-1" class="control-label">
                         {{ getCompanyKey('currency_name_ar') }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name')" class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
                         <input
@@ -1029,11 +1108,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-3" v-if="isVisible('symbol')">
                     <div class="form-group">
                       <label for="field-45" class="control-label">
                         {{ getCompanyKey('currency_symbol_ar') }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('symbol')" class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
                         <input
@@ -1068,11 +1147,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-3" v-if="isVisible('code')">
                     <div class="form-group">
                       <label for="field-3" class="control-label">
                         {{ getCompanyKey('currency_code_ar') }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('code')" class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
                         <input
@@ -1107,11 +1186,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-3" v-if="isVisible('fraction')">
                     <div class="form-group">
                       <label for="field-5" class="control-label">
                         {{ getCompanyKey('currency_fraction_ar') }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('fraction')" class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
                         <input
@@ -1146,11 +1225,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-3" v-if="isVisible('name_e')">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
                         {{ getCompanyKey('currency_name_en') }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name_e')" class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
                         <input
@@ -1185,11 +1264,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-3" v-if="isVisible('symbol_e')">
                     <div class="form-group">
                       <label for="field-33" class="control-label">
                         {{ getCompanyKey('currency_symbol_en') }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('symbol_e')" class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
                         <input
@@ -1224,11 +1303,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-3" v-if="isVisible('code_e')">
                     <div class="form-group">
                       <label for="field-4" class="control-label">
                         {{ getCompanyKey('currency_code_en') }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('code_e')" class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
                         <input
@@ -1264,11 +1343,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-3" v-if="isVisible('fraction_e')">
                     <div class="form-group">
                       <label for="field-6" class="control-label">
                         {{ getCompanyKey('currency_fraction_en') }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('fraction_e')" class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
                         <input
@@ -1311,11 +1390,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-3" v-if="isVisible('fraction_no')">
                     <div class="form-group">
                       <label for="field-7" class="control-label">
                         {{ getCompanyKey('currency_fraction_number') }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('fraction_no')" class="text-danger">*</span>
                       </label>
                       <input
                         type="number"
@@ -1341,10 +1420,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-3" v-if="isVisible('is_default')">
                     <div class="form-group">
                       <label class="mr-2" for="field-11">
                         {{ getCompanyKey('currency_default') }}
+                          <span v-if="isRequired('is_default')" class="text-danger">*</span>
                       </label>
                       <select
                         class="custom-select mr-sm-2"
@@ -1371,11 +1451,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-3" v-if="isVisible('is_active')">
                     <div class="form-group">
                       <label class="mr-2">
                         {{ getCompanyKey('currency_status') }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('is_active')" class="text-danger">*</span>
                       </label>
                       <b-form-group
                         :class="{
@@ -1432,7 +1512,7 @@ export default {
                         />
                       </div>
                     </th >
-                    <th v-if="setting.name">
+                    <th v-if="setting.name && isVisible('name')">
                       <div class="d-flex justify-content-center" >
                         <span>{{ getCompanyKey('currency_name_ar') }}</span>
                         <div class="arrow-sort">
@@ -1447,7 +1527,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.name_e">
+                    <th v-if="setting.name_e && isVisible('name_e')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('currency_name_en') }}</span>
                         <div class="arrow-sort">
@@ -1462,7 +1542,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.code">
+                    <th v-if="setting.code && isVisible('code')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('currency_code_ar') }}</span>
                         <div class="arrow-sort">
@@ -1477,7 +1557,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.code_e">
+                    <th v-if="setting.code_e && isVisible('code_e')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('currency_code_en') }}</span>
                         <div class="arrow-sort">
@@ -1492,7 +1572,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.fraction">
+                    <th v-if="setting.fraction && isVisible('fraction')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('currency_fraction_ar') }}</span>
                         <div class="arrow-sort">
@@ -1507,7 +1587,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.fraction_e">
+                    <th v-if="setting.fraction_e && isVisible('fraction_e')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('currency_fraction_en') }}</span>
                         <div class="arrow-sort">
@@ -1522,7 +1602,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.symbol">
+                    <th v-if="setting.symbol && isVisible('symbol')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('currency_symbol_ar') }}</span>
                         <div class="arrow-sort">
@@ -1537,7 +1617,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.symbol_e">
+                    <th v-if="setting.symbol_e && isVisible('symbol_e')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('currency_symbol_en') }}</span>
                         <div class="arrow-sort">
@@ -1552,7 +1632,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.fraction_no">
+                    <th v-if="setting.fraction_no && isVisible('fraction_no')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('currency_fraction_number') }}</span>
                         <div class="arrow-sort">
@@ -1567,12 +1647,12 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.is_default">
+                    <th v-if="setting.is_default && isVisible('is_default')">
                       <div class="d-flex justify-content-center">
                         {{ getCompanyKey('currency_default') }}
                       </div>
                     </th>
-                    <th v-if="setting.is_active">
+                    <th v-if="setting.is_active && isVisible('is_active')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey('currency_status') }}</span>
                         <div class="arrow-sort">
@@ -1612,20 +1692,20 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.name">
+                    <td v-if="setting.name && isVisible('name')">
                       <h5 class="m-0 font-weight-normal">{{ data.name }}</h5>
                     </td>
-                    <td v-if="setting.name_e">
+                    <td v-if="setting.name_e && isVisible('name_e')">
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
-                    <td v-if="setting.code">{{ data.code }}</td>
-                    <td v-if="setting.code_e">{{ data.code_e }}</td>
-                    <td v-if="setting.fraction">{{ data.fraction }}</td>
-                    <td v-if="setting.fraction_e">{{ data.fraction_e }}</td>
-                    <td v-if="setting.fraction_no">{{ data.fraction_no }}</td>
-                    <td v-if="setting.symbol">{{ data.symbol }}</td>
-                    <td v-if="setting.symbol_e">{{ data.symbol_e }}</td>
-                    <td v-if="setting.is_default">
+                    <td v-if="setting.code && isVisible('code')">{{ data.code }}</td>
+                    <td v-if="setting.code_e && isVisible('code_e')">{{ data.code_e }}</td>
+                    <td v-if="setting.fraction && isVisible('fraction')">{{ data.fraction }}</td>
+                    <td v-if="setting.fraction_e && isVisible('fraction_e')">{{ data.fraction_e }}</td>
+                    <td v-if="setting.fraction_no && isVisible('fraction_no')">{{ data.fraction_no }}</td>
+                    <td v-if="setting.symbol && isVisible('symbol')">{{ data.symbol }}</td>
+                    <td v-if="setting.symbol_e && isVisible('symbol_e')">{{ data.symbol_e }}</td>
+                    <td v-if="setting.is_default && isVisible('is_default')">
                       <span
                         :class="[
                           data.is_default == 1 ? 'text-success' : 'text-danger',
@@ -1639,7 +1719,7 @@ export default {
                         }}
                       </span>
                     </td>
-                    <td v-if="setting.is_active == 1">
+                    <td v-if="setting.is_active == 1 && isVisible('is_active')">
                       <span
                         :class="[
                           data.is_active ? 'text-success' : 'text-danger',
@@ -1731,11 +1811,11 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-3" v-if="isVisible('name')">
                               <div class="form-group">
                                 <label for="edit-1" class="control-label">
                                   {{ getCompanyKey('currency_name_ar') }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('name')" class="text-danger">*</span>
                                 </label>
                                 <div dir="rtl">
                                   <input
@@ -1776,11 +1856,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" v-if="isVisible('symbol')">
                               <div class="form-group">
                                 <label for="edit-45" class="control-label">
                                   {{ getCompanyKey('currency_symbol_ar') }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('symbol')" class="text-danger">*</span>
                                 </label>
                                 <div dir="rtl">
                                   <input
@@ -1823,11 +1903,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" v-if="isVisible('code')">
                               <div class="form-group">
                                 <label for="edit-3" class="control-label">
                                   {{ getCompanyKey('currency_code_ar') }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('code')" class="text-danger">*</span>
                                 </label>
                                 <div dir="rtl">
                                   <input
@@ -1868,11 +1948,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" v-if="isVisible('fraction')">
                               <div class="form-group">
                                 <label for="edit-5" class="control-label">
                                   {{ getCompanyKey('currency_fraction_ar') }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('fraction')" class="text-danger">*</span>
                                 </label>
                                 <div dir="rtl">
                                   <input
@@ -1915,11 +1995,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" v-if="isVisible('name_e')">
                                   <div class="form-group">
                                       <label for="edit-2" class="control-label">
                                           {{ getCompanyKey('currency_name_en') }}
-                                          <span class="text-danger">*</span>
+                                          <span v-if="isRequired('name_e')" class="text-danger">*</span>
                                       </label>
                                       <div dir="ltr">
                                           <input
@@ -1962,11 +2042,11 @@ export default {
                                       </template>
                                   </div>
                               </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" v-if="isVisible('fraction_e')">
                               <div class="form-group">
                                 <label for="field-6" class="control-label">
                                   {{ getCompanyKey('currency_code_en') }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('fraction_e')" class="text-danger">*</span>
                                 </label>
                                 <div dir="ltr">
                                   <input
@@ -2010,11 +2090,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" v-if="isVisible('symbol_e')">
                                   <div class="form-group">
                                       <label for="edit-33" class="control-label">
                                           {{ getCompanyKey('currency_symbol_en') }}
-                                          <span class="text-danger">*</span>
+                                          <span v-if="isRequired('symbol_e')" class="text-danger">*</span>
                                       </label>
                                       <div dir="ltr">
                                           <input
@@ -2057,11 +2137,11 @@ export default {
                                       </template>
                                   </div>
                               </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" v-if="isVisible('code_e')">
                                   <div class="form-group">
                                       <label for="edit-4" class="control-label">
                                           {{ getCompanyKey('currency_code_en') }}
-                                          <span class="text-danger">*</span>
+                                          <span v-if="isRequired('code_e')" class="text-danger">*</span>
                                       </label>
                                       <div dir="ltr">
                                           <input
@@ -2104,11 +2184,11 @@ export default {
                                       </template>
                                   </div>
                               </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" v-if="isVisible('fraction_no')">
                               <div class="form-group">
                                 <label for="edit-7" class="control-label">
                                   {{ getCompanyKey('currency_fraction_number') }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('fraction_no')" class="text-danger">*</span>
                                 </label>
                                 <input
                                   type="number"
@@ -2134,10 +2214,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" v-if="isVisible('is_default')">
                               <div class="form-group">
                                 <label class="mr-2" for="edit-11">
                                   {{ getCompanyKey('currency_default') }}
+                                    <span v-if="isRequired('is_default')" class="text-danger">*</span>
                                 </label>
                                 <select
                                   class="custom-select mr-sm-2"
@@ -2169,11 +2250,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" v-if="isVisible('is_active')">
                               <div class="form-group">
                                 <label class="mr-2">
                                   {{ getCompanyKey('currency_status') }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('is_active')" class="text-danger">*</span>
                                 </label>
                                 <b-form-group
                                   :class="{

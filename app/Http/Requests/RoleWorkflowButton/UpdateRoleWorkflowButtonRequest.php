@@ -24,9 +24,9 @@ class UpdateRoleWorkflowButtonRequest extends FormRequest
     public function rules()
     {
         return [
-            "role_id"       => "exists:roles,id" ,
-            "workflow_id"     => "numeric" ,
-            "button_id"   => "numeric" ,
+            "role_id"       => "nullable|exists:roles,id" ,
+            "workflow_id"     => "nullable|numeric" ,
+            "button_id"   => "nullable|numeric" ,
         ];
     }
 }

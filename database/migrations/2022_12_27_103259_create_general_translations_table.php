@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('general_translations', function (Blueprint $table) {
             $table->id();
-            $table->string ('key')->index();
+            $table->string ('key')->index()->nullable();
             $table->string ('default_en')->nullable ();
             $table->string ('default_ar')->nullable ();
             $table->string ('new_en')->nullable ();

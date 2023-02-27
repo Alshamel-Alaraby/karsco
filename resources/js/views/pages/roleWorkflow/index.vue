@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength, integer } from "vuelidate/lib/validators";
+import {required, minLength, maxLength, integer, requiredIf} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -32,6 +32,7 @@ export default {
   },
   data() {
     return {
+        fields: [],
         enabled3: true,
         printLoading: true,
         printObj: {
@@ -76,12 +77,20 @@ export default {
   },
   validations: {
     create: {
-      role_id: { required },
-      workflow_id: { required },
+      role_id: { required: requiredIf(function (model) {
+              return this.isRequired("role_id");
+          }) },
+      workflow_id: { required: requiredIf(function (model) {
+              return this.isRequired("role_id");
+          }) },
     },
     edit: {
-      role_id: { required },
-      workflow_id: { required },
+        role_id: { required: requiredIf(function (model) {
+                return this.isRequired("role_id");
+            }) },
+        workflow_id: { required: requiredIf(function (model) {
+                return this.isRequired("role_id");
+            }) },
     },
   },
   watch: {
@@ -117,6 +126,7 @@ export default {
   },
   async mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
+    this.getCustomTableFields();
     await this.getWorkflow();
     await this.getData();
   },
@@ -143,6 +153,35 @@ export default {
     });
   },
   methods: {
+      getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_role_workflows`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+      isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+      isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
     showScreen(module, screen) {
       let filterRes = this.$store.state.auth.allWorkFlow.filter(
         (workflow) => workflow.name_e == module
@@ -680,6 +719,7 @@ export default {
                     class="btn-block setting-search"
                   >
                     <b-form-checkbox
+                      v-if="isVisible('role_id')"
                       v-model="filterSetting"
                       :value="$i18n.locale == 'ar' ? 'role.name' : 'role.name_e'"
                       class="mb-1"
@@ -688,6 +728,7 @@ export default {
                     </b-form-checkbox>
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('workflow_id')"
                       value="workflow_id"
                       class="mb-1"
                     >
@@ -785,10 +826,10 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.role_id" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('role_id')" v-model="setting.role_id" class="mb-1">
                         {{ getCompanyKey("role") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.workflow_id" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('workflow_id')" v-model="setting.workflow_id" class="mb-1">
                         {{ getCompanyKey("workflow") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
@@ -893,9 +934,12 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-12">
+                  <div class="col-md-12" v-if="isVisible('role_id')">
                     <div class="form-group">
-                      <label class="my-1 mr-2">{{ getCompanyKey("role") }}</label>
+                      <label class="my-1 mr-2">
+                          {{ getCompanyKey("role") }}
+                          <span v-if="isRequired('role_id')" class="text-danger">*</span>
+                      </label>
                       <multiselect
                         @input="showRoleModal"
                         v-model="create.role_id"
@@ -917,9 +961,12 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-12" v-if="isVisible('workflow_id')">
                     <div class="form-group">
-                      <label class="my-1 mr-2">{{ getCompanyKey("workflow") }}</label>
+                      <label class="my-1 mr-2">
+                          {{ getCompanyKey("workflow") }}
+                          <span v-if="isRequired('workflow_id')" class="text-danger">*</span>
+                      </label>
                       <multiselect
                         v-model="create.workflow_id"
                         :options="workflows.map((type) => type.id)"
@@ -965,12 +1012,12 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.role_id">
+                    <th v-if="setting.role_id && isVisible('role_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("role") }}</span>
                       </div>
                     </th>
-                    <th v-if="setting.workflow_id">
+                    <th v-if="setting.workflow_id && isVisible('workflow_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("workflow") }}</span>
                       </div>
@@ -1000,12 +1047,12 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.role_id">
+                    <td v-if="setting.role_id && isVisible('role_id')">
                       <h5 class="m-0 font-weight-normal">
                         {{ $i18n.locale == "ar" ? data.role.name : data.role.name_e }}
                       </h5>
                     </td>
-                    <td v-if="setting.workflow_id">
+                    <td v-if="setting.workflow_id && isVisible('workflow_id')">
                       <h5 class="m-0 font-weight-normal">
                         {{
                           workflows.length > 0
@@ -1093,11 +1140,13 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-12" v-if="isVisible('role_id')">
                               <div class="form-group">
                                 <label class="my-1 mr-2">{{
                                   getCompanyKey("role")
-                                }}</label>
+                                }}
+                                    <span v-if="isRequired('role_id')" class="text-danger">*</span>
+                                </label>
                                 <multiselect
                                   @input="showRoleModalEdit"
                                   v-model="edit.role_id"
@@ -1119,11 +1168,13 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-12" v-if="isVisible('workflow_id')">
                               <div class="form-group">
                                 <label class="my-1 mr-2">{{
                                   getCompanyKey("workflow")
-                                }}</label>
+                                }}
+                                    <span v-if="isRequired('workflow_id')" class="text-danger">*</span>
+                                </label>
                                 <multiselect
                                   v-model="edit.workflow_id"
                                   :options="workflows.map((type) => type.id)"

@@ -118,6 +118,10 @@ return new class extends Migration
         Schema::table($pref.'custom_tables', function (Blueprint $table) {
             $table->unsignedBigInteger ('company_id')->nullable ()->default (0);
         });
+        Schema::table($pref.'documents', function (Blueprint $table) {
+            $table->unsignedBigInteger ('company_id')->nullable ()->default (0);
+        });
+
 
     }
 

@@ -30,7 +30,7 @@ class DocTypeResource extends JsonResource
         $archFiles = ArchiveFile::get();
         foreach ($archFiles as $file) {
             $docType = DocType::find($file->arch_doc_type_id);
-            if($docType){
+            if ($docType) {
                 if ($docType->parent_id == $this->id && $file->arch_department_id == $this->arch_department_id) {
                     $keyField = null;
                     foreach ($file->data_type_value as $field) {
@@ -49,9 +49,11 @@ class DocTypeResource extends JsonResource
         $key["children"] = collect($subIds)->map(function ($id) use ($arch_file) {
             return [
                 "name" => $id, "name_e" => $id, "archive_file" => $arch_file, "parent_doc_type_children" => $this->children,
-                "parent_doc_id"=>$this->id
+                "parent_doc_id"=>$this->id,
+
             ];
         });
+
         return [
             'id' => $this->id,
             'name' => $this->name,

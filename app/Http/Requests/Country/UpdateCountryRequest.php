@@ -23,18 +23,18 @@ class UpdateCountryRequest extends FormRequest
      */public function rules()
     {
         return [
-            'name' => 'string|max:255|unique:general_countries,name,' . $this->id,
-            'name_e' => 'string|max:255|unique:general_countries,name,' . $this->id,
-            "is_default" => "in:0,1",
-            "phone_key" => "unique:general_countries,phone_key," . $this->id,
-            'national_id_length' => "integer",
-            'long_name' => "max:100",
-            'long_name_e' => "max:100",
-            'short_code' => "max:10",
+            'name' => 'nullable|string|max:255|unique:general_countries,name,' . $this->id,
+            'name_e' => 'nullable|string|max:255|unique:general_countries,name,' . $this->id,
+            "is_default" => "nullable|in:0,1",
+            "phone_key" => "nullable|unique:general_countries,phone_key," . $this->id,
+            'national_id_length' => "nullable|integer",
+            'long_name' => "nullable|max:100",
+            'long_name_e' => "nullablemax:100",
+            'short_code' => "nullablemax:10",
             'is_active' => 'nullable|in:active,inactive',
             "media" => "nullable|array",
-            "media.*" => ["exists:media,id", new \App\Rules\MediaRule()],
-            'old_media.*' => ['exists:media,id', new \App\Rules\MediaRule("App\Models\Country")],
+            "media.*" => ["nullable|exists:media,id", new \App\Rules\MediaRule()],
+            'old_media.*' => ['nullable|exists:media,id', new \App\Rules\MediaRule("App\Models\Country")],
         ];
     }
 

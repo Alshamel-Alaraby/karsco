@@ -263,12 +263,10 @@ class ArchiveFileController extends Controller
 
     public function sendArchvingNotification(Request $request)
     {
-
         $model = $this->model->find($request->id);
         if (!$model) {
             return responseJson(404, 'not found');
         }
-
         User::whereIn('id', $request->users)->get()->each(function ($user) use ($model, $request) {
             $user->notify(new GeneralNotification(
                 [
@@ -280,26 +278,21 @@ class ArchiveFileController extends Controller
                 $request->title
             ));
         });
-
         return responseJson(200, 'success notification');
     }
-   public function valueMedia(Request $request)
+
+    public function valueMedia(Request $request)
     {
         $model = $this->model->
         where('arch_department_id',$request->department_id)->
-        where('data_type_value','like','%"value":"'.$request->value.'"%')->whereHas('docType',function ($q) use ($request){
+        where('data_type_value','like','%"value":"'.$request->value.'"%')
+        ->whereHas('docType',function ($q) use ($request){
                 $q->where('parent_id',$request->parent_arch_doc_type_id);
         })->where(function ($q) use ($request){
             $q->when($request->arch_doc_type_id,function ($q) use ($request){
                 $q->where('arch_doc_type_id',$request->arch_doc_type_id);
-            });  
-        })->get()->map(function ($item) use ($request){
-        $array = collect($item->data_type_value)->filter(function ($item) use ($request){
-            return $item->value == $request->value;
-        });
-        $item->data_type_value =  $array ;
-        return $item;
-    });
+            });
+        })->get();
 
 
         if (!$model) {

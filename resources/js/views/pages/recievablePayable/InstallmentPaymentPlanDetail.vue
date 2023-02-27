@@ -68,6 +68,7 @@ export default {
     return {
       enabled3: true,
       printLoading: true,
+      func: true,
       printObj: {
             id: "printCustom",
         },
@@ -408,6 +409,7 @@ export default {
                   }
               ]
       };
+      this.payment_plans = [];
       this.$nextTick(() => {
         this.$v.$reset();
       });
@@ -443,8 +445,9 @@ export default {
     /**
      *  create module
      */
-     resetForm() {
-      this.create = {
+     async resetForm() {
+        await this.getInstallPaymentPlans();
+        this.create = {
           installment_payment_plan_id: null,
           installment_payment_plan_details:
               [
@@ -458,11 +461,11 @@ export default {
                   }
               ]
       };
-      this.$nextTick(() => {
-        this.$v.$reset();
-      });
-      this.is_disabled = false;
-      this.errors = {};
+        this.$nextTick(() => {
+          this.$v.$reset();
+        });
+        this.is_disabled = false;
+        this.errors = {};
     },
 
     AddSubmit() {
@@ -559,7 +562,8 @@ export default {
      */
     async resetModalEdit(id) {
       await this.getInstallPaymentTypes();
-      await this.getInstallPaymentPlans();
+      await this.getInstallPaymentPlansEdit();
+      this.func = false;
       let module = this.planDetails.find((e) => id == e.id);
       this.edit.installment_payment_plan_id = module.id;
       module.installment_payment_plan_details.forEach((e,index) => {
@@ -579,10 +583,12 @@ export default {
      */
     resetModalHiddenEdit(id) {
       this.errors = {};
+      this.func = true;
       this.edit = {
           installment_payment_plan_id: null,
           installment_payment_plan_details: []
       };
+      this.payment_plans = [];
     },
     /**
      *  start  dynamicSortString
@@ -630,6 +636,31 @@ export default {
         });
     },
     async getInstallPaymentPlans() {
+          this.isLoader = true;
+
+          await adminApi
+              .get(`/recievable-payable/rp_installment_p_plan?null_relation_plan_details=true`)
+              .then((res) => {
+                  let l = res.data.data;
+                  l.unshift({
+                      id: 0,
+                      name: "اضف خطه دفع",
+                      name_e: "Add installment payment plan",
+                  });
+                  this.payment_plans = l;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+    async getInstallPaymentPlansEdit() {
           this.isLoader = true;
 
           await adminApi
@@ -735,7 +766,7 @@ export default {
     <InstallmentPaymentPlan
         :companyKeys="companyKeys"
         :defaultsKeys="defaultsKeys"
-        @created="getInstallPaymentPlans"
+        @created="func ? getInstallPaymentPlans:getInstallPaymentPlansEdit"
     />
     <div class="row">
       <div class="col-12">

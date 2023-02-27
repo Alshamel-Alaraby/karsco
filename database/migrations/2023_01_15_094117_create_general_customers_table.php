@@ -15,10 +15,10 @@ return new class extends Migration
     {
         Schema::create('general_customers', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
-            $table->string('name_e', 100);
-            $table->string('phone', 50);
-            $table->string('email', 100);
+            $table->string('name', 100)->nullable();
+            $table->string('name_e', 100)->nullable();
+            $table->string('phone', 50)->nullable();
+            $table->string('email', 100)->nullable();
             $table->unsignedInteger('country_id')->nullable()->default(0);
             $table->unsignedInteger('city_id')->nullable()->default(0);
             $table->string('rp_code', 20)->nullable();
