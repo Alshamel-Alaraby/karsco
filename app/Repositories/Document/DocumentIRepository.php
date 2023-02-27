@@ -48,7 +48,7 @@ class DocumentIRepository implements DocumentInterface
 
             $this->model->
             where([
-                ['company_id',$request['company_id']],
+                ['company_id',$request["documents"][0]['company_id']],
                 ['is_admin',1]
             ])->delete();
             foreach ($request['documents'] as $document):

@@ -506,7 +506,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     showScreen: function showScreen(module, screen) {
-      var filterRes = this.allWorkFlowTree.filter(function (workflow) {
+      var filterRes = this.$store.state.auth.allWorkFlow.filter(function (workflow) {
         return workflow.name_e == module.name;
       });
       var _module = filterRes.length ? filterRes[0] : null;
@@ -6707,7 +6707,9 @@ var render = function () {
                     _vm._v(" "),
                     !item.isTitle &&
                     !item.isLayout &&
-                    (_vm.workFlowTree.includes(item.name) ||
+                    (_vm.$store.state.auth.work_flow_trees.includes(
+                      item.name
+                    ) ||
                       _vm.$store.state.auth.user.type == "super_admin")
                       ? _c(
                           "li",

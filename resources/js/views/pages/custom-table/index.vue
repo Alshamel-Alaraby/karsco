@@ -41,8 +41,7 @@ export default {
       Tooltip: "",
       mouseEnter: "",
       invisibleColumns: ["id", "company_id",'is_admin', "deleted_at", "created_at", "updated_at","email_verified_at"
-          ,"remember_token","country_id",'governorate_id','city_id','bank_id','nationality','employee_id','roletype_id'
-            ,'salesman_type_id','branch_id','store_id','role_id','user_id','hotfield_id','workflow_id','bank_account_id'],
+          ,"remember_token"],
       create: {
         table_name: "",
         columns: [],
