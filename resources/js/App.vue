@@ -54,7 +54,9 @@ export default {
     },
   },
   mounted() {
-    this.companyId(this.$store.getters["auth/company_id"]);
+    if (this.$store.getters["auth/company_id"]) {
+      this.companyId(this.$store.getters["auth/company_id"]);
+    }
   },
 };
 </script>

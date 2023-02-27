@@ -570,7 +570,7 @@ export default {
   </div>
 </template>
 
-<style scoped>
+<style lang="scss">
 @media print {
   .do-not-print {
     display: none;
@@ -581,7 +581,9 @@ export default {
   }
 }
 .card {
-  height: 400px !important;
+  .multiselect__content-wrapper {
+    max-height: 170px !important;
+  }
 }
 .closeField {
   font-size: 48px !important;

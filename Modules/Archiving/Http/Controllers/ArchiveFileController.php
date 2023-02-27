@@ -292,7 +292,7 @@ class ArchiveFileController extends Controller
         })->where(function ($q) use ($request){
             $q->when($request->arch_doc_type_id,function ($q) use ($request){
                 $q->where('arch_doc_type_id',$request->arch_doc_type_id);
-            });
+            });  
         })->get()->map(function ($item) use ($request){
         $array = collect($item->data_type_value)->filter(function ($item) use ($request){
             return $item->value == $request->value;
