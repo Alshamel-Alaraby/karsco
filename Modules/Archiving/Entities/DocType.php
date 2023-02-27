@@ -70,12 +70,6 @@ class DocType extends Model
 
     public function getKeyAttribute()
     {
-        $key = $this->departments()->first();
-        if ($key) {
-            return DocumentField::where("id", $key->key_value)->first();
-        } else {
-            return null;
-        }
         return $this->fields()->first();
     }
 
