@@ -365,7 +365,8 @@ export default {
                     <li
                       :key="index"
                       v-if="
-                        showScreen(item, subitem)||$store.state.auth.user.type == 'super_admin'
+                        showScreen(item, subitem) ||
+                        $store.state.auth.user.type == 'super_admin'
                       "
                     >
                       <router-link
@@ -394,6 +395,10 @@ export default {
                             :key="index"
                           >
                             <router-link
+                              v-if="
+                                showScreen(subitem, subSubitem) ||
+                                $store.state.auth.user.type == 'super_admin'
+                              "
                               :to="subSubitem.link"
                               class="side-nav-link-ref"
                               >{{ $t(subSubitem.label) }}</router-link

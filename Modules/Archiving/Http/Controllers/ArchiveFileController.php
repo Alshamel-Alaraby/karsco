@@ -211,7 +211,7 @@ class ArchiveFileController extends Controller
             $lastPdf = $pdfs->last();
             if ($lastPdf) {
                 Pdf::loadView('pdf', $data)->save($path);
-                $oMerger->addPDF($path, 'all');
+                // $oMerger->addPDF($path, 'all');
                 $oMerger->addPDF($lastPdf->getPath(), 'all');
                 $oMerger->merge('file');
                 $oMerger->save($path);

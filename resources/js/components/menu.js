@@ -34,25 +34,82 @@ export const menuItems = [
     },
     {
         id: 113872,
-        label: "general.Properties",
+        label: "general.help",
         icon: "fas fa-hand-spock",
-        name: 'properties',
+        name: 'archiving',
         isMenuCollapsed: false,
-        subItems: [
+        subItems:[
             {
-                id:225,
-                label: 'general.ScreenProperties',
-                name: 'screen properties',
-                link: '/dashboard/screen-properties'
+                id: 113872,
+                label: "general.Properties",
+                icon: "fas fa-hand-spock",
+                name: 'properties',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id:225,
+                        label: 'general.ScreenProperties',
+                        name: 'screen properties',
+                        link: '/dashboard/screen-properties'
+                    },
+                    {
+                        id:226,
+                        label: 'general.TreeProperty',
+                        name: 'tree property',
+                        link: '/dashboard/tree-properties'
+                    },
+                ]
             },
             {
-                id:226,
-                label: 'general.TreeProperty',
-                name: 'tree property',
-                link: '/dashboard/tree-properties'
+                id: 1000544,
+                label: "menuitems.area.text",
+                icon: "fas fa-flag",
+                name: "area",
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 2,
+                        label: 'menuitems.dashboard.list.country',
+                        name: "country",
+                        link: '/dashboard/country'
+                    },
+                    {
+                        id: 3,
+                        label: 'menuitems.dashboard.list.governorate',
+                        name: "governorate",
+                        link: '/dashboard/governorate'
+        
+                    },
+                    {
+                        id: 4,
+                        label: 'menuitems.dashboard.list.city',
+                        name: "city",
+                        link: '/dashboard/city'
+                    },
+                    {
+                        id: 8,
+                        label: 'menuitems.dashboard.list.avenue',
+                        name: "avenue",
+                        link: '/dashboard/avenue'
+                    },
+                ]
+            },
+            {
+                id: 1022343,
+                name: 'customer',
+                label: 'general.customer',
+                link: '/dashboard/realEstate/customer'
+            },
+            {
+                id: 1222,
+                label: 'general.customTable',
+                icon: 'fas fa-tasks',
+                name: 'custom table',
+                link: '/dashboard/custom-table'
             },
         ]
     },
+  
     {
         id: 10006,
         label: "menuitems.salesMen.text",
@@ -113,40 +170,7 @@ export const menuItems = [
             }
         ]
     },
-    {
-        id: 1000544,
-        label: "menuitems.area.text",
-        icon: "fas fa-flag",
-        name: "area",
-        isMenuCollapsed: false,
-        subItems: [
-            {
-                id: 2,
-                label: 'menuitems.dashboard.list.country',
-                name: "country",
-                link: '/dashboard/country'
-            },
-            {
-                id: 3,
-                label: 'menuitems.dashboard.list.governorate',
-                name: "governorate",
-                link: '/dashboard/governorate'
-
-            },
-            {
-                id: 4,
-                label: 'menuitems.dashboard.list.city',
-                name: "city",
-                link: '/dashboard/city'
-            },
-            {
-                id: 8,
-                label: 'menuitems.dashboard.list.avenue',
-                name: "avenue",
-                link: '/dashboard/avenue'
-            },
-        ]
-    },
+    
     {
         id: 10001,
         label: "menuitems.role.text",
@@ -229,12 +253,6 @@ export const menuItems = [
                 name: 'building',
                 label: 'general.building',
                 link: '/dashboard/realEstate/building'
-            },
-            {
-                id: 1022343,
-                name: 'customer',
-                label: 'general.customer',
-                link: '/dashboard/realEstate/customer'
             },
             {
                 id: 1022323,
@@ -465,14 +483,7 @@ export const menuItems = [
         icon: 'fas fa-palette',
         link: '/dashboard/colors'
     },
-    {
-        id: 1222,
-        label: 'general.customTable',
-        icon: 'fas fa-tasks',
-        name: 'custom table',
-        link: '/dashboard/custom-table'
-    },
-
+    
     // {
     //     id: 1115,
     //     label: "menuitems.dashboard.text",
