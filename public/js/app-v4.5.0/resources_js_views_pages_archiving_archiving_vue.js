@@ -9510,16 +9510,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                if (!(_this16.images.length > 0)) {
-                  _context8.next = 3;
-                  break;
-                }
-                _context8.next = 3;
-                return _this16.getPdf(_this16.archive_id);
-              case 3:
-                _context8.next = 5;
+                _context8.next = 2;
                 return _this16.getArchiveFiles();
-              case 5:
+              case 2:
                 // await this.getData();
                 _this16.create = {
                   job_file_number: null,
@@ -9538,7 +9531,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this16.archive_id = null;
                 _this16.lockupTableObject = null;
                 _this16.type = "";
-              case 12:
+              case 9:
               case "end":
                 return _context8.stop();
             }

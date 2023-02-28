@@ -207,7 +207,7 @@ class ArchiveFileController extends Controller
                 'updated_at' => $model->updated_at,
             ];
             // $oMerger = \Webklex\PDFMerger\Facades\PDFMergerFacade::init();
-            $pdfs = $model->files->where('mime_type', 'application/pdf');
+            // $pdfs = $model->files->where('mime_type', 'application/pdf');
             // $lastPdf = $pdfs->last();
             // if ($lastPdf) {
             //     Pdf::loadView('pdf', $data)->save($path);
