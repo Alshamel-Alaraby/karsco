@@ -589,6 +589,7 @@
         }
     },
     "general": {
+        "help":"مساعدة",
         "ScreenSubContactGroupTable":"جدول شاشات جروبات التواصل الفرعي",
         "ScreenSubcontactGroup":"شاشات التواصل الفرعي",
         "documentPlansTable":"جدول خطط الوثائق",
