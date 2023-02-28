@@ -192,7 +192,7 @@ class ArchiveFileController extends Controller
     public function pdf($id)
     {
         return DB::transaction(function () use ($id) {
-            set_time_limit(0);
+            // set_time_limit(0);
             $model = $this->model->find($id);
             if (!$model) {
                 return responseJson(404, 'not found');
@@ -206,25 +206,25 @@ class ArchiveFileController extends Controller
                 'created_at' => $model->created_at,
                 'updated_at' => $model->updated_at,
             ];
-            $oMerger = \Webklex\PDFMerger\Facades\PDFMergerFacade::init();
+            // $oMerger = \Webklex\PDFMerger\Facades\PDFMergerFacade::init();
             $pdfs = $model->files->where('mime_type', 'application/pdf');
-            $lastPdf = $pdfs->last();
-            if ($lastPdf) {
+            // $lastPdf = $pdfs->last();
+            // if ($lastPdf) {
+            //     Pdf::loadView('pdf', $data)->save($path);
+            //     // $oMerger->addPDF($path, 'all');
+            //     $oMerger->addPDF($lastPdf->getPath(), 'all');
+            //     $oMerger->merge('file');
+            //     $oMerger->save($path);
+            //     $model->addMedia($path)->toMediaCollection('media');
+            //     $lastPdf->delete();
+            //     $model->refresh();
+            //     return responseJson(200, 'done', new ArchiveFileResource($model));
+            // } else {
                 Pdf::loadView('pdf', $data)->save($path);
-                // $oMerger->addPDF($path, 'all');
-                $oMerger->addPDF($lastPdf->getPath(), 'all');
-                $oMerger->merge('file');
-                $oMerger->save($path);
                 $model->addMedia($path)->toMediaCollection('media');
-                $lastPdf->delete();
                 $model->refresh();
                 return responseJson(200, 'done', new ArchiveFileResource($model));
-            } else {
-                Pdf::loadView('pdf', $data)->save($path);
-                $model->addMedia($path)->toMediaCollection('media');
-                $model->refresh();
-                return responseJson(200, 'done', new ArchiveFileResource($model));
-            }
+        //     }
         });
     }
 

@@ -585,7 +585,7 @@
         }
     },
     "general": {
-        "help":"Help",
+        "help":"Help File",
         "ScreenSubContactGroupTable":"Screen subcontact groups table",
         "ScreenSubcontactGroup":"Screen subcontact group",
         "documentPlansTable":"Document plans table",
