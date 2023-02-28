@@ -803,7 +803,7 @@ export default {
       //   await this.getPdf(this.archive_id);
       // }
       await this.getArchiveFiles();
-      // await this.getData();
+      // await this.getData();S
       this.create = {
         job_file_number: null,
         document_type_id: null,
