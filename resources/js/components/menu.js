@@ -95,10 +95,11 @@ export const menuItems = [
                 ]
             },
             {
-                id: 1022343,
-                name: 'customer',
+                id: 2224,
+                name: 'general customer',
                 label: 'general.customer',
-                link: '/dashboard/realEstate/customer'
+                icon: 'fas fa-user-friends',
+                link: '/dashboard/customer'
             },
             {
                 id: 1222,
@@ -433,13 +434,6 @@ export const menuItems = [
         label: 'general.Users',
         icon: 'fas fa-user',
         link: '/dashboard/users'
-    },
-    {
-        id: 2224,
-        name: 'general customer',
-        label: 'general.customer',
-        icon: 'fas fa-user-friends',
-        link: '/dashboard/customer'
     },
     {
         id: 5,
