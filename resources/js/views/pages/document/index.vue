@@ -11,6 +11,7 @@ import { dynamicSortString } from "../../../helper/tableSort";
 import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
 import { arabicValue, englishValue } from "../../../helper/langTransform";
+import Multiselect from "vue-multiselect";
 
 /**
  * Advanced Table component
@@ -27,6 +28,7 @@ export default {
         Switches,
         ErrorMessage,
         loader,
+        Multiselect
     },
     beforeRouteEnter(to, from, next) {
         next((vm) => {
@@ -83,11 +85,11 @@ export default {
                 available: 0,
             },
             branchFormCreate: {
-                branch_id: null,
+                branche_id: null,
                 serial_id: null,
             },
             branchFormEdit: {
-                branch_id: null,
+                branche_id: null,
                 serial_id: null,
             },
 
@@ -148,11 +150,11 @@ export default {
             },
         },
         branchFormCreate: {
-            branch_id: { required },
+            branche_id: { required },
             serial_id: { required },
         },
         branchFormEdit: {
-            branch_id: { required },
+            branche_id: { required },
             serial_id: { required },
         }
     },
@@ -254,9 +256,9 @@ export default {
                     this.isLoader = false;
                 });
         },
-        getBranches() {
+        async getBranches() {
             this.isLoader = true;
-            adminApi
+            await adminApi
                 .get(`/branches`)
                 .then((res) => {
                     this.branches = res.data.data;
@@ -276,9 +278,9 @@ export default {
                     this.isLoader = false;
                 });
         },
-        getSerials() {
+        async getSerials() {
             this.isLoader = true;
-            adminApi
+            await adminApi
                 .get(`/serials`)
                 .then((res) => {
                     this.serials = res.data.data;
@@ -557,7 +559,7 @@ export default {
                 available: 0,
             }
             this.branchFormCreate = {
-                branch_id: null,
+                branche_id: null,
                 serial_id: null,
             };
             this.document_id = null;
@@ -581,7 +583,7 @@ export default {
                 available: 0,
             };
             this.branchFormCreate = {
-                branch_id: null,
+                branche_id: null,
                 serial_id: null,
             };
             this.document_id = null;
@@ -607,7 +609,7 @@ export default {
                 available: 0,
             };
             this.branchFormCreate = {
-                branch_id: null,
+                branche_id: null,
                 serial_id: null,
             };
             this.document_id = null;
@@ -712,29 +714,27 @@ export default {
         /**
          *   show Modal (edit)
          */
-        resetModalEdit(id) {
+        async resetModalEdit(id) {
             let module = this.documents.find((e) => id == e.id);
-            if (module.is_admin != 1) {
-                this.$bvModal.show(`modal-edit-${id}`)
-                this.edit.name = module.name;
-                this.edit.name_e = module.name_e;
-                this.edit.is_default = module.is_default;
-                if (module.attributes) {
-                    this.edit_effects.cash = module.attributes.cash;
-                    this.edit_effects.customer = module.attributes.customer;
-                    this.edit_effects.supplier = module.attributes.supplier;
-                    this.edit_effects.item_quantity = module.attributes.item_quantity;
-                    this.edit_effects.reserved_quantity = module.attributes.reserved_quantity;
-                    this.edit_effects.ordered_quantity = module.attributes.ordered_quantity;
-                    this.edit_effects.available = module.attributes.available;
-                }
-                this.document_id = module.id;
-                this.branchFormEdit.branch_id = module.branch_id;
-                this.branchFormEdit.serial_id = module.serial_id;
-                this.getBranches();
-                this.getSerials();
-                this.errors = {};
+            this.$bvModal.show(`modal-edit-${id}`)
+            this.edit.name = module.name;
+            this.edit.name_e = module.name_e;
+            this.edit.is_default = module.is_default;
+            if (module.attributes) {
+                this.edit_effects.cash = module.attributes.cash;
+                this.edit_effects.customer = module.attributes.customer;
+                this.edit_effects.supplier = module.attributes.supplier;
+                this.edit_effects.item_quantity = module.attributes.item_quantity;
+                this.edit_effects.reserved_quantity = module.attributes.reserved_quantity;
+                this.edit_effects.ordered_quantity = module.attributes.ordered_quantity;
+                this.edit_effects.available = module.attributes.available;
             }
+            await this.getBranches();
+            await this.getSerials();
+            this.document_id = module.id;
+            this.branchFormEdit.branche_id = module.branche_id;
+            this.branchFormEdit.serial_id = module.serial_id;
+            this.errors = {};
         },
         /**
          *  hidden Modal (edit)
@@ -756,7 +756,7 @@ export default {
                 available: 0,
             };
             this.branchFormEdit = {
-                branch_id: null,
+                branche_id: null,
                 serial_id: null,
             };
             this.document_id = null;
@@ -882,10 +882,10 @@ export default {
                         <div class="row justify-content-between align-items-center mb-2 px-1">
                             <div class="col-md-3 d-flex align-items-center mb-1 mb-xl-0">
                                 <!-- start create and printer -->
-                                <b-button v-b-modal.create variant="primary" class="btn-sm mx-1 font-weight-bold">
-                                    {{ $t("general.Create") }}
-                                    <i class="fas fa-plus"></i>
-                                </b-button>
+                                <!-- <b-button v-b-modal.create variant="primary" class="btn-sm mx-1 font-weight-bold">
+                                                    {{ $t("general.Create") }}
+                                                    <i class="fas fa-plus"></i>
+                                                </b-button> -->
                                 <div class="d-inline-flex">
                                     <button class="custom-btn-dowonload" @click="ExportExcel('xlsx')">
                                         <i class="fas fa-file-download"></i>
@@ -1225,15 +1225,15 @@ export default {
                                                         $t("general.branch")
                                                     }}</label>
                                                     <span class="text-danger">*</span>
-                                                    <multiselect v-model="$v.branchFormCreate.branch_id.$model"
+                                                    <multiselect v-model="$v.branchFormCreate.branche_id.$model"
                                                         :options="branches.map((type) => type.id)" :custom-label="
                                                             (opt) =>
                                                                 $i18n.locale == 'ar'
                                                                     ? branches.find((type) => type.id == opt).name
                                                                     : branches.find((type) => type.id == opt).name_e"
-                                                        :class="{ 'is-invalid': $v.branchFormCreate.branch_id.$error }">
+                                                        :class="{ 'is-invalid': $v.branchFormCreate.branche_id.$error }">
                                                     </multiselect>
-                                                    <div v-if="!$v.branchFormCreate.branch_id.required"
+                                                    <div v-if="!$v.branchFormCreate.branche_id.required"
                                                         class="invalid-feedback">
                                                         {{ $t("general.fieldIsRequired") }}
                                                     </div>
@@ -1320,13 +1320,12 @@ export default {
                                     </tr>
                                 </thead>
                                 <tbody v-if="documents.length > 0">
-                                    <tr @click.capture="checkRow(data.id)" @dblclick.prevent="editSubmit(data.id)"
+                                    <tr @click.capture="checkRow(data.id)" @dblclick.prevent="resetModalEdit(data.id)"
                                         v-for="(data, index) in documents" :key="data.id" class="body-tr-custom">
                                         <td v-if="enabled3" class="do-not-print">
                                             <div class="form-check custom-control" style="min-height: 1.9em">
                                                 <input style="width: 17px; height: 17px" class="form-check-input"
-                                                    :disabled="data.is_admin == 1" type="checkbox" :value="data.id"
-                                                    v-model="checkAll" />
+                                                    type="checkbox" :value="data.id" v-model="checkAll" />
                                             </div>
                                         </td>
                                         <td v-if="setting.name && isVisible('name')">
@@ -1348,28 +1347,28 @@ export default {
                                             </span>
                                         </td>
                                         <td v-if="enabled3" class="do-not-print">
-                                            <div class="btn-group" v-if="!data.is_admin">
+                                            <div class="btn-group">
                                                 <button type="button" class="btn btn-sm dropdown-toggle dropdown-coustom"
                                                     data-toggle="dropdown" aria-expanded="false">
                                                     {{ $t("general.commands") }}
                                                     <i class="fas fa-angle-down"></i>
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu-custom">
-                                                    <a class="dropdown-item" href="#" @click="editSubmit(data.id)">
+                                                    <a class="dropdown-item" href="#" @click="resetModalEdit(data.id)">
                                                         <div
                                                             class="d-flex justify-content-between align-items-center text-black">
                                                             <span>{{ $t("general.edit") }}</span>
                                                             <i class="mdi mdi-square-edit-outline text-info"></i>
                                                         </div>
                                                     </a>
-                                                    <a class="dropdown-item text-black" href="#"
-                                                        @click.prevent="deleteModule(data.id)">
-                                                        <div
-                                                            class="d-flex justify-content-between align-items-center text-black">
-                                                            <span>{{ $t("general.delete") }}</span>
-                                                            <i class="fas fa-times text-danger"></i>
-                                                        </div>
-                                                    </a>
+                                                    <!-- <a class="dropdown-item text-black" href="#"
+                                                                        @click.prevent="deleteModule(data.id)">
+                                                                        <div
+                                                                            class="d-flex justify-content-between align-items-center text-black">
+                                                                            <span>{{ $t("general.delete") }}</span>
+                                                                            <i class="fas fa-times text-danger"></i>
+                                                                        </div>
+                                                                    </a> -->
                                                 </div>
                                             </div>
 
@@ -1377,9 +1376,9 @@ export default {
                                             <b-modal :id="`modal-edit-${data.id}`"
                                                 :title="getCompanyKey('document_edit_form')" title-class="font-18"
                                                 body-class="p-4" :ref="`edit-${data.id}`" :hide-footer="true"
-                                                @hidden="resetModalHiddenEdit(data.id)">
+                                                @hidden="resetModalHiddenEdit(data.id)" size="lg">
                                                 <form>
-                                                    <div class="mb-3 d-flex justify-content-end">
+                                                    <div v-if="$store.state.auth.user.type == 'super_admin'" class="mb-3 d-flex justify-content-end">
                                                         <!-- Emulate built in modal footer ok and cancel button actions -->
                                                         <b-button variant="success" type="submit" class="mx-1"
                                                             v-if="!isLoader" @click.prevent="editSubmit(data.id)">
@@ -1399,7 +1398,7 @@ export default {
                                                     <b-tabs>
                                                         <b-tab :title="$t('general.DataEntry')" active>
                                                             <div class="row">
-                                                                <div class="col-md-12" v-if="isVisible('name')">
+                                                                <div class="col-md-6" v-if="isVisible('name')">
                                                                     <div class="form-group">
                                                                         <label for="field-u-1" class="control-label">
                                                                             {{ getCompanyKey("document_name_ar") }}
@@ -1435,7 +1434,7 @@ export default {
                                                                         </template>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-md-12" v-if="isVisible('name_e')">
+                                                                <div class="col-md-6" v-if="isVisible('name_e')">
                                                                     <div class="form-group">
                                                                         <label for="field-u-2" class="control-label">
                                                                             {{ getCompanyKey("document_name_en") }}
@@ -1513,7 +1512,7 @@ export default {
 
                                                         </b-tab>
                                                         <b-tab :title="$t('general.effects')">
-                                                            <div class="d-flex justify-content-end">
+                                                            <div v-if="$store.state.auth.user.type == 'super_admin'" class="d-flex justify-content-end">
                                                                 <b-button variant="success" v-if="!isLoader" type="submit"
                                                                     class="mx-1" @click.prevent="addEffects('update')">
                                                                     {{ $t("general.Add") }}
@@ -1673,16 +1672,16 @@ export default {
                                                                         }}</label>
                                                                         <span class="text-danger">*</span>
                                                                         <multiselect
-                                                                            v-model="$v.branchFormEdit.branch_id.$model"
+                                                                            v-model="$v.branchFormEdit.branche_id.$model"
                                                                             :options="branches.map((type) => type.id)"
                                                                             :custom-label="
                                                                                 (opt) =>
                                                                                     $i18n.locale == 'ar'
                                                                                         ? branches.find((x) => x.id == opt).name
                                                                                         : branches.find((x) => x.id == opt).name_e"
-                                                                            :class="{ 'is-invalid': $v.branchFormEdit.branch_id.$error }">
+                                                                            :class="{ 'is-invalid': $v.branchFormEdit.branche_id.$error }">
                                                                         </multiselect>
-                                                                        <div v-if="!$v.branchFormEdit.branch_id.required"
+                                                                        <div v-if="!$v.branchFormEdit.branche_id.required"
                                                                             class="invalid-feedback">
                                                                             {{ $t("general.fieldIsRequired") }}
                                                                         </div>
@@ -1739,3 +1738,25 @@ export default {
         </div>
     </Layout>
 </template>
+<style>
+.tab-content {
+    padding: 70px 60px 40px;
+    min-height: 300px;
+    background-color: #f5f5f5;
+    position: relative;
+}
+
+.nav-tabs .nav-link {
+    border: 1px solid #b7b7b7 !important;
+    background-color: #d7e5f2;
+    border-bottom: 0 !important;
+    margin-bottom: 1px;
+}
+
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+    color: #000;
+    background-color: hsl(0deg 0% 96%);
+    border-bottom: 0 !important;
+}
+</style>

@@ -585,6 +585,7 @@
         }
     },
     "general": {
+        "serial": "Serial",
         "supplier": "Supplier",
         "item_quantity": "Item quantity",
         "reserved_quantity": "Reserved quantity",

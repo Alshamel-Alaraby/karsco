@@ -1581,14 +1581,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _api_adminAxios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/adminAxios */ "./resources/js/api/adminAxios.js");
-/* harmony import */ var vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vuelidate/lib/validators */ "./node_modules/vuelidate/lib/validators/index.js");
-/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
-/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var vue_switches__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-switches */ "./node_modules/vue-switches/src/switches.vue");
-/* harmony import */ var _components_widgets_errorMessage__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/widgets/errorMessage */ "./resources/js/components/widgets/errorMessage.vue");
-/* harmony import */ var _components_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/loader */ "./resources/js/components/loader.vue");
-/* harmony import */ var _helper_translation_comp_mixin__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../helper/translation-comp-mixin */ "./resources/js/helper/translation-comp-mixin.js");
-/* harmony import */ var _helper_langTransform__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../helper/langTransform */ "./resources/js/helper/langTransform.js");
+/* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-multiselect */ "./node_modules/vue-multiselect/dist/vue-multiselect.min.js");
+/* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue_multiselect__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! vuelidate/lib/validators */ "./node_modules/vuelidate/lib/validators/index.js");
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var vue_switches__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue-switches */ "./node_modules/vue-switches/src/switches.vue");
+/* harmony import */ var _components_widgets_errorMessage__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/widgets/errorMessage */ "./resources/js/components/widgets/errorMessage.vue");
+/* harmony import */ var _components_loader__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../components/loader */ "./resources/js/components/loader.vue");
+/* harmony import */ var _helper_translation_comp_mixin__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../helper/translation-comp-mixin */ "./resources/js/helper/translation-comp-mixin.js");
+/* harmony import */ var _helper_langTransform__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../helper/langTransform */ "./resources/js/helper/langTransform.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
@@ -2118,29 +2120,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
 
 
 
@@ -2152,11 +2132,12 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    Switches: vue_switches__WEBPACK_IMPORTED_MODULE_2__["default"],
-    ErrorMessage: _components_widgets_errorMessage__WEBPACK_IMPORTED_MODULE_3__["default"],
-    loader: _components_loader__WEBPACK_IMPORTED_MODULE_4__["default"]
+    Switches: vue_switches__WEBPACK_IMPORTED_MODULE_3__["default"],
+    ErrorMessage: _components_widgets_errorMessage__WEBPACK_IMPORTED_MODULE_4__["default"],
+    loader: _components_loader__WEBPACK_IMPORTED_MODULE_5__["default"],
+    Multiselect: (vue_multiselect__WEBPACK_IMPORTED_MODULE_1___default())
   },
-  mixins: [_helper_translation_comp_mixin__WEBPACK_IMPORTED_MODULE_5__["default"]],
+  mixins: [_helper_translation_comp_mixin__WEBPACK_IMPORTED_MODULE_6__["default"]],
   props: {
     id: {
       "default": "country-create"
@@ -2170,6 +2151,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
   },
   mounted: function mounted() {
     this.getCustomTableFields();
+    this.getCountrySeeder();
     this.company_id = this.$store.getters["auth/company_id"];
   },
   updated: function updated() {
@@ -2195,65 +2177,65 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
   validations: {
     create: {
       name: {
-        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.requiredIf)(function (model) {
+        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.requiredIf)(function (model) {
           return this.isRequired("name");
         }),
-        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.minLength)(2),
-        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.maxLength)(100)
+        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.minLength)(2),
+        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.maxLength)(100)
       },
       name_e: {
-        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.requiredIf)(function (model) {
+        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.requiredIf)(function (model) {
           return this.isRequired("name_e");
         }),
-        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.minLength)(2),
-        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.maxLength)(100)
+        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.minLength)(2),
+        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.maxLength)(100)
       },
       long_name: {
-        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.requiredIf)(function (model) {
+        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.requiredIf)(function (model) {
           return this.isRequired("long_name");
         }),
-        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.minLength)(2),
-        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.maxLength)(100)
+        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.minLength)(2),
+        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.maxLength)(100)
       },
       long_name_e: {
-        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.requiredIf)(function (model) {
+        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.requiredIf)(function (model) {
           return this.isRequired("long_name_e");
         }),
-        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.minLength)(2),
-        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.maxLength)(100)
+        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.minLength)(2),
+        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.maxLength)(100)
       },
       short_code: {
-        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.requiredIf)(function (model) {
+        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.requiredIf)(function (model) {
           return this.isRequired("short_code");
         }),
-        alpha: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.alpha,
-        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.minLength)(1),
-        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.maxLength)(10)
+        alpha: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.alpha,
+        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.minLength)(1),
+        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.maxLength)(10)
       },
       phone_key: {
-        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.requiredIf)(function (model) {
+        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.requiredIf)(function (model) {
           return this.isRequired("phone_key");
         }),
-        integer: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.integer,
-        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.minLength)(1),
-        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.maxLength)(10)
+        integer: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.integer,
+        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.minLength)(1),
+        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.maxLength)(10)
       },
       is_default: {
-        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.requiredIf)(function (model) {
+        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.requiredIf)(function (model) {
           return this.isRequired("is_default");
         }),
-        integer: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.integer
+        integer: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.integer
       },
       national_id_length: {
-        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.requiredIf)(function (model) {
+        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.requiredIf)(function (model) {
           return this.isRequired("national_id_length");
         }),
-        integer: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.integer,
-        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.minLength)(8),
-        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.maxLength)(20)
+        integer: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.integer,
+        minLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.minLength)(8),
+        maxLength: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.maxLength)(20)
       },
       is_active: {
-        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_7__.requiredIf)(function (model) {
+        required: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_8__.requiredIf)(function (model) {
           return this.isRequired("is_active");
         })
       },
@@ -2272,6 +2254,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       showPhoto: "./images/img-1.png",
       changeImage: false,
       idDelete: null,
+      seederCountries: [],
       create: {
         name: "",
         name_e: "",
@@ -2287,18 +2270,40 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     };
   },
   methods: {
-    getCustomTableFields: function getCustomTableFields() {
+    setCreateForm: function setCreateForm(nicename) {
+      var country = this.seederCountries.filter(function (el) {
+        return el.nicename == nicename;
+      })[0];
+      this.create.long_name_e = country.name;
+      this.create.short_code = country.iso;
+      this.create.phone_key = country.phonecode;
+    },
+    getCountrySeeder: function getCountrySeeder() {
       var _this = this;
-      _api_adminAxios__WEBPACK_IMPORTED_MODULE_0__["default"].get("/customTable/table-columns/general_countries").then(function (res) {
-        _this.fields = res.data;
+      _api_adminAxios__WEBPACK_IMPORTED_MODULE_0__["default"].get("/countries/seeder").then(function (res) {
+        _this.seederCountries = res.data;
       })["catch"](function (err) {
-        sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
+        sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire({
           icon: "error",
           title: "".concat(_this.$t("general.Error")),
           text: "".concat(_this.$t("general.Thereisanerrorinthesystem"))
         });
       })["finally"](function () {
         _this.isLoader = false;
+      });
+    },
+    getCustomTableFields: function getCustomTableFields() {
+      var _this2 = this;
+      _api_adminAxios__WEBPACK_IMPORTED_MODULE_0__["default"].get("/customTable/table-columns/general_countries").then(function (res) {
+        _this2.fields = res.data;
+      })["catch"](function (err) {
+        sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire({
+          icon: "error",
+          title: "".concat(_this2.$t("general.Error")),
+          text: "".concat(_this2.$t("general.Thereisanerrorinthesystem"))
+        });
+      })["finally"](function () {
+        _this2.isLoader = false;
       });
     },
     isVisible: function isVisible(fieldName) {
@@ -2317,7 +2322,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      *  reset Modal (create)
      */
     resetModalHidden: function resetModalHidden() {
-      var _this2 = this;
+      var _this3 = this;
       this.create = {
         name: "",
         name_e: "",
@@ -2331,7 +2336,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         media: null
       };
       this.$nextTick(function () {
-        _this2.$v.$reset();
+        _this3.$v.$reset();
       });
       this.images = [];
       this.country_id = null;
@@ -2342,7 +2347,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      *  hidden Modal (create)
      */
     resetModal: function resetModal() {
-      var _this3 = this;
+      var _this4 = this;
       this.create = {
         name: "",
         name_e: "",
@@ -2356,7 +2361,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       };
       this.showPhoto = "./images/img-1.png";
       this.$nextTick(function () {
-        _this3.$v.$reset();
+        _this4.$v.$reset();
       });
       this.country_id = null;
       this.media = {};
@@ -2367,7 +2372,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      *  create countrie
      */
     resetForm: function resetForm() {
-      var _this4 = this;
+      var _this5 = this;
       this.create = {
         name: "",
         name_e: "",
@@ -2380,14 +2385,14 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         is_active: "active"
       };
       this.$nextTick(function () {
-        _this4.$v.$reset();
+        _this5.$v.$reset();
       });
       this.country_id = null;
       this.media = {};
       this.images = [];
     },
     AddSubmit: function AddSubmit() {
-      var _this5 = this;
+      var _this6 = this;
       if (!this.create.name) {
         this.create.name = this.create.name_e;
       }
@@ -2409,28 +2414,28 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         _api_adminAxios__WEBPACK_IMPORTED_MODULE_0__["default"].post("/countries", _objectSpread(_objectSpread({}, this.create), {}, {
           company_id: this.company_id
         })).then(function (res) {
-          _this5.country_id = res.data.data.id;
-          _this5.$emit("created");
+          _this6.country_id = res.data.data.id;
+          _this6.$emit("created");
           setTimeout(function () {
-            sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
+            sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire({
               icon: "success",
-              text: "".concat(_this5.$t("general.Addedsuccessfully")),
+              text: "".concat(_this6.$t("general.Addedsuccessfully")),
               showConfirmButton: false,
               timer: 1500
             });
           }, 200);
         })["catch"](function (err) {
           if (err.response.data) {
-            _this5.errors = err.response.data.errors;
+            _this6.errors = err.response.data.errors;
           } else {
-            sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
+            sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire({
               icon: "error",
-              title: "".concat(_this5.$t("general.Error")),
-              text: "".concat(_this5.$t("general.Thereisanerrorinthesystem"))
+              title: "".concat(_this6.$t("general.Error")),
+              text: "".concat(_this6.$t("general.Thereisanerrorinthesystem"))
             });
           }
         })["finally"](function () {
-          _this5.isLoader = false;
+          _this6.isLoader = false;
         });
       }
     },
@@ -2454,7 +2459,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       this.addImage(file);
     },
     addImage: function addImage(file) {
-      var _this6 = this;
+      var _this7 = this;
       this.media = file; //upload
       if (file) {
         this.idDelete = null;
@@ -2468,41 +2473,41 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
           formDate.append("media[0]", this.media);
           _api_adminAxios__WEBPACK_IMPORTED_MODULE_0__["default"].post("/media", formDate).then(function (res) {
             var old_media = [];
-            _this6.images.forEach(function (e) {
+            _this7.images.forEach(function (e) {
               return old_media.push(e.id);
             });
             var new_media = [];
             res.data.data.forEach(function (e) {
               return new_media.push(e.id);
             });
-            _api_adminAxios__WEBPACK_IMPORTED_MODULE_0__["default"].put("/countries/".concat(_this6.country_id), {
+            _api_adminAxios__WEBPACK_IMPORTED_MODULE_0__["default"].put("/countries/".concat(_this7.country_id), {
               old_media: old_media,
               media: new_media
             }).then(function (res) {
-              _this6.images = res.data.data.media;
-              _this6.showPhoto = _this6.images[_this6.images.length - 1].webp;
+              _this7.images = res.data.data.media;
+              _this7.showPhoto = _this7.images[_this7.images.length - 1].webp;
             })["catch"](function (err) {
-              sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
+              sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire({
                 icon: "error",
-                title: "".concat(_this6.$t("general.Error")),
-                text: "".concat(_this6.$t("general.Thereisanerrorinthesystem"))
+                title: "".concat(_this7.$t("general.Error")),
+                text: "".concat(_this7.$t("general.Thereisanerrorinthesystem"))
               });
             });
           })["catch"](function (err) {
             if (err.response.data) {
-              _this6.errors = err.response.data.errors;
+              _this7.errors = err.response.data.errors;
             } else {
-              sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
+              sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire({
                 icon: "error",
-                title: "".concat(_this6.$t("general.Error")),
-                text: "".concat(_this6.$t("general.Thereisanerrorinthesystem"))
+                title: "".concat(_this7.$t("general.Error")),
+                text: "".concat(_this7.$t("general.Thereisanerrorinthesystem"))
               });
             }
           })["finally"](function () {
-            _this6.isLoader = false;
+            _this7.isLoader = false;
           });
         } else {
-          sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
+          sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire({
             title: "".concat(this.$t("general.Thisfilehasalreadybeenuploaded")),
             type: "warning",
             showCancelButton: true,
@@ -2513,44 +2518,44 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
             buttonsStyling: false
           }).then(function (result) {
             if (result.value) {
-              _this6.isLoader = true;
+              _this7.isLoader = true;
               var _formDate = new FormData();
-              _formDate.append("media[0]", _this6.media);
+              _formDate.append("media[0]", _this7.media);
               _api_adminAxios__WEBPACK_IMPORTED_MODULE_0__["default"].post("/media", _formDate).then(function (res) {
                 var old_media = [];
-                _this6.images.forEach(function (e) {
+                _this7.images.forEach(function (e) {
                   return old_media.push(e.id);
                 });
-                old_media.splice(old_media.indexOf(_this6.idDelete), 1);
+                old_media.splice(old_media.indexOf(_this7.idDelete), 1);
                 var new_media = [];
                 res.data.data.forEach(function (e) {
                   return new_media.push(e.id);
                 });
-                _api_adminAxios__WEBPACK_IMPORTED_MODULE_0__["default"].put("/countries/".concat(_this6.country_id), {
+                _api_adminAxios__WEBPACK_IMPORTED_MODULE_0__["default"].put("/countries/".concat(_this7.country_id), {
                   old_media: old_media,
                   media: new_media
                 }).then(function (res) {
-                  _this6.images = res.data.data.media;
-                  _this6.showPhoto = _this6.images[_this6.images.length - 1].webp;
+                  _this7.images = res.data.data.media;
+                  _this7.showPhoto = _this7.images[_this7.images.length - 1].webp;
                 })["catch"](function (err) {
-                  sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
+                  sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire({
                     icon: "error",
-                    title: "".concat(_this6.$t("general.Error")),
-                    text: "".concat(_this6.$t("general.Thereisanerrorinthesystem"))
+                    title: "".concat(_this7.$t("general.Error")),
+                    text: "".concat(_this7.$t("general.Thereisanerrorinthesystem"))
                   });
                 });
               })["catch"](function (err) {
                 if (err.response.data) {
-                  _this6.errors = err.response.data.errors;
+                  _this7.errors = err.response.data.errors;
                 } else {
-                  sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
+                  sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire({
                     icon: "error",
-                    title: "".concat(_this6.$t("general.Error")),
-                    text: "".concat(_this6.$t("general.Thereisanerrorinthesystem"))
+                    title: "".concat(_this7.$t("general.Error")),
+                    text: "".concat(_this7.$t("general.Thereisanerrorinthesystem"))
                   });
                 }
               })["finally"](function () {
-                _this6.isLoader = false;
+                _this7.isLoader = false;
               });
             }
           });
@@ -2558,7 +2563,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       }
     },
     deleteImageCreate: function deleteImageCreate(id, index) {
-      var _this7 = this;
+      var _this8 = this;
       var old_media = [];
       this.images.forEach(function (e) {
         if (e.id != id) {
@@ -2568,13 +2573,13 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       _api_adminAxios__WEBPACK_IMPORTED_MODULE_0__["default"].put("/countries/".concat(this.country_id), {
         old_media: old_media
       }).then(function (res) {
-        _this7.images = res.data.data.media;
-        _this7.showPhoto = _this7.images[_this7.images.length - 1].webp;
+        _this8.images = res.data.data.media;
+        _this8.showPhoto = _this8.images[_this8.images.length - 1].webp;
       })["catch"](function (err) {
-        sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
+        sweetalert2__WEBPACK_IMPORTED_MODULE_2___default().fire({
           icon: "error",
-          title: "".concat(_this7.$t("general.Error")),
-          text: "".concat(_this7.$t("general.Thereisanerrorinthesystem"))
+          title: "".concat(_this8.$t("general.Error")),
+          text: "".concat(_this8.$t("general.Thereisanerrorinthesystem"))
         });
       });
     },
@@ -2582,16 +2587,16 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      *  end Image ceate
      */
     arabicValue: function arabicValue(txt) {
-      this.create.name = (0,_helper_langTransform__WEBPACK_IMPORTED_MODULE_6__.arabicValue)(txt);
+      this.create.name = (0,_helper_langTransform__WEBPACK_IMPORTED_MODULE_7__.arabicValue)(txt);
     },
     arabicValueLong: function arabicValueLong(txt) {
-      this.create.long_name = (0,_helper_langTransform__WEBPACK_IMPORTED_MODULE_6__.arabicValue)(txt);
+      this.create.long_name = (0,_helper_langTransform__WEBPACK_IMPORTED_MODULE_7__.arabicValue)(txt);
     },
     englishValue: function englishValue(txt) {
-      this.create.name_e = (0,_helper_langTransform__WEBPACK_IMPORTED_MODULE_6__.englishValue)(txt);
+      this.create.name_e = (0,_helper_langTransform__WEBPACK_IMPORTED_MODULE_7__.englishValue)(txt);
     },
     englishValueLong: function englishValueLong(txt) {
-      this.create.long_name_e = (0,_helper_langTransform__WEBPACK_IMPORTED_MODULE_6__.englishValue)(txt);
+      this.create.long_name_e = (0,_helper_langTransform__WEBPACK_IMPORTED_MODULE_7__.englishValue)(txt);
     }
   }
 });
@@ -18605,6 +18610,266 @@ var render = function () {
                     _c("div", { staticClass: "row" }, [
                       _c("div", { staticClass: "col-md-7" }, [
                         _c("div", { staticClass: "row" }, [
+                          _vm.isVisible("name_e")
+                            ? _c("div", { staticClass: "col-md-6" }, [
+                                _c(
+                                  "div",
+                                  { staticClass: "form-group" },
+                                  [
+                                    _c(
+                                      "label",
+                                      {
+                                        staticClass: "control-label",
+                                        attrs: { for: "field-1" },
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                                " +
+                                            _vm._s(
+                                              _vm.getCompanyKey(
+                                                "country_name_en"
+                                              )
+                                            ) +
+                                            "\n                                "
+                                        ),
+                                        _vm.isRequired("name_e")
+                                          ? _c(
+                                              "span",
+                                              { staticClass: "text-danger" },
+                                              [_vm._v("*")]
+                                            )
+                                          : _vm._e(),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("multiselect", {
+                                      attrs: {
+                                        options: _vm.seederCountries.map(
+                                          function (type) {
+                                            return type.nicename
+                                          }
+                                        ),
+                                        "custom-label": function (opt) {
+                                          return opt
+                                        },
+                                      },
+                                      on: { input: _vm.setCreateForm },
+                                      model: {
+                                        value: _vm.$v.create.name_e.$model,
+                                        callback: function ($$v) {
+                                          _vm.$set(
+                                            _vm.$v.create.name_e,
+                                            "$model",
+                                            $$v
+                                          )
+                                        },
+                                        expression: "$v.create.name_e.$model",
+                                      },
+                                    }),
+                                    _vm._v(" "),
+                                    _vm.$v.create.name_e.$error
+                                      ? _c(
+                                          "div",
+                                          { staticClass: "text-danger" },
+                                          [
+                                            _vm._v(
+                                              "\n                                " +
+                                                _vm._s(
+                                                  _vm.$t(
+                                                    "general.fieldIsRequired"
+                                                  )
+                                                ) +
+                                                "\n                              "
+                                            ),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                  ],
+                                  1
+                                ),
+                              ])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.isVisible("long_name_e")
+                            ? _c("div", { staticClass: "col-md-6" }, [
+                                _c(
+                                  "div",
+                                  { staticClass: "form-group" },
+                                  [
+                                    _c(
+                                      "label",
+                                      {
+                                        staticClass: "control-label",
+                                        attrs: { for: "field-4" },
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                      " +
+                                            _vm._s(
+                                              _vm.getCompanyKey(
+                                                "country_long_name_en"
+                                              )
+                                            ) +
+                                            "\n                      "
+                                        ),
+                                        _vm.isRequired("long_name_e")
+                                          ? _c(
+                                              "span",
+                                              { staticClass: "text-danger" },
+                                              [_vm._v("*")]
+                                            )
+                                          : _vm._e(),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("div", { attrs: { dir: "ltr" } }, [
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value:
+                                              _vm.$v.create.long_name_e.$model,
+                                            expression:
+                                              "$v.create.long_name_e.$model",
+                                          },
+                                        ],
+                                        staticClass: "form-control",
+                                        class: {
+                                          "is-invalid":
+                                            _vm.$v.create.long_name_e.$error ||
+                                            _vm.errors.long_name_e,
+                                          "is-valid":
+                                            !_vm.$v.create.long_name_e
+                                              .$invalid &&
+                                            !_vm.errors.long_name_e,
+                                        },
+                                        attrs: {
+                                          readonly: "",
+                                          type: "text",
+                                          "data-create": "4",
+                                          id: "field-4",
+                                        },
+                                        domProps: {
+                                          value:
+                                            _vm.$v.create.long_name_e.$model,
+                                        },
+                                        on: {
+                                          keyup: function ($event) {
+                                            return _vm.longEnglishValue(
+                                              _vm.create.long_name_e
+                                            )
+                                          },
+                                          keypress: function ($event) {
+                                            if (
+                                              !$event.type.indexOf("key") &&
+                                              _vm._k(
+                                                $event.keyCode,
+                                                "enter",
+                                                13,
+                                                $event.key,
+                                                "Enter"
+                                              )
+                                            ) {
+                                              return null
+                                            }
+                                            return _vm.moveInput(
+                                              "input",
+                                              "create",
+                                              5
+                                            )
+                                          },
+                                          input: function ($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.$set(
+                                              _vm.$v.create.long_name_e,
+                                              "$model",
+                                              $event.target.value
+                                            )
+                                          },
+                                        },
+                                      }),
+                                    ]),
+                                    _vm._v(" "),
+                                    !_vm.$v.create.long_name_e.minLength
+                                      ? _c(
+                                          "div",
+                                          { staticClass: "invalid-feedback" },
+                                          [
+                                            _vm._v(
+                                              "\n                      " +
+                                                _vm._s(
+                                                  _vm.$t(
+                                                    "general.Itmustbeatleast"
+                                                  )
+                                                ) +
+                                                "\n                      " +
+                                                _vm._s(
+                                                  _vm.$v.create.long_name_e
+                                                    .$params.minLength.min
+                                                ) +
+                                                "\n                      " +
+                                                _vm._s(
+                                                  _vm.$t("general.letters")
+                                                ) +
+                                                "\n                    "
+                                            ),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    !_vm.$v.create.long_name_e.maxLength
+                                      ? _c(
+                                          "div",
+                                          { staticClass: "invalid-feedback" },
+                                          [
+                                            _vm._v(
+                                              "\n                      " +
+                                                _vm._s(
+                                                  _vm.$t(
+                                                    "general.Itmustbeatmost"
+                                                  )
+                                                ) +
+                                                "\n                      " +
+                                                _vm._s(
+                                                  _vm.$v.create.long_name_e
+                                                    .$params.maxLength.max
+                                                ) +
+                                                "\n                      " +
+                                                _vm._s(
+                                                  _vm.$t("general.letters")
+                                                ) +
+                                                "\n                    "
+                                            ),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    _vm.errors.long_name_e
+                                      ? _vm._l(
+                                          _vm.errors.long_name_e,
+                                          function (errorMessage, index) {
+                                            return _c(
+                                              "ErrorMessage",
+                                              { key: index },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(errorMessage) +
+                                                    "\n                      "
+                                                ),
+                                              ]
+                                            )
+                                          }
+                                        )
+                                      : _vm._e(),
+                                  ],
+                                  2
+                                ),
+                              ])
+                            : _vm._e(),
+                          _vm._v(" "),
                           _vm.isVisible("name")
                             ? _c("div", { staticClass: "col-md-6" }, [
                                 _c(
@@ -18956,361 +19221,6 @@ var render = function () {
                                 ),
                               ])
                             : _vm._e(),
-                          _vm._v(" "),
-                          _vm.isVisible("name_e")
-                            ? _c("div", { staticClass: "col-md-6" }, [
-                                _c(
-                                  "div",
-                                  { staticClass: "form-group" },
-                                  [
-                                    _c(
-                                      "label",
-                                      {
-                                        staticClass: "control-label",
-                                        attrs: { for: "field-2" },
-                                      },
-                                      [
-                                        _vm._v(
-                                          "\n                      " +
-                                            _vm._s(
-                                              _vm.getCompanyKey(
-                                                "country_name_en"
-                                              )
-                                            ) +
-                                            "\n                      "
-                                        ),
-                                        _vm.isRequired("name_e")
-                                          ? _c(
-                                              "span",
-                                              { staticClass: "text-danger" },
-                                              [_vm._v("*")]
-                                            )
-                                          : _vm._e(),
-                                      ]
-                                    ),
-                                    _vm._v(" "),
-                                    _c("div", { attrs: { dir: "ltr" } }, [
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: _vm.$v.create.name_e.$model,
-                                            expression:
-                                              "$v.create.name_e.$model",
-                                          },
-                                        ],
-                                        staticClass: "form-control",
-                                        class: {
-                                          "is-invalid":
-                                            _vm.$v.create.name_e.$error ||
-                                            _vm.errors.name_e,
-                                          "is-valid":
-                                            !_vm.$v.create.name_e.$invalid &&
-                                            !_vm.errors.name_e,
-                                        },
-                                        attrs: {
-                                          type: "text",
-                                          "data-create": "2",
-                                          id: "field-2",
-                                        },
-                                        domProps: {
-                                          value: _vm.$v.create.name_e.$model,
-                                        },
-                                        on: {
-                                          keyup: function ($event) {
-                                            return _vm.englishValue(
-                                              _vm.create.name_e
-                                            )
-                                          },
-                                          keypress: function ($event) {
-                                            if (
-                                              !$event.type.indexOf("key") &&
-                                              _vm._k(
-                                                $event.keyCode,
-                                                "enter",
-                                                13,
-                                                $event.key,
-                                                "Enter"
-                                              )
-                                            ) {
-                                              return null
-                                            }
-                                            return _vm.moveInput(
-                                              "input",
-                                              "create",
-                                              3
-                                            )
-                                          },
-                                          input: function ($event) {
-                                            if ($event.target.composing) {
-                                              return
-                                            }
-                                            _vm.$set(
-                                              _vm.$v.create.name_e,
-                                              "$model",
-                                              $event.target.value
-                                            )
-                                          },
-                                        },
-                                      }),
-                                    ]),
-                                    _vm._v(" "),
-                                    !_vm.$v.create.name_e.minLength
-                                      ? _c(
-                                          "div",
-                                          { staticClass: "invalid-feedback" },
-                                          [
-                                            _vm._v(
-                                              "\n                      " +
-                                                _vm._s(
-                                                  _vm.$t(
-                                                    "general.Itmustbeatleast"
-                                                  )
-                                                ) +
-                                                "\n                      " +
-                                                _vm._s(
-                                                  _vm.$v.create.name_e.$params
-                                                    .minLength.min
-                                                ) +
-                                                "\n                      " +
-                                                _vm._s(
-                                                  _vm.$t("general.letters")
-                                                ) +
-                                                "\n                    "
-                                            ),
-                                          ]
-                                        )
-                                      : _vm._e(),
-                                    _vm._v(" "),
-                                    !_vm.$v.create.name_e.maxLength
-                                      ? _c(
-                                          "div",
-                                          { staticClass: "invalid-feedback" },
-                                          [
-                                            _vm._v(
-                                              "\n                      " +
-                                                _vm._s(
-                                                  _vm.$t(
-                                                    "general.Itmustbeatmost"
-                                                  )
-                                                ) +
-                                                "\n                      " +
-                                                _vm._s(
-                                                  _vm.$v.create.name_e.$params
-                                                    .maxLength.max
-                                                ) +
-                                                "\n                      " +
-                                                _vm._s(
-                                                  _vm.$t("general.letters")
-                                                ) +
-                                                "\n                    "
-                                            ),
-                                          ]
-                                        )
-                                      : _vm._e(),
-                                    _vm._v(" "),
-                                    _vm.errors.name_e
-                                      ? _vm._l(
-                                          _vm.errors.name_e,
-                                          function (errorMessage, index) {
-                                            return _c(
-                                              "ErrorMessage",
-                                              { key: index },
-                                              [
-                                                _vm._v(
-                                                  _vm._s(errorMessage) +
-                                                    "\n                      "
-                                                ),
-                                              ]
-                                            )
-                                          }
-                                        )
-                                      : _vm._e(),
-                                  ],
-                                  2
-                                ),
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.isVisible("long_name_e")
-                            ? _c("div", { staticClass: "col-md-6" }, [
-                                _c(
-                                  "div",
-                                  { staticClass: "form-group" },
-                                  [
-                                    _c(
-                                      "label",
-                                      {
-                                        staticClass: "control-label",
-                                        attrs: { for: "field-4" },
-                                      },
-                                      [
-                                        _vm._v(
-                                          "\n                      " +
-                                            _vm._s(
-                                              _vm.getCompanyKey(
-                                                "country_long_name_en"
-                                              )
-                                            ) +
-                                            "\n                      "
-                                        ),
-                                        _vm.isRequired("long_name_e")
-                                          ? _c(
-                                              "span",
-                                              { staticClass: "text-danger" },
-                                              [_vm._v("*")]
-                                            )
-                                          : _vm._e(),
-                                      ]
-                                    ),
-                                    _vm._v(" "),
-                                    _c("div", { attrs: { dir: "ltr" } }, [
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value:
-                                              _vm.$v.create.long_name_e.$model,
-                                            expression:
-                                              "$v.create.long_name_e.$model",
-                                          },
-                                        ],
-                                        staticClass: "form-control",
-                                        class: {
-                                          "is-invalid":
-                                            _vm.$v.create.long_name_e.$error ||
-                                            _vm.errors.long_name_e,
-                                          "is-valid":
-                                            !_vm.$v.create.long_name_e
-                                              .$invalid &&
-                                            !_vm.errors.long_name_e,
-                                        },
-                                        attrs: {
-                                          type: "text",
-                                          "data-create": "4",
-                                          id: "field-4",
-                                        },
-                                        domProps: {
-                                          value:
-                                            _vm.$v.create.long_name_e.$model,
-                                        },
-                                        on: {
-                                          keyup: function ($event) {
-                                            return _vm.longEnglishValue(
-                                              _vm.create.long_name_e
-                                            )
-                                          },
-                                          keypress: function ($event) {
-                                            if (
-                                              !$event.type.indexOf("key") &&
-                                              _vm._k(
-                                                $event.keyCode,
-                                                "enter",
-                                                13,
-                                                $event.key,
-                                                "Enter"
-                                              )
-                                            ) {
-                                              return null
-                                            }
-                                            return _vm.moveInput(
-                                              "input",
-                                              "create",
-                                              5
-                                            )
-                                          },
-                                          input: function ($event) {
-                                            if ($event.target.composing) {
-                                              return
-                                            }
-                                            _vm.$set(
-                                              _vm.$v.create.long_name_e,
-                                              "$model",
-                                              $event.target.value
-                                            )
-                                          },
-                                        },
-                                      }),
-                                    ]),
-                                    _vm._v(" "),
-                                    !_vm.$v.create.long_name_e.minLength
-                                      ? _c(
-                                          "div",
-                                          { staticClass: "invalid-feedback" },
-                                          [
-                                            _vm._v(
-                                              "\n                      " +
-                                                _vm._s(
-                                                  _vm.$t(
-                                                    "general.Itmustbeatleast"
-                                                  )
-                                                ) +
-                                                "\n                      " +
-                                                _vm._s(
-                                                  _vm.$v.create.long_name_e
-                                                    .$params.minLength.min
-                                                ) +
-                                                "\n                      " +
-                                                _vm._s(
-                                                  _vm.$t("general.letters")
-                                                ) +
-                                                "\n                    "
-                                            ),
-                                          ]
-                                        )
-                                      : _vm._e(),
-                                    _vm._v(" "),
-                                    !_vm.$v.create.long_name_e.maxLength
-                                      ? _c(
-                                          "div",
-                                          { staticClass: "invalid-feedback" },
-                                          [
-                                            _vm._v(
-                                              "\n                      " +
-                                                _vm._s(
-                                                  _vm.$t(
-                                                    "general.Itmustbeatmost"
-                                                  )
-                                                ) +
-                                                "\n                      " +
-                                                _vm._s(
-                                                  _vm.$v.create.long_name_e
-                                                    .$params.maxLength.max
-                                                ) +
-                                                "\n                      " +
-                                                _vm._s(
-                                                  _vm.$t("general.letters")
-                                                ) +
-                                                "\n                    "
-                                            ),
-                                          ]
-                                        )
-                                      : _vm._e(),
-                                    _vm._v(" "),
-                                    _vm.errors.long_name_e
-                                      ? _vm._l(
-                                          _vm.errors.long_name_e,
-                                          function (errorMessage, index) {
-                                            return _c(
-                                              "ErrorMessage",
-                                              { key: index },
-                                              [
-                                                _vm._v(
-                                                  _vm._s(errorMessage) +
-                                                    "\n                      "
-                                                ),
-                                              ]
-                                            )
-                                          }
-                                        )
-                                      : _vm._e(),
-                                  ],
-                                  2
-                                ),
-                              ])
-                            : _vm._e(),
                         ]),
                       ]),
                       _vm._v(" "),
@@ -19550,6 +19460,7 @@ var render = function () {
                                           !_vm.errors.short_code,
                                       },
                                       attrs: {
+                                        readonly: "",
                                         type: "text",
                                         "data-create": "7",
                                         id: "field-6",
@@ -19719,6 +19630,7 @@ var render = function () {
                                           !_vm.errors.phone_key,
                                       },
                                       attrs: {
+                                        readonly: "",
                                         type: "number",
                                         "data-create": "6",
                                         id: "field-5",

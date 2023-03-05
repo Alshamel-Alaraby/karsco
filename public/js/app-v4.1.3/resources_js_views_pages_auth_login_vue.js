@@ -97,7 +97,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         var _email = this.email,
           password = this.password;
         if (this.login_as == "admin") {
-          axios.post("".concat("http://localhost:8080/", "api/partners/login"), {
+          axios.post("".concat("https://alshamelalaraby.com/", "api/partners/login"), {
             email: _email,
             password: password
           }).then( /*#__PURE__*/function () {
@@ -201,7 +201,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return axios.get("".concat("http://localhost:8080/", "api/everything_about_the_company/").concat(id)).then(function (res) {
+                return axios.get("".concat("https://alshamelalaraby.com/", "api/everything_about_the_company/").concat(id)).then(function (res) {
                   var l = res.data.data;
                   var name = [];
                   l.work_flow_trees.forEach(function (parent) {

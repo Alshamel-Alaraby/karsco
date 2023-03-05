@@ -8700,7 +8700,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       child_doc_types: [],
       showPhoto: "/images/img-1.png",
       root: [],
-      per_page: 6,
+      per_page: 1,
       type: "",
       search: "",
       favourite: false,
@@ -8836,6 +8836,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   methods: {
+    getPaginatedArchFiles: function getPaginatedArchFiles(page) {
+      this.current_page = page ? page : this.current_page;
+      if (this.currentNode.parent_doc_type_children) {
+        //If node selected is key value
+        this.getArchiveFiles();
+      } else if (this.currentNode.arch_documents) {
+        //If node selected department
+        this.getArchiveFilesByDepartmentDocument(this.currentNode.id, null);
+      } else if (this.currentNode.key) {
+        //If node selected parent document
+        this.getArchiveFilesByDepartmentDocument(this.currentNode.arch_department_id, this.currentNode.id);
+      }
+    },
     getArchiveFiles: function getArchiveFiles(docId) {
       var _this4 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
@@ -8851,9 +8864,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context2.abrupt("return");
               case 3:
                 _context2.next = 5;
-                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-archive-files/valueMedia?value=".concat(_typeof(_this4.currentNode.name_e) === 'object' ? _this4.currentNode.name_e.name_e : _this4.currentNode.name_e, "&department_id=").concat(_this4.currentNode.archive_file.arch_department_id, "\n          &parent_arch_doc_type_id=").concat(_this4.currentNode.parent_doc_id, "\n          &arch_doc_type_id=").concat(_this4.arch_doc_type_id ? _this4.arch_doc_type_id : "")).then(function (res) {
+                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-archive-files/valueMedia?value=".concat(_typeof(_this4.currentNode.name_e) === 'object' ? _this4.currentNode.name_e.name_e : _this4.currentNode.name_e, "&department_id=").concat(_this4.currentNode.archive_file.arch_department_id, "\n          &parent_arch_doc_type_id=").concat(_this4.currentNode.parent_doc_id, "\n          &arch_doc_type_id=").concat(_this4.arch_doc_type_id ? _this4.arch_doc_type_id : "", "\n          &page=").concat(_this4.current_page, "&per_page=").concat(_this4.per_page)).then(function (res) {
                   var l = res.data;
                   _this4.archiveFiles = l.data;
+                  _this4.archivesPagination = l.pagination;
+                  _this4.current_page = l.pagination.current_page;
                 })["catch"](function (err) {
                   sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                     icon: "error",
@@ -8879,9 +8894,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("arch-archive-files/files_Department_Doc_Type?arch_department_id=".concat(departmentId, "&arch_doc_type_id=").concat(parentDocumentId ? parentDocumentId : "")).then(function (res) {
+                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("arch-archive-files/files_Department_Doc_Type?arch_department_id=".concat(departmentId, "&arch_doc_type_id=").concat(parentDocumentId ? parentDocumentId : "", "&page=").concat(_this5.current_page, "&per_page=").concat(_this5.per_page)).then(function (res) {
                   var l = res.data;
                   _this5.archiveFiles = l.data;
+                  _this5.archivesPagination = l.pagination;
+                  _this5.current_page = l.pagination.current_page;
                 })["catch"](function (err) {
                   sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                     icon: "error",
@@ -9133,16 +9150,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         name_e: "All"
       }].concat(_toConsumableArray(this.currentNode.parent_doc_type_children)) : [];
       this.arch_doc_type_id = null;
-      if (this.currentNode.parent_doc_type_children) {
-        //If node selected is key value
-        this.getArchiveFiles();
-      } else if (this.currentNode.arch_documents) {
-        //If node selected department
-        this.getArchiveFilesByDepartmentDocument(this.currentNode.id, null);
-      } else if (this.currentNode.key) {
-        //If node selected parent document
-        this.getArchiveFilesByDepartmentDocument(this.currentNode.arch_department_id, this.currentNode.id);
-      }
+      this.getPaginatedArchFiles(1);
       this.isActiveFile = !this.isActiveFile;
       this.$store.commit("archiving/archiveFileEmity");
       this.$store.commit("archiving/objectActiveEmity");
@@ -47084,13 +47092,13 @@ var render = function () {
                                   },
                                   [
                                     _vm._v(
-                                      "\n                    " +
+                                      "\n                      " +
                                         _vm._s(
                                           _vm.$i18n.locale == "ar"
                                             ? node.name
                                             : node.name_e
                                         ) +
-                                        "\n                  "
+                                        "\n                    "
                                     ),
                                   ]
                                 )
@@ -47126,13 +47134,13 @@ var render = function () {
                                   },
                                   [
                                     _vm._v(
-                                      "\n                    " +
+                                      "\n                      " +
                                         _vm._s(
                                           _vm.$i18n.locale == "ar"
                                             ? field.doc_field_id.name
                                             : field.doc_field_id.name_e
                                         ) +
-                                        "\n                  "
+                                        "\n                    "
                                     ),
                                   ]
                                 )
@@ -47395,9 +47403,9 @@ var render = function () {
                           },
                           [
                             _vm._v(
-                              "\n                " +
+                              "\n                  " +
                                 _vm._s(_vm.$t("general.favorite")) +
-                                "\n                "
+                                "\n                  "
                             ),
                             _vm.favourite
                               ? _c("i", { staticClass: "fa fa-star" })
@@ -47486,13 +47494,13 @@ var render = function () {
                                 },
                                 [
                                   _vm._v(
-                                    "\n                    " +
+                                    "\n                      " +
                                       _vm._s(_vm.archivesPagination.from) +
                                       "-" +
                                       _vm._s(_vm.archivesPagination.to) +
-                                      "\n                    /\n                    " +
+                                      "\n                      /\n                      " +
                                       _vm._s(_vm.archivesPagination.total) +
-                                      "\n                  "
+                                      "\n                    "
                                   ),
                                 ]
                               ),
@@ -47511,7 +47519,7 @@ var render = function () {
                                     on: {
                                       click: function ($event) {
                                         $event.preventDefault()
-                                        return _vm.getData(
+                                        return _vm.getPaginatedArchFiles(
                                           _vm.archivesPagination.current_page -
                                             1
                                         )
@@ -47547,7 +47555,7 @@ var render = function () {
                                       ) {
                                         return null
                                       }
-                                      return _vm.getDataCurrentPage()
+                                      return _vm.getPaginatedArchFiles()
                                     },
                                     input: function ($event) {
                                       if ($event.target.composing) {
@@ -47572,7 +47580,7 @@ var render = function () {
                                     on: {
                                       click: function ($event) {
                                         $event.preventDefault()
-                                        return _vm.getData(
+                                        return _vm.getPaginatedArchFiles(
                                           _vm.archivesPagination.current_page +
                                             1
                                         )
@@ -47640,11 +47648,11 @@ var render = function () {
                                             },
                                             [
                                               _vm._v(
-                                                "\n                        " +
+                                                "\n                          " +
                                                   _vm._s(
                                                     _vm.$t("general.Add")
                                                   ) +
-                                                  "\n                      "
+                                                  "\n                        "
                                               ),
                                             ]
                                           )
@@ -47695,9 +47703,9 @@ var render = function () {
                                   },
                                   [
                                     _vm._v(
-                                      "\n                      " +
+                                      "\n                        " +
                                         _vm._s(_vm.$t("general.Cancel")) +
-                                        "\n                    "
+                                        "\n                      "
                                     ),
                                   ]
                                 ),
@@ -47796,7 +47804,7 @@ var render = function () {
                                                             },
                                                             [
                                                               _vm._v(
-                                                                "\n                              " +
+                                                                "\n                                " +
                                                                   _vm._s(
                                                                     _vm.$i18n
                                                                       .locale ==
@@ -47808,7 +47816,7 @@ var render = function () {
                                                                           .doc_field_id
                                                                           .name_e
                                                                   ) +
-                                                                  "\n                              "
+                                                                  "\n                                "
                                                               ),
                                                               field.is_required ==
                                                               1
@@ -47869,7 +47877,7 @@ var render = function () {
                                                             },
                                                             [
                                                               _vm._v(
-                                                                "\n                              " +
+                                                                "\n                                " +
                                                                   _vm._s(
                                                                     _vm.$i18n
                                                                       .locale ==
@@ -48035,7 +48043,7 @@ var render = function () {
                                                               },
                                                               [
                                                                 _vm._v(
-                                                                  "\n                                " +
+                                                                  "\n                                  " +
                                                                     _vm._s(
                                                                       _vm.$i18n
                                                                         .locale ==
@@ -48164,7 +48172,7 @@ var render = function () {
                                                             },
                                                             [
                                                               _vm._v(
-                                                                "\n                              " +
+                                                                "\n                                " +
                                                                   _vm._s(
                                                                     _vm.$i18n
                                                                       .locale ==
@@ -48176,7 +48184,7 @@ var render = function () {
                                                                           .doc_field_id
                                                                           .name_e
                                                                   ) +
-                                                                  "\n                              "
+                                                                  "\n                                "
                                                               ),
                                                               field.is_required ==
                                                               1
@@ -48238,7 +48246,7 @@ var render = function () {
                                                             },
                                                             [
                                                               _vm._v(
-                                                                "\n                              " +
+                                                                "\n                                " +
                                                                   _vm._s(
                                                                     _vm.$i18n
                                                                       .locale ==
@@ -48250,7 +48258,7 @@ var render = function () {
                                                                           .doc_field_id
                                                                           .name_e
                                                                   ) +
-                                                                  "\n                              "
+                                                                  "\n                                "
                                                               ),
                                                               field.is_required ==
                                                               1
@@ -48311,7 +48319,7 @@ var render = function () {
                                                             },
                                                             [
                                                               _vm._v(
-                                                                "\n                              " +
+                                                                "\n                                " +
                                                                   _vm._s(
                                                                     _vm.$i18n
                                                                       .locale ==
@@ -48323,7 +48331,7 @@ var render = function () {
                                                                           .doc_field_id
                                                                           .name_e
                                                                   ) +
-                                                                  "\n                              "
+                                                                  "\n                                "
                                                               ),
                                                               field.is_required ==
                                                               1
@@ -48435,7 +48443,7 @@ var render = function () {
                                                             },
                                                             [
                                                               _vm._v(
-                                                                "\n                              " +
+                                                                "\n                                " +
                                                                   _vm._s(
                                                                     _vm.$i18n
                                                                       .locale ==
@@ -48447,7 +48455,7 @@ var render = function () {
                                                                           .doc_field_id
                                                                           .name_e
                                                                   ) +
-                                                                  "\n                              "
+                                                                  "\n                                "
                                                               ),
                                                               field.is_required ==
                                                               1
@@ -48616,7 +48624,7 @@ var render = function () {
                                                             },
                                                             [
                                                               _vm._v(
-                                                                "\n                              " +
+                                                                "\n                                " +
                                                                   _vm._s(
                                                                     _vm.$i18n
                                                                       .locale ==
@@ -48628,7 +48636,7 @@ var render = function () {
                                                                           .doc_field_id
                                                                           .name_e
                                                                   ) +
-                                                                  "\n                              "
+                                                                  "\n                                "
                                                               ),
                                                               field.is_required ==
                                                               1
@@ -48737,7 +48745,7 @@ var render = function () {
                                                             },
                                                             [
                                                               _vm._v(
-                                                                "\n                              " +
+                                                                "\n                                " +
                                                                   _vm._s(
                                                                     _vm.$i18n
                                                                       .locale ==
@@ -48749,7 +48757,7 @@ var render = function () {
                                                                           .doc_field_id
                                                                           .name_e
                                                                   ) +
-                                                                  "\n                              "
+                                                                  "\n                                "
                                                               ),
                                                               field.is_required ==
                                                               1
@@ -49033,11 +49041,11 @@ var render = function () {
                                                                             },
                                                                             [
                                                                               _vm._v(
-                                                                                "\n                                          " +
+                                                                                "\n                                            " +
                                                                                   _vm._s(
                                                                                     photo.name
                                                                                   ) +
-                                                                                  "\n                                        "
+                                                                                  "\n                                          "
                                                                               ),
                                                                             ]
                                                                           ),
@@ -49127,13 +49135,13 @@ var render = function () {
                                                       },
                                                       [
                                                         _vm._v(
-                                                          "\n                              " +
+                                                          "\n                                " +
                                                             _vm._s(
                                                               _vm.$t(
                                                                 "general.Add"
                                                               )
                                                             ) +
-                                                            "\n                            "
+                                                            "\n                              "
                                                         ),
                                                       ]
                                                     )
@@ -49285,13 +49293,13 @@ var render = function () {
                                       { staticClass: "control-label" },
                                       [
                                         _vm._v(
-                                          "\n                        " +
+                                          "\n                          " +
                                             _vm._s(
                                               _vm.$i18n.locale == "ar"
                                                 ? field.name
                                                 : field.name_e
                                             ) +
-                                            "\n                      "
+                                            "\n                        "
                                         ),
                                       ]
                                     ),
@@ -49456,9 +49464,9 @@ var render = function () {
                         this.currentNode
                           ? [
                               _vm._v(
-                                "\n                  " +
+                                "\n                    " +
                                   _vm._s(_vm.$t("general.currentNode")) +
-                                  " :\n                  " +
+                                  " :\n                    " +
                                   _vm._s(
                                     _vm.$i18n.locale == "ar"
                                       ? typeof this.currentNode.name ===
@@ -49474,7 +49482,7 @@ var render = function () {
                                         : this.currentNode.name_e.name_e
                                       : this.currentNode.name_e
                                   ) +
-                                  "\n                "
+                                  "\n                  "
                               ),
                             ]
                           : _vm._e(),

@@ -98,7 +98,6 @@ class ArchiveFileController extends Controller
         } else {
             $models = ['data' => $models->get(), 'paginate' => false];
         }
-
         return responseJson(200, 'success', ArchiveFileResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
@@ -292,13 +291,16 @@ class ArchiveFileController extends Controller
             $q->when($request->arch_doc_type_id,function ($q) use ($request){
                 $q->where('arch_doc_type_id',$request->arch_doc_type_id);
             });
-        })->get();
-
-
+        });
         if (!$model) {
             return responseJson(404, 'not found');
         }
-        return responseJson(200, 'done', ArchiveFileResource::collection($model));
+        if ($request->per_page) {
+            $model = ['data' => $model->paginate($request->per_page), 'paginate' => true];
+        } else {
+            $model = ['data' => $model->get(), 'paginate' => false];
+        }
+        return responseJson(200, 'success', ArchiveFileResource::collection($model['data']), $model['paginate'] ? getPaginates($model['data']) : null);
     }
 
 
@@ -314,8 +316,14 @@ class ArchiveFileController extends Controller
                     $q->where('parent_id', $request->arch_doc_type_id);
                 });
             });
-        })->get();
-        return responseJson(200, 'done', ArchiveFileResource::collection($model));
+        });
+        //
+        if ($request->per_page) {
+            $model = ['data' => $model->paginate($request->per_page), 'paginate' => true];
+        } else {
+            $model = ['data' => $model->get(), 'paginate' => false];
+        }
+        return responseJson(200, 'success', ArchiveFileResource::collection($model['data']), $model['paginate'] ? getPaginates($model['data']) : null);
     }
     public function searchValue($value)
     {

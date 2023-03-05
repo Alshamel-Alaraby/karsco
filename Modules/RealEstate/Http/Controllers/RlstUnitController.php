@@ -8,6 +8,7 @@ use Modules\RealEstate\Entities\RlstUnit;
 use Modules\RealEstate\Http\Requests\RlstUnitEditRequest;
 use Modules\RealEstate\Http\Requests\RlstUnitRequest;
 use Modules\RealEstate\Transformers\RlstUnitResource;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class RlstUnitController extends Controller
 {
@@ -64,7 +65,7 @@ class RlstUnitController extends Controller
         if (!$model) {
             return responseJson(404, 'not found');
         }
-        $model->update($request->validated()->except(["media"]));
+        $model->update($request->all());
         if ($request->media && !$request->old_media) { // if there is new media and no old media
             $model->clearMediaCollection('media');
             foreach ($request->media as $media) {

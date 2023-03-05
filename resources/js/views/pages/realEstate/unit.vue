@@ -68,6 +68,7 @@ export default {
             unit_id: null,
             saveImageName: [],
             showPhoto: "./images/img-1.png",
+            mime_type: '',
             unitsPagination: {},
             units: [],
             buildings: [],
@@ -475,6 +476,7 @@ export default {
             this.errors = {};
             this.$bvModal.hide(`create`);
             this.images = [];
+            this.mime_type = '';
             this.unit_id = null;
         },
         /**
@@ -510,6 +512,7 @@ export default {
             });
             this.unit_id = null;
             this.media = {};
+            this.mime_type = '';
             this.images = [];
             this.errors = {};
         },
@@ -546,8 +549,8 @@ export default {
             });
             this.media = {};
             this.images = [];
+            this.mime_type = '';
         },
-
         AddSubmit(){
 
             if(!this.create.name){ this.create.name = this.create.name_e}
@@ -664,6 +667,13 @@ export default {
             this.edit.unit_net_area = unit.unit_net_area;
             this.edit.rooms = unit.rooms;
             this.edit.view = unit.view;
+            this.images = unit.media ?? [];
+            if (this.images && this.images.length > 0) {
+                this.showPhoto = this.images[this.images.length - 1].url;
+                this.mime_type = this.images[this.images.length - 1].mime_type;
+            } else {
+                this.showPhoto = "./images/img-1.png";
+            }
             this.errors = {};
         },
         /**
@@ -692,6 +702,7 @@ export default {
             };
             this.unit_id = null;
             this.images = [];
+            this.mime_type = '';
         },
         /**
          *  start  dynamicSortString
@@ -895,7 +906,8 @@ export default {
                                 .then((res) => {
                                     this.images = res.data.data.media ?? [];
                                     if (this.images && this.images.length > 0) {
-                                        this.showPhoto = this.images[this.images.length - 1].webp;
+                                        this.showPhoto = this.images[this.images.length - 1].url;
+                                        this.mime_type = this.images[this.images.length - 1].mime_type;
                                     } else {
                                         this.showPhoto = "./images/img-1.png";
                                     }
@@ -955,7 +967,8 @@ export default {
                                         .then((res) => {
                                             this.images = res.data.data.media ?? [];
                                             if (this.images && this.images.length > 0) {
-                                                this.showPhoto = this.images[this.images.length - 1].webp;
+                                                this.showPhoto = this.images[this.images.length - 1].url;
+                                                this.mime_type = this.images[this.images.length - 1].mime_type;
                                             } else {
                                                 this.showPhoto = "./images/img-1.png";
                                             }
@@ -1001,7 +1014,8 @@ export default {
                     this.units[index] = res.data.data;
                     this.images = res.data.data.media ?? [];
                     if (this.images && this.images.length > 0) {
-                        this.showPhoto = this.images[this.images.length - 1].webp;
+                        this.showPhoto = this.images[this.images.length - 1].url;
+                        this.mime_type = this.images[this.images.length - 1].mime_type;
                     } else {
                         this.showPhoto = "./images/img-1.png";
                     }
@@ -1637,14 +1651,24 @@ export default {
                                                                         <div class="row align-items-center">
                                                                             <div
                                                                                 class="col-auto"
-                                                                                @click="showPhoto = photo.webp"
+                                                                                @click="showPhoto = photo.url;mime_type=photo.mime_type"
                                                                             >
-                                                                                <img
-                                                                                    data-dz-thumbnail
-                                                                                    :src="photo.webp"
-                                                                                    class="avatar-sm rounded bg-light"
-                                                                                    @error="src = './images/img-1.png'"
-                                                                                />
+                                                                                <template v-if="!photo.mime_type.includes('video')">
+                                                                                    <img
+                                                                                        data-dz-thumbnail
+                                                                                        :src="photo.url"
+                                                                                        class="avatar-sm rounded bg-light"
+                                                                                        @error="src = '../../../assets/images/video.jpg'"
+                                                                                    />
+                                                                                </template>
+                                                                                <template v-else>
+                                                                                    <img
+                                                                                        data-dz-thumbnail
+                                                                                        src="../../../assets/images/video.jpg"
+                                                                                        class="avatar-sm rounded bg-light"
+                                                                                        @error="src = '../../../assets/images/video.jpg'"
+                                                                                    />
+                                                                                </template>
                                                                             </div>
                                                                             <div class="col pl-0">
                                                                                 <a
@@ -1700,12 +1724,19 @@ export default {
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                                <div class="show-dropzone">
+                                                <div class="show-dropzone" v-if="!mime_type.includes('video')">
                                                     <img
                                                         :src="showPhoto"
                                                         class="img-thumbnail"
                                                         @error="src = './images/img-1.png'"
                                                     />
+                                                </div>
+                                                <div class="show-dropzone" v-else>
+                                                    <video width="320" height="240" controls autoplay>
+                                                        <source :src="showPhoto" :type="mime_type">
+                                                        <source :src="showPhoto" type="video/mp4">
+                                                        <source :src="showPhoto" type="video/ogg">
+                                                    </video>
                                                 </div>
                                             </div>
                                         </div>
@@ -2360,24 +2391,34 @@ export default {
                                                                                         <div class="row align-items-center">
                                                                                             <div
                                                                                                 class="col-auto"
-                                                                                                @click="showPhoto = photo.webp"
+                                                                                                @click="showPhoto = photo.url;mime_type=photo.mime_type"
                                                                                             >
-                                                                                                <img
-                                                                                                    data-dz-thumbnail
-                                                                                                    :src="photo.webp"
-                                                                                                    class="avatar-sm rounded bg-light"
-                                                                                                    @error="src = './images/img-1.png'"
-                                                                                                />
+                                                                                                <template v-if="!photo.mime_type.includes('video')">
+                                                                                                    <img
+                                                                                                        data-dz-thumbnail
+                                                                                                        :src="photo.url"
+                                                                                                        class="avatar-sm rounded bg-light"
+                                                                                                        @error="src = '../../../assets/images/video.jpg'"
+                                                                                                    />
+                                                                                                </template>
+                                                                                                <template v-else>
+                                                                                                    <img
+                                                                                                        data-dz-thumbnail
+                                                                                                        src="../../../assets/images/video.jpg"
+                                                                                                        class="avatar-sm rounded bg-light"
+                                                                                                        @error="src = '../../../assets/images/video.jpg'"
+                                                                                                    />
+                                                                                                </template>
                                                                                             </div>
                                                                                             <div class="col pl-0">
                                                                                                 <a
                                                                                                     href="javascript:void(0);"
                                                                                                     :class="[
-                                                                                      'font-weight-bold',
-                                                                                      images.length - 1 == index
-                                                                                        ? 'text-white'
-                                                                                        : 'text-muted',
-                                                                                    ]"
+                                                                                                      'font-weight-bold',
+                                                                                                      images.length - 1 == index
+                                                                                                        ? 'text-white'
+                                                                                                        : 'text-muted',
+                                                                                                    ]"
                                                                                                     data-dz-name
                                                                                                 >
                                                                                                     {{ photo.name }}
@@ -2423,12 +2464,19 @@ export default {
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-4">
-                                                                <div class="show-dropzone">
+                                                                <div class="show-dropzone" v-if="!mime_type.includes('video')">
                                                                     <img
                                                                         :src="showPhoto"
                                                                         class="img-thumbnail"
                                                                         @error="src = './images/img-1.png'"
                                                                     />
+                                                                </div>
+                                                                <div class="show-dropzone" v-else>
+                                                                    <video width="320" height="240" controls autoplay>
+                                                                        <source :src="showPhoto" :type="mime_type">
+                                                                        <source :src="showPhoto" type="video/mp4">
+                                                                        <source :src="showPhoto" type="video/ogg">
+                                                                    </video>
                                                                 </div>
                                                             </div>
                                                         </div>

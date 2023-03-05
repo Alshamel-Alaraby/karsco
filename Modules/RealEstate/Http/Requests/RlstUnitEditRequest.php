@@ -14,9 +14,9 @@ class RlstUnitEditRequest extends FormRequest
     public function rules()
     {
         return [
-            'code' => "required|string|max:20",
-            'name' => "required|string|max:100",
-            'name_e' => "required|string|max:100",
+            'code' => "nullable|string|max:20",
+            'name' => "nullable|string|max:100",
+            'name_e' => "nullable|string|max:100",
             'description' => "nullable|string",
             'description_e' => "nullable|string",
             'unit_ty' => "nullable|integer",
@@ -29,13 +29,13 @@ class RlstUnitEditRequest extends FormRequest
             'view' => "nullable|integer",
             'floor' => "nullable|integer",
             'finishing' => "nullable|integer",
-            'properties' => "required|array",
+            'properties' => "nullable|array",
             'attachments' => "nullable|array",
-            'module' => "required|string",
+            'module' => "nullable|string",
             "media" => "nullable|array",
-            "media.*" => ["nullable|exists:media,id", new \App\Rules\MediaRule()],
-            'old_media.*' => ['nullable|exists:media,id', new \App\Rules\MediaRule("Modules\RealEstate\Entities\RlstUnit")]
-        ];
+            "media.*" => ["nullable", "exists:media,id", new \App\Rules\MediaRule()],
+            'old_media.*' => ['nullable', "exists:media,id", new \App\Rules\MediaRule("Modules\RealEstate\Entities\RlstUnit")],
+            ];
     }
 
     /**
