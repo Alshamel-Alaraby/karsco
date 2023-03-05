@@ -31,7 +31,8 @@ class CreateCityRequest extends FormRequest
             "name_e" => "nullable|unique:general_cities,name_e",
             "country_id" => "nullable|exists:general_countries,id",
             "governorate_id" => "nullable|exists:general_governorates,id",
-            "company_id" => "nullable"
+            "company_id" => "nullable",
+            "is_active"=>"nullable"
         ];
     }
 }

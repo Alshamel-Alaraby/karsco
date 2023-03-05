@@ -427,7 +427,7 @@ export default {
         country_id: null,
         swift_code: "",
       };
-      this.getCountries();
+      if(this.isVisible('country_id')) this.getCountries();
       this.$nextTick(() => {
         this.$v.$reset();
       });
@@ -531,11 +531,11 @@ export default {
      *   show Modal (edit)
      */
     async resetModalEdit(id) {
-      await this.getCountries();
+      if(this.isVisible('country_id')) await this.getCountries();
       let bank = this.banks.find((e) => id == e.id);
       this.edit.name = bank.name;
       this.edit.name_e = bank.name_e;
-      this.edit.country_id = bank.country_id;
+      this.edit.country_id = bank.country_id ?? null;
       this.edit.swift_code = bank.swift_code;
       this.errors = {};
     },
@@ -575,9 +575,7 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
+
     async getCountries() {
       this.isLoader = true;
       await adminApi
@@ -940,15 +938,12 @@ export default {
                       <input
                         type="text"
                         class="form-control"
-                        data-create="1"
-                        @keypress.enter="moveInput('input', 'create', 2)"
                         v-model="$v.create.swift_code.$model"
                         :class="{
                           'is-invalid': $v.create.swift_code.$error || errors.swift_code,
                           'is-valid':
                             !$v.create.swift_code.$invalid && !errors.swift_code,
                         }"
-                        id="field-15"
                       />
                       <template v-if="errors.swift_code">
                         <ErrorMessage
@@ -969,8 +964,6 @@ export default {
                         <input
                           type="text"
                           class="form-control arabicInput"
-                          data-create="1"
-                          @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
                           :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
@@ -1010,8 +1003,6 @@ export default {
                         <input
                           type="text"
                           class="form-control englishInput"
-                          data-create="2"
-                          @keypress.enter="moveInput('input', 'create', 3)"
                           v-model="$v.create.name_e.$model"
                           :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -1167,7 +1158,7 @@ export default {
                     <td v-if="setting.country_id && isVisible('country_id')">
                       <h5 class="m-0 font-weight-normal">
                         {{
-                          $i18n.locale == "ar" ? data.country.name : data.country.name_e
+                           data.country ? $i18n.locale == "ar" ? data.country.name : data.country.name_e : ' - '
                         }}
                       </h5>
                     </td>
@@ -1296,7 +1287,6 @@ export default {
                                   type="text"
                                   class="form-control"
                                   data-create="1"
-                                  @keypress.enter="moveInput('input', 'create', 2)"
                                   v-model="$v.edit.swift_code.$model"
                                   :class="{
                                     'is-invalid':
@@ -1325,8 +1315,6 @@ export default {
                                   <input
                                     type="text"
                                     class="form-control arabicInput"
-                                    data-create="1"
-                                    @keypress.enter="moveInput('input', 'create', 2)"
                                     v-model="$v.edit.name.$model"
                                     :class="{
                                       'is-invalid': $v.edit.name.$error || errors.name,

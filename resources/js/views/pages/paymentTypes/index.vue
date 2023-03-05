@@ -551,12 +551,6 @@ export default {
         this.checkAll.splice(index, 1);
       }
     },
-    /**
-     *  end  ckeckRow
-     */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     formatDate(value) {
       return formatDateOnly(value);
     },
@@ -855,8 +849,6 @@ export default {
                         <input
                           type="text"
                           class="form-control "
-                          data-create="1"
-                          @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
                           :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
@@ -896,8 +888,6 @@ export default {
                         <input
                           type="text"
                           class="form-control "
-                          data-create="2"
-                          @keypress.enter="moveInput('select', 'create', 3)"
                           v-model="$v.create.name_e.$model"
                           :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -926,7 +916,7 @@ export default {
                       </template>
                     </div>
                   </div>
-                    <div class="col-md-12" v-if="isVisible('is_default')">
+                  <div class="col-md-12" v-if="isVisible('is_default')">
                         <div class="form-group">
                             <label class="mr-2">
                                 {{ getCompanyKey("payment_type_default") }}

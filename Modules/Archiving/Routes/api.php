@@ -32,7 +32,6 @@ Route::group(['prefix' => 'document-field'], function () {
         Route::get("tables", 'getTables');
         Route::get("columns/{table}", 'getColumns');
         Route::get("column-data/{table}/{column}", 'getColumnData');
-
         Route::get('/', 'all')->name('document.index');
         Route::get('/{id}', 'find');
         Route::post('/', 'create')->name('document.create');

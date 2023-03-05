@@ -1,3 +1,5 @@
+
+
 <script>
 import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
@@ -15,7 +17,7 @@ import bankAccount from "../../../components/create/bankAccount";
 import Multiselect from "vue-multiselect";
 import translation from "../../../helper/translation-mixin";
 import {arabicValue,englishValue} from "../../../helper/langTransform";
-
+import axios from "axios";
 // require styles
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
@@ -65,6 +67,7 @@ export default {
             per_page: 50,
             search: '',
             debounce: {},
+            isVaildPhone: false,
             ownersPagination: {},
             owners: [],
             cities: [],
@@ -75,6 +78,7 @@ export default {
             create: {
                 name: '',
                 name_e: '',
+                phone_code: '',
                 phone: '',
                 email: '',
                 rb_code: null,
@@ -92,6 +96,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
+                phone_code: '',
                 rb_code: null,
                 nationality_id: null,
                 contact_person: '',
@@ -152,31 +157,31 @@ export default {
             name: {required,minLength: minLength(2),maxLength: maxLength(100),},
             name_e: {required,minLength: minLength(2),maxLength: maxLength(100),},
             phone: {required,maxLength: maxLength(100)},
-            email: {required,maxLength: maxLength(100),email},
+            email: {maxLength: maxLength(100),email},
             rb_code: {required,integer,maxLength: maxLength(9),},
             nationality_id: {required,integer,maxLength: maxLength(40),},
-            contact_person: {required,maxLength: maxLength(100)},
-            contact_phones: {required,integer,maxLength: maxLength(100)},
+            contact_person: {maxLength: maxLength(100)},
+            contact_phones: {integer,maxLength: maxLength(100)},
             national_id: {required,integer},
             country_id: {required},
             city_id: {required},
             bank_account_id: {required},
-            whatsapp: {required,integer}
+            whatsapp: {integer}
         },
         edit: {
             name: {required,minLength: minLength(2),maxLength: maxLength(100),},
             name_e: {required,minLength: minLength(2),maxLength: maxLength(100),},
             phone: {required,maxLength: maxLength(100)},
-            email: {required,maxLength: maxLength(100),email},
+            email: {maxLength: maxLength(100),email},
             rb_code: {required,integer,maxLength: maxLength(9),},
             nationality_id: {required,integer,maxLength: maxLength(40),},
-            contact_person: {required,maxLength: maxLength(100)},
-            contact_phones: {required,integer,maxLength: maxLength(100)},
+            contact_person: {maxLength: maxLength(100)},
+            contact_phones: {integer,maxLength: maxLength(100)},
             national_id: {required,integer},
             country_id: {required},
             city_id: {required},
             bank_account_id: {required},
-            whatsapp: {required,integer}
+            whatsapp: {integer}
         },
     },
     watch: {
@@ -213,40 +218,17 @@ export default {
     mounted() {
         this.getData();
     },
-    updated(){
-        $(function(){
-            $("").keypress(function(event){
-                var ew = event.which;
-                if(ew == 32)
-                    return true;
-                if(48 <= ew && ew <= 57)
-                    return true;
-                if(65 <= ew && ew <= 90)
-                    return true;
-                if(97 <= ew && ew <= 122)
-                    return true;
-                return false;
-            });
-            $(".arabicInput").keypress(function(event){
-                var ew = event.which;
-                if(ew == 32)
-                    return true;
-                if(48 <= ew && ew <= 57)
-                    return true;
-                if(65 <= ew && ew <= 90)
-                    return false;
-                if(97 <= ew && ew <= 122)
-                    return false;
-                return true;
-            });
-        });
+    computed: {
+        codeCountry(){
+            return geoplugin_countryCode();
+        }
     },
     methods: {
-                arabicValue(txt) {
+        arabicValue(txt) {
       this.create.name = arabicValue(txt);
       this.edit.name = arabicValue(txt);
     },
-    englishValue(txt) {
+        englishValue(txt) {
       this.create.name_e = englishValue(txt);
       this.edit.name_e = englishValue(txt);
     },
@@ -424,6 +406,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
+                phone_code: '',
                 rb_code: null,
                 nationality_id: null,
                 contact_person: '',
@@ -437,6 +420,7 @@ export default {
             this.$nextTick(() => { this.$v.$reset() });
             this.errors = {};
             this.$bvModal.hide(`create`);
+            this.isVaildPhone = false;
         },
         /**
          *  hidden Modal (create)
@@ -449,6 +433,7 @@ export default {
                 name_e: '',
                 phone: '',
                 email: '',
+                phone_code: '',
                 rb_code: null,
                 nationality_id: null,
                 contact_person: '',
@@ -461,6 +446,7 @@ export default {
             };
             this.$nextTick(() => { this.$v.$reset() });
             this.errors = {};
+            this.isVaildPhone = false;
         },
         /**
          *  create countrie
@@ -468,6 +454,7 @@ export default {
         async resetForm(){
             await this.getCategory();
             await this.getBankAcount();
+            this.isVaildPhone = false;
             this.create = {
                 name: '',
                 name_e: '',
@@ -475,6 +462,7 @@ export default {
                 email: '',
                 rb_code: null,
                 nationality_id: null,
+                phone_code: '',
                 contact_person: '',
                 contact_phones:'',
                 national_id: null,
@@ -495,7 +483,7 @@ export default {
 
             this.$v.create.$touch();
 
-            if (this.$v.create.$invalid) {
+            if (this.$v.create.$invalid && !this.isVaildPhone) {
                 return;
             } else {
                 this.isLoader = true;
@@ -539,7 +527,7 @@ export default {
             if(!this.edit.name_e){ this.edit.name_e = this.edit.name}
             this.$v.edit.$touch();
 
-            if (this.$v.edit.$invalid) {
+            if (this.$v.edit.$invalid && !this.isVaildPhone) {
                 return;
             } else {
                 this.isLoader = true;
@@ -583,6 +571,7 @@ export default {
             await this.getBankAcount();
             this.edit.name = build.name;
             this.edit.name_e = build.name_e;
+            this.edit.phone_code =  build.phone_code;
             this.edit.phone = build.phone;
             this.edit.city_id = build.city.id;
             this.edit.country_id = build.country.id;
@@ -595,6 +584,7 @@ export default {
             this.edit.contact_phones = build.contact_phones;
             this.edit.national_id = build.national_id;
             this.errors = {};
+            this.isVaildPhone = false;
         },
         /**
          *  hidden Modal (edit)
@@ -604,6 +594,7 @@ export default {
             this.edit = {
                 name: '',
                 name_e: '',
+                phone_code: '',
                 phone: '',
                 email: '',
                 rb_code: null,
@@ -616,6 +607,7 @@ export default {
                 city_id: null ,
                 whatsapp: ''
             };
+            this.isVaildPhone = false;
         },
         /**
          *  start  dynamicSortString
@@ -636,9 +628,6 @@ export default {
         /**
          *  end  ckeckRow
          */
-        moveInput(tag,c,index){
-            document.querySelector(`${tag}[data-${c}='${index}']`).focus()
-        },
         formatDate(value) {
             return formatDateOnly(value);
         },
@@ -773,7 +762,29 @@ export default {
                 }
                 this.enabled3 = true;
             }, 100);
-        }
+        },
+        updatePhone(e) {
+            this.create.phone = e.phoneNumber;
+            this.create.phone_code = e.countryCallingCode;
+            this.isVaildPhone = e.isValid;
+        },
+        updateWhatsapp(e){
+            this.create.whatsapp = e.phoneNumber;
+        },
+        updateWhatsappEdit(e){
+            this.edit.whatsapp = e.phoneNumber;
+        },
+        updatePhoneEdit(e) {
+            this.edit.phone = e.phoneNumber;
+            this.edit.phone_code = e.countryCallingCode;
+            this.isVaildPhone = e.isValid;
+        },
+        updateContract(e){
+            this.create.contact_phones = e.phoneNumber;
+        },
+        updateContractEdit(e){
+            this.edit.contact_phones = e.phoneNumber;
+        },
     },
 };
 </script>
@@ -999,6 +1010,61 @@ export default {
                                     </b-button>
                                 </div>
                                 <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="field-1" class="control-label">
+                                                {{ getCompanyKey("owner_name_ar") }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <div dir="rtl">
+                                                <input
+                                                    @keyup="arabicValue(create.name)"
+                                                    type="text"
+                                                    class="form-control"
+                                                    v-model="$v.create.name.$model"
+                                                    :class="{
+                                                    'is-invalid':$v.create.name.$error || errors.name,
+                                                    'is-valid':!$v.create.name.$invalid && !errors.name
+                                                }"
+                                                    id="field-1"
+                                                />
+                                            </div>
+                                            <div v-if="!$v.create.name.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.create.name.$params.minLength.min }} {{ $t('general.letters') }}</div>
+                                            <div v-if="!$v.create.name.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.create.name.$params.maxLength.max }} {{ $t('general.letters') }}</div>
+                                            <template v-if="errors.name">
+                                                <ErrorMessage v-for="(errorMessage,index) in errors.name" :key="index">{{ errorMessage }}</ErrorMessage>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="field-2" class="control-label">
+                                                {{ getCompanyKey('owner_name_en') }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <div dir="ltr">
+                                                <input
+                                                    @keyup="englishValue(create.name_e)"
+                                                    type="text"
+                                                    class="form-control"
+                                                    v-model="$v.create.name_e.$model"
+                                                    :class="{
+                                                        'is-invalid':$v.create.name_e.$error || errors.name_e,
+                                                        'is-valid':!$v.create.name_e.$invalid && !errors.name_e
+                                                    }"
+                                                    id="field-2"
+                                                />
+                                            </div>
+                                            <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.create.name_e.$params.minLength.min }} {{ $t('general.letters') }}</div>
+                                            <div v-if="!$v.create.name_e.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.create.name_e.$params.maxLength.max }} {{ $t('general.letters') }}</div>
+                                            <template v-if="errors.name_e">
+                                                <ErrorMessage v-for="(errorMessage,index) in errors.name_e" :key="index">{{ errorMessage }}</ErrorMessage>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr style="margin: 10px 0 !important;border-top: 1px solid rgb(141 163 159 / 42%)" />
+                                <div class="row">
                                     <div class="col-md-3">
                                         <div class="form-group position-relative">
                                             <label class="control-label">
@@ -1083,6 +1149,30 @@ export default {
                                         </div>
                                     </div>
                                     <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label  class="control-label">
+                                                {{ getCompanyKey('owner_national_id') }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                step="0.1"
+                                                v-model="$v.create.national_id.$model"
+                                                :class="{
+                                                'is-invalid':$v.create.national_id.$error || errors.national_id,
+                                                'is-valid':!$v.create.national_id.$invalid && !errors.national_id
+                                            }"
+                                            />
+                                            <template v-if="errors.national_id">
+                                                <ErrorMessage v-for="(errorMessage,index) in errors.national_id" :key="index">{{ errorMessage }}</ErrorMessage>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr style="margin: 10px 0 !important;border-top: 1px solid rgb(141 163 159 / 42%)" />
+                                <div class="row">
+                                    <div class="col-md-3">
                                         <div class="form-group position-relative">
                                             <label class="control-label">
                                                 {{ getCompanyKey('bank_account') }}
@@ -1112,57 +1202,21 @@ export default {
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="field-1" class="control-label">
-                                                {{ getCompanyKey("owner_name_ar") }}
+                                            <label  class="control-label">
+                                                {{ getCompanyKey('owner_code') }}
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <div dir="rtl">
-                                                <input
-                                                @keyup="arabicValue(create.name)"
-                                                    type="text"
-                                                    class="form-control"
-                                                    data-create="1"
-                                                    @keypress.enter="moveInput('input','create',2)"
-                                                    v-model="$v.create.name.$model"
-                                                    :class="{
-                                                    'is-invalid':$v.create.name.$error || errors.name,
-                                                    'is-valid':!$v.create.name.$invalid && !errors.name
-                                                }"
-                                                    id="field-1"
-                                                />
-                                            </div>
-                                            <div v-if="!$v.create.name.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.create.name.$params.minLength.min }} {{ $t('general.letters') }}</div>
-                                            <div v-if="!$v.create.name.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.create.name.$params.maxLength.max }} {{ $t('general.letters') }}</div>
-                                            <template v-if="errors.name">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.name" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="field-2" class="control-label">
-                                                {{ getCompanyKey('owner_name_en') }}
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <div dir="ltr">
-                                                <input
-                                                @keyup="englishValue(create.name_e)"
-                                                    type="text"
-                                                    class="form-control"
-                                                    data-create="2"
-                                                    @keypress.enter="moveInput('input','create',3)"
-                                                    v-model="$v.create.name_e.$model"
-                                                    :class="{
-                                                        'is-invalid':$v.create.name_e.$error || errors.name_e,
-                                                        'is-valid':!$v.create.name_e.$invalid && !errors.name_e
-                                                    }"
-                                                    id="field-2"
-                                                />
-                                            </div>
-                                            <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.create.name_e.$params.minLength.min }} {{ $t('general.letters') }}</div>
-                                            <div v-if="!$v.create.name_e.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.create.name_e.$params.maxLength.max }} {{ $t('general.letters') }}</div>
-                                            <template v-if="errors.name_e">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.name_e" :key="index">{{ errorMessage }}</ErrorMessage>
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                v-model="$v.create.rb_code.$model"
+                                                :class="{
+                                                'is-invalid':$v.create.rb_code.$error || errors.rb_code,
+                                                'is-valid':!$v.create.rb_code.$invalid && !errors.rb_code
+                                            }"
+                                            />
+                                            <template v-if="errors.rb_code">
+                                                <ErrorMessage v-for="(errorMessage,index) in errors.rb_code" :key="index">{{ errorMessage }}</ErrorMessage>
                                             </template>
                                         </div>
                                     </div>
@@ -1172,19 +1226,35 @@ export default {
                                                 {{ getCompanyKey('owner_phone') }}
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                data-create="9"
-                                                @keypress.enter="moveInput('select','create',10)"
+                                            <VuePhoneNumberInput
                                                 v-model="$v.create.phone.$model"
-                                                :class="{
-                                                'is-invalid':$v.create.phone.$error || errors.phone,
-                                                'is-valid':!$v.create.phone.$invalid && !errors.phone
-                                            }"
+                                                :default-country-code="codeCountry"
+                                                valid-color="#28a745"
+                                                error-color="#dc3545"
+                                                :preferred-countries="['FR', 'EG', 'DE']"
+                                                @update="updatePhone"
                                             />
                                             <template v-if="errors.phone">
                                                 <ErrorMessage v-for="(errorMessage,index) in errors.phone" :key="index">{{ errorMessage }}</ErrorMessage>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="control-label">
+                                                {{ getCompanyKey('owner_whatsapp') }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <VuePhoneNumberInput
+                                                v-model="$v.create.whatsapp.$model"
+                                                :default-country-code="codeCountry"
+                                                valid-color="#28a745"
+                                                error-color="#dc3545"
+                                                :preferred-countries="['FR', 'EG', 'DE']"
+                                                @update="updateWhatsapp"
+                                            />
+                                            <template v-if="errors.whatsapp">
+                                                <ErrorMessage v-for="(errorMessage,index) in errors.whatsapp" :key="index">{{ errorMessage }}</ErrorMessage>
                                             </template>
                                         </div>
                                     </div>
@@ -1197,8 +1267,6 @@ export default {
                                             <input
                                                 type="text"
                                                 class="form-control"
-                                                data-create="9"
-                                                @keypress.enter="moveInput('select','create',10)"
                                                 v-model="$v.create.email.$model"
                                                 :class="{
                                                 'is-invalid':$v.create.email.$error || errors.email,
@@ -1210,7 +1278,10 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                </div>
+                                <hr style="margin: 10px 0 !important;border-top: 1px solid rgb(141 163 159 / 42%)" />
+                                <div class="row">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label class="control-label">
                                                 {{ getCompanyKey('owner_contact_person') }}
@@ -1219,8 +1290,6 @@ export default {
                                             <input
                                                 type="text"
                                                 class="form-control"
-                                                data-create="9"
-                                                @keypress.enter="moveInput('select','create',10)"
                                                 v-model="$v.create.contact_person.$model"
                                                 :class="{
                                                 'is-invalid':$v.create.contact_person.$error || errors.contact_person,
@@ -1232,93 +1301,22 @@ export default {
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label  class="control-label">
-                                                {{ getCompanyKey('owner_code') }}
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="number"
-                                                class="form-control"
-                                                data-create="9"
-                                                @keypress.enter="moveInput('select','create',10)"
-                                                v-model="$v.create.rb_code.$model"
-                                                :class="{
-                                                'is-invalid':$v.create.rb_code.$error || errors.rb_code,
-                                                'is-valid':!$v.create.rb_code.$invalid && !errors.rb_code
-                                            }"
-                                            />
-                                            <template v-if="errors.rb_code">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.rb_code" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label  class="control-label">
-                                                {{ getCompanyKey('owner_national_id') }}
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="number"
-                                                class="form-control"
-                                                data-create="9"
-                                                step="0.1"
-                                                @keypress.enter="moveInput('select','create',10)"
-                                                v-model="$v.create.national_id.$model"
-                                                :class="{
-                                                'is-invalid':$v.create.national_id.$error || errors.national_id,
-                                                'is-valid':!$v.create.national_id.$invalid && !errors.national_id
-                                            }"
-                                            />
-                                            <template v-if="errors.national_id">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.national_id" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label  class="control-label">
                                                 {{ getCompanyKey('owner_contact_phones') }}
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <input
-                                                type="number"
-                                                class="form-control"
-                                                data-create="9"
-                                                step="0.1"
-                                                @keypress.enter="moveInput('select','create',10)"
+                                            <VuePhoneNumberInput
                                                 v-model="$v.create.contact_phones.$model"
-                                                :class="{
-                                                'is-invalid':$v.create.contact_phones.$error || errors.contact_phones,
-                                                'is-valid':!$v.create.contact_phones.$invalid && !errors.contact_phones
-                                            }"
+                                                :default-country-code="codeCountry"
+                                                valid-color="#28a745"
+                                                error-color="#dc3545"
+                                                :preferred-countries="['FR', 'EG', 'DE']"
+                                                @update="updateContract"
                                             />
                                             <template v-if="errors.contact_phones">
                                                 <ErrorMessage v-for="(errorMessage,index) in errors.contact_phones" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label class="control-label">
-                                                {{ getCompanyKey('owner_whatsapp') }}
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                data-create="9"
-                                                @keypress.enter="moveInput('select','create',10)"
-                                                v-model="$v.create.whatsapp.$model"
-                                                :class="{
-                                                'is-invalid':$v.create.whatsapp.$error || errors.whatsapp,
-                                                'is-valid':!$v.create.whatsapp.$invalid && !errors.whatsapp
-                                            }"
-                                            />
-                                            <template v-if="errors.whatsapp">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.whatsapp" :key="index">{{ errorMessage }}</ErrorMessage>
                                             </template>
                                         </div>
                                     </div>
@@ -1471,16 +1469,16 @@ export default {
                                     <td v-if="setting.name_e">
                                         <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                                     </td>
-                                    <td v-if="setting.phone">{{ data.phone }}</td>
+                                    <td v-if="setting.phone">{{ data.phone ? '+'+ data.phone_code + data.phone : '-' }}</td>
                                     <td v-if="setting.email">{{ data.email }}</td>
                                     <td v-if="setting.nationality_id">{{ $i18n.locale == 'ar' ? data.nationality.name : data.nationality.name_e }}</td>
                                     <td v-if="setting.national_id">{{ data.national_id }}</td>
                                     <td v-if="setting.contact_person">{{ data.contact_person }}</td>
-                                    <td v-if="setting.contact_phones">{{ data.contact_phones }}</td>
+                                    <td v-if="setting.contact_phones">{{ data.contact_phones ? '+'+ data.phone_code + data.contact_phones : '-' }}</td>
                                     <td v-if="setting.country_id">{{ $i18n.locale == 'ar' ? data.country.name : data.country.name_e }}</td>
                                     <td v-if="setting.city_id">{{ $i18n.locale == 'ar' ? data.city.name : data.city.name_e }}</td>
                                     <td v-if="setting.bank_account_id">{{  data.ban1k_account.account_number }}</td>
-                                    <td v-if="setting.whatsapp">{{ data.whatsapp }}</td>
+                                    <td v-if="setting.whatsapp">{{ data.whatsapp ? '+'+data.phone_code + data.whatsapp : '-'}}</td>
                                     <td v-if="setting.rb_code">{{ data.rb_code }}</td>
                                     <td v-if="enabled3" class="do-not-print">
                                         <div class="btn-group">
@@ -1554,6 +1552,59 @@ export default {
                                                         {{ $t('general.Cancel') }}
                                                     </b-button>
                                                 </div>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="field-1" class="control-label">
+                                                                {{ getCompanyKey("owner_name_ar") }}
+                                                                <span class="text-danger">*</span>
+                                                            </label>
+                                                            <div dir="rtl">
+                                                                <input
+                                                                    @keyup="arabicValue(edit.name)"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                                    v-model="$v.edit.name.$model"
+                                                                    :class="{
+                                                    'is-invalid':$v.edit.name.$error || errors.name,
+                                                    'is-valid':!$v.edit.name.$invalid && !errors.name
+                                                }"
+                                                                />
+                                                            </div>
+                                                            <div v-if="!$v.edit.name.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.edit.name.$params.minLength.min }} {{ $t('general.letters') }}</div>
+                                                            <div v-if="!$v.edit.name.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.edit.name.$params.maxLength.max }} {{ $t('general.letters') }}</div>
+                                                            <template v-if="errors.name">
+                                                                <ErrorMessage v-for="(errorMessage,index) in errors.name" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="field-2" class="control-label">
+                                                                {{ getCompanyKey('owner_name_en') }}
+                                                                <span class="text-danger">*</span>
+                                                            </label>
+                                                            <div dir="ltr">
+                                                                <input
+                                                                    @keyup="englishValue(edit.name_e)"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                                    v-model="$v.edit.name_e.$model"
+                                                                    :class="{
+                                                        'is-invalid':$v.edit.name_e.$error || errors.name_e,
+                                                        'is-valid':!$v.edit.name_e.$invalid && !errors.name_e
+                                                    }"
+                                                                />
+                                                            </div>
+                                                            <div v-if="!$v.edit.name_e.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.edit.name_e.$params.minLength.min }} {{ $t('general.letters') }}</div>
+                                                            <div v-if="!$v.edit.name_e.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.edit.name_e.$params.maxLength.max }} {{ $t('general.letters') }}</div>
+                                                            <template v-if="errors.name_e">
+                                                                <ErrorMessage v-for="(errorMessage,index) in errors.name_e" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr style="margin: 10px 0 !important;border-top: 1px solid rgb(141 163 159 / 42%)" />
                                                 <div class="row">
                                                     <div class="col-md-3">
                                                         <div class="form-group position-relative">
@@ -1639,6 +1690,30 @@ export default {
                                                         </div>
                                                     </div>
                                                     <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label  class="control-label">
+                                                                {{ getCompanyKey('owner_national_id') }}
+                                                                <span class="text-danger">*</span>
+                                                            </label>
+                                                            <input
+                                                                type="number"
+                                                                class="form-control"
+                                                                step="0.1"
+                                                                v-model="$v.edit.national_id.$model"
+                                                                :class="{
+                                                'is-invalid':$v.edit.national_id.$error || errors.national_id,
+                                                'is-valid':!$v.edit.national_id.$invalid && !errors.national_id
+                                            }"
+                                                            />
+                                                            <template v-if="errors.national_id">
+                                                                <ErrorMessage v-for="(errorMessage,index) in errors.national_id" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr style="margin: 10px 0 !important;border-top: 1px solid rgb(141 163 159 / 42%)" />
+                                                <div class="row">
+                                                    <div class="col-md-3">
                                                         <div class="form-group position-relative">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('bank_account') }}
@@ -1668,55 +1743,21 @@ export default {
                                                     </div>
                                                     <div class="col-md-3">
                                                         <div class="form-group">
-                                                            <label for="field-1" class="control-label">
-                                                                {{ getCompanyKey("owner_name_ar") }}
+                                                            <label  class="control-label">
+                                                                {{ getCompanyKey('owner_code') }}
                                                                 <span class="text-danger">*</span>
                                                             </label>
-                                                            <div dir="rtl">
-                                                                <input
-                                                                @keyup="arabicValue(edit.name)"
-                                                                    type="text"
-                                                                    class="form-control"
-                                                                    data-edit="1"
-                                                                    @keypress.enter="moveInput('input','edit',2)"
-                                                                    v-model="$v.edit.name.$model"
-                                                                    :class="{
-                                                    'is-invalid':$v.edit.name.$error || errors.name,
-                                                    'is-valid':!$v.edit.name.$invalid && !errors.name
-                                                }"
-                                                                />
-                                                            </div>
-                                                            <div v-if="!$v.edit.name.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.edit.name.$params.minLength.min }} {{ $t('general.letters') }}</div>
-                                                            <div v-if="!$v.edit.name.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.edit.name.$params.maxLength.max }} {{ $t('general.letters') }}</div>
-                                                            <template v-if="errors.name">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.name" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label for="field-2" class="control-label">
-                                                                {{ getCompanyKey('owner_name_en') }}
-                                                                <span class="text-danger">*</span>
-                                                            </label>
-                                                            <div dir="ltr">
-                                                                <input
-                                                                @keyup="englishValue(edit.name_e)"
-                                                                    type="text"
-                                                                    class="form-control"
-                                                                    data-edit="2"
-                                                                    @keypress.enter="moveInput('input','edit',3)"
-                                                                    v-model="$v.edit.name_e.$model"
-                                                                    :class="{
-                                                        'is-invalid':$v.edit.name_e.$error || errors.name_e,
-                                                        'is-valid':!$v.edit.name_e.$invalid && !errors.name_e
-                                                    }"
-                                                                />
-                                                            </div>
-                                                            <div v-if="!$v.edit.name_e.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.edit.name_e.$params.minLength.min }} {{ $t('general.letters') }}</div>
-                                                            <div v-if="!$v.edit.name_e.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.edit.name_e.$params.maxLength.max }} {{ $t('general.letters') }}</div>
-                                                            <template v-if="errors.name_e">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.name_e" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                            <input
+                                                                type="number"
+                                                                class="form-control"
+                                                                v-model="$v.edit.rb_code.$model"
+                                                                :class="{
+                                                'is-invalid':$v.edit.rb_code.$error || errors.rb_code,
+                                                'is-valid':!$v.edit.rb_code.$invalid && !errors.rb_code
+                                            }"
+                                                            />
+                                                            <template v-if="errors.rb_code">
+                                                                <ErrorMessage v-for="(errorMessage,index) in errors.rb_code" :key="index">{{ errorMessage }}</ErrorMessage>
                                                             </template>
                                                         </div>
                                                     </div>
@@ -1726,19 +1767,35 @@ export default {
                                                                 {{ getCompanyKey('owner_phone') }}
                                                                 <span class="text-danger">*</span>
                                                             </label>
-                                                            <input
-                                                                type="text"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                @keypress.enter="moveInput('select','edit',10)"
+                                                            <VuePhoneNumberInput
                                                                 v-model="$v.edit.phone.$model"
-                                                                :class="{
-                                                'is-invalid':$v.edit.phone.$error || errors.phone,
-                                                'is-valid':!$v.edit.phone.$invalid && !errors.phone
-                                            }"
+                                                                :default-country-code="codeCountry"
+                                                                valid-color="#28a745"
+                                                                error-color="#dc3545"
+                                                                :preferred-countries="['FR', 'EG', 'DE']"
+                                                                @update="updatePhoneEdit"
                                                             />
                                                             <template v-if="errors.phone">
                                                                 <ErrorMessage v-for="(errorMessage,index) in errors.phone" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label class="control-label">
+                                                                {{ getCompanyKey('owner_whatsapp') }}
+                                                                <span class="text-danger">*</span>
+                                                            </label>
+                                                            <VuePhoneNumberInput
+                                                                v-model="$v.edit.whatsapp.$model"
+                                                                :default-country-code="codeCountry"
+                                                                valid-color="#28a745"
+                                                                error-color="#dc3545"
+                                                                :preferred-countries="['FR', 'EG', 'DE']"
+                                                                @update="updateWhatsappEdit"
+                                                            />
+                                                            <template v-if="errors.whatsapp">
+                                                                <ErrorMessage v-for="(errorMessage,index) in errors.whatsapp" :key="index">{{ errorMessage }}</ErrorMessage>
                                                             </template>
                                                         </div>
                                                     </div>
@@ -1751,8 +1808,6 @@ export default {
                                                             <input
                                                                 type="text"
                                                                 class="form-control"
-                                                                data-edit="9"
-                                                                @keypress.enter="moveInput('select','edit',10)"
                                                                 v-model="$v.edit.email.$model"
                                                                 :class="{
                                                 'is-invalid':$v.edit.email.$error || errors.email,
@@ -1764,7 +1819,10 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                </div>
+                                                <hr style="margin: 10px 0 !important;border-top: 1px solid rgb(141 163 159 / 42%)" />
+                                                <div class="row">
+                                                    <div class="col-md-3">
                                                         <div class="form-group">
                                                             <label class="control-label">
                                                                 {{ getCompanyKey('owner_contact_person') }}
@@ -1773,8 +1831,6 @@ export default {
                                                             <input
                                                                 type="text"
                                                                 class="form-control"
-                                                                data-edit="9"
-                                                                @keypress.enter="moveInput('select','edit',10)"
                                                                 v-model="$v.edit.contact_person.$model"
                                                                 :class="{
                                                 'is-invalid':$v.edit.contact_person.$error || errors.contact_person,
@@ -1786,93 +1842,22 @@ export default {
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
-                                                        <div class="form-group">
-                                                            <label  class="control-label">
-                                                                {{ getCompanyKey('owner_code') }}
-                                                                <span class="text-danger">*</span>
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                @keypress.enter="moveInput('select','edit',10)"
-                                                                v-model="$v.edit.rb_code.$model"
-                                                                :class="{
-                                                'is-invalid':$v.edit.rb_code.$error || errors.rb_code,
-                                                'is-valid':!$v.edit.rb_code.$invalid && !errors.rb_code
-                                            }"
-                                                            />
-                                                            <template v-if="errors.rb_code">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.rb_code" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <div class="form-group">
-                                                            <label  class="control-label">
-                                                                {{ getCompanyKey('owner_national_id') }}
-                                                                <span class="text-danger">*</span>
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                step="0.1"
-                                                                @keypress.enter="moveInput('select','edit',10)"
-                                                                v-model="$v.edit.national_id.$model"
-                                                                :class="{
-                                                'is-invalid':$v.edit.national_id.$error || errors.national_id,
-                                                'is-valid':!$v.edit.national_id.$invalid && !errors.national_id
-                                            }"
-                                                            />
-                                                            <template v-if="errors.national_id">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.national_id" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-3">
                                                         <div class="form-group">
                                                             <label  class="control-label">
                                                                 {{ getCompanyKey('owner_contact_phones') }}
                                                                 <span class="text-danger">*</span>
                                                             </label>
-                                                            <input
-                                                                type="number"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                step="0.1"
-                                                                @keypress.enter="moveInput('select','edit',10)"
+                                                            <VuePhoneNumberInput
                                                                 v-model="$v.edit.contact_phones.$model"
-                                                                :class="{
-                                                'is-invalid':$v.edit.contact_phones.$error || errors.contact_phones,
-                                                'is-valid':!$v.edit.contact_phones.$invalid && !errors.contact_phones
-                                            }"
+                                                                :default-country-code="codeCountry"
+                                                                valid-color="#28a745"
+                                                                error-color="#dc3545"
+                                                                :preferred-countries="['FR', 'EG', 'DE']"
+                                                                @update="updateContractEdit"
                                                             />
                                                             <template v-if="errors.contact_phones">
                                                                 <ErrorMessage v-for="(errorMessage,index) in errors.contact_phones" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-group">
-                                                            <label class="control-label">
-                                                                {{ getCompanyKey('owner_whatsapp') }}
-                                                                <span class="text-danger">*</span>
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                @keypress.enter="moveInput('select','edit',10)"
-                                                                v-model="$v.edit.whatsapp.$model"
-                                                                :class="{
-                                                                    'is-invalid':$v.edit.whatsapp.$error || errors.whatsapp,
-                                                                    'is-valid':!$v.edit.whatsapp.$invalid && !errors.whatsapp
-                                                                }"
-                                                            />
-                                                            <template v-if="errors.whatsapp">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.whatsapp" :key="index">{{ errorMessage }}</ErrorMessage>
                                                             </template>
                                                         </div>
                                                     </div>

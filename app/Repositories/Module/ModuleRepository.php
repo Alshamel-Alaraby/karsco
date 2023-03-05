@@ -3,6 +3,7 @@
 namespace App\Repositories\Module;
 
 use Illuminate\Support\Facades\DB;
+use Nwidart\Modules\Facades\Module;
 
 class ModuleRepository implements ModuleInterface
 {
@@ -73,6 +74,19 @@ class ModuleRepository implements ModuleInterface
         ];
         foreach ($keys as $key) {
             cacheForget($key);
+        }
+
+    }
+
+    public function moduleDisable($request)
+    {
+//        return Module::all();
+
+        collect(Module::all())->each(function ($item , $key){
+            Module::disable($key);
+        });
+        foreach ($request['modules_name']  as $item){
+            Module::enable($item);
         }
 
     }

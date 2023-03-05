@@ -23,7 +23,7 @@ return new class extends Migration
             $table->unsignedInteger('city_id')->nullable()->default(0);
             $table->string('rp_code', 20)->nullable();
             $table->string('nationality')->nullable();
-            $table->unsignedInteger('bank_account_id');
+            $table->unsignedInteger('bank_account_id')->nullable();
             $table->string('contact_person', 100)->nullable();
             $table->string('contact_phone', 100)->nullable();
             $table->string('national_id', 20)->nullable();

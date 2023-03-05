@@ -616,12 +616,6 @@ export default {
         this.create.bank_id = null;
       }
     },
-    showBankModalEdit() {
-      if (this.edit.bank_id == 0) {
-        this.$bvModal.show("bank-create");
-        this.edit.bank_id = null;
-      }
-    },
     /**
      *  reset Modal (create)
      */

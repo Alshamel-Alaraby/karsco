@@ -147,7 +147,7 @@
                   </multiselect>
                 </div>
               </div>
-              <div v-if="$store.state.archiving.objectActive.media" class="col-md-12">
+              <div class="col-md-12">
                 <div class="form-group">
                   <label class="control-label"> Link </label>
                   <input

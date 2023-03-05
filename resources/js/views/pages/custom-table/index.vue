@@ -468,7 +468,7 @@ export default {
         this.isLoader = true;
         this.errors = {};
         adminApi
-          .put(`/customTable/${id}`, { ...this.edit, company_id: this.company_id })
+          .put(`/customTable/update`, { ...this.edit, company_id: this.company_id })
           .then((res) => {
             this.$bvModal.hide(`modal-edit-${id}`);
             this.getData();
@@ -603,6 +603,7 @@ export default {
                   v-b-modal.create
                   variant="primary"
                   class="btn-sm mx-1 font-weight-bold"
+                  v-if="0"
                 >
                   {{ $t("general.Create") }}
                   <i class="fas fa-plus"></i>
@@ -622,18 +623,20 @@ export default {
                     <i class="mdi mdi-square-edit-outline"></i>
                   </button>
                   <!-- start mult delete  -->
+                  <!--    v-if="checkAll.length > 1"-->
                   <button
                     class="custom-btn-dowonload"
-                    v-if="checkAll.length > 1"
+                    v-if="0"
                     @click.prevent="deleteBranch(checkAll)"
                   >
                     <i class="fas fa-trash-alt"></i>
                   </button>
                   <!-- end mult delete  -->
                   <!--  start one delete  -->
+                  <!-- v-if="checkAll.length == 1" -->
                   <button
+                    v-if="0"
                     class="custom-btn-dowonload"
-                    v-if="checkAll.length == 1"
                     @click.prevent="deleteBranch(checkAll[0])"
                   >
                     <i class="fas fa-trash-alt"></i>
@@ -965,6 +968,7 @@ export default {
                             </div>
                           </a>
                           <a
+                            v-if="0"
                             class="dropdown-item text-black"
                             href="#"
                             @click.prevent="deleteBranch(data.id)"
@@ -1075,7 +1079,7 @@ export default {
                                   </label>
                                   <b-form-group>
                                     <b-form-radio
-                                    @change="
+                                      @change="
                                         edit.columns[index].is_visible == 0
                                           ? (edit.columns[index].is_required = 0)
                                           : null
@@ -1086,7 +1090,7 @@ export default {
                                       >{{ $t("general.Yes") }}
                                     </b-form-radio>
                                     <b-form-radio
-                                    @change="
+                                      @change="
                                         edit.columns[index].is_visible == 0
                                           ? (edit.columns[index].is_required = 0)
                                           : null

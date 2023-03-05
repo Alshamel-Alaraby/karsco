@@ -445,7 +445,7 @@ export default {
       this.$nextTick(() => {
         this.$v.$reset();
       });
-      this.getSaleMenType();
+      if(this.isVisible('salesman_type_id')) this.getSaleMenType();
       this.errors = {};
     },
     resetForm() {
@@ -457,7 +457,7 @@ export default {
       this.$nextTick(() => {
         this.$v.$reset();
       });
-      this.getSaleMenType();
+      if(this.isVisible('salesman_type_id')) this.getSaleMenType();
       this.errors = {};
       this.is_disabled = false;
     },
@@ -556,10 +556,10 @@ export default {
      */
     async resetModalEdit(id) {
       let module = this.salesmens.find((e) => id == e.id);
-      await this.getSaleMenType();
+      if(this.isVisible('salesman_type_id')) await this.getSaleMenType();
       this.edit.name = module.name;
       this.edit.name_e = module.name_e;
-      this.edit.salesman_type_id = module.salesmanType.id;
+      if(data.salesmanType) this.edit.salesman_type_id = module.salesmanType.id;
       this.errors = {};
     },
     /**
@@ -594,9 +594,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     async getSaleMenType() {
       this.isLoader = true;
 
@@ -940,8 +937,6 @@ export default {
                         <input
                           type="text"
                           class="form-control arabicInput"
-                          data-create="1"
-                          @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
                           :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
@@ -981,8 +976,6 @@ export default {
                         <input
                           type="text"
                           class="form-control englishInput"
-                          data-create="2"
-                          @keypress.enter="moveInput('select', 'create', 3)"
                           v-model="$v.create.name_e.$model"
                           :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -1114,9 +1107,9 @@ export default {
                     </td>
                     <td v-if="setting.salesman_type_id && isVisible('salesman_type_id')">
                       {{
-                        $i18n.locale == "ar"
+                         data.salesmanType? $i18n.locale == "ar"
                           ? data.salesmanType.name
-                          : data.salesmanType.name_e
+                          : data.salesmanType.name_e : ' - '
                       }}
                     </td>
                     <td v-if="enabled3" class="do-not-print">

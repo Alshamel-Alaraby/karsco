@@ -82,16 +82,12 @@ export default {
       name: {
         required: requiredIf(function (model) {
           return this.isRequired("name");
-        }),
-        minLength: minLength(2),
-        maxLength: maxLength(100),
+        }), minLength: minLength(2), maxLength: maxLength(100),
       },
       name_e: {
         required: requiredIf(function (model) {
           return this.isRequired("name_e");
-        }),
-        minLength: minLength(2),
-        maxLength: maxLength(100),
+        }), minLength: minLength(2), maxLength: maxLength(100),
       },
       is_active: {
         required: requiredIf(function (model) {
@@ -904,8 +900,6 @@ export default {
                         <input
                           type="text"
                           class="form-control arabicInput"
-                          data-create="1"
-                          @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
                           :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
@@ -944,8 +938,6 @@ export default {
                         <input
                           type="text"
                           class="form-control englishInput"
-                          data-create="2"
-                          @keypress.enter="moveInput('select', 'create', 3)"
                           v-model="$v.create.name_e.$model"
                           :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -1195,8 +1187,6 @@ export default {
                                   <input
                                     type="text"
                                     class="form-control arabicInput"
-                                    data-edit="1"
-                                    @keypress.enter="moveInput('input', 'edit', 2)"
                                     v-model="$v.edit.name.$model"
                                     :class="{
                                       'is-invalid': $v.edit.name.$error || errors.name,
@@ -1235,14 +1225,12 @@ export default {
                               <div class="form-group">
                                 <label for="edit-2" class="control-label">
                                   {{ getCompanyKey("branch_name_en") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('name_e')" class="text-danger">*</span>
                                 </label>
                                 <div dir="ltr">
                                   <input
                                     type="text"
                                     class="form-control englishInput"
-                                    data-edit="2"
-                                    @keypress.enter="moveInput('select', 'edit', 3)"
                                     v-model="$v.edit.name_e.$model"
                                     :class="{
                                       'is-invalid':
@@ -1283,7 +1271,7 @@ export default {
                               <div class="form-group">
                                 <label class="mr-2">
                                   {{ getCompanyKey("branch_status") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="is_active('name_e')" class="text-danger">*</span>
                                 </label>
                                 <b-form-group
                                   :class="{

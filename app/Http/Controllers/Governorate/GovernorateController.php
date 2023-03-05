@@ -6,6 +6,7 @@ use App\Http\Requests\AllRequest;
 use App\Http\Requests\Governorate\StoreGovernorateRequest;
 use App\Http\Requests\Governorate\UpdateGovernorateRequest;
 use App\Http\Resources\Governorate\GovernorateResource;
+use App\Models\Governorate;
 use App\Repositories\Governorate\GovernorateInterface;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -54,7 +55,8 @@ class GovernorateController extends Controller
     public function create(StoreGovernorateRequest $request)
     {
         $model = $this->modelInterface->create($request);
-        return responseJson(200, 'success');
+        return $model;
+        // return responseJson(200, 'success');
     }
 
     public function update(UpdateGovernorateRequest $request, $id)

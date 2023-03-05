@@ -16,11 +16,13 @@ class RlstWalletOwnerResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            'wallet' => new RlstOwnerResource($this->wallet),
-            'owner' => new RlstOwnerResource($this->owner),
+            'wallet'     => new RlstWalletResource($this->wallet),
+//            'owner'      => new RlstOwnerResource($this->owner),
             'percentage' => $this->percentage,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+
+
         ];
     }
 }

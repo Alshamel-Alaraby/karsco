@@ -7,13 +7,15 @@ use Illuminate\Routing\Controller;
 use Modules\RealEstate\Entities\RlstWalletOwner;
 use Modules\RealEstate\Http\Requests\RlstWalletOwnerRequest;
 use Modules\RealEstate\Transformers\RlstWalletOwnerResource;
+use Modules\RealEstate\Entities\RlstWallet;
 
 class RlstWalletOwnerController extends Controller
 {
 
-    public function __construct(private RlstWalletOwner $model)
+    public function __construct(private RlstWalletOwner $model ,RlstWallet $modelWallet)
     {
         $this->model = $model;
+        $this->modelWallet = $modelWallet;
     }
 
     public function find($id)
@@ -41,24 +43,27 @@ class RlstWalletOwnerController extends Controller
 
     public function create(RlstWalletOwnerRequest $request)
     {
-        $model = $this->model->create($request->validated());
+        foreach ($request['wallet-owner'] as $wallet_owner){
+            $model = $this->model->create($wallet_owner);
+        }
         $model->refresh();
-
-        return responseJson(200, 'created', new RlstWalletOwnerResource($model));
-
+        return responseJson(200, 'success');
     }
 
     public function update($id, RlstWalletOwnerRequest $request)
     {
-        $model = $this->model->find($id);
-        if (!$model) {
+        $modelWallets = $this->modelWallet->find($id);
+        if (!$modelWallets) {
             return responseJson(404, 'not found');
         }
-
-        $model->update($request->validated());
+        foreach ($modelWallets->walletOwner as $walletOwner){
+            $walletOwner->delete();
+        }
+        foreach ($request['wallet-owner'] as $wallet_owner){
+            $model = $this->model->create($wallet_owner);
+        }
         $model->refresh();
-
-        return responseJson(200, 'updated', new RlstWalletOwnerResource($model));
+        return responseJson(200, 'success');
     }
 
     public function logs($id)

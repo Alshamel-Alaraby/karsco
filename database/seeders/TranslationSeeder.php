@@ -767,8 +767,8 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "country_short_code",
-                "default_en" => "Country short code",
-                "default_ar" => "الكود المختصر للدولة",
+                "default_en" => "Country web code",
+                "default_ar" => "الكود الويب المختصر للدولة",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
@@ -1848,7 +1848,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_unit_ty",
-                "default_en" => "Unit Ty (realEstate)",
+                "default_en" => "Unit Ty ",
                 "default_ar" => "Unit Ty",
                 "new_ar" => "",
                 "new_en" => "",
@@ -1858,7 +1858,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_status_date",
-                "default_en" => "Status Date (realEstate)",
+                "default_en" => "Status Date ",
                 "default_ar" => "وقت الحاله",
                 "new_ar" => "",
                 "new_en" => "",
@@ -1868,7 +1868,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_unit_area",
-                "default_en" => "Unit Area (realEstate)",
+                "default_en" => "Unit Area ",
                 "default_ar" => "مساحه الوحده",
                 "new_ar" => "",
                 "new_en" => "",
@@ -1878,7 +1878,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_building",
-                "default_en" => "Unit building (realEstate)",
+                "default_en" => "Unit building ",
                 "default_ar" => "وحده المبنا (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -1888,7 +1888,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_owner",
-                "default_en" => "Unit Owner (realEstate)",
+                "default_en" => "Unit Owner ",
                 "default_ar" => "مالك المبني (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -1898,7 +1898,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_currency",
-                "default_en" => "Unit Currency (realEstate)",
+                "default_en" => "Unit Currency ",
                 "default_ar" => "عمله الوحده (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -1908,7 +1908,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_wallet",
-                "default_en" => "Unit wallet (realEstate)",
+                "default_en" => "Unit wallet ",
                 "default_ar" => "محفظه الوحده (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -1918,7 +1918,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_wallet",
-                "default_en" => "Unit wallet (realEstate)",
+                "default_en" => "Unit wallet ",
                 "default_ar" => "محفظه الوحده (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -1928,7 +1928,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_status",
-                "default_en" => "Unit Status (realEstate)",
+                "default_en" => "Unit Status ",
                 "default_ar" => "حاله الوحده (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -1938,7 +1938,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_price",
-                "default_en" => "price (realEstate)",
+                "default_en" => "price ",
                 "default_ar" => "سعر (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -1947,38 +1947,8 @@ class TranslationSeeder extends Seeder
 
             ],
             [
-                "key" => "realEstate_unit_commission_ty",
-                "default_en" => "Commission ty (realEstate)",
-                "default_ar" => "Commission Ty (realEstate)",
-                "new_ar" => "",
-                "new_en" => "",
-                "company_id" => 0,
-                "screen" => "realEstate units"
-
-            ],
-            [
-                "key" => "realEstate_unit_commission_value",
-                "default_en" => "Commission Value (realEstate)",
-                "default_ar" => "قيمة العموله (عقارات)",
-                "new_ar" => "",
-                "new_en" => "",
-                "company_id" => 0,
-                "screen" => "realEstate units"
-
-            ],
-            [
-                "key" => "realEstate_unit_commission_ty",
-                "default_en" => "Commission ty (realEstate)",
-                "default_ar" => "Commission Ty",
-                "new_ar" => "",
-                "new_en" => "",
-                "company_id" => 0,
-                "screen" => "realEstate units"
-
-            ],
-            [
                 "key" => "realEstate_unit_rooms",
-                "default_en" => "Rooms (realEstate)",
+                "default_en" => "Rooms ",
                 "default_ar" => "الغرف (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -1988,7 +1958,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_path",
-                "default_en" => "Path (realEstate)",
+                "default_en" => "Path ",
                 "default_ar" => "حمام (عقارات) ",
                 "new_ar" => "",
                 "new_en" => "",
@@ -1998,7 +1968,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_floor",
-                "default_en" => "Floor (realEstate)",
+                "default_en" => "Floor ",
                 "default_ar" => "الارضيه (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -2008,8 +1978,36 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_view",
-                "default_en" => "View (realEstate)",
-                "default_ar" => "View (realEstate)",
+                "default_en" => "View ",
+                "default_ar" => "View ",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "realEstate units"
+
+            ],
+            [
+                "key" => "realEstate_unit_unit_net_area",
+                "default_en" => "Unit Net Area",
+                "default_ar" => "Unit Net Area",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "realEstate units"
+            ],
+            [
+                "key" => "realEstate_unit_finishing",
+                "default_en" => "Finishing ",
+                "default_ar" => "Finishing ",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "realEstate units"
+            ],
+            [
+                "key" => "realEstate_unit_properties",
+                "default_en" => "Properties ",
+                "default_ar" => "Properties ",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
@@ -2018,7 +2016,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_rank",
-                "default_en" => "Rank (realEstate)",
+                "default_en" => "Rank ",
                 "default_ar" => "مرتبه (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -2028,7 +2026,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_module",
-                "default_en" => "Module (realEstate)",
+                "default_en" => "Module ",
                 "default_ar" => "موديول (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4159,8 +4157,8 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "country_short_code",
-                "default_en" => "Country short code",
-                "default_ar" => "الكود المختصر للدولة",
+                "default_en" => "Country web short code",
+                "default_ar" => "كود الويب المختصر للدولة",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
@@ -4186,8 +4184,8 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "country_national_id",
-                "default_en" => "Country national id",
-                "default_ar" => "الرقم القومي للدولة",
+                "default_en" => "Country national id length",
+                "default_ar" => "طول الرقم القومي للدولة",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
@@ -4768,7 +4766,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_edit_form",
-                "default_en" => "Edit color form",
+                "default_en" => "Edit Unit form",
                 "default_ar" => "نموذج تعديل الوحده",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4828,7 +4826,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_unit_ty",
-                "default_en" => "Unit Ty (realEstate)",
+                "default_en" => "Unit Ty ",
                 "default_ar" => "Unit Ty",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4838,7 +4836,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_status_date",
-                "default_en" => "Status Date (realEstate)",
+                "default_en" => "Status Date ",
                 "default_ar" => "وقت الحاله",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4848,7 +4846,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_unit_area",
-                "default_en" => "Unit Area (realEstate)",
+                "default_en" => "Unit Area ",
                 "default_ar" => "مساحه الوحده",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4858,7 +4856,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_building",
-                "default_en" => "Unit building (realEstate)",
+                "default_en" => "Unit building ",
                 "default_ar" => "وحده المبنا (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4868,7 +4866,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_owner",
-                "default_en" => "Unit Owner (realEstate)",
+                "default_en" => "Unit Owner ",
                 "default_ar" => "مالك المبني (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4878,7 +4876,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_currency",
-                "default_en" => "Unit Currency (realEstate)",
+                "default_en" => "Unit Currency ",
                 "default_ar" => "عمله الوحده (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4888,7 +4886,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_wallet",
-                "default_en" => "Unit wallet (realEstate)",
+                "default_en" => "Unit wallet ",
                 "default_ar" => "محفظه الوحده (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4898,7 +4896,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_wallet",
-                "default_en" => "Unit wallet (realEstate)",
+                "default_en" => "Unit wallet ",
                 "default_ar" => "محفظه الوحده (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4908,7 +4906,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_status",
-                "default_en" => "Unit Status (realEstate)",
+                "default_en" => "Unit Status ",
                 "default_ar" => "حاله الوحده (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4918,7 +4916,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_price",
-                "default_en" => "price (realEstate)",
+                "default_en" => "price ",
                 "default_ar" => "سعر (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4928,8 +4926,8 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_commission_ty",
-                "default_en" => "Commission ty (realEstate)",
-                "default_ar" => "Commission Ty (realEstate)",
+                "default_en" => "Commission ty ",
+                "default_ar" => "Commission Ty ",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
@@ -4938,7 +4936,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_commission_value",
-                "default_en" => "Commission Value (realEstate)",
+                "default_en" => "Commission Value ",
                 "default_ar" => "قيمة العموله (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4948,7 +4946,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_commission_ty",
-                "default_en" => "Commission ty (realEstate)",
+                "default_en" => "Commission ty ",
                 "default_ar" => "Commission Ty",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4958,7 +4956,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_rooms",
-                "default_en" => "Rooms (realEstate)",
+                "default_en" => "Rooms ",
                 "default_ar" => "الغرف (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4968,7 +4966,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_path",
-                "default_en" => "Path (realEstate)",
+                "default_en" => "Path ",
                 "default_ar" => "حمام (عقارات) ",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4978,7 +4976,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_floor",
-                "default_en" => "Floor (realEstate)",
+                "default_en" => "Floor ",
                 "default_ar" => "الارضيه (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -4988,8 +4986,8 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_view",
-                "default_en" => "View (realEstate)",
-                "default_ar" => "View (realEstate)",
+                "default_en" => "View ",
+                "default_ar" => "View ",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
@@ -4998,7 +4996,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_rank",
-                "default_en" => "Rank (realEstate)",
+                "default_en" => "Rank ",
                 "default_ar" => "مرتبه (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -5008,7 +5006,7 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "realEstate_unit_module",
-                "default_en" => "Module (realEstate)",
+                "default_en" => "Module ",
                 "default_ar" => "موديول (عقارات)",
                 "new_ar" => "",
                 "new_en" => "",
@@ -5100,8 +5098,8 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "owner_contact_person",
-                "default_en" => "Owner contact person",
-                "default_ar" => "معلومات المالك الشخصية",
+                "default_en" => "Other contact person",
+                "default_ar" => "جهة اتصال أخرى",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
@@ -5110,8 +5108,8 @@ class TranslationSeeder extends Seeder
             ],
             [
                 "key" => "owner_contact_phones",
-                "default_en" => "Owner contact phones",
-                "default_ar" => "هواتف اتصال المالك",
+                "default_en" => "Other contract phone",
+                "default_ar" => "هاتف اتصال اخر",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,

@@ -23,26 +23,26 @@ export default {
     meta: [{ name: "description", content: "Country" }],
   },
   mixins: [translation],
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      if (vm.$store.state.auth.work_flow_trees.includes("area-e")) {
-        Swal.fire({
-          icon: "error",
-          title: `${vm.$t("general.Error")}`,
-          text: `${vm.$t("general.ModuleExpired")}`,
-        });
-        return vm.$router.push({ name: "home" });
-      } else if (
-        (vm.showScreen( "area","governorate") &&
-          vm.$store.state.auth.work_flow_trees.includes("area")) ||
-        vm.$store.state.auth.user.type == "super_admin"
-      ) {
-        return true;
-      } else {
-        return vm.$router.push({ name: "home" });
-      }
-    });
-  },
+  // beforeRouteEnter(to, from, next) {
+  //   next((vm) => {
+  //     if (vm.$store.state.auth.work_flow_trees.includes("area-e")) {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: `${vm.$t("general.Error")}`,
+  //         text: `${vm.$t("general.ModuleExpired")}`,
+  //       });
+  //       return vm.$router.push({ name: "home" });
+  //     } else if (
+  //       (vm.showScreen( "area","governorate") &&
+  //         vm.$store.state.auth.work_flow_trees.includes("area")) ||
+  //       vm.$store.state.auth.user.type == "super_admin"
+  //     ) {
+  //       return true;
+  //     } else {
+  //       return vm.$router.push({ name: "home" });
+  //     }
+  //   });
+  // },
   components: {
     Layout,
     PageHeader,
@@ -493,7 +493,7 @@ export default {
       this.$nextTick(() => {
         this.$v.$reset();
       });
-      this.getCategory();
+      if(this.isVisible('country_id')) this.getCategory();
       this.countries = [];
       this.errors = {};
     },
@@ -599,8 +599,8 @@ export default {
       this.edit.name = governorate.name;
       this.edit.name_e = governorate.name_e;
       this.edit.is_active = governorate.is_active;
-      await this.getCategory();
-      this.edit.country_id = governorate.country.id;
+      if(this.isVisible('country_id')) await this.getCategory();
+      if(governorate.country)this.edit.country_id = governorate.country.id;
       this.edit.phone_key = governorate.phone_key;
       this.errors = {};
     },
@@ -1067,7 +1067,6 @@ export default {
                       @keyup="englishValue(create.name_e)"
                         type="text"
                         class="form-control"
-                        data-create="2"
                         v-model="$v.create.name_e.$model"
                         :class="{
                           'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -1103,7 +1102,6 @@ export default {
                       <select
                         class="custom-select mr-sm-2"
                         id="field-11"
-                        data-create="5"
                         v-model="$v.create.is_default.$model"
                         :class="{
                           'is-invalid': $v.create.is_default.$error || errors.is_default,
@@ -1112,8 +1110,8 @@ export default {
                         }"
                       >
                         <option value="" selected>{{ $t("general.Choose") }}...</option>
-                        <option value="1">{{ $t("general.Active") }}</option>
-                        <option value="0">{{ $t("general.Inactive") }}</option>
+                        <option value="1">{{ $t("general.Yes") }}</option>
+                        <option value="0">{{ $t("general.No") }}</option>
                       </select>
                       <template v-if="errors.is_default">
                         <ErrorMessage
@@ -1124,35 +1122,46 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6" v-if="isVisible('is_active')">
-                    <div class="form-group">
-                      <label class="mr-2" for="inlineFormCustomSelectPref">
-                        {{ getCompanyKey("governorate_status") }}
-                        <span v-if="isRequired('is_active')" class="text-danger">*</span>
-                      </label>
-                      <select
-                        class="custom-select mr-sm-2"
-                        id="inlineFormCustomSelectPref"
-                        data-create="6"
-                        v-model="$v.create.is_active.$model"
-                        :class="{
-                          'is-invalid': $v.create.is_active.$error || errors.is_active,
-                          'is-valid': !$v.create.is_active.$invalid && !errors.is_active,
-                        }"
-                      >
-                        <option value="" selected>{{ $t("general.Choose") }}...</option>
-                        <option value="active">{{ $t("general.Active") }}</option>
-                        <option value="inactive">{{ $t("general.Inactive") }}</option>
-                      </select>
-                      <template v-if="errors.is_active">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.is_active"
-                          :key="index"
-                          >{{ errorMessage }}
-                        </ErrorMessage>
-                      </template>
-                    </div>
-                  </div>
+                <div class="col-md-12" v-if="isVisible('is_active')">
+                              <div class="form-group">
+                                <label class="mr-2">
+                                  {{ getCompanyKey("governorate_status") }}
+                                  <span v-if="isRequired('is_active')" class="text-danger"
+                                    >*</span
+                                  >
+                                </label>
+                                <b-form-group
+                                  :class="{
+                                    'is-invalid':
+                                      $v.create.is_active.$error || errors.is_active,
+                                    'is-valid':
+                                      !$v.create.is_active.$invalid && !errors.is_active,
+                                  }"
+                                >
+                                  <b-form-radio
+                                    class="d-inline-block"
+                                    v-model="$v.create.is_active.$model"
+                                    name="some-radios"
+                                    value="active"
+                                    >{{ $t("general.Active") }}</b-form-radio
+                                  >
+                                  <b-form-radio
+                                    class="d-inline-block m-1"
+                                    v-model="$v.create.is_active.$model"
+                                    name="some-radios"
+                                    value="inactive"
+                                    >{{ $t("general.Inactive") }}</b-form-radio
+                                  >
+                                </b-form-group>
+                                <template v-if="errors.is_active">
+                                  <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.is_active"
+                                    :key="index"
+                                    >{{ errorMessage }}
+                                  </ErrorMessage>
+                                </template>
+                              </div>
+                            </div>
                 </div>
               </form>
             </b-modal>
@@ -1271,7 +1280,7 @@ export default {
                     </td>
                     <td v-if="setting.phone_key && isVisible('phone_key')">{{ data.phone_key }}</td>
                     <td v-if="setting.country_id && isVisible('country_id')">
-                      {{ $i18n.locale == "ar" ? data.country.name : data.country.name_e }}
+                      {{data.country ? $i18n.locale == "ar" ? data.country.name : data.country.name_e : ''}}
                     </td>
                     <td v-if="setting.is_default && isVisible('is_default')">
                       <span
@@ -1418,7 +1427,6 @@ export default {
                                 <input
                                   type="number"
                                   class="form-control"
-                                  data-edit="6"
                                   v-model="$v.edit.phone_key.$model"
                                   :class="{
                                     'is-invalid':
@@ -1465,7 +1473,6 @@ export default {
                                   type="text"
                                   class="form-control"
                                   data-edit="1"
-                                  @keypress.enter="moveInput('input', 'edit', 2)"
                                   v-model="$v.edit.name.$model"
                                   :class="{
                                     'is-invalid': $v.edit.name.$error || errors.name,
@@ -1509,8 +1516,6 @@ export default {
 
                                   type="text"
                                   class="form-control"
-                                  data-edit="2"
-                                  @keypress.enter="moveInput('input', 'edit', 4)"
                                   v-model="$v.edit.name_e.$model"
                                   :class="{
                                     'is-invalid': $v.edit.name_e.$error || errors.name_e,
@@ -1553,8 +1558,7 @@ export default {
                                 <select
                                   class="custom-select mr-sm-2"
                                   id="edit-11"
-                                  data-edit="8"
-                                  v-model="$v.create.is_default.$model"
+                                  v-model="$v.edit.is_default.$model"
                                   :class="{
                                     'is-invalid':
                                       $v.edit.is_default.$error || errors.is_default,
@@ -1565,8 +1569,8 @@ export default {
                                   <option value="" selected>
                                     {{ $t("general.Choose") }}...
                                   </option>
-                                  <option value="1">{{ $t("general.Active") }}</option>
-                                  <option value="0">{{ $t("general.Inactive") }}</option>
+                                  <option value="1">{{ $t("general.Yes") }}</option>
+                                  <option value="0">{{ $t("general.No") }}</option>
                                 </select>
                                 <template v-if="errors.is_default">
                                   <ErrorMessage
@@ -1577,16 +1581,15 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6" v-if="isVisible('is_active')">
+                          <div class="col-md-12" v-if="isVisible('is_active')">
                               <div class="form-group">
                                 <label class="mr-2">
                                   {{ getCompanyKey("governorate_status") }}
-                                  <span v-if="isRequired('is_active')" class="text-danger">*</span>
+                                  <span v-if="isRequired('is_active')" class="text-danger"
+                                    >*</span
+                                  >
                                 </label>
-                                <select
-                                  class="custom-select mr-sm-2"
-                                  data-edit="9"
-                                  v-model="$v.edit.is_active.$model"
+                                <b-form-group
                                   :class="{
                                     'is-invalid':
                                       $v.edit.is_active.$error || errors.is_active,
@@ -1594,16 +1597,21 @@ export default {
                                       !$v.edit.is_active.$invalid && !errors.is_active,
                                   }"
                                 >
-                                  <option value="" selected>
-                                    {{ $t("general.Choose") }}...
-                                  </option>
-                                  <option value="active">
-                                    {{ $t("general.Active") }}
-                                  </option>
-                                  <option value="inactive">
-                                    {{ $t("general.Inactive") }}
-                                  </option>
-                                </select>
+                                  <b-form-radio
+                                    class="d-inline-block"
+                                    v-model="$v.edit.is_active.$model"
+                                    name="some-radios"
+                                    value="active"
+                                    >{{ $t("general.Active") }}</b-form-radio
+                                  >
+                                  <b-form-radio
+                                    class="d-inline-block m-1"
+                                    v-model="$v.edit.is_active.$model"
+                                    name="some-radios"
+                                    value="inactive"
+                                    >{{ $t("general.Inactive") }}</b-form-radio
+                                  >
+                                </b-form-group>
                                 <template v-if="errors.is_active">
                                   <ErrorMessage
                                     v-for="(errorMessage, index) in errors.is_active"

@@ -188,35 +188,41 @@
                           </template>
                       </div>
                   </div>
-                  <div class="col-md-6" v-if="isVisible('is_active')">
-                      <div class="form-group">
-                          <label class="mr-2" for="inlineFormCustomSelectPref">
-                              {{ getCompanyKey("city_status") }}
-                              <span v-if="isRequired('is_active')" class="text-danger">*</span>
-                          </label>
-                          <select
-                              class="custom-select mr-sm-2"
-                              id="inlineFormCustomSelectPref"
-                              data-create="5"
-                              @keypress.enter.prevent="moveInput('input', 'create', 1)"
-                              v-model="$v.create.is_active.$model"
-                              :class="{
+                    <div class="col-md-12" v-if="isVisible('is_active')">
+                    <div class="form-group">
+                      <label class="mr-2">
+                        {{ getCompanyKey("city_status") }}
+                        <span v-if="isRequired('is_active')" class="text-danger">*</span>
+                      </label>
+                      <b-form-group
+                        :class="{
                           'is-invalid': $v.create.is_active.$error || errors.is_active,
                           'is-valid': !$v.create.is_active.$invalid && !errors.is_active,
                         }"
-                          >
-                              <option value="" selected>{{ $t("general.Choose") }}...</option>
-                              <option value="1">{{ $t("general.Active") }}</option>
-                              <option value="0">{{ $t("general.Inactive") }}</option>
-                          </select>
-                          <template v-if="errors.is_active">
-                              <ErrorMessage
-                                  v-for="(errorMessage, index) in errors.is_active"
-                                  :key="index"
-                              >{{ errorMessage }}</ErrorMessage
-                              >
-                          </template>
-                      </div>
+                      >
+                        <b-form-radio
+                          class="d-inline-block"
+                          v-model="$v.create.is_active.$model"
+                          name="some-radios"
+                          value="1"
+                          >{{ $t("general.Active") }}</b-form-radio
+                        >
+                        <b-form-radio
+                          class="d-inline-block m-1"
+                          v-model="$v.create.is_active.$model"
+                          name="some-radios"
+                          value="0"
+                          >{{ $t("general.Inactive") }}</b-form-radio
+                        >
+                      </b-form-group>
+                      <template v-if="errors.is_active">
+                        <ErrorMessage
+                          v-for="(errorMessage, index) in errors.is_active"
+                          :key="index"
+                          >{{ errorMessage }}
+                        </ErrorMessage>
+                      </template>
+                    </div>
                   </div>
               </div>
           </form>
@@ -451,7 +457,7 @@ export default {
         country_id: null,
         governorate_id: null,
         city_id: null,
-        is_active: "active",
+        is_active: 1,
       };
       this.$nextTick(() => {
         this.$v.$reset();

@@ -17,15 +17,15 @@ class CreateGeneralCustomerRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'=>['required'],
-            'name_e'=>['required'],
-            'phone'=>['required'],
-            'email'=>['required'],
-            'country_id'=>['numeric'],
-            'city_id'=>['numeric'],
-            'rp_code'=>[],
+            'name'=>[],
+            'name_e'=>[],
+            'phone'=>[],
+            'email'=>[],
+            'country_id'=>['nullable'],
+            'city_id'=>['nullable'],
+            'rp_code'=>['nullable'],
             'nationality'=>[],
-            'bank_account_id'=>['numeric'],
+            'bank_account_id'=>['nullable'],
             'contact_phone'=>[],
             'national_id'=>[],
             'whatsapp'=>[],

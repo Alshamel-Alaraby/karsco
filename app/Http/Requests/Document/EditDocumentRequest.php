@@ -28,6 +28,10 @@ class EditDocumentRequest extends FormRequest
             'name_e'     => 'nullable',
             'is_default' => 'nullable|integer',
             'company_id'  => 'nullable|integer',
+            'attributes' => "nullable|array",
+            'branche_id' => "nullable",
+            'serial_id' => "nullable",
+
         ];
     }
 }

@@ -428,7 +428,7 @@ export default {
      *  hidden Modal (create)
      */
     async resetModal() {
-      await this.getEmployees();
+      if(this.isVisible('employee_id')) await this.getEmployees();
       this.create = {
         name: "",
         name_e: "",
@@ -563,13 +563,13 @@ export default {
      *   show Modal (edit)
      */
     async resetModalEdit(id) {
-      await this.getEmployees();
+      if(this.isVisible('employee_id')) await this.getEmployees();
       let user = this.users.find((e) => id == e.id);
       this.user_id = id;
       this.edit.name = user.name;
       this.edit.name_e = user.name_e;
       this.edit.email = user.email;
-      this.edit.employee_id = user.employee_id;
+      this.edit.employee_id = user.employee_id ?? null;
       this.edit.is_active = user.is_active;
       this.images = user.media ? user.media : [];
       if (this.images && this.images.length > 0) {
@@ -637,9 +637,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     /**
      *  start Image ceate
      */
@@ -1116,7 +1113,6 @@ export default {
                                 >{{ getCompanyKey('employee') }}
                                 <span v-if="isRequired('employee_id')" class="text-danger">*</span></label
                               >
-
                               <multiselect
                                 @input="showEmployeeModal"
                                 v-model="create.employee_id"
@@ -1140,8 +1136,6 @@ export default {
                               <input
                                 type="text"
                                 class="form-control"
-                                data-create="1"
-                                @keypress.enter="moveInput('input', 'create', 2)"
                                 v-model="$v.create.email.$model"
                                 :class="{
                                   'is-invalid': $v.create.email.$error || errors.email,
@@ -1170,8 +1164,6 @@ export default {
                               <input
                                 type="text"
                                 class="form-control"
-                                data-create="1"
-                                @keypress.enter="moveInput('input', 'create', 2)"
                                 v-model="$v.create.password.$model"
                                 :class="{
                                   'is-invalid':
@@ -1179,7 +1171,6 @@ export default {
                                   'is-valid':
                                     !$v.create.password.$invalid && !errors.password,
                                 }"
-                                id="field-15"
                               />
                               <div
                                 v-if="!$v.create.password.minLength"
@@ -1208,7 +1199,6 @@ export default {
                                 <input
                                   type="text"
                                   class="form-control"
-                                  data-create="1"
                                   @keyup="arabicValueName(create.name)"
                                   v-model="$v.create.name.$model"
                                   :class="{
@@ -1254,7 +1244,6 @@ export default {
                                 <input
                                   type="text"
                                   class="form-control englishInput"
-                                  data-create="2"
                                   @keyup="englishValueName(create.name_e)"
                                   v-model="$v.create.name_e.$model"
                                   :class="{
@@ -1592,7 +1581,7 @@ export default {
                     <td v-if="setting.employee_id && isVisible('employee_id')">
                       <h5 v-if="data.employee" class="m-0 font-weight-normal">
                         {{
-                          $i18n.locale == "ar" ? data.employee.name : data.employee.name_e
+                            data.employee? $i18n.locale == "ar" ? data.employee.name : data.employee.name_e : ' - '
                         }}
                       </h5>
                     </td>
@@ -1716,14 +1705,13 @@ export default {
                                   </div>
                                   <div class="col-md-6" v-if="isVisible('email')">
                                     <div class="form-group">
-                                      <label for="field-15" class="control-label">
+                                      <label  class="control-label">
                                         {{ getCompanyKey("user_email") }}
                                         <span v-if="isRequired('email')" class="text-danger">*</span>
                                       </label>
                                       <input
                                         type="text"
                                         class="form-control"
-                                        data-create="1"
                                         v-model="$v.edit.email.$model"
                                         :class="{
                                           'is-invalid':
@@ -1731,7 +1719,6 @@ export default {
                                           'is-valid':
                                             !$v.edit.email.$invalid && !errors.email,
                                         }"
-                                        id="field-15"
                                       />
                                       <div v-if="!$v.edit.email.email" class="invalid-feedback">
                                         {{ $t("general.notValidEmail") }}
@@ -1754,7 +1741,6 @@ export default {
                                       <input
                                         type="text"
                                         class="form-control"
-                                        data-create="1"
                                         v-model="$v.edit.password.$model"
                                         :class="{
                                           'is-invalid':
@@ -1792,7 +1778,6 @@ export default {
                                                 <input
                                                     type="text"
                                                     class="form-control"
-                                                    data-create="1"
                                                     @keyup="arabicValueName(edit.name)"
                                                     v-model="$v.edit.name.$model"
                                                     :class="{
@@ -1838,7 +1823,6 @@ export default {
                                         <input
                                           type="text"
                                           class="form-control englishInput"
-                                          data-create="2"
                                           @keyup="englishValueName(edit.name_e)"
                                           v-model="$v.edit.name_e.$model"
                                           :class="{

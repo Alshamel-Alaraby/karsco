@@ -59,8 +59,8 @@ class CityController extends Controller
         if (!DB::table('general_governorates')->find($request->governorate_id)) {
             return responseJson(404, __('governorates does\'t exist'));
         }
-        $this->repository->create($request->validated());
-        return responseJson(200, __('done'));
+        return $this->repository->create($request->validated());
+        // return responseJson(200, __('done'));
 
     }
 
@@ -110,20 +110,7 @@ class CityController extends Controller
             }
             $data['governorate_id'] = $request->governorate_id;
         }
-
-        if ($request->name) {
-            $data['name'] = $request->name;
-        }
-
-        if ($request->name_e) {
-            $data['name_e'] = $request->name_e;
-        }
-
-        if ($request->is_active) {
-            $data['is_active'] = $request->is_active;
-        }
-
-        $this->repository->update($data, $id);
+        $this->repository->update($request->validated(), $id);
         return responseJson(200, __('updated'));
 
     }

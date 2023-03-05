@@ -21,6 +21,9 @@ class DocumentResource extends JsonResource
             'is_default'  => $this->is_default,
             'is_admin'    => $this->is_admin,
             'company_id'  => $this->company_id,
+            'attributes'  => $this->attributes,
+            'branche_id'  => $this->branche_id,
+            'serial_id'  => $this->serial_id,
             'payment_plan_installments'  => $this->payment_plan_installments,
         ];
     }

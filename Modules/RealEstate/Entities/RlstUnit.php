@@ -3,15 +3,17 @@
 namespace Modules\RealEstate\Entities;
 
 use App\Traits\LogTrait;
+use App\Traits\MediaTrait;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
+use Spatie\MediaLibrary\HasMedia;
 
-class RlstUnit extends Model
+class RlstUnit extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes, LogTrait;
+    use HasFactory, SoftDeletes, LogTrait,MediaTrait;
 
     protected $fillable = [
         "code",
@@ -20,24 +22,18 @@ class RlstUnit extends Model
         'description',
         'description_e',
         'unit_ty',
-        'status_date',
-        'unit_area',
-        'building_id',
-        'owner_id',
-        'currency_id',
-        'wallet_id',
         'unit_status_id',
-        'commission_ty',
-        'commission_value',
-        'price',
+        'unit_area',
+        'unit_net_area',
+        'building_id',
         'rooms',
         'path',
         'view',
         'floor',
-        'rank',
+        'finishing',
         'properties',
-        'attachments',
         'module_id',
+
 
     ];
 

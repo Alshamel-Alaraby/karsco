@@ -62,6 +62,14 @@ Route::prefix ('recievable-payable')->group (function (){
     Route ::get ( 'rp_document_plan/logs/{id}' , 'RpDocumentPlanController@logs' );
     Route ::post ( 'rp_document_plan/logs/bulk-delete' , 'RpDocumentPlanController@bulkDelete' );
 
+    Route ::resource ( 'rp_opening_balance' , 'OpeningBalanceController' ) -> except ( 'edit' , 'create' );
+    Route ::get ( 'rp_dopening_balance/logs/{id}' , 'OpeningBalanceController@logs' );
+    Route ::post ( 'rp_opening_balance/logs/bulk-delete' , 'OpeningBalanceController@bulkDelete' );
+
+    Route ::resource ( 'rp_break_down' , 'RpBreakDownController' ) -> except ( 'edit' , 'create' );
+    Route ::get ( 'rp_break_down/logs/{id}' , 'RpBreakDownController@logs' );
+    Route ::post ( 'rp_break_down/logs/bulk-delete' , 'RpBreakDownController@bulkDelete' );
+
 
 
 

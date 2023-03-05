@@ -27,9 +27,9 @@ class CityRepository implements CityRepositoryInterface
 
     public function create(array $data)
     {
-        DB::transaction(function () use ($data) {
-            $this->model->create($data);
+        return DB::transaction(function () use ($data) {
             cacheForget("cities");
+            return $this->model->create($data);
         });
     }
 

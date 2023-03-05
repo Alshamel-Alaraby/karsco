@@ -465,7 +465,7 @@ export default {
      *  hidden Modal (create)
      */
     async resetModal() {
-      await this.getBank();
+      if(this.isVisible('bank_id')) await this.getBank();
       this.create = {
         bank_id: null,
         account_number: "",
@@ -488,7 +488,7 @@ export default {
      *  create countrie
      */
     async resetForm() {
-      await this.getBank();
+      if(this.isVisible('bank_id')) await this.getBank();
       this.create = {
         bank_id: null,
         account_number: "",
@@ -624,10 +624,10 @@ export default {
      *   show Modal (edit)
      */
     async resetModalEdit(id) {
-      await this.getBank();
+      if(this.isVisible('bank_id')) await this.getBank();
       let bankAccount = this.bankAccounts.find((e) => id == e.id);
       this.bankAccount_id = id;
-      this.edit.bank_id = bankAccount.bank_id;
+      this.edit.bank_id = bankAccount.bank_id ?? null;
       this.edit.account_number = bankAccount.account_number;
       this.edit.phone = bankAccount.phone;
       this.edit.address = bankAccount.address;
@@ -680,9 +680,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     /**
      *  start Image ceate
      */
@@ -1736,7 +1733,7 @@ export default {
                     </td>
                     <td v-if="setting.bank_id && isVisible('bank_id')">
                       <h5 class="m-0 font-weight-normal">
-                        {{ $i18n.locale == "ar" ? data.bank.name : data.bank.name_e }}
+                        {{ data.bank ? $i18n.locale == "ar" ? data.bank.name : data.bank.name_e : ' - '}}
                       </h5>
                     </td>
                     <td v-if="setting.account_number && isVisible('account_number')">

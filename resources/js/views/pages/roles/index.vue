@@ -440,7 +440,7 @@ export default {
      */
 
     async resetModal() {
-      await this.getRoleType();
+      if(this.isVisible('roletype_id')) await this.getRoleType();
       this.create = { name: "", name_e: "", roletype_id: null };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -451,7 +451,7 @@ export default {
      *  create module
      */
     async resetForm() {
-      await this.getRoleType();
+      if(this.isVisible('roletype_id'))await this.getRoleType();
       this.create = { name: "", name_e: "", roletype_id: null };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -556,11 +556,11 @@ export default {
      *   show Modal (edit)
      */
     async resetModalEdit(id) {
-      await this.getRoleType();
+      if(this.isVisible('roletype_id'))await this.getRoleType();
       let module = this.roles.find((e) => id == e.id);
       this.edit.name = module.name;
       this.edit.name_e = module.name_e;
-      this.edit.roletype_id = module.roletype_id;
+      this.edit.roletype_id = module.roletype_id ?? null;
       this.errors = {};
     },
     /**
@@ -594,9 +594,7 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
+
     async getRoleType() {
       this.isLoader = true;
 
@@ -970,8 +968,6 @@ export default {
                           @keyup="arabicValue(create.name)"
                           type="text"
                           class="form-control"
-                          data-create="1"
-                          @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
                           :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
@@ -1011,8 +1007,6 @@ export default {
                           @keyup="englishValue(create.name_e)"
                           type="text"
                           class="form-control"
-                          data-create="2"
-                          @keypress.enter="moveInput('select', 'create', 3)"
                           v-model="$v.create.name_e.$model"
                           :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -1137,11 +1131,10 @@ export default {
                     <td v-if="setting.name_e && isVisible('name_e')">
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
-
                     <td v-if="setting.roletype_id && isVisible('roletype_id')">
                       <h5 class="m-0 font-weight-normal">
                         {{
-                          $i18n.locale == "ar" ? data.roletype.name : data.roletype.name_e
+                          data.roletype ? $i18n.locale == "ar" ? data.roletype.name : data.roletype.name_e : ' - '
                         }}
                       </h5>
                     </td>

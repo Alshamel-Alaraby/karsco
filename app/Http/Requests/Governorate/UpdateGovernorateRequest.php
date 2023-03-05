@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Governorate;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateGovernorateRequest extends FormRequest
 {
@@ -24,10 +25,16 @@ class UpdateGovernorateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string|max:255|unique:general_governorates,name',
-            'name_e' => 'nullable|string|max:255|unique:general_governorates,name_e',
-            'name' => 'nullable|string|max:255|unique:general_governorates,name,'.$this->id,
-            'name_e' => 'nullable|string|max:255|unique:general_governorates,name_e,'.$this->id,
+            "name" => ["nullable", Rule::unique('general_governorates')->where(function ($querry) {
+                $querry
+                    ->where("country_id", request()->country_id)
+                    ->where("name", request()->name);
+            })->ignore($this->id)],
+            "name_e" => ["nullable", Rule::unique('general_governorates')->where(function ($querry) {
+                $querry
+                    ->where("country_id", request()->country_id)
+                    ->where("name_e", request()->name_e);
+            })->ignore($this->id)],
             "is_active" => "nullable|in:active,inactive",
             "is_default" => "nullable|in:0,1",
             "country_id" => "nullable|exists:general_countries,id",

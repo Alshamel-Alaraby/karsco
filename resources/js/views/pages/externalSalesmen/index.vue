@@ -473,7 +473,7 @@ export default {
       this.$nextTick(() => {
         this.$v.$reset();
       });
-      this.getCategory();
+      if(this.isVisible('country_id')) this.getCategory();
       this.errors = {};
     },
     /**
@@ -582,8 +582,8 @@ export default {
     async resetModalEdit(id) {
       let externalSalesmen = this.externalSalesmens.find((e) => id == e.id);
       this.edit.is_active = externalSalesmen.is_active;
-      await this.getCategory();
-      this.edit.country_id = externalSalesmen.country.id;
+      if(this.isVisible('country_id')) await this.getCategory();
+      this.edit.country_id = externalSalesmen.country.id ?? null;
       this.edit.national_id = externalSalesmen.national_id;
       this.edit.phone = externalSalesmen.phone;
       this.edit.email = externalSalesmen.email;
@@ -630,9 +630,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     async getCategory() {
       this.isLoader = true;
       this.countries = [];
@@ -1010,8 +1007,6 @@ export default {
                       <input
                         type="number"
                         class="form-control"
-                        data-create="1"
-                        @keypress.enter="moveInput('input', 'create', 2)"
                         v-model="$v.create.phone.$model"
                         :class="{
                           'is-invalid': $v.create.phone.$error || errors.phone,
@@ -1047,8 +1042,6 @@ export default {
                       <input
                         type="email"
                         class="form-control"
-                        data-create="2"
-                        @keypress.enter="moveInput('input', 'create', 4)"
                         v-model="$v.create.email.$model"
                         :class="{
                           'is-invalid': $v.create.email.$error || errors.email,
@@ -1080,8 +1073,6 @@ export default {
                         type="text"
                         class="form-control"
                         v-model.trim="$v.create.national_id.$model"
-                        data-create="4"
-                        @keypress.enter="moveInput('select', 'create', 5)"
                         :class="{
                           'is-invalid':
                             $v.create.national_id.$error || errors.national_id,
@@ -1108,7 +1099,6 @@ export default {
                       <input
                         type="email"
                         class="form-control"
-                        data-create="7"
                         v-model="$v.create.address.$model"
                         :class="{
                           'is-invalid': $v.create.address.$error || errors.address,
@@ -1144,7 +1134,6 @@ export default {
                       <input
                         type="number"
                         class="form-control"
-                        data-create="6"
                         v-model="$v.create.rp_code.$model"
                         :class="{
                           'is-invalid': $v.create.rp_code.$error || errors.rp_code,
@@ -1341,7 +1330,9 @@ export default {
                     <td v-if="setting.email && isVisible('email')">
                       <h5 class="m-0 font-weight-normal">{{ data.email }}</h5>
                     </td>
-                    <td v-if="setting.country_id && isVisible('country_id')">{{ data.country.name }}</td>
+                    <td v-if="setting.country_id && isVisible('country_id')">
+                        {{data.country ? $i18n.locale == 'ar' ? data.country.name : data.country.name_e : ' - '}}
+                    </td>
                     <td v-if="setting.national_id && isVisible('national_id')">{{ data.national_id }}</td>
                     <td v-if="setting.address && isVisible('address')">{{ data.address }}</td>
                     <td v-if="setting.rp_code && isVisible('rp_code')">{{ data.rp_code }}</td>

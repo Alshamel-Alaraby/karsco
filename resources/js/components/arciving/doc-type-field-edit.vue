@@ -582,8 +582,7 @@ export default {
 }
 .card {
   .multiselect__content-wrapper {
-    position: relative;
-    z-index: 9999;
+    max-height: 170px !important;
   }
 }
 .closeField {

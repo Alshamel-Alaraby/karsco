@@ -28,6 +28,9 @@ class CreateDocumentRequest extends FormRequest
             'name'       => 'nullable',
             'name_e'     => 'nullable',
             'is_default' => 'nullable|integer',
+            'attributes' => "nullable|array",
+            'branche_id' => "nullable",
+            'serial_id' => "nullable",
             'company_id'  => 'nullable|integer',
         ];
     }

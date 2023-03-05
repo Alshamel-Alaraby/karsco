@@ -409,7 +409,7 @@ export default {
       this.$nextTick(() => {
         this.$v.$reset();
       });
-      this.getEmployee();
+      if(this.isVisible('employee_id'))  this.getEmployee();
       this.errors = {};
     },
     /**
@@ -425,7 +425,7 @@ export default {
         this.$v.$reset();
       });
       this.is_disabled = false;
-      this.getEmployee();
+      if(this.isVisible('employee_id'))  this.getEmployee();
       this.errors = {};
     },
     AddSubmit() {
@@ -513,8 +513,8 @@ export default {
      */
     async resetModalEdit(id) {
       let module = this.inernalSales.find((e) => id == e.id);
-      await this.getEmployee();
-      this.edit.employee_id = module.employee.id;
+      if(this.isVisible('employee_id'))  await this.getEmployee();
+      if(module.employee) this.edit.employee_id = module.employee.id;
       this.edit.is_active = module.is_active;
       this.errors = {};
     },
@@ -549,9 +549,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     async getEmployee() {
       this.isLoader = true;
 
@@ -969,7 +966,7 @@ export default {
                     <td v-if="setting.employee_id && isVisible('employee_id')">
                       <h5 class="m-0 font-weight-normal">
                         {{
-                          $i18n.locale == "ar" ? data.employee.name : data.employee.name_e
+                           data.employee ? $i18n.locale == "ar" ? data.employee.name : data.employee.name_e : ' - '
                         }}
                       </h5>
                     </td>

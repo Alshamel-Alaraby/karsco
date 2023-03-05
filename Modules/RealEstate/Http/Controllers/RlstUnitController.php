@@ -5,6 +5,7 @@ namespace Modules\RealEstate\Http\Controllers;
 use App\Http\Requests\AllRequest;
 use Illuminate\Routing\Controller;
 use Modules\RealEstate\Entities\RlstUnit;
+use Modules\RealEstate\Http\Requests\RlstUnitEditRequest;
 use Modules\RealEstate\Http\Requests\RlstUnitRequest;
 use Modules\RealEstate\Transformers\RlstUnitResource;
 
@@ -42,23 +43,65 @@ class RlstUnitController extends Controller
     public function create(RlstUnitRequest $request)
     {
         $model = $this->model->create($request->validated());
+        if ($request->media) {
+            foreach ($request->media as $media) {
+                $this->media::where('id', $media)->update([
+                    'model_id' => $model->id,
+                    'model_type' => get_class($this->model),
+                ]);
+            }
+        }
         $model->refresh();
 
         return responseJson(200, 'created', new RlstUnitResource($model));
 
     }
 
-    public function update($id, RlstUnitRequest $request)
+
+    public function update($id, RlstUnitEditRequest $request)
     {
         $model = $this->model->find($id);
         if (!$model) {
             return responseJson(404, 'not found');
         }
+        $model->update($request->validated()->except(["media"]));
+        if ($request->media && !$request->old_media) { // if there is new media and no old media
+            $model->clearMediaCollection('media');
+            foreach ($request->media as $media) {
+                uploadImage($media, [
+                    'model_id' => $model->id,
+                    'model_type' => get_class($this->model),
+                ]);
+            }
+        }
 
-        $model->update($request->validated());
+        if ($request->old_media && !$request->media) { // if there is old media and no new media
+            $model->media->whereNotIn('id', $request->old_media)->each(function (Media $media) {
+                $media->delete();
+            });
+        }
+
+        if ($request->old_media && $request->media) { // if there is old media and new media
+            $model->media->whereNotIn('id', $request->old_media)->each(function (Media $media) {
+                $media->delete();
+            });
+            foreach ($request->media as $image) {
+                uploadImage($image, [
+                    'model_id' => $model->id,
+                    'model_type' => get_class($this->model),
+                ]);
+            }
+        }
+
+        if (!$request->old_media && !$request->media) { // if this is no old media and new media
+            $model->clearMediaCollection('media');
+        }
         $model->refresh();
         return responseJson(200, 'updated', new RlstUnitResource($model));
     }
+
+
+
 
     public function logs($id)
     {

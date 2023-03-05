@@ -99,4 +99,11 @@ class ModuleController extends Controller
         return responseJson(200, __('Done'));
     }
 
+    public function moduleDisable(Request $request)
+    {
+        $model = $this->modelInterface->moduleDisable($request);
+        return $model;
+        return responseJson(200, 'success');
+    }
+
 }

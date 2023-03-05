@@ -155,8 +155,6 @@
 
                                 type="text"
                                 class="form-control"
-                                data-create="1"
-                                @keypress.enter="moveInput('input', 'create', 2)"
                                 v-model="$v.create.name.$model"
                                 :class="{
                           'is-invalid': $v.create.name.$error || errors.name,
@@ -194,8 +192,6 @@
 
                                 type="text"
                                 class="form-control"
-                                data-create="2"
-                                @keypress.enter="moveInput('input', 'create', 3)"
                                 v-model="$v.create.name_e.$model"
                                 :class="{
                           'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -222,36 +218,42 @@
                             </template>
                         </div>
                     </div>
-                    <div class="col-md-6" v-if="isVisible('is_active')">
-                        <div class="form-group">
-                            <label class="mr-2" for="inlineFormCustomSelectPref">
-                                {{ getCompanyKey("avenue_status") }}
-                                <span v-if="isRequired('is_active')" class="text-danger">*</span>
-                            </label>
-                            <select
-                                class="custom-select mr-sm-2"
-                                id="inlineFormCustomSelectPref"
-                                data-create="6"
-                                @keypress.enter.prevent="moveInput('input', 'create', 1)"
-                                v-model="$v.create.is_active.$model"
-                                :class="{
+                       <div class="col-md-12" v-if="isVisible('is_active')">
+                    <div class="form-group">
+                      <label class="mr-2">
+                        {{ getCompanyKey("avenue_status") }}
+                        <span v-if="isRequired('is_active')" class="text-danger">*</span>
+                      </label>
+                      <b-form-group
+                        :class="{
                           'is-invalid': $v.create.is_active.$error || errors.is_active,
                           'is-valid': !$v.create.is_active.$invalid && !errors.is_active,
                         }"
-                            >
-                                <option value="" selected>{{ $t("general.Choose") }}...</option>
-                                <option value="active">{{ $t("general.Active") }}</option>
-                                <option value="inactive">{{ $t("general.Inactive") }}</option>
-                            </select>
-                            <template v-if="errors.is_active">
-                                <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.is_active"
-                                    :key="index"
-                                >{{ errorMessage }}</ErrorMessage
-                                >
-                            </template>
-                        </div>
+                      >
+                        <b-form-radio
+                          class="d-inline-block"
+                          v-model="$v.create.is_active.$model"
+                          name="some-radios"
+                          value="active"
+                          >{{ $t("general.Active") }}</b-form-radio
+                        >
+                        <b-form-radio
+                          class="d-inline-block m-1"
+                          v-model="$v.create.is_active.$model"
+                          name="some-radios"
+                          value="inactive"
+                          >{{ $t("general.Inactive") }}</b-form-radio
+                        >
+                      </b-form-group>
+                      <template v-if="errors.is_active">
+                        <ErrorMessage
+                          v-for="(errorMessage, index) in errors.is_active"
+                          :key="index"
+                          >{{ errorMessage }}
+                        </ErrorMessage>
+                      </template>
                     </div>
+                  </div>
                 </div>
             </form>
         </b-modal>
@@ -525,14 +527,9 @@ export default {
         /**
          *  end  ckeckRow
          */
-        moveInput(tag, c, index) {
-            document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-        },
         async getCategory() {
             this.create.governorate_id = null;
-            this.edit.governorate_id = null;
             this.create.city_id = null;
-            this.edit.city_id = null;
             await adminApi
                 .get(`/countries?is_active=active`)
                 .then((res) => {
@@ -558,9 +555,7 @@ export default {
                 return;
             }
             this.create.city_id = null;
-            this.edit.city_id = null;
             this.create.governorate_id = null;
-            this.edit.governorate_id = null;
             await adminApi
                 .get(`/governorates?country_id=${id}`)
                 .then((res) => {

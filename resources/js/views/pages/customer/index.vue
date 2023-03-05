@@ -510,8 +510,8 @@ export default {
             this.countries = [];
             this.cities = [];
             this.bank_accounts = [];
-            await this.getCategory();
-            await this.getBankAcount();
+            if(this.isVisible('country_id')) await this.getCategory();
+            if(this.isVisible('bank_account_id'))await this.getBankAcount();
             this.create = {
                 name: '',
                 name_e: '',
@@ -537,8 +537,8 @@ export default {
             this.countries = [];
             this.cities = [];
             this.bank_accounts = [];
-            await this.getCategory();
-            await this.getBankAcount();
+            if(this.isVisible('country_id'))await this.getCategory();
+            if(this.isVisible('bank_account_id'))await this.getBankAcount();
             this.create = {
                 name: '',
                 name_e: '',
@@ -650,20 +650,20 @@ export default {
             this.countries = [];
             this.cities = [];
             this.bank_accounts = [];
-            await this.getCategory();
-            await this.getBankAcount();
+            if(this.isVisible('country_id'))await this.getCategory();
+            if(this.isVisible('bank_account_id'))await this.getBankAcount();
             let build = this.customers.find(e => id == e.id );
-            await this.getCity(build.city_id);
+            if(this.isVisible('city_id'))await this.getCity(build.city_id);
             this.edit.name = build.name;
             this.edit.name_e = build.name_e;
-            this.edit.bank_account_id = build.bank_account_id;
-            this.edit.city_id = build.city_id;
+            this.edit.bank_account_id = build.bank_account_id ?? null;
+            this.edit.city_id = build.city_id ?? null;
             this.edit.contact_person = build.contact_person;
             this.edit.contact_phone = build.contact_phone;
-            this.edit.country_id = build.country_id;
+            this.edit.country_id = build.country_id ?? null;
             this.edit.national_id = build.national_id;
             this.edit.email = build.email;
-            this.edit.nationality = build.nationality;
+            this.edit.nationality = build.nationality ?? null;
             this.edit.passport_no = build.passport_no;
             this.edit.phone = build.phone;
             this.edit.rp_code = build.rp_code;
@@ -714,9 +714,6 @@ export default {
         /**
          *  end  ckeckRow
          */
-        moveInput(tag,c,index){
-            document.querySelector(`${tag}[data-${c}='${index}']`).focus()
-        },
         formatDate(value) {
             return formatDateOnly(value);
         },
@@ -797,20 +794,22 @@ export default {
                 this.cities = [];
                 this.create.city_id = null;
                 this.edit.city_id = null;
-                await adminApi
-                    .get(`/cities?country_id=${id}`)
-                    .then((res) => {
-                        let l = res.data.data;
-                        l.unshift({ id: 0, name: "اضافة مدينة", name_e: "Add City" });
-                        this.cities = l;
-                    })
-                    .catch((err) => {
-                        Swal.fire({
-                            icon: "error",
-                            title: `${this.$t("general.Error")}`,
-                            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                if(this.isVisible('country_id')){
+                    await adminApi
+                        .get(`/cities?country_id=${id}`)
+                        .then((res) => {
+                            let l = res.data.data;
+                            l.unshift({ id: 0, name: "اضافة مدينة", name_e: "Add City" });
+                            this.cities = l;
+                        })
+                        .catch((err) => {
+                            Swal.fire({
+                                icon: "error",
+                                title: `${this.$t("general.Error")}`,
+                                text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                            });
                         });
-                    });
+                }
             }
 
         },
@@ -1566,9 +1565,15 @@ export default {
                                     <td v-if="setting.national_id && isVisible('national_id')">{{ data.national_id }}</td>
                                     <td v-if="setting.contact_person && isVisible('contact_person')">{{ data.contact_person }}</td>
                                     <td v-if="setting.contact_phone && isVisible('contact_phone')">{{ data.contact_phone }}</td>
-                                    <td v-if="setting.country_id && isVisible('country_id')">{{ data.country_id }}</td>
-                                    <td v-if="setting.city_id && isVisible('city_id')">{{ data.city_id }}</td>
-                                    <td v-if="setting.bank_account_id && isVisible('bank_account_id')">{{ data.bank_account_id }}</td>
+                                    <td v-if="setting.country_id && isVisible('country_id')">
+                                        {{data.country ? $i18n.locale == 'ar'? data.country.name : data.country.name_e : ' - '}}
+                                    </td>
+                                    <td v-if="setting.city_id && isVisible('city_id')">
+                                        {{data.city ? $i18n.locale == 'ar'? data.city.name : data.city.name_e : ' - '}}
+                                    </td>
+                                    <td v-if="setting.bank_account_id && isVisible('bank_account_id')">
+                                        {{ data.bankAccount ?  data.bankAccount.account_number : ' - '}}
+                                    </td>
                                     <td v-if="setting.whatsapp && isVisible('whatsapp')">{{ data.whatsapp }}</td>
                                     <td v-if="setting.rp_code && isVisible('rp_code')">{{ data.rp_code }}</td>
                                     <td v-if="enabled3" class="do-not-print">
@@ -1810,8 +1815,6 @@ export default {
                                                             <input
                                                                 type="text"
                                                                 class="form-control"
-                                                                data-edit="9"
-                                                                @keypress.enter="moveInput('select','edit',10)"
                                                                 v-model="$v.edit.email.$model"
                                                                 :class="{
                                                 'is-invalid':$v.edit.email.$error || errors.email,

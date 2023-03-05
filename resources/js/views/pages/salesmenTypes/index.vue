@@ -574,10 +574,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
-
       /**
        *   Export Excel
        */
@@ -598,7 +594,6 @@ export default {
           this.create.name = arabicValue(txt);
           this.edit.name = arabicValue(txt);
       } ,
-
       englishValue(txt){
           this.create.name_e = englishValue(txt);
           this.edit.name_e = englishValue(txt);
@@ -845,8 +840,6 @@ export default {
                         <input
                           type="text"
                           class="form-control arabicInput"
-                          data-create="1"
-                          @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
                           :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
@@ -886,8 +879,6 @@ export default {
                         <input
                           type="text"
                           class="form-control"
-                          data-create="2"
-                          @keypress.enter="moveInput('select', 'create', 3)"
                           v-model="$v.create.name_e.$model"
                           :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,

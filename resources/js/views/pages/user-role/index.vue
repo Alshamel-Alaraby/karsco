@@ -419,8 +419,8 @@ export default {
      *  hidden Modal (create)
      */
     async resetModal() {
-      await this.getUsers();
-      await this.getRoles();
+      if(this.isVisible('user_id')) await this.getUsers();
+      if(this.isVisible('role_id'))await this.getRoles();
       this.create = { role_id: null, user_id: null };
       this.is_disabled = false;
       this.$nextTick(() => {
@@ -565,10 +565,10 @@ export default {
      */
     async resetModalEdit(id) {
       let userRole = this.userRoles.find((e) => id == e.id);
-      await this.getUsers();
-      await this.getRoles();
-      this.edit.role_id = userRole.role_id;
-      this.edit.user_id = userRole.user_id;
+      if(this.isVisible('user_id'))await this.getUsers();
+      if(this.isVisible('role_id'))await this.getRoles();
+      this.edit.role_id = userRole.role_id ?? null;
+      this.edit.user_id = userRole.user_id ?? null;
       this.errors = {};
     },
     /**
@@ -1020,12 +1020,12 @@ export default {
                     </td>
                     <td v-if="setting.role_id && isVisible('role_id')">
                       <h5 class="m-0 font-weight-normal">
-                        {{ $i18n.locale == "ar" ? data.role.name : data.role.name_e }}
+                        {{data.role ? $i18n.locale == "ar" ? data.role.name : data.role.name_e : ' - '}}
                       </h5>
                     </td>
                     <td v-if="setting.user_id && isVisible('user_id')">
                       <h5 class="m-0 font-weight-normal">
-                        {{ $i18n.locale == "ar" ? data.user.name : data.user.name_e }}
+                        {{data.user ? $i18n.locale == "ar" ? data.user.name : data.user.name_e  : ' - '}}
                       </h5>
                     </td>
                     <td v-if="enabled3" class="do-not-print">

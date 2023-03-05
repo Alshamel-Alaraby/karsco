@@ -26,6 +26,7 @@ class RlstOwnerResource extends JsonResource
             "country" => new CountryResource($this->country),
             "city" => new CityResource($this->city),
             'rb_code' => $this->rb_code,
+            'phone_code' => $this->phone_code,
             "nationality" => new CountryResource($this->nationality),
             "ban1k_account" => new BankAccountResource($this->bankAccount),
             "contact_person" => $this->contact_person,
@@ -34,8 +35,11 @@ class RlstOwnerResource extends JsonResource
             "whatsapp" => $this->whatsapp,
             "categories" => $this->categories,
             "attachments" => $this->attachments,
+            "walletOwner" => $this->walletOwner,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'deleted_at' => $this->deleted_at,
+            "walletOwner" => $this->walletOwner,
 
         ];
     }

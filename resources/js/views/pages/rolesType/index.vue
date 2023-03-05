@@ -569,9 +569,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     formatDate(value) {
       return formatDateOnly(value);
     },
@@ -873,8 +870,6 @@ export default {
                           @keyup="arabicValue(create.name)"
                           type="text"
                           class="form-control"
-                          data-create="1"
-                          @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
                           :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
@@ -914,8 +909,6 @@ export default {
                           @keyup="englishValue(create.name_e)"
                           type="text"
                           class="form-control"
-                          data-create="2"
-                          @keypress.enter="moveInput('select', 'create', 3)"
                           v-model="$v.create.name_e.$model"
                           :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -1034,7 +1027,6 @@ export default {
                     <td v-if="setting.name_e && isVisible('name_e')">
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
-
                     <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button

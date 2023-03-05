@@ -66,6 +66,8 @@ Route::group(['prefix' => 'modules'], function () {
         // Route::post('/{module_id}/company/{company_id}', 'addModuleToCompany')->name('modules.company.add');
         // Route::delete('/{module_id}/company/{company_id}', 'removeModuleFromCompany')->name('modules.company.remove');
         Route::post("bulk-delete", "bulkDelete");
+        Route::post('/moduleDisable', 'moduleDisable');
+
     });
 });
 
@@ -84,6 +86,7 @@ Route::group(['prefix' => 'stores'], function () {
 Route::group(['prefix' => 'countries'], function () {
     Route::controller(\App\Http\Controllers\Country\CountryController::class)->group(function () {
         Route::get('/', 'all')->name('countries.index');
+        Route::get('seeder', 'getCountrySeeder');
         Route::get('logs/{id}', 'logs')->name('countries.logs');
         Route::get('/{id}', 'find');
         Route::post('/', 'create')->name('countries.create');
@@ -124,7 +127,7 @@ Route::group(['prefix' => 'customTable'], function () {
         Route::get('logs/{id}', 'logs')->name('customTable.logs');
         Route::get('/{id}', 'find');
         Route::post('/', 'create')->name('customTable.create');
-        Route::put('/{id}', 'update')->name('customTable.update');
+        Route::put( '/update','update')->name('customTable.update');
         Route::delete('/{id}', 'delete')->name('customTable.destroy');
         Route::post("bulk-delete", "bulkDelete");
 

@@ -16,6 +16,7 @@ class Document extends Model
     protected $table = 'general_documents';
 
     protected $guarded = ['id'];
+    protected $casts = ["attributes" => "json"];
 
     public function payment_plan_installments()
     {

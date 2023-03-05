@@ -7,6 +7,7 @@ use App\Http\Requests\Country\UpdateCountryRequest;
 use App\Http\Resources\Country\CountryResource;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 
 class CountryController extends Controller
 {
@@ -112,4 +113,7 @@ class CountryController extends Controller
         return responseJson(200, __('Done'));
     }
 
+    public function getCountrySeeder(){
+        return DB::table("country_seeder")->get();
+    }
 }

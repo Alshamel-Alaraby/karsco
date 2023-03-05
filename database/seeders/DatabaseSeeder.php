@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\DataType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,10 +22,14 @@ class DatabaseSeeder extends Seeder
             // CountrySeeder::class,
              TranslationSeeder::class,
              DataTypeSeeder::class,
-              UserSeeder::class
+             UserSeeder::class,
+             GeneralCustomerSeeder::class,
+             NewCustomerSeeder::class,
+            //  DataTypeSeeder::class,
+            //   UserSeeder::class
         //    ArchiveFileSeeder::class
         ]);
-
+        DB::unprepared(file_get_contents(public_path("country_lookup.sql")));
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([

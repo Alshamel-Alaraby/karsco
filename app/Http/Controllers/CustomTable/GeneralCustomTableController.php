@@ -40,17 +40,15 @@ class GeneralCustomTableController extends Controller
         $model = $this->modelInterface->create($request->validated());
         $model->refresh();
         return responseJson(200, 'success', new CustomTableResource($model));
+
+
     }
 
 
 
-    public function update(CustomTableRequest $request, $id)
+    public function update(CustomTableRequest $request)
     {
-        $model = $this->modelInterface->find($id);
-        if (!$model) {
-            return responseJson(404, __('message.data not found'));
-        }
-        $this->modelInterface->update($request->validated(), $id);
+        $model = $this->modelInterface->update($request->validated());
         $model->refresh();
         return responseJson(200, 'success', new CustomTableResource($model));
     }
@@ -85,7 +83,18 @@ class GeneralCustomTableController extends Controller
 
     public function getCustomTableFields($tableName)
     {
-        $customTable = GeneralCustomTable::where("table_name", $tableName)->first();
+        $company_id = request()->header('company-id');
+        $customTable = GeneralCustomTable::where([
+            ["table_name", $tableName],
+            ['company_id',$company_id]
+        ])
+        ->first();
+        if(!$customTable){
+            $customTable = GeneralCustomTable::where([
+                ["table_name", $tableName],
+                ['company_id',0]
+            ])->first();
+        }
         return $customTable ? $customTable->columns : [];
     }
 }

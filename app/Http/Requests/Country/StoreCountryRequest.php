@@ -27,7 +27,7 @@ class StoreCountryRequest extends FormRequest
             'name' => 'nullable|string|max:255',
             'name_e' => 'nullable|string|max:255',
             "is_default" => "nullable|in:0,1",
-            "phone_key" => "nullable",
+            "phone_key" => "nullable|unique:general_countries,phone_key",
             'national_id_length' => "nullable|integer",
             'long_name' => "nullable|max:100",
             'long_name_e' => "nullable|max:100",

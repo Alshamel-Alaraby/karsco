@@ -81,10 +81,10 @@ export default {
           this.$i18n.locale  == 'ar'?'branch.name':'branch.name_e',
           this.$i18n.locale  == 'ar'?'store.name':'store.name_e'
       ],
-        printLoading: true,
-        printObj: {
-            id: "printData",
-        }
+      printLoading: true,
+      printObj: {
+          id: "printData",
+      }
     };
   },
   validations: {
@@ -401,7 +401,7 @@ export default {
         store_id: null,
         is_default: 1,
       };
-      this.getBranch(this.company_id);
+      if(this.isVisible('branch_id')) this.getBranch(this.company_id);
       this.$nextTick(() => {
         this.$v.$reset();
       });
@@ -498,16 +498,16 @@ export default {
      *   show Modal (edit)
      */
     async resetModalEdit(id) {
-      await this.getBranch(this.company_id);
+      if(this.isVisible('branch_id')) await this.getBranch(this.company_id);
+      if(this.isVisible('store_id'))  await this.getStore(this.edit.branch_id);
       let serial = this.serials.find((e) => id == e.id);
       this.edit.start_no = serial.start_no;
       this.edit.perfix = serial.perfix;
       this.edit.suffix = serial.suffix;
       this.edit.restart_period = serial.restart_period;
-      this.edit.branch_id = serial.branch_id;
+      this.edit.branch_id = serial.branch_id ?? null;
       this.edit.is_default = parseInt(serial.is_default) ;
-      await this.getStore(this.edit.branch_id);
-      this.edit.store_id = serial.store_id;
+      this.edit.store_id = serial.store_id ?? null;
       this.errors = {};
     },
     /**
@@ -550,9 +550,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     async getBranch(id) {
       this.isLoader = true;
       await adminApi
@@ -1295,12 +1292,12 @@ export default {
                     </td>
                     <td v-if="setting.branch_id && isVisible('branch_id')">
                       <h5 class="m-0 font-weight-normal">
-                        {{ $i18n.locale == "ar" ? data.branch.name : data.branch.name_e }}
+                        {{data.branch ? $i18n.locale == "ar" ? data.branch.name : data.branch.name_e : ' - '}}
                       </h5>
                     </td>
                     <td v-if="setting.store_id && isVisible('store_id')">
                       <h5 class="m-0 font-weight-normal">
-                        {{ $i18n.locale == "ar" ? data.store.name : data.store.name_e }}
+                        {{data.store ? $i18n.locale == "ar" ? data.store.name : data.store.name_e : ' - '}}
                       </h5>
                     </td>
                     <td v-if="setting.is_default && isVisible('is_default')">
