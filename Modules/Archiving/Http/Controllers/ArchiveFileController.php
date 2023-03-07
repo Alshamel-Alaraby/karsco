@@ -219,11 +219,11 @@ class ArchiveFileController extends Controller
             //     $model->refresh();
             //     return responseJson(200, 'done', new ArchiveFileResource($model));
             // } else {
-                Pdf::loadView('pdf', $data)->save($path);
-                $model->addMedia($path)->toMediaCollection('media');
-                $model->refresh();
-                return responseJson(200, 'done', new ArchiveFileResource($model));
-        //     }
+            Pdf::loadView('pdf', $data)->save($path);
+            $model->addMedia($path)->toMediaCollection('media');
+            $model->refresh();
+            return responseJson(200, 'done', new ArchiveFileResource($model));
+            //     }
         });
     }
 
@@ -282,16 +282,15 @@ class ArchiveFileController extends Controller
 
     public function valueMedia(Request $request)
     {
-        $model = $this->model->
-        where('arch_department_id',$request->department_id)->
-        where('data_type_value','like','%"value":"'.$request->value.'"%')
-        ->whereHas('docType',function ($q) use ($request){
-                $q->where('parent_id',$request->parent_arch_doc_type_id);
-        })->where(function ($q) use ($request){
-            $q->when($request->arch_doc_type_id,function ($q) use ($request){
-                $q->where('arch_doc_type_id',$request->arch_doc_type_id);
+        $model = $this->model->where('arch_department_id', $request->department_id)
+            ->whereJsonContains('data_type_value', ["value" => request()->value])
+            ->whereHas('docType', function ($q) use ($request) {
+                $q->where('parent_id', $request->parent_arch_doc_type_id);
+            })->where(function ($q) use ($request) {
+                $q->when($request->arch_doc_type_id, function ($q) use ($request) {
+                    $q->where('arch_doc_type_id', $request->arch_doc_type_id);
+                });
             });
-        });
         if (!$model) {
             return responseJson(404, 'not found');
         }

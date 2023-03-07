@@ -12,12 +12,7 @@ import { formatDateOnly, formatDateTime } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
 import Multiselect from "vue-multiselect";
 import InstallmentPaymentType from "../../../components/create/receivablePayment/installmentPaymentType.vue";
-
-// require styles
-import "quill/dist/quill.core.css";
-import "quill/dist/quill.snow.css";
-import "quill/dist/quill.bubble.css";
-import { arabicValue, englishValue } from "../../../helper/langTransform";
+import {arabicValue, englishValue} from "../../../helper/langTransform";
 /**
  * Advanced Table component
  */
@@ -66,68 +61,6 @@ export default {
       },
       per_page: 50,
       search: "",
-      editorOption: {
-        // Some Quill options...
-        theme: "snow",
-        modules: {
-          toolbar: [
-            [
-              {
-                font: [],
-              },
-              {
-                size: [],
-              },
-            ],
-            ["bold", "italic", "underline", "strike"],
-            [
-              {
-                color: [],
-              },
-              {
-                background: [],
-              },
-            ],
-            [
-              {
-                script: "super",
-              },
-              {
-                script: "sub",
-              },
-            ],
-            [
-              {
-                header: [false, 1, 2, 3, 4, 5, 6],
-              },
-              "blockquote",
-              "code-block",
-            ],
-            [
-              {
-                list: "ordered",
-              },
-              {
-                list: "bullet",
-              },
-              {
-                indent: "-1",
-              },
-              {
-                indent: "+1",
-              },
-            ],
-            [
-              "direction",
-              {
-                align: [],
-              },
-            ],
-            ["link", "image", "video"],
-            ["clean"],
-          ],
-        },
-      },
       debounce: {},
       installmentStatusPagination: {},
       installmentStatus: [],
@@ -614,9 +547,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     formatDate(value) {
       return formatDateOnly(value);
     },
@@ -670,6 +600,14 @@ export default {
     englishValueName(txt) {
       this.create.name_e = englishValue(txt);
       this.edit.name_e = englishValue(txt);
+    },
+    arabicValueDescription(txt){
+         this.create.description = arabicValue(txt);
+         this.edit.description = arabicValue(txt);
+    },
+    englishValueDescription(txt){
+         this.create.description_e = englishValue(txt);
+         this.edit.description_e = englishValue(txt);
     },
   },
 };
@@ -1077,45 +1015,37 @@ export default {
                     </div>
                   </div>
                   <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="mr-2">
-                        {{ getCompanyKey("installment_payment_description_ar") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <quill-editor
-                        v-model="$v.create.description.$model"
-                        style="min-height: 150px; background-color: #fff"
-                        :options="editorOption"
-                      />
-                      <template v-if="errors.description">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.description"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
+                        <div class="form-group">
+                            <label class="mr-2" for="inlineFormCustomSelectPref">
+                                {{ getCompanyKey("installment_payment_description_ar") }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            <textarea @input="arabicValueDescription(create.description)" v-model="$v.create.description.$model" class="form-control" :maxlength="1000" rows="5"></textarea>
+                            <template v-if="errors.description">
+                                <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.description"
+                                    :key="index"
+                                >{{ errorMessage }}</ErrorMessage
+                                >
+                            </template>
+                        </div>
                     </div>
-                  </div>
                   <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="mr-2">
-                        {{ getCompanyKey("installment_payment_description_en") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <quill-editor
-                        v-model="$v.create.description_e.$model"
-                        style="min-height: 150px; background-color: #fff"
-                        :options="editorOption"
-                      />
-                      <template v-if="errors.description_e">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.description_e"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
+                        <div class="form-group">
+                            <label class="mr-2">
+                                {{ getCompanyKey("installment_payment_description_en") }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            <textarea  @input="englishValueDescription(create.description_e)" v-model="$v.create.description_e.$model" class="form-control" :maxlength="1000" rows="5"></textarea>
+                            <template v-if="errors.description_e">
+                                <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.description_e"
+                                    :key="index"
+                                >{{ errorMessage }}</ErrorMessage
+                                >
+                            </template>
+                        </div>
                     </div>
-                  </div>
                 </div>
               </form>
             </b-modal>
@@ -1516,49 +1446,37 @@ export default {
                               </div>
                             </div>
                             <div class="col-md-6">
-                              <div class="form-group">
-                                <label class="mr-2">
-                                  {{
-                                    getCompanyKey("installment_payment_description_ar")
-                                  }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <quill-editor
-                                  v-model="$v.edit.description.$model"
-                                  style="min-height: 150px; background-color: #fff"
-                                  :options="editorOption"
-                                />
-                                <template v-if="errors.description">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.description"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
+                                  <div class="form-group">
+                                      <label class="mr-2">
+                                          {{ getCompanyKey("installment_payment_description_ar") }}
+                                          <span class="text-danger">*</span>
+                                      </label>
+                                      <textarea @input="arabicValueDescription(edit.description)" v-model="$v.edit.description.$model" class="form-control" :maxlength="1000" rows="5"></textarea>
+                                      <template v-if="errors.description">
+                                          <ErrorMessage
+                                              v-for="(errorMessage, index) in errors.description"
+                                              :key="index"
+                                          >{{ errorMessage }}</ErrorMessage
+                                          >
+                                      </template>
+                                  </div>
                               </div>
-                            </div>
                             <div class="col-md-6">
-                              <div class="form-group">
-                                <label class="mr-2">
-                                  {{
-                                    getCompanyKey("installment_payment_description_en")
-                                  }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <quill-editor
-                                  v-model="$v.edit.description_e.$model"
-                                  style="min-height: 150px; background-color: #fff"
-                                  :options="editorOption"
-                                />
-                                <template v-if="errors.description_e">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.description_e"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
+                                  <div class="form-group">
+                                      <label class="mr-2">
+                                          {{ getCompanyKey("installment_payment_description_en") }}
+                                          <span class="text-danger">*</span>
+                                      </label>
+                                      <textarea  @input="englishValueDescription(edit.description_e)" v-model="$v.edit.description_e.$model" class="form-control" :maxlength="1000" rows="5"></textarea>
+                                      <template v-if="errors.description_e">
+                                          <ErrorMessage
+                                              v-for="(errorMessage, index) in errors.description_e"
+                                              :key="index"
+                                          >{{ errorMessage }}</ErrorMessage
+                                          >
+                                      </template>
+                                  </div>
                               </div>
-                            </div>
                           </div>
                         </form>
                       </b-modal>

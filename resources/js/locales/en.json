@@ -585,6 +585,7 @@
         }
     },
     "general": {
+        "invoice":"Invoice",
         "serial": "Serial",
         "supplier": "Supplier",
         "item_quantity": "Item quantity",
@@ -900,6 +901,7 @@
         "recievablePayable": "Receivable Payable",
         "installmentStatus": "installment Status",
         "installmentStatusTable": "installment Status Table",
+        "installmentCustomerOpeningBalanceTable": "Customer Opening Balance Table",
         "installmentPaymentType": "Installment Payment Type",
         "installmentPaymentTypeTable": "Installment Payment Type Table",
         "MainContactGroups": "Main Contact Groups",
@@ -936,6 +938,17 @@
         "rows": "Rows",
         "documentTable": "Document Table",
         "document": "Document",
-        "location": "Location"
+        "Break": "Break",
+        "countOpeningBalance": "count Opening Balance",
+        "total_local_debit": "total Local Debit",
+        "total_local_credit": "total Local Credit",
+        "net": "Net",
+        "location": "Location",
+        "debit": "Debit",
+        "credit": "Credit",
+        "totalAmount": "Total Amount",
+        "totalDivision": "Total Division",
+        "Residual": "Residual",
+        "Invoice": "Invoice"
     }
 }

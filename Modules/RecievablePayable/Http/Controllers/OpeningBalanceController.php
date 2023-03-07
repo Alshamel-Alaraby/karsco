@@ -44,7 +44,8 @@ class OpeningBalanceController extends Controller
     public function store(CreateOpeningBalanceRequest $request)
     {
         $model = $this->modelInterface->create($request->validated());
-        return responseJson(200, 'success');
+        return $model;
+        return responseJson(200, 'success', new OpeningBalanceResource($model));
     }
 
     public function update(CreateOpeningBalanceRequest $request, $deta)

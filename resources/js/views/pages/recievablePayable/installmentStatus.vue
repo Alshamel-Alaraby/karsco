@@ -483,9 +483,6 @@ export default {
         /**
          *  end  ckeckRow
          */
-        moveInput(tag, c, index) {
-            document.querySelector(`${tag}[data-${c}='${index}']`).focus()
-        },
         formatDate(value) {
             return formatDateOnly(value);
         },

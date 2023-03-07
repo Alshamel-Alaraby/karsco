@@ -34,6 +34,9 @@ trait LogTrait
 //                 $q->where('name', 'like', '%' . $request->search . '%');
 //                 $q->orWhere('name_e', 'like', '%' . $request->search . '%');
              }
+             if ($request->has('date')){
+                 $q->whereDate('date',$request->date);
+             }
 
             if ($request->search && $request->columns) {
                 foreach ($request->columns as $column) {

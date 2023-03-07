@@ -880,7 +880,7 @@ export default {
             </div>
 
             <!--  create   -->
-            <b-modal id="create" :title="getCompanyKey('installment_payment_type_create_form')" title-class="font-18"
+            <b-modal id="create" size="lg" :title="getCompanyKey('installment_payment_type_create_form')" title-class="font-18"
               body-class="p-4 " :hide-footer="true" @show="resetModal" @hidden="resetModalHidden">
               <form>
                 <div class="mb-3 d-flex justify-content-end">
@@ -905,9 +905,9 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-12">
+                  <div class="col-md-6">
                     <div class="form-group">
-                      <label for="field-1" class="control-label">
+                      <label class="control-label">
                         {{ getCompanyKey("installment_payment_type_name") }}
                         <span class="text-danger">*</span>
                       </label>
@@ -916,7 +916,7 @@ export default {
                           v-model="$v.create.name.$model" :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
                             'is-valid': !$v.create.name.$invalid && !errors.name,
-                          }" id="field-1" />
+                          }"  />
                       </div>
                       <div v-if="!$v.create.name.minLength" class="invalid-feedback">
                         {{ $t("general.Itmustbeatleast") }}
@@ -935,9 +935,9 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-6">
                     <div class="form-group">
-                      <label for="field-2" class="control-label">
+                      <label class="control-label">
                         {{ getCompanyKey("installment_payment_type_name_e") }}
                         <span class="text-danger">*</span>
                       </label>
@@ -946,7 +946,7 @@ export default {
                           @keyup="englishValueName(create.name_e)" v-model="$v.create.name_e.$model" :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
                             'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
-                          }" id="field-2" />
+                          }" />
                       </div>
                       <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
                         {{ $t("general.Itmustbeatleast") }}
@@ -964,9 +964,9 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-6">
                     <div class="form-group">
-                      <label class="mr-2" for="field-12">
+                      <label class="mr-2">
                         {{ getCompanyKey("is_conditional") }}
                       </label>
                       <b-form-group id="create-11" :class="{
@@ -989,7 +989,7 @@ export default {
                     </div>
                   </div>
                   <template v-if="create.is_conditional == 1">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                       <div class="form-group">
                         <label class="my-1 mr-2">
                           {{ getCompanyKey("condition") }}
@@ -1018,9 +1018,9 @@ export default {
                       </div>
                     </div>
                   </template>
-                  <div class="col-md-12">
+                  <div class="col-md-6">
                     <div class="form-group">
-                      <label for="field-2" class="control-label">
+                      <label  class="control-label">
                         {{ getCompanyKey("installmentPaymentType_per") }}
                         <span class="text-danger">*</span>
                       </label>
@@ -1030,7 +1030,7 @@ export default {
                           'is-invalid': $v.create.installmentPaymentType_per.$error || errors.installmentPaymentType_per,
                           'is-valid':
                             !$v.create.installmentPaymentType_per.$invalid && !errors.installmentPaymentType_per,
-                        }" id="field-2" />
+                        }" />
                       <template v-if="errors.installmentPaymentType_per">
                         <ErrorMessage v-for="(errorMessage, index) in errors.installmentPaymentType_per" :key="index">{{
                           errorMessage }}
@@ -1038,9 +1038,9 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-6">
                     <div class="form-group">
-                      <label for="field-2" class="control-label">
+                      <label class="control-label">
                         {{ getCompanyKey("installmentPaymentType_freq") }}
                         <span class="text-danger">*</span>
                       </label>
@@ -1050,7 +1050,7 @@ export default {
                           'is-invalid': $v.create.installmentPaymentType_freq.$error || errors.installmentPaymentType_freq,
                           'is-valid':
                             !$v.create.installmentPaymentType_freq.$invalid && !errors.installmentPaymentType_freq,
-                        }" id="field-2" />
+                        }" />
                       <template v-if="errors.installmentPaymentType_freq">
                         <ErrorMessage v-for="(errorMessage, index) in errors.installmentPaymentType_freq" :key="index">{{
                           errorMessage }}
@@ -1058,7 +1058,7 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-6">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
                         {{ getCompanyKey("interest_per") }}
@@ -1069,16 +1069,16 @@ export default {
                           'is-invalid': $v.create.interest_per.$error || errors.interest_per,
                           'is-valid':
                             !$v.create.interest_per.$invalid && !errors.interest_per,
-                        }" id="field-2" />
+                        }" />
                       <template v-if="errors.interest_per">
                         <ErrorMessage v-for="(errorMessage, index) in errors.interest_per" :key="index">{{ errorMessage }}
                         </ErrorMessage>
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-4">
                     <div class="form-group">
-                      <label class="mr-2" for="edit-12">
+                      <label class="mr-2">
                         {{ getCompanyKey("installment_payment_is_partially") }}
                       </label>
                       <b-form-group id="edit-11" :class="{
@@ -1098,7 +1098,7 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-4">
                     <div class="form-group">
                       <label class="mr-2" for="field-11">
                         {{ getCompanyKey("is_passed") }}
@@ -1119,7 +1119,7 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-4">
                     <div class="form-group">
                       <label class="mr-2" for="field-12">
                         {{ getCompanyKey("is_passed_all") }}
@@ -1142,8 +1142,7 @@ export default {
                       </template>
                     </div>
                   </div>
-
-                  <div class="col-md-12">
+                  <div class="col-md-4">
                     <div class="form-group">
                       <label class="mr-2" for="field-12">
                         {{ getCompanyKey("is_passed_contract_plan") }}
@@ -1170,7 +1169,7 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-4">
                     <div class="form-group">
                       <label class="mr-2" for="field-11">
                         {{ getCompanyKey("installment_payment_auto_freq") }}
@@ -1192,19 +1191,20 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-6">
                     <div class="form-group">
-                      <label for="field-2" class="control-label">
+                      <label class="control-label">
                         {{ getCompanyKey("freq_period") }}
                         <span class="text-danger">*</span>
                       </label>
                       <input type="number" class="form-control" data-create="2"
-                        @keypress.enter="moveInput('select', 'create', 3)" v-model="$v.create.Freq_period.$model" :class="{
+                         v-model="$v.create.Freq_period.$model"
+                         :class="{
                           'is-invalid':
                             $v.create.Freq_period.$error || errors.Freq_period,
                           'is-valid':
                             !$v.create.Freq_period.$invalid && !errors.Freq_period,
-                        }" id="field-2" />
+                        }" />
                       <template v-if="errors.Freq_period">
                         <ErrorMessage v-for="(errorMessage, index) in errors.Freq_period" :key="index">{{ errorMessage }}
                         </ErrorMessage>
@@ -1335,7 +1335,7 @@ export default {
                       </div>
 
                       <!--  edit   -->
-                      <b-modal :id="`modal-edit-${data.id}`" :title="getCompanyKey('installment_payment_type_edit_form')"
+                      <b-modal size="lg" :id="`modal-edit-${data.id}`" :title="getCompanyKey('installment_payment_type_edit_form')"
                         title-class="font-18" body-class="p-4" :ref="`edit-${data.id}`" :hide-footer="true"
                         @show="resetModalEdit(data.id)" @hidden="resetModalHiddenEdit(data.id)">
                         <form>
@@ -1357,7 +1357,7 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                               <div class="form-group">
                                 <label for="field-1" class="control-label">
                                   {{ getCompanyKey("installment_payment_type_name") }}
@@ -1387,7 +1387,7 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                               <div class="form-group">
                                 <label for="field-2" class="control-label">
                                   {{ getCompanyKey("installment_payment_type_name_e") }}
@@ -1417,7 +1417,7 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                               <div class="form-group">
                                 <label class="mr-2" for="field-12">
                                   {{ getCompanyKey("is_conditional") }}
@@ -1445,7 +1445,7 @@ export default {
                               </div>
                             </div>
                             <template v-if="edit.is_conditional == 1">
-                              <div class="col-md-12">
+                              <div class="col-md-6">
                                 <div class="form-group">
                                   <label class="my-1 mr-2">
                                     {{ getCompanyKey("condition") }}
@@ -1475,7 +1475,7 @@ export default {
                                 </div>
                               </div>
                             </template>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                               <div class="form-group">
                                 <label for="field-2" class="control-label">
                                   {{ getCompanyKey("installmentPaymentType_per") }}
@@ -1496,7 +1496,7 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                               <div class="form-group">
                                 <label for="field-2" class="control-label">
                                   {{ getCompanyKey("installmentPaymentType_freq") }}
@@ -1517,7 +1517,7 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                               <div class="form-group">
                                 <label for="field-2" class="control-label">
                                   {{ getCompanyKey("interest_per") }}
@@ -1537,7 +1537,7 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-4">
                               <div class="form-group">
                                 <label class="mr-2" for="edit-12">
                                   {{ getCompanyKey("installment_payment_is_partially") }}
@@ -1560,7 +1560,7 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-4">
                               <div class="form-group">
                                 <label class="mr-2" for="field-11">
                                   {{ getCompanyKey("is_passed") }}
@@ -1582,7 +1582,7 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-4">
                               <div class="form-group">
                                 <label class="mr-2" for="field-12">
                                   {{ getCompanyKey("is_passed_all") }}
@@ -1608,8 +1608,7 @@ export default {
                                 </template>
                               </div>
                             </div>
-
-                            <div class="col-md-12">
+                            <div class="col-md-4">
                               <div class="form-group">
                                 <label class="mr-2" for="field-12">
                                   {{ getCompanyKey("is_passed_contract_plan") }}
@@ -1637,7 +1636,7 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-4">
                               <div class="form-group">
                                 <label class="mr-2" for="field-11">
                                   {{ getCompanyKey("installment_payment_auto_freq") }}
@@ -1660,7 +1659,7 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                               <div class="form-group">
                                 <label for="field-2" class="control-label">
                                   {{ getCompanyKey("freq_period") }}

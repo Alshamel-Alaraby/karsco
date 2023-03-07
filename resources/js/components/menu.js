@@ -282,7 +282,7 @@ export const menuItems = [
                     {
                         id: 100021,
                         name: 'contract unit',
-                        label: 'general.contractunit',
+                        label: 'general.invoice',
                         link: '/dashboard/realEstate/contractunit'
                     }
                 ]
@@ -495,7 +495,7 @@ export const menuItems = [
                         label: 'general.openinig balance',
                         icon: 'fas fa-hot-tub',
                         name: 'receivable payable',
-                        link: '/'
+                        link: '/dashboard/receivablePayable/transaction/openingBalance'
                     },
                     {
                         id: 2234,
@@ -649,6 +649,8 @@ export const menuItems = [
         icon: 'fas fa-palette',
         link: '/dashboard/colors'
     },
+
+
 
     // {
     //     id: 1115,

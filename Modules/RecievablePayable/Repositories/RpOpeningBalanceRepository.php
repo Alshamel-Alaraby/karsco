@@ -32,6 +32,9 @@ class RpOpeningBalanceRepository implements RpOpeningBalanceInterface
             $this->model->scopeFilter($q , $request);
         })->orderBy($request->order ? $request->order : 'updated_at', $request->sort ? $request->sort : 'DESC');
 
+        if ($request->group){
+            $models->groupBy('date')->selectRaw('sum(local_credit) as total_local_credit,sum(local_debit) as total_local_debit,date,COUNT(id) as count')->orderBy('date','desc');
+        }
         if ($request->per_page) {
             return ['data' => $models->paginate($request->per_page), 'paginate' => true];
         } else {
@@ -47,10 +50,13 @@ class RpOpeningBalanceRepository implements RpOpeningBalanceInterface
     public function create($request)
     {
 
-        DB::transaction(function () use ($request) {
+       return DB::transaction(function () use ($request) {
+            $data = [];
             foreach ($request['opening_balances'] as $opening_balances):
-            $model = $this->model->create($opening_balances);
+                $model = $this->model->create($opening_balances);
+                $data[] = $model;
             endforeach;
+            return $data;
         });
     }
 

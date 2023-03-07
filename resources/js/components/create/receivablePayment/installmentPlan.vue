@@ -12,11 +12,6 @@ import DatePicker from "vue2-datepicker";
 import Multiselect from "vue-multiselect";
 import InstallmentPaymentType from "./installmentPaymentType.vue";
 import {arabicValue, englishValue} from "../../../helper/langTransform";
-
-// require styles
-import "quill/dist/quill.core.css";
-import "quill/dist/quill.snow.css";
-import "quill/dist/quill.bubble.css";
 /**
  * Advanced Table component
  */
@@ -32,68 +27,6 @@ export default {
   },
   data() {
     return {
-      editorOption: {
-        // Some Quill options...
-        theme: "snow",
-        modules: {
-          toolbar: [
-            [
-              {
-                font: [],
-              },
-              {
-                size: [],
-              },
-            ],
-            ["bold", "italic", "underline", "strike"],
-            [
-              {
-                color: [],
-              },
-              {
-                background: [],
-              },
-            ],
-            [
-              {
-                script: "super",
-              },
-              {
-                script: "sub",
-              },
-            ],
-            [
-              {
-                header: [false, 1, 2, 3, 4, 5, 6],
-              },
-              "blockquote",
-              "code-block",
-            ],
-            [
-              {
-                list: "ordered",
-              },
-              {
-                list: "bullet",
-              },
-              {
-                indent: "-1",
-              },
-              {
-                indent: "+1",
-              },
-            ],
-            [
-              "direction",
-              {
-                align: [],
-              },
-            ],
-            ["link", "image", "video"],
-            ["clean"],
-          ],
-        },
-      },
       debounce: {},
       enabled3: false,
       isLoader: false,
@@ -222,16 +155,17 @@ export default {
           });
       }
     },
-      arabicValue(txt){
-          this.create.name = arabicValue(txt);
-      },
       arabicValueDescription(txt){
           this.create.description = arabicValue(txt);
+          this.edit.description = arabicValue(txt);
+      },
+      englishValueDescription(txt){
+          this.create.description_e = englishValue(txt);
+          this.edit.description_e = englishValue(txt);
       },
       arabicValueName(txt) {
           this.create.name = arabicValue(txt);
       },
-
       englishValueName(txt) {
           this.create.name_e = englishValue(txt);
       },
@@ -304,9 +238,9 @@ export default {
                                   @keyup="arabicValueName(create.name)"
                                   v-model="$v.create.name.$model"
                                   :class="{
-                            'is-invalid': $v.create.name.$error || errors.name,
-                            'is-valid': !$v.create.name.$invalid && !errors.name,
-                          }"
+                                    'is-invalid': $v.create.name.$error || errors.name,
+                                    'is-valid': !$v.create.name.$invalid && !errors.name,
+                                  }"
                                   id="field-1"
                               />
                           </div>
@@ -344,9 +278,9 @@ export default {
                                   @keyup="englishValueName(create.name_e)"
                                   v-model="$v.create.name_e.$model"
                                   :class="{
-                            'is-invalid': $v.create.name_e.$error || errors.name_e,
-                            'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
-                          }"
+                                    'is-invalid': $v.create.name_e.$error || errors.name_e,
+                                    'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
+                                  }"
                                   id="field-2"
                               />
                           </div>
@@ -448,11 +382,7 @@ export default {
                               {{ getCompanyKey("installment_payment_description_ar") }}
                               <span class="text-danger">*</span>
                           </label>
-                          <quill-editor
-                              v-model="$v.create.description.$model"
-                              style="min-height: 150px; background-color: #fff"
-                              :options="editorOption"
-                          />
+                          <textarea @input="arabicValueDescription(create.description)" v-model="$v.create.description.$model" class="form-control" :maxlength="1000" rows="5"></textarea>
                           <template v-if="errors.description">
                               <ErrorMessage
                                   v-for="(errorMessage, index) in errors.description"
@@ -468,11 +398,7 @@ export default {
                               {{ getCompanyKey("installment_payment_description_en") }}
                               <span class="text-danger">*</span>
                           </label>
-                          <quill-editor
-                              v-model="$v.create.description_e.$model"
-                              style="min-height: 150px; background-color: #fff"
-                              :options="editorOption"
-                          />
+                          <textarea  @input="englishValueDescription(create.description_e)" v-model="$v.create.description_e.$model" class="form-control" :maxlength="1000" rows="5"></textarea>
                           <template v-if="errors.description_e">
                               <ErrorMessage
                                   v-for="(errorMessage, index) in errors.description_e"

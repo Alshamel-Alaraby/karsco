@@ -6939,6 +6939,139 @@ class TranslationSeeder extends Seeder
 
             ],
         ]);
+
+        // installment opening balance
+        Translation::insert([
+            [
+                "key" => "installment_opening_balance_create_form",
+                "default_en" => "Add customer opening balance",
+                "default_ar" => "اضافة الرصيد الافتتاحى للعملاء",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+            ],
+            [
+                "key" => "installment_opening_balance_edit_form",
+                "default_en" => "Edit customer opening balance",
+                "default_ar" => "نموذج تعديل الرصيد الافتتاحى للعملاء",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+
+            ],
+            [
+                "key" => "installment_opening_balance_date",
+                "default_en" => "date",
+                "default_ar" => "التاريخ",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+
+            ],
+            [
+                "key" => "installment_opening_balance_currency",
+                "default_en" => "Currency",
+                "default_ar" => "العملة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+
+            ],
+            [
+                "key" => "installment_opening_balance_rate",
+                "default_en" => "Rate",
+                "default_ar" => "المعدل",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+
+            ],
+            [
+                "key" => "installment_opening_balance_debit",
+                "default_en" => "Debit Foreign",
+                "default_ar" => "مدين اجنبية",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+
+            ],
+            [
+                "key" => "installment_opening_balance_credit",
+                "default_en" => "Credit Foreign",
+                "default_ar" => "دائن اجنبية",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+
+            ],
+            [
+                "key" => "installment_opening_balance_local_debit",
+                "default_en" => "Local Debit",
+                "default_ar" => "مدين محلية",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+
+            ],
+            [
+                "key" => "installment_opening_balance_local_credit",
+                "default_en" => "Local Credit",
+                "default_ar" => "دائن محلية",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+
+            ],
+            [
+                "key" => "installment_count_opening_balance",
+                "default_en" => "Count Opening Balance",
+                "default_ar" => "عدد الارصدة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+
+            ],
+            [
+                "key" => "installment_opening_total_local_debit",
+                "default_en" => "Total Local Debit",
+                "default_ar" => "اجمالى مدين",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+
+            ],
+            [
+                "key" => "installment_opening_total_local_credit",
+                "default_en" => "Total Local Credit",
+                "default_ar" => "اجمالى دائن",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+
+            ],
+            [
+                "key" => "installment_opening_net",
+                "default_en" => "Net",
+                "default_ar" => "الرصيد",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "receivable payable"
+
+            ],
+        ]);
     }
 
 }

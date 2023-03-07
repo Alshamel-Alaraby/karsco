@@ -276,310 +276,314 @@ export default {
         </b-button>
       </div>
       <div class="row">
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="field-1" class="control-label">
-              {{ getCompanyKey("installment_payment_type_name") }}
-              <span class="text-danger">*</span>
-            </label>
-            <div dir="rtl">
-              <input type="text" class="form-control" data-create="1" @keyup="arabicValueName(create.name)"
-                v-model="$v.create.name.$model" :class="{
-                  'is-invalid': $v.create.name.$error || errors.name,
-                  'is-valid': !$v.create.name.$invalid && !errors.name,
-                }" id="field-1" />
-            </div>
-            <div v-if="!$v.create.name.minLength" class="invalid-feedback">
-              {{ $t("general.Itmustbeatleast") }}
-              {{ $v.create.name.$params.minLength.min }}
-              {{ $t("general.letters") }}
-            </div>
-            <div v-if="!$v.create.name.maxLength" class="invalid-feedback">
-              {{ $t("general.Itmustbeatmost") }}
-              {{ $v.create.name.$params.maxLength.max }}
-              {{ $t("general.letters") }}
-            </div>
-            <template v-if="errors.name">
-              <ErrorMessage v-for="(errorMessage, index) in errors.name" :key="index">
-                {{ errorMessage }}
-              </ErrorMessage>
-            </template>
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label class="control-label">
+                      {{ getCompanyKey("installment_payment_type_name") }}
+                      <span class="text-danger">*</span>
+                  </label>
+                  <div dir="rtl">
+                      <input type="text" class="form-control" data-create="1" @keyup="arabicValueName(create.name)"
+                             v-model="$v.create.name.$model" :class="{
+                            'is-invalid': $v.create.name.$error || errors.name,
+                            'is-valid': !$v.create.name.$invalid && !errors.name,
+                          }"  />
+                  </div>
+                  <div v-if="!$v.create.name.minLength" class="invalid-feedback">
+                      {{ $t("general.Itmustbeatleast") }}
+                      {{ $v.create.name.$params.minLength.min }}
+                      {{ $t("general.letters") }}
+                  </div>
+                  <div v-if="!$v.create.name.maxLength" class="invalid-feedback">
+                      {{ $t("general.Itmustbeatmost") }}
+                      {{ $v.create.name.$params.maxLength.max }}
+                      {{ $t("general.letters") }}
+                  </div>
+                  <template v-if="errors.name">
+                      <ErrorMessage v-for="(errorMessage, index) in errors.name" :key="index">
+                          {{ errorMessage }}
+                      </ErrorMessage>
+                  </template>
+              </div>
           </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="field-2" class="control-label">
-              {{ getCompanyKey("installment_payment_type_name_e") }}
-              <span class="text-danger">*</span>
-            </label>
-            <div>
-              <input type="text" class="form-control englishInput" data-create="2"
-                @keyup="englishValueName(create.name_e)" v-model="$v.create.name_e.$model" :class="{
-                  'is-invalid': $v.create.name_e.$error || errors.name_e,
-                  'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
-                }" id="field-2" />
-            </div>
-            <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
-              {{ $t("general.Itmustbeatleast") }}
-              {{ $v.create.name_e.$params.minLength.min }}
-              {{ $t("general.letters") }}
-            </div>
-            <div v-if="!$v.create.name_e.maxLength" class="invalid-feedback">
-              {{ $t("general.Itmustbeatmost") }}
-              {{ $v.create.name_e.$params.maxLength.max }}
-              {{ $t("general.letters") }}
-            </div>
-            <template v-if="errors.name_e">
-              <ErrorMessage v-for="(errorMessage, index) in errors.name_e" :key="index">{{ errorMessage }}
-              </ErrorMessage>
-            </template>
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label class="control-label">
+                      {{ getCompanyKey("installment_payment_type_name_e") }}
+                      <span class="text-danger">*</span>
+                  </label>
+                  <div>
+                      <input type="text" class="form-control englishInput" data-create="2"
+                             @keyup="englishValueName(create.name_e)" v-model="$v.create.name_e.$model" :class="{
+                            'is-invalid': $v.create.name_e.$error || errors.name_e,
+                            'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
+                          }" />
+                  </div>
+                  <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
+                      {{ $t("general.Itmustbeatleast") }}
+                      {{ $v.create.name_e.$params.minLength.min }}
+                      {{ $t("general.letters") }}
+                  </div>
+                  <div v-if="!$v.create.name_e.maxLength" class="invalid-feedback">
+                      {{ $t("general.Itmustbeatmost") }}
+                      {{ $v.create.name_e.$params.maxLength.max }}
+                      {{ $t("general.letters") }}
+                  </div>
+                  <template v-if="errors.name_e">
+                      <ErrorMessage v-for="(errorMessage, index) in errors.name_e" :key="index">{{ errorMessage }}
+                      </ErrorMessage>
+                  </template>
+              </div>
           </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label class="mr-2" for="field-12">
-              {{ getCompanyKey("is_conditional") }}
-            </label>
-            <b-form-group id="create-11" :class="{
-              'is-invalid':
-                $v.create.is_conditional.$error || errors.is_conditional,
-              'is-valid':
-                !$v.create.is_conditional.$invalid &&
-                !errors.is_conditional,
-            }">
-              <b-form-radio class="d-inline-block" v-model="$v.create.is_conditional.$model"
-                name="some-radios-create-is_conditional" value="1">{{ $t("general.Yes") }}</b-form-radio>
-              <b-form-radio class="d-inline-block m-1" v-model="$v.create.is_conditional.$model"
-                name="some-radios-create-is_conditional" value="0">{{ $t("general.No") }}</b-form-radio>
-            </b-form-group>
-            <template v-if="errors.is_conditional">
-              <ErrorMessage v-for="(errorMessage, index) in errors.is_conditional" :key="index">{{ errorMessage
-              }}
-              </ErrorMessage>
-            </template>
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label class="mr-2">
+                      {{ getCompanyKey("is_conditional") }}
+                  </label>
+                  <b-form-group id="create-11" :class="{
+                        'is-invalid':
+                          $v.create.is_conditional.$error || errors.is_conditional,
+                        'is-valid':
+                          !$v.create.is_conditional.$invalid &&
+                          !errors.is_conditional,
+                      }">
+                      <b-form-radio class="d-inline-block" v-model="$v.create.is_conditional.$model"
+                                    name="some-radios-create-is_conditional" value="1">{{ $t("general.Yes") }}</b-form-radio>
+                      <b-form-radio class="d-inline-block m-1" v-model="$v.create.is_conditional.$model"
+                                    name="some-radios-create-is_conditional" value="0">{{ $t("general.No") }}</b-form-radio>
+                  </b-form-group>
+                  <template v-if="errors.is_conditional">
+                      <ErrorMessage v-for="(errorMessage, index) in errors.is_conditional" :key="index">{{ errorMessage
+                          }}
+                      </ErrorMessage>
+                  </template>
+              </div>
           </div>
-        </div>
-        <template v-if="create.is_conditional == 1">
-          <div class="col-md-12">
-            <div class="form-group">
-              <label class="my-1 mr-2">
-                {{ getCompanyKey("condition") }}
-                <span class="text-danger">*</span>
-              </label>
-              <multiselect @input="showConditionModal" v-model="create.Condition_id"
-                :options="conditions.map((type) => type.id)" :custom-label="
-                  (opt) =>
-                    $i18n.locale == 'ar'
-                      ? conditions.find((x) => x.id == opt).name
-                      : conditions.find((x) => x.id == opt).name_e
-                " :class="{
+          <template v-if="create.is_conditional == 1">
+              <div class="col-md-6">
+                  <div class="form-group">
+                      <label class="my-1 mr-2">
+                          {{ getCompanyKey("condition") }}
+                          <span class="text-danger">*</span>
+                      </label>
+                      <multiselect @input="showConditionModal" v-model="create.Condition_id"
+                                   :options="conditions.map((type) => type.id)" :custom-label="
+                            (opt) =>
+                              $i18n.locale == 'ar'
+                                ? conditions.find((x) => x.id == opt).name
+                                : conditions.find((x) => x.id == opt).name_e
+                          " :class="{
   'is-invalid':
     $v.create.Condition_id.$error || errors.Condition_id,
 }">
-              </multiselect>
-              <div v-if="!$v.create.Condition_id.required" class="invalid-feedback">
-                {{ $t("general.fieldIsRequired") }}
-              </div>
+                      </multiselect>
+                      <div v-if="!$v.create.Condition_id.required" class="invalid-feedback">
+                          {{ $t("general.fieldIsRequired") }}
+                      </div>
 
-              <template v-if="errors.condition_id">
-                <ErrorMessage v-for="(errorMessage, index) in errors.condition_id" :key="index">{{ errorMessage
-                }}
-                </ErrorMessage>
-              </template>
-            </div>
+                      <template v-if="errors.condition_id">
+                          <ErrorMessage v-for="(errorMessage, index) in errors.condition_id" :key="index">{{ errorMessage
+                              }}
+                          </ErrorMessage>
+                      </template>
+                  </div>
+              </div>
+          </template>
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label  class="control-label">
+                      {{ getCompanyKey("installmentPaymentType_per") }}
+                      <span class="text-danger">*</span>
+                  </label>
+                  <input type="number" class="form-control" data-create="2"
+                         @keypress.enter="moveInput('select', 'create', 3)"
+                         v-model="$v.create.installmentPaymentType_per.$model" :class="{
+                          'is-invalid': $v.create.installmentPaymentType_per.$error || errors.installmentPaymentType_per,
+                          'is-valid':
+                            !$v.create.installmentPaymentType_per.$invalid && !errors.installmentPaymentType_per,
+                        }" />
+                  <template v-if="errors.installmentPaymentType_per">
+                      <ErrorMessage v-for="(errorMessage, index) in errors.installmentPaymentType_per" :key="index">{{
+                              errorMessage }}
+                      </ErrorMessage>
+                  </template>
+              </div>
           </div>
-        </template>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="field-2" class="control-label">
-              {{ getCompanyKey("installmentPaymentType_per") }}
-              <span class="text-danger">*</span>
-            </label>
-            <input type="number" class="form-control" data-create="2" @keypress.enter="moveInput('select', 'create', 3)"
-              v-model="$v.create.installmentPaymentType_per.$model" :class="{
-                'is-invalid': $v.create.installmentPaymentType_per.$error || errors.installmentPaymentType_per,
-                'is-valid':
-                  !$v.create.installmentPaymentType_per.$invalid && !errors.installmentPaymentType_per,
-              }" id="field-2" />
-            <template v-if="errors.installmentPaymentType_per">
-              <ErrorMessage v-for="(errorMessage, index) in errors.installmentPaymentType_per" :key="index">{{
-                errorMessage }}
-              </ErrorMessage>
-            </template>
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label class="control-label">
+                      {{ getCompanyKey("installmentPaymentType_freq") }}
+                      <span class="text-danger">*</span>
+                  </label>
+                  <input type="number" class="form-control" data-create="2"
+                         @keypress.enter="moveInput('select', 'create', 3)"
+                         v-model="$v.create.installmentPaymentType_freq.$model" :class="{
+                          'is-invalid': $v.create.installmentPaymentType_freq.$error || errors.installmentPaymentType_freq,
+                          'is-valid':
+                            !$v.create.installmentPaymentType_freq.$invalid && !errors.installmentPaymentType_freq,
+                        }" />
+                  <template v-if="errors.installmentPaymentType_freq">
+                      <ErrorMessage v-for="(errorMessage, index) in errors.installmentPaymentType_freq" :key="index">{{
+                              errorMessage }}
+                      </ErrorMessage>
+                  </template>
+              </div>
           </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="field-2" class="control-label">
-              {{ getCompanyKey("installmentPaymentType_freq") }}
-              <span class="text-danger">*</span>
-            </label>
-            <input type="number" class="form-control" data-create="2" @keypress.enter="moveInput('select', 'create', 3)"
-              v-model="$v.create.installmentPaymentType_freq.$model" :class="{
-                'is-invalid': $v.create.installmentPaymentType_freq.$error || errors.installmentPaymentType_freq,
-                'is-valid':
-                  !$v.create.installmentPaymentType_freq.$invalid && !errors.installmentPaymentType_freq,
-              }" id="field-2" />
-            <template v-if="errors.installmentPaymentType_freq">
-              <ErrorMessage v-for="(errorMessage, index) in errors.installmentPaymentType_freq" :key="index">{{
-                errorMessage }}
-              </ErrorMessage>
-            </template>
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label for="field-2" class="control-label">
+                      {{ getCompanyKey("interest_per") }}
+                      <span class="text-danger">*</span>
+                  </label>
+                  <input type="number" class="form-control" data-create="2"
+                         @keypress.enter="moveInput('select', 'create', 3)" v-model="$v.create.interest_per.$model" :class="{
+                          'is-invalid': $v.create.interest_per.$error || errors.interest_per,
+                          'is-valid':
+                            !$v.create.interest_per.$invalid && !errors.interest_per,
+                        }" />
+                  <template v-if="errors.interest_per">
+                      <ErrorMessage v-for="(errorMessage, index) in errors.interest_per" :key="index">{{ errorMessage }}
+                      </ErrorMessage>
+                  </template>
+              </div>
           </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="field-2" class="control-label">
-              {{ getCompanyKey("interest_per") }}
-              <span class="text-danger">*</span>
-            </label>
-            <input type="number" class="form-control" data-create="2" @keypress.enter="moveInput('select', 'create', 3)"
-              v-model="$v.create.interest_per.$model" :class="{
-                'is-invalid': $v.create.interest_per.$error || errors.interest_per,
-                'is-valid':
-                  !$v.create.interest_per.$invalid && !errors.interest_per,
-              }" id="field-2" />
-            <template v-if="errors.interest_per">
-              <ErrorMessage v-for="(errorMessage, index) in errors.interest_per" :key="index">{{ errorMessage }}
-              </ErrorMessage>
-            </template>
+          <div class="col-md-4">
+              <div class="form-group">
+                  <label class="mr-2">
+                      {{ getCompanyKey("installment_payment_is_partially") }}
+                  </label>
+                  <b-form-group id="edit-11" :class="{
+                        'is-invalid':
+                          $v.create.is_partially.$error || errors.is_partially,
+                        'is-valid':
+                          !$v.create.is_partially.$invalid && !errors.is_partially,
+                      }">
+                      <b-form-radio class="d-inline-block" v-model="$v.create.is_partially.$model"
+                                    name="some-radios-is_partially" value="1">{{ $t("general.Yes") }}</b-form-radio>
+                      <b-form-radio class="d-inline-block m-1" v-model="$v.create.is_partially.$model"
+                                    name="some-radios-is_partially" value="0">{{ $t("general.No") }}</b-form-radio>
+                  </b-form-group>
+                  <template v-if="errors.is_partially">
+                      <ErrorMessage v-for="(errorMessage, index) in errors.is_partially" :key="index">{{ errorMessage }}
+                      </ErrorMessage>
+                  </template>
+              </div>
           </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label class="mr-2" for="edit-12">
-              {{ getCompanyKey("installment_payment_is_partially") }}
-            </label>
-            <b-form-group id="edit-11" :class="{
-              'is-invalid':
-                $v.create.is_partially.$error || errors.is_partially,
-              'is-valid':
-                !$v.create.is_partially.$invalid && !errors.is_partially,
-            }">
-              <b-form-radio class="d-inline-block" v-model="$v.create.is_partially.$model" name="some-radios-is_partially"
-                value="1">{{ $t("general.Yes") }}</b-form-radio>
-              <b-form-radio class="d-inline-block m-1" v-model="$v.create.is_partially.$model"
-                name="some-radios-is_partially" value="0">{{ $t("general.No") }}</b-form-radio>
-            </b-form-group>
-            <template v-if="errors.is_partially">
-              <ErrorMessage v-for="(errorMessage, index) in errors.is_partially" :key="index">{{ errorMessage }}
-              </ErrorMessage>
-            </template>
+          <div class="col-md-4">
+              <div class="form-group">
+                  <label class="mr-2" for="field-11">
+                      {{ getCompanyKey("is_passed") }}
+                  </label>
+                  <b-form-group id="edit-11" :class="{
+                        'is-invalid': $v.create.is_passed.$error || errors.is_passed,
+                        'is-valid':
+                          !$v.create.is_passed.$invalid && !errors.is_passed,
+                      }">
+                      <b-form-radio class="d-inline-block" v-model="$v.create.is_passed.$model"
+                                    name="some-radioscreate-is_passed" value="1">{{ $t("general.Yes") }}</b-form-radio>
+                      <b-form-radio class="d-inline-block m-1" v-model="$v.create.is_passed.$model"
+                                    name="some-radioscreate-is_passed" value="0">{{ $t("general.No") }}</b-form-radio>
+                  </b-form-group>
+                  <template v-if="errors.is_passed">
+                      <ErrorMessage v-for="(errorMessage, index) in errors.is_passed" :key="index">{{ errorMessage }}
+                      </ErrorMessage>
+                  </template>
+              </div>
           </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label class="mr-2" for="field-11">
-              {{ getCompanyKey("is_passed") }}
-            </label>
-            <b-form-group id="edit-11" :class="{
-              'is-invalid': $v.create.is_passed.$error || errors.is_passed,
-              'is-valid':
-                !$v.create.is_passed.$invalid && !errors.is_passed,
-            }">
-              <b-form-radio class="d-inline-block" v-model="$v.create.is_passed.$model" name="some-radioscreate-is_passed"
-                value="1">{{ $t("general.Yes") }}</b-form-radio>
-              <b-form-radio class="d-inline-block m-1" v-model="$v.create.is_passed.$model"
-                name="some-radioscreate-is_passed" value="0">{{ $t("general.No") }}</b-form-radio>
-            </b-form-group>
-            <template v-if="errors.is_passed">
-              <ErrorMessage v-for="(errorMessage, index) in errors.is_passed" :key="index">{{ errorMessage }}
-              </ErrorMessage>
-            </template>
+          <div class="col-md-4">
+              <div class="form-group">
+                  <label class="mr-2" for="field-12">
+                      {{ getCompanyKey("is_passed_all") }}
+                  </label>
+                  <b-form-group id="create-11" :class="{
+                        'is-invalid':
+                          $v.create.is_passed_all.$error || errors.is_passed_all,
+                        'is-valid':
+                          !$v.create.is_passed_all.$invalid && !errors.is_passed_all,
+                      }">
+                      <b-form-radio class="d-inline-block" v-model="$v.create.is_passed_all.$model"
+                                    name="some-radios-create-is_passed_all" value="1">{{ $t("general.Yes") }}</b-form-radio>
+                      <b-form-radio class="d-inline-block m-1" v-model="$v.create.is_passed_all.$model"
+                                    name="some-radios-create-is_passed_all" value="0">{{ $t("general.No") }}</b-form-radio>
+                  </b-form-group>
+                  <template v-if="errors.is_passed_all">
+                      <ErrorMessage v-for="(errorMessage, index) in errors.is_passed_all" :key="index">{{ errorMessage
+                          }}
+                      </ErrorMessage>
+                  </template>
+              </div>
           </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label class="mr-2" for="field-12">
-              {{ getCompanyKey("is_passed_all") }}
-            </label>
-            <b-form-group id="create-11" :class="{
-              'is-invalid':
-                $v.create.is_passed_all.$error || errors.is_passed_all,
-              'is-valid':
-                !$v.create.is_passed_all.$invalid && !errors.is_passed_all,
-            }">
-              <b-form-radio class="d-inline-block" v-model="$v.create.is_passed_all.$model"
-                name="some-radios-create-is_passed_all" value="1">{{ $t("general.Yes") }}</b-form-radio>
-              <b-form-radio class="d-inline-block m-1" v-model="$v.create.is_passed_all.$model"
-                name="some-radios-create-is_passed_all" value="0">{{ $t("general.No") }}</b-form-radio>
-            </b-form-group>
-            <template v-if="errors.is_passed_all">
-              <ErrorMessage v-for="(errorMessage, index) in errors.is_passed_all" :key="index">{{ errorMessage
-              }}
-              </ErrorMessage>
-            </template>
+          <div class="col-md-4">
+              <div class="form-group">
+                  <label class="mr-2" for="field-12">
+                      {{ getCompanyKey("is_passed_contract_plan") }}
+                  </label>
+                  <b-form-group id="create-11" :class="{
+                        'is-invalid':
+                          $v.create.is_passed_contract_plan.$error || errors.is_passed_contract_plan,
+                        'is-valid':
+                          !$v.create.is_passed_contract_plan.$invalid &&
+                          !errors.is_passed_contract_plan,
+                      }">
+                      <b-form-radio class="d-inline-block" v-model="$v.create.is_passed_contract_plan.$model"
+                                    name="some-radios-create-is_passed_contract_plan" value="1">{{ $t("general.Yes")
+                          }}</b-form-radio>
+                      <b-form-radio class="d-inline-block m-1" v-model="$v.create.is_passed_contract_plan.$model"
+                                    name="some-radios-create-is_passed_contract_plan" value="0">{{ $t("general.No")
+                          }}</b-form-radio>
+                  </b-form-group>
+                  <template v-if="errors.is_passed_contract_plan">
+                      <ErrorMessage v-for="(errorMessage, index) in errors.is_passed_contract_plan" :key="index">{{
+                              errorMessage
+                          }}
+                      </ErrorMessage>
+                  </template>
+              </div>
           </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label class="mr-2" for="field-12">
-              {{ getCompanyKey("is_passed_contract_plan") }}
-            </label>
-            <b-form-group id="create-11" :class="{
-              'is-invalid':
-                $v.create.is_passed_contract_plan.$error || errors.is_passed_contract_plan,
-              'is-valid':
-                !$v.create.is_passed_contract_plan.$invalid &&
-                !errors.is_passed_contract_plan,
-            }">
-              <b-form-radio class="d-inline-block" v-model="$v.create.is_passed_contract_plan.$model"
-                name="some-radios-create-is_passed_contract_plan" value="1">{{ $t("general.Yes")
-                }}</b-form-radio>
-              <b-form-radio class="d-inline-block m-1" v-model="$v.create.is_passed_contract_plan.$model"
-                name="some-radios-create-is_passed_contract_plan" value="0">{{ $t("general.No")
-                }}</b-form-radio>
-            </b-form-group>
-            <template v-if="errors.is_passed_contract_plan">
-              <ErrorMessage v-for="(errorMessage, index) in errors.is_passed_contract_plan" :key="index">{{
-                errorMessage
-              }}
-              </ErrorMessage>
-            </template>
+          <div class="col-md-4">
+              <div class="form-group">
+                  <label class="mr-2" for="field-11">
+                      {{ getCompanyKey("installment_payment_auto_freq") }}
+                  </label>
+                  <b-form-group id="edit-11" :class="{
+                        'is-invalid': $v.create.auto_freq.$error || errors.auto_freq,
+                        'is-valid': !$v.create.auto_freq.$invalid && !errors.auto_freq,
+                      }">
+                      <b-form-radio :disabled="create.installmentPaymentType_freq <= 1" class="d-inline-block"
+                                    v-model="$v.create.auto_freq.$model" name="some-radioscreate-auto_freq" value="1">{{
+                              $t("general.Yes") }}</b-form-radio>
+                      <b-form-radio :disabled="create.installmentPaymentType_freq <= 1" class="d-inline-block m-1"
+                                    v-model="$v.create.auto_freq.$model" name="some-radioscreate-auto_freq" value="0">{{
+                              $t("general.No") }}</b-form-radio>
+                  </b-form-group>
+                  <template v-if="errors.auto_freq">
+                      <ErrorMessage v-for="(errorMessage, index) in errors.auto_freq" :key="index">{{ errorMessage }}
+                      </ErrorMessage>
+                  </template>
+              </div>
           </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label class="mr-2" for="field-11">
-              {{ getCompanyKey("installment_payment_auto_freq") }}
-            </label>
-            <b-form-group id="edit-11" :class="{
-              'is-invalid': $v.create.auto_freq.$error || errors.auto_freq,
-              'is-valid': !$v.create.auto_freq.$invalid && !errors.auto_freq,
-            }">
-              <b-form-radio :disabled="create.installmentPaymentType_freq <= 1" class="d-inline-block"
-                v-model="$v.create.auto_freq.$model" name="some-radioscreate-auto_freq" value="1">{{
-                  $t("general.Yes") }}</b-form-radio>
-              <b-form-radio :disabled="create.installmentPaymentType_freq <= 1" class="d-inline-block m-1"
-                v-model="$v.create.auto_freq.$model" name="some-radioscreate-auto_freq" value="0">{{
-                  $t("general.No") }}</b-form-radio>
-            </b-form-group>
-            <template v-if="errors.auto_freq">
-              <ErrorMessage v-for="(errorMessage, index) in errors.auto_freq" :key="index">{{ errorMessage }}
-              </ErrorMessage>
-            </template>
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label class="control-label">
+                      {{ getCompanyKey("freq_period") }}
+                      <span class="text-danger">*</span>
+                  </label>
+                  <input type="number" class="form-control" data-create="2"
+                         v-model="$v.create.Freq_period.$model"
+                         :class="{
+                          'is-invalid':
+                            $v.create.Freq_period.$error || errors.Freq_period,
+                          'is-valid':
+                            !$v.create.Freq_period.$invalid && !errors.Freq_period,
+                        }" />
+                  <template v-if="errors.Freq_period">
+                      <ErrorMessage v-for="(errorMessage, index) in errors.Freq_period" :key="index">{{ errorMessage }}
+                      </ErrorMessage>
+                  </template>
+              </div>
           </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="field-2" class="control-label">
-              {{ getCompanyKey("freq_period") }}
-              <span class="text-danger">*</span>
-            </label>
-            <input type="number" class="form-control" data-create="2" @keypress.enter="moveInput('select', 'create', 3)"
-              v-model="$v.create.Freq_period.$model" :class="{
-                'is-invalid':
-                  $v.create.Freq_period.$error || errors.Freq_period,
-                'is-valid':
-                  !$v.create.Freq_period.$invalid && !errors.Freq_period,
-              }" id="field-2" />
-            <template v-if="errors.Freq_period">
-              <ErrorMessage v-for="(errorMessage, index) in errors.Freq_period" :key="index">{{ errorMessage }}
-              </ErrorMessage>
-            </template>
-          </div>
-        </div>
       </div>
     </form>
   </b-modal>
-<!--  /create   --></template>
+<!--  /create   -->
+</template>

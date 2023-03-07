@@ -82,4 +82,15 @@ export default [
         },
         component: () => import('../../views/pages/recievablePayable/screenSubcontactgroup'),
     },
+
+    //start transaction
+
+    {
+        path: '/dashboard/receivablePayable/transaction/openingBalance',
+        name: 'installment opening balance',
+        meta: {
+            middleware: [auth,checkAuth]
+        },
+        component: () => import('../../views/pages/recievablePayable/transaction/openingBalance'),
+    },
 ];

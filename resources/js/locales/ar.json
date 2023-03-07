@@ -881,6 +881,7 @@
         "recievablePayable": "الحسابات الدائنه",
         "installmentStatus": "حالة التقسيط",
         "installmentStatusTable": " جدول حالة التقسيط",
+        "installmentCustomerOpeningBalanceTable": " جدول الرصيد الافتتاحى للعملاء",
         "installmentPaymentType": "نوع الدفع بالتقسيط",
         "installmentPaymentTypeTable": " جدول نوع الدفع بالتقسيط",
         "MainContactGroups": "مجموعات الاتصال الرئيسية",
@@ -917,6 +918,17 @@
         "rows": "الصفوف",
         "documentTable": "جدول المستندات",
         "document": "المستندات",
-        "location": "الموقع"
+        "Break": "Break",
+        "countOpeningBalance": "عدد الارصدة",
+        "total_local_debit": "اجمالى مدين",
+        "total_local_credit": "اجمالى دائن",
+        "net": "الرصيد",
+        "location": "الموقع",
+        "debit": "مدين",
+        "credit": "دائن",
+        "totalAmount": "اجمالى المبلغ",
+        "totalDivision": "اجمالى التقسيم",
+        "Residual": "المتبقى",
+        "Invoice": "فاتورة"
     }
 }
