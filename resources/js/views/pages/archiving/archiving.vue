@@ -98,6 +98,7 @@ export default {
       fileImages: [],
       secondLevelNodes: [],
       fields: [],
+      searchFinished: false,
       properties: [],
       treePropId: null,
       arch_doc_type_id: null,
@@ -352,6 +353,7 @@ export default {
       }
     },
     getCurrentField(id) {
+      this.searchFinished = false;
       this.from = 0;
       this.to = 0;
       this.toDate = new Date();
@@ -488,6 +490,7 @@ export default {
     },
     nodeWasClicked(result) {
       this.currentNode = result;
+      this.searchFinished = false;
       this.child_doc_types =
         this.currentNode &&
           this.currentNode.parent_doc_type_children &&
@@ -562,6 +565,7 @@ export default {
      *  get Data archives
      */
     async getData(page = 1) {
+      this.searchFinished = false;
       this.isLoader = true;
       if (this.from && !this.to) {
         this.to = this.from;
@@ -606,6 +610,7 @@ export default {
           this.archiveFiles = l.data;
           this.archivesPagination = l.pagination;
           this.current_page = l.pagination.current_page;
+          this.searchFinished = true;
         })
         .catch((err) => {
           Swal.fire({
@@ -1327,8 +1332,8 @@ export default {
                   <!-- Basic dropdown -->
                   <b-dropdown variant="primary" :text="$t('general.fields')" ref="dropdown"
                     class="btn-block setting-search m-2">
-                    <b-form-checkbox v-for="field in fields" :key="field.name_e" v-model="searchFieldId" :value="field.name_e"
-                      class="mb-1" @change="getCurrentField">
+                    <b-form-checkbox v-for="field in fields" :key="field.name_e" v-model="searchFieldId"
+                      :value="field.name_e" class="mb-1" @change="getCurrentField">
                       {{
                         $i18n.locale == "ar"
                         ? field.name
@@ -1377,8 +1382,9 @@ export default {
                     ]">
                       <i class="fe-search"></i>
                     </span>
-                    <input class="form-control" style="display: block; width: 93%; padding-top: 3px" type="text"
-                      v-model.trim="search" :placeholder="`${$t('general.Search')}...`" />
+                    <input class="form-control" @input="searchFinished = false"
+                      style="display: block; width: 93%; padding-top: 3px" type="text" v-model.trim="search"
+                      :placeholder="`${$t('general.Search')}...`" />
                   </div>
                 </template>
               </div>
@@ -1504,9 +1510,9 @@ export default {
               <div class="col-xs-10 col-md-9 col-lg-3 d-flex align-items-center justify-content-end">
                 <div>
                   <!-- <b-button class="mx-1 custom-btn-background">
-                                      {{ $t("general.filter") }}
-                                      <i class="fas fa-filter"></i>
-                                    </b-button> -->
+                                                  {{ $t("general.filter") }}
+                                                  <i class="fas fa-filter"></i>
+                                                </b-button> -->
                   <!-- start Pagination -->
                   <div class="d-inline-flex align-items-center pagination-custom">
                     <div class="d-inline-block" style="font-size: 15px">
@@ -1946,8 +1952,13 @@ export default {
                 </div>
               </div>
               <div class="col-lg-5">
-                <Files @onDoubleClicked="showFileModal" :archiveFiles="archiveFiles" :isActiveFile="isActiveFile"
-                  :isSearch="isSearch" />
+                <template v-if="archiveFiles.length">
+                  <Files @onDoubleClicked="showFileModal" :archiveFiles="archiveFiles" :isActiveFile="isActiveFile"
+                    :isSearch="isSearch" />
+                </template>
+                <div v-else-if="searchFinished" class="text-center">
+                  {{ $t("general.NO_FILES_FOUND", { value: from || to ? `${from} - ${to}` : search }) }}
+                </div>
               </div>
               <div class="col-lg-4" v-if="$store.state.archiving.archiveFile.length > 0">
                 <Details :currentNode="currentNode" @getDataTree="getData" @pdfPopup="generateReport"
