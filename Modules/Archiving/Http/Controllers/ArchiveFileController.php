@@ -89,9 +89,7 @@ class ArchiveFileController extends Controller
                 });
             }
             $ids = $res->values();
-            if (@count($ids) > 0) {
-                $models = $models->whereIn('id', $ids);
-            }
+            $models = $models->whereIn('id', $ids);
         }
         if ($request->per_page) {
             $models = ['data' => $models->paginate($request->per_page), 'paginate' => true];
@@ -366,10 +364,10 @@ class ArchiveFileController extends Controller
     //Commons
     private function isExist($array, $element)
     {
-        $check=false;
+        $check = false;
         foreach ($array as $el) {
             if ($el->name_e == $element->name_e) {
-                return $check=true;
+                return $check = true;
             }
         }
         return $check;
