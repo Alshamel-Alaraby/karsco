@@ -2,7 +2,13 @@
 /**
  * Footer Component
  */
-export default {}
+export default {
+    data() {
+        return {
+           version : process.env.MIX_VERSION
+        }
+    }
+}
 </script>
 
 <template>
@@ -12,6 +18,7 @@ export default {}
         <div class="row">
             <div class="col-md-6 color">
                 {{ new Date().getFullYear()}} &copy; Al Shamel Al Araby
+                <span style="margin: 0px 30px">{{ version }}</span>
             </div>
             <div class="col-md-6">
                 <div class="text-md-right footer-links d-none d-sm-block">

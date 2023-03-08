@@ -53,7 +53,6 @@ class RlstUnitController extends Controller
             }
         }
         $model->refresh();
-
         return responseJson(200, 'created', new RlstUnitResource($model));
 
     }

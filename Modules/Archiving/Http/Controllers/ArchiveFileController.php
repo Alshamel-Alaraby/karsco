@@ -345,4 +345,33 @@ class ArchiveFileController extends Controller
         $model = $model->first();
         return responseJson(200, 'done', new ArchiveFileRelationResource($model));
     }
+
+    public function  docTypeChildArchiveFiles(Request $request)
+    {
+        $models = $this->model->whereHas('docType', function ($q) use ($request) {
+            $q->where('parent_id', $request->doc_type_id);
+        })->get();
+        $data_type_values = [];
+        foreach ($models as $model) {
+            $data_type_values = array_merge($data_type_values, $model->data_type_value);
+        }
+        $result = [];
+        foreach ($data_type_values as $data_type_value) {
+            if (!$this->isExist($result, $data_type_value)) {
+                $result[] = $data_type_value;
+            }
+        }
+        return $result;
+    }
+    //Commons
+    private function isExist($array, $element)
+    {
+        $check=false;
+        foreach ($array as $el) {
+            if ($el->name_e == $element->name_e) {
+                return $check=true;
+            }
+        }
+        return $check;
+    }
 }

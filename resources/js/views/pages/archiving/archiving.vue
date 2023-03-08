@@ -155,7 +155,7 @@ export default {
      * watch per_page
      */
     per_page(after, befour) {
-      this.getData();
+      // this.getData();
     },
     /**
      * watch search
@@ -163,7 +163,7 @@ export default {
     search(after, befour) {
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
-        this.getData();
+        this.getFieldData();
         this.isSearch = !this.isSearch;
       }, 400);
     },
@@ -189,8 +189,16 @@ export default {
     this.getSecondLevelNodes();
   },
   methods: {
+    getFieldData() {
+      this.getPaginatedArchFiles(1);
+      this.currentNode = null;
+    },
     getPaginatedArchFiles(page) {
       this.current_page = page ? page : this.current_page;
+      if (!this.currentNode) {
+        this.getData(page);
+        return;
+      }
       if (this.currentNode.parent_doc_type_children) {
         //If node selected is key value
         this.getArchiveFiles();
@@ -351,7 +359,7 @@ export default {
       this.search = "";
 
       this.currentField = this.fields.filter((field) => {
-        return field.id == id;
+        return field.name_e == id;
       })[0];
     },
     getFields(id) {
@@ -366,13 +374,13 @@ export default {
       }
       this.isLoader = true;
       adminApi
-        .get(`/arch-doc-type/${id}`)
+        .get(`arch-archive-files/docType-child-archiv-files?doc_type_id=${id}`)
         .then((res) => {
-          this.fields = res.data.data.doc_type_field;
+          this.fields = res.data;
           if (this.fields.length) {
-            this.searchFieldId = this.fields[0].id;
+            this.searchFieldId = this.fields[0].name_e;
             this.currentField = this.fields.filter((field) => {
-              return field.id == this.searchFieldId;
+              return field.name_e == this.searchFieldId;
             })[0];
           }
           this.isLoader = false;
@@ -491,6 +499,7 @@ export default {
           : [];
       this.arch_doc_type_id = null;
       this.getPaginatedArchFiles(1);
+      this.searchFields = false;
       this.isActiveFile = !this.isActiveFile;
       this.$store.commit("archiving/archiveFileEmity");
       this.$store.commit("archiving/objectActiveEmity");
@@ -569,25 +578,24 @@ export default {
       await adminApi
         .get(
           `/arch-archive-files?page=${page}&per_page=${this.per_page}&search=${this.search
-          }&arch_doc_type_id=${this.currentNode ? this.currentNode.id : ""}&favourite=${this.favourite
-          }`,
+          }&favourite=${this.favourite}`,
           {
             params: this.currentField
               ? {
                 field: {
                   from:
-                    this.currentField.doc_field_id.data_type.name_e == "INTEGER"
+                    this.currentField.data_type == "INTEGER"
                       ? this.from
                       : this.fromDate,
                   to:
-                    this.currentField.doc_field_id.data_type.name_e == "INTEGER"
+                    this.currentField.data_type == "INTEGER"
                       ? this.to
                       : this.toDate,
                   text: this.search,
                   range: ["INTEGER", "DATE"].includes(
-                    this.currentField.doc_field_id.data_type.name_e
+                    this.currentField.data_type
                   ),
-                  data_type: this.currentField.doc_field_id.data_type.name_e,
+                  data_type: this.currentField.data_type,
                 },
               }
               : {},
@@ -808,7 +816,6 @@ export default {
         await this.getPdf(this.archive_id);
       }
       await this.getArchiveFiles();
-      // await this.getData();
       this.create = {
         job_file_number: null,
         document_type_id: null,
@@ -1320,12 +1327,12 @@ export default {
                   <!-- Basic dropdown -->
                   <b-dropdown variant="primary" :text="$t('general.fields')" ref="dropdown"
                     class="btn-block setting-search m-2">
-                    <b-form-checkbox v-for="field in fields" :key="field.id" v-model="searchFieldId" :value="field.id"
+                    <b-form-checkbox v-for="field in fields" :key="field.name_e" v-model="searchFieldId" :value="field.name_e"
                       class="mb-1" @change="getCurrentField">
                       {{
                         $i18n.locale == "ar"
-                        ? field.doc_field_id.name
-                        : field.doc_field_id.name_e
+                        ? field.name
+                        : field.name_e
                       }}
                     </b-form-checkbox>
                   </b-dropdown>
@@ -1333,31 +1340,31 @@ export default {
                 </div>
                 <template v-if="
                   currentField &&
-                  currentField.doc_field_id.data_type.name_e == 'INTEGER'
+                  currentField.data_type == 'INTEGER'
                 ">
                   <div class="d-inline-block position-relative m-2" style="width: 100%">
                     <div class="row">
                       <div class="col-6">
                         <input class="form-control" style="padding-top: 3px; display: inline-block" type="text"
-                          v-model.trim="from" :placeholder="`${$t('general.from')}`" @keyup="getData()" />
+                          v-model.trim="from" :placeholder="`${$t('general.from')}`" @keyup="getFieldData()" />
                       </div>
                       <div class="col-6">
                         <input class="form-control" style="padding-top: 3px; display: inline-block" type="text"
-                          v-model.trim="to" @keyup="getData()" :placeholder="`${$t('general.to')}`" />
+                          v-model.trim="to" @keyup="getFieldData()" :placeholder="`${$t('general.to')}`" />
                       </div>
                     </div>
                   </div>
                 </template>
                 <template v-else-if="
-                  currentField && currentField.doc_field_id.data_type.name_e == 'DATE'
+                  currentField && currentField.data_type == 'DATE'
                 ">
                   <div class="d-inline-block position-relative m-2" style="width: 100%">
                     <div class="row">
                       <div class="col-6">
-                        <date-picker @change="getData()" v-model="fromDate" type="date" confirm></date-picker>
+                        <date-picker @change="getFieldData()" v-model="fromDate" type="date" confirm></date-picker>
                       </div>
                       <div class="col-6">
-                        <date-picker @change="getData()" v-model="toDate" type="date" confirm></date-picker>
+                        <date-picker @change="getFieldData()" v-model="toDate" type="date" confirm></date-picker>
                       </div>
                     </div>
                   </div>
@@ -1497,9 +1504,9 @@ export default {
               <div class="col-xs-10 col-md-9 col-lg-3 d-flex align-items-center justify-content-end">
                 <div>
                   <!-- <b-button class="mx-1 custom-btn-background">
-                      {{ $t("general.filter") }}
-                      <i class="fas fa-filter"></i>
-                    </b-button> -->
+                                      {{ $t("general.filter") }}
+                                      <i class="fas fa-filter"></i>
+                                    </b-button> -->
                   <!-- start Pagination -->
                   <div class="d-inline-flex align-items-center pagination-custom">
                     <div class="d-inline-block" style="font-size: 15px">

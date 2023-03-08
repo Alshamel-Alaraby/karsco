@@ -7,5 +7,6 @@
     "GL": true,
     "Custody": true,
     "Custodyd": true,
-    "Stock": true
+    "Stock": true,
+    "BoardsRent": true
 }

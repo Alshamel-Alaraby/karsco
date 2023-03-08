@@ -4,6 +4,7 @@ namespace Modules\Archiving\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Archiving\Entities\DocType;
 use Modules\Archiving\Http\Requests\DocTypeRequest;
 use Modules\Archiving\Repositories\DocTypeInterface;
@@ -26,14 +27,13 @@ class DocTypeController extends Controller
 
     public function find($id)
     {
-
         $model = $this->modelInterface->find($id);
         if (!$model) {
             return responseJson(404, 'data not found');
         }
         return responseJson(200, 'success', new DocTypeResource($model));
-
     }
+
     public function create(DocTypeRequest $request)
     {
         $model = $this->modelInterface->create($request);

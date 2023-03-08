@@ -26,4 +26,5 @@ interface DocTypeInterface
     public function tree();
 
     public function nodesLevelTwo($request);
+
 }

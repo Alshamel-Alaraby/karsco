@@ -19,9 +19,7 @@ return new class extends Migration
             $table->string ('name_e',100);
             $table->unsignedTinyInteger ('is_conditional')->nullable ()->default (0)->comment ('1=Yes, 0=No (default 0)');
             $table->unsignedTinyInteger ('installment_condation_id')->nullable();
-            $table->double ('installment_payment_type_per')->nullable ()->default (0)->comment ('نسبة% من اجمالي المبلغ');
-            $table->unsignedInteger('installment_payment_type_freq')->nullable ()->default (1)->comment ('عدد الاقساط (default 1)');
-            $table->double ('interest_per')->nullable ()->default (0)->comment ('نسبة الفايدة');
+            $table->unsignedTinyInteger('installment_payment_type_freq')->nullable ()->default (1)->comment ('1=Yes, 0=No (default 0)');
             $table->unsignedTinyInteger ('is_partially')->nullable ()->default (0)->comment ('1=Yes, 0=No (default 0)');
             $table->unsignedTinyInteger ('is_passed')->nullable ()->default (0)->comment ('1=Yes, 0=No (default 0)');
             $table->unsignedTinyInteger ('is_passed_all')->nullable ()->default (0)->comment ('1=Yes, 0=No (default 0)');

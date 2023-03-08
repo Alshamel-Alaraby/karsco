@@ -84,6 +84,7 @@ Route::group(['prefix' => 'arch-doc-type'], function () {
     Route::controller(DocTypeController::class)->group(function () {
         Route::get("/tree", 'tree')->name('arch-doc-type.tree');
         Route::get("/nodes-level-two", 'nodesLevelTwo');
+        Route::get("/docTypeChildArchiveFiles", 'docTypeChildArchiveFiles');
         Route::get('/', 'all')->name('arch-doc-type.index');
         Route::post('add-status-to-document', 'addStatusToDocumentType');
         Route::delete('remove-status-from-document/{doc_type_id}/{status_id}', 'removeStatusFromDocumentType');
@@ -153,6 +154,7 @@ Route::group(['prefix' => 'arch-doc-type-department'], function () {
 Route::group(['prefix' => 'arch-archive-files'], function () {
     Route::controller(ArchiveFileController::class)->group(function () {
         Route::get('valueMedia', 'valueMedia');
+        Route::get("/docType-child-archiv-files", 'docTypeChildArchiveFiles');
         Route::get('files_Department_Doc_Type', 'files_Department_Doc_Type');
         Route::get("/value/{value}", "searchValue");
         Route::get("pdf/{id}", "pdf");

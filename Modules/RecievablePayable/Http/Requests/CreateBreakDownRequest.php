@@ -14,21 +14,21 @@ class CreateBreakDownRequest extends FormRequest
     public function rules()
     {
         return [
-
-            'instalment_date' => 'required|date',
-            'rate' => 'required|regex:/^\d+(\.\d{2,2})?$/',
-            'currency_id' => 'required|integer',
-            'customer_id' => 'required|integer',
-            'opening_balance_id' => 'required|integer',
-            'instalment_type_id' => 'required|integer',
-            'document_id' => 'required|integer',
-            'debit' => 'nullable|regex:/^\d+(\.\d{5,5})?$/',
-            'credit' => 'nullable|regex:/^\d+(\.\d{5,5})?$/',
-            'repate' => 'required|integer',
-            'total' => 'required|regex:/^\d+(\.\d{2,2})?$/',
-            "terms"  => "nullable|array",
-            'installment_statu_id' => 'nullable|integer',
-            'details' => 'nullable|string',
+            'break_downs' => 'required|array',
+            'break_downs.*.instalment_date' => 'required|date',
+            'break_downs.*.rate' => 'required|regex:/^\d+(\.\d{2,2})?$/',
+            'break_downs.*.currency_id' => 'required|integer',
+            'break_downs.*.customer_id' => 'required|integer',
+            'break_downs.*.opening_balance_id' => 'required|integer',
+            'break_downs.*.instalment_type_id' => 'required|integer',
+            'break_downs.*.document_id' => 'nullable|integer',
+            'break_downs.*.debit' => 'nullable|regex:/^\d+(\.\d{5,5})?$/',
+            'break_downs.*.credit' => 'nullable|regex:/^\d+(\.\d{5,5})?$/',
+            'break_downs.*.repate' => 'required|integer',
+            'break_downs.*.total' => 'required|regex:/^\d+(\.\d{2,2})?$/',
+            "break_downs.*.terms"  => "nullable|array",
+            'break_downs.*.installment_statu_id' => 'nullable|integer',
+            'break_downs.*.details' => 'nullable|string',
         ];
     }
 

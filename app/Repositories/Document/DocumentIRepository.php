@@ -45,7 +45,6 @@ class DocumentIRepository implements DocumentInterface
     }
 
     public function createFromAdmin($request){
-
             $this->model->
             where([
                 ['company_id',$request["documents"][0]['company_id']],

@@ -22,4 +22,9 @@ class RpInstallmentPaymentType extends Model
     {
         return $this->belongsTo(RpInstallmentCondation::class, "installment_condation_id");
     }
+
+    public function payment_plan_installment()
+    {
+        return $this->hasOne(RpPaymentPlanInstallment::class,"installment_payment_type_id");
+    }
 }

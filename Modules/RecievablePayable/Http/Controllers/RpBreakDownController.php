@@ -41,9 +41,13 @@ class RpBreakDownController extends Controller
 
     public function store(CreateBreakDownRequest $request)
     {
-        $model = $this->model->create($request->validated());
+        foreach ($request->validated()['break_downs'] as $break_downs ):
+            $model = $this->model->create(array_merge($break_downs,['document_id'=>1]));
+        endforeach;
         $model->refresh();
 
-        return responseJson(200, 'created', new BreakDownResource($model));
+        return responseJson(200, 'success');
     }
+
+
 }

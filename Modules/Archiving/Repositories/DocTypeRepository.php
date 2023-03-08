@@ -48,13 +48,14 @@ class DocTypeRepository implements DocTypeInterface
                 $doc_type_fields = DocTypeField::where("doc_type_id", $model->id)->get();
                 // dd($doc_type_fields);
                 foreach ($doc_type_fields as $doc_type_field) {
-                    DocTypeField::create([
-                        "doc_type_id" => $data->id,
-                        "doc_field_id" => $doc_type_field->doc_field_id,
-                        "is_required" => $doc_type_field->is_required,
-                        "field_order" => $doc_type_field->field_order,
-                        "parent_id" => $model->id,
-                    ]
+                    DocTypeField::create(
+                        [
+                            "doc_type_id" => $data->id,
+                            "doc_field_id" => $doc_type_field->doc_field_id,
+                            "is_required" => $doc_type_field->is_required,
+                            "field_order" => $doc_type_field->field_order,
+                            "parent_id" => $model->id,
+                        ]
                     );
                 }
 
@@ -72,9 +73,7 @@ class DocTypeRepository implements DocTypeInterface
                 $model->statuses()->attach($ids);
             }
             return $data;
-
         });
-
     }
 
     public function update($request, $id)
@@ -105,14 +104,13 @@ class DocTypeRepository implements DocTypeInterface
     public function nodesLevelTwo($request)
     {
         // level two
-        $parents = $this->model->whereNull('parent_id')->pluck('id')->toArray();
-        $models = $this->model->whereIn('parent_id', $parents);
+        $models = $this->model->whereNull('parent_id');
+        //        $models = $this->model->whereIn('parent_id', $parents);
         if ($request->per_page) {
             return ['data' => $models->paginate($request->per_page), 'paginate' => true];
         } else {
             return ['data' => $models->get(), 'paginate' => false];
         }
-
     }
 
     private function forget($id)
@@ -155,5 +153,4 @@ class DocTypeRepository implements DocTypeInterface
         return ArchDocumentStatus::where("status_id", $status_id)->where("document_id", $doc_type_id)
             ->count() > 0;
     }
-
 }

@@ -18,9 +18,7 @@ class RpInstallmentPaymentTypeResource extends JsonResource
             "id"=>$this->id,
             "name"=>$this->name,
             "name_e"=>$this->name_e,
-            "installment_payment_type_per"=>$this->installment_payment_type_per,
             "installment_payment_type_freq"=>$this->installment_payment_type_freq,
-            "interest_per"=>$this->interest_per,
             "is_partially"=>$this->is_partially,
             "is_passed"=>$this->is_passed,
             "is_passed_all"=>$this->is_passed_all,
@@ -30,7 +28,7 @@ class RpInstallmentPaymentTypeResource extends JsonResource
             "is_conditional"=>$this->is_conditional,
             "installment_condation_id"=>$this->installment_condation_id,
             "installment_condation"=>$this->installment_condation,
-
+            "payment_plan_installment"=>$this->payment_plan_installment,
         ];
     }
 }

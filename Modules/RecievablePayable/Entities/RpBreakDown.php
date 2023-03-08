@@ -11,6 +11,7 @@ class RpBreakDown extends Model
     use HasFactory,LogTrait;
 
     protected $guarded = ['id'];
+    protected $casts = ["terms" => "json"];
     public function document()
     {
         return $this->belongsTo(\App\Models\Document::class,'document_id',);
