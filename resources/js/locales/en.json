@@ -585,6 +585,7 @@
         }
     },
     "general": {
+        "NO_FILES_FOUND":"Your search - {value} - did not match any documents.",
         "invoice":"Invoice",
         "serial": "Serial",
         "supplier": "Supplier",

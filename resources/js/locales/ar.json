@@ -589,6 +589,7 @@
         }
     },
     "general": {
+        "NO_FILES_FOUND":"بحثك - {value} - لم يطابق أي وثائق.",
         "serial": "سيريال",
         "supplier": "مورد",
         "noeffect": "لايوجد تاثير",
