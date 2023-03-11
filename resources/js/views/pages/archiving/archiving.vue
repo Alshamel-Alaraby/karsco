@@ -12,7 +12,7 @@ import { formatDateTime } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
 import DatePicker from "vue2-datepicker";
 import rootData from "./root.json";
-import TreeBrowser from "../../../components/arch-screen/tree";
+import TreeBrowser from "../../../components/arch-screen/lazy-tree";
 import Files from "../../../components/arch-screen/files.vue";
 import Details from "../../../components/arch-screen/details.vue";
 import General from "../../../components/create/general";

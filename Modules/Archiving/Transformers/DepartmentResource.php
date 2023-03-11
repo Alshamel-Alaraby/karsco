@@ -34,7 +34,7 @@ class DepartmentResource extends JsonResource
             'key_value' => new DocumentFieldResource($key_val),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            "archive_file"=>new ArchiveFileResource($this->archiveFile)
+            // "archive_file"=>new ArchiveFileResource($this->archiveFile)
         ];
     }
 }
