@@ -2,12 +2,12 @@
 
 namespace Modules\RecievablePayable\Http\Requests;
 
-use App\Traits\ValidationTrait;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRpInstallmentPaymentTypeRequest extends FormRequest
 {
-    use ValidationTrait;
+
     /**
      * Get the validation rules that apply to the request.
      *

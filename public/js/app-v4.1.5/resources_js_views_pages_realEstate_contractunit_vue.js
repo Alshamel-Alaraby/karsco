@@ -8661,6 +8661,76 @@ var menuItems = [{
     }]
   }]
 }, {
+  id: 1002168,
+  label: "general.boardRent",
+  icon: "fas fa-hotel",
+  name: 'real estate',
+  isMenuCollapsed: false,
+  subItems: [{
+    id: 10211,
+    name: 'real estate',
+    label: 'general.master_file',
+    isMenuCollapsed: false,
+    subItems: [{
+      id: 100024,
+      name: 'board-realEstate unit status',
+      label: 'general.sellMethod',
+      link: '/dashboard/boardRent/sell-method'
+    }, {
+      id: 100023,
+      name: 'board-realEstate unit status',
+      label: 'general.department',
+      link: '/dashboard/boardRent/department'
+    }, {
+      id: 100021,
+      name: 'board-realEstate unit status',
+      label: 'general.panel',
+      link: '/dashboard/boardRent/panel'
+    }, {
+      id: 100022,
+      name: 'board-realEstate unit status',
+      label: 'general.package',
+      link: '/dashboard/boardRent/package'
+    }]
+  }, {
+    id: 14211,
+    name: 'real estate',
+    label: 'general.transaction',
+    isMenuCollapsed: false,
+    subItems: [{
+      id: 102375,
+      name: 'building wallet',
+      label: 'general.tasks',
+      link: '/dashboard/boardRent/tasks'
+    }, {
+      id: 102373,
+      name: 'building wallet',
+      label: 'general.quotation',
+      link: '/dashboard/boardRent/quotation'
+    }, {
+      id: 102372,
+      name: 'building wallet',
+      label: 'general.order',
+      link: '/dashboard/boardRent/order'
+    }, {
+      id: 102374,
+      name: 'building wallet',
+      label: 'general.invoice',
+      link: '/dashboard/boardRent/invoice'
+    }]
+  }, {
+    id: 14211,
+    name: 'real estate',
+    label: 'general.systemSetup',
+    isMenuCollapsed: false,
+    subItems: [{
+      id: 102275,
+      name: 'building wallet',
+      label: 'general.tasks',
+      link: '/dashboard/boardRent/soctor'
+    }]
+  }]
+}, {
   id: 1004346756,
   label: "general.archive",
   name: 'archiving',
@@ -10304,11 +10374,15 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
+<<<<<<< HEAD
 <<<<<<< HEAD:public/js/app-v4.1.4/resources_js_views_pages_realEstate_contractunit_vue.js
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.loader[data-v-155ec09e] {\n    width: 100%;\n    height: 100%;\n    background-color: #fff;\n    opacity: .6;\n    z-index: 100;\n}\n.loader-large[data-v-155ec09e] {\n    width: 4rem;\n    height: 4rem\n}\n.loader-small[data-v-155ec09e] {\n    width: 1rem;\n    height: 1rem\n}\n.loader-middle[data-v-155ec09e] {\n    width: 2.25rem;\n    height: 2.25rem\n}\n", ""]);
 =======
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.color {\n    color: #6c757d !important;\n}\n", ""]);
 >>>>>>> b7efc7009968c4a85933b54bc00a732a6fa60ea2:public/js/app-v4.1.5/resources_js_views_pages_realEstate_contractunit_vue.js
+=======
+___CSS_LOADER_EXPORT___.push([module.id, "\n.color {\r\n    color: #6c757d !important;\n}\r\n", ""]);
+>>>>>>> 4a623a22647776ef00038a56e4d1f3bb62689048
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -13063,9 +13137,9 @@ var render = function () {
       _c("div", { staticClass: "row" }, [
         _c("div", { staticClass: "col-md-6 color" }, [
           _vm._v(
-            "\n                " +
+            "\r\n                " +
               _vm._s(new Date().getFullYear()) +
-              " © Al Shamel Al Araby\n                "
+              " © Al Shamel Al Araby\r\n                "
           ),
           _c("span", { staticStyle: { margin: "0px 30px" } }, [
             _vm._v(_vm._s(_vm.version)),

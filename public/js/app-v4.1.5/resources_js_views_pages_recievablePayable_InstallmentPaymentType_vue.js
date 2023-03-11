@@ -1834,32 +1834,28 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         name: "",
         name_e: "",
         auto_freq: 0,
-        is_partially: 0,
-        is_passed: 0,
-        is_passed_all: 0,
-        Freq_period: 0,
+        is_partially: 1,
+        is_passed: 1,
+        is_passed_all: 1,
+        Freq_period: 1,
         is_conditional: 0,
         Condition_id: null,
-        installmentPaymentType_per: 0,
-        installmentPaymentType_freq: 1,
-        interest_per: 0,
-        is_passed_contract_plan: 0
+        installmentPaymentType_freq: 0,
+        is_passed_contract_plan: 1
       },
       conditions: [],
       edit: {
         name: "",
         name_e: "",
         auto_freq: 0,
-        is_partially: 0,
-        is_passed: 0,
-        is_passed_all: 0,
-        Freq_period: 0,
+        is_partially: 1,
+        is_passed: 1,
+        is_passed_all: 1,
+        Freq_period: 1,
         is_conditional: 0,
         Condition_id: null,
-        installmentPaymentType_per: 0,
-        installmentPaymentType_freq: 1,
-        interest_per: 0,
-        is_passed_contract_plan: 0
+        installmentPaymentType_freq: 0,
+        is_passed_contract_plan: 1
       },
       errors: {},
       dropDownSenders: [],
@@ -1905,15 +1901,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       is_conditional: {
         required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_13__.required
       },
-      installmentPaymentType_per: {
-        required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_13__.required
-      },
       installmentPaymentType_freq: {
         required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_13__.required,
         minValue: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_13__.minValue)(1)
-      },
-      interest_per: {
-        required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_13__.required
       },
       is_passed_contract_plan: {
         required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_13__.required
@@ -1953,15 +1943,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       is_conditional: {
         required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_13__.required
       },
-      installmentPaymentType_per: {
-        required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_13__.required
-      },
       installmentPaymentType_freq: {
         required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_13__.required,
         minValue: (0,vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_13__.minValue)(1)
-      },
-      interest_per: {
-        required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_13__.required
       },
       is_passed_contract_plan: {
         required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_13__.required
@@ -2228,16 +2212,14 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         name: "",
         name_e: "",
         auto_freq: 0,
-        is_partially: 0,
-        is_passed: 0,
-        is_passed_all: 0,
-        Freq_period: 0,
+        is_partially: 1,
+        is_passed: 1,
+        is_passed_all: 1,
+        Freq_period: 1,
         is_conditional: 0,
         Condition_id: null,
-        installmentPaymentType_per: 0,
-        installmentPaymentType_freq: 1,
-        interest_per: 0,
-        is_passed_contract_plan: 0
+        installmentPaymentType_freq: 0,
+        is_passed_contract_plan: 1
       };
       this.$nextTick(function () {
         _this7.$v.$reset();
@@ -2255,16 +2237,14 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         name: "",
         name_e: "",
         auto_freq: 0,
-        is_partially: 0,
-        is_passed: 0,
-        is_passed_all: 0,
-        Freq_period: 0,
+        is_partially: 1,
+        is_passed: 1,
+        is_passed_all: 1,
+        Freq_period: 1,
         is_conditional: 0,
         Condition_id: null,
-        installmentPaymentType_per: 0,
-        installmentPaymentType_freq: 1,
-        interest_per: 0,
-        is_passed_contract_plan: 0
+        installmentPaymentType_freq: 0,
+        is_passed_contract_plan: 1
       };
       this.$nextTick(function () {
         _this8.$v.$reset();
@@ -2280,16 +2260,14 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         name: "",
         name_e: "",
         auto_freq: 0,
-        is_partially: 0,
-        is_passed: 0,
-        is_passed_all: 0,
-        Freq_period: 0,
+        is_partially: 1,
+        is_passed: 1,
+        is_passed_all: 1,
+        Freq_period: 1,
         is_conditional: 0,
         Condition_id: null,
-        installmentPaymentType_per: 0,
-        installmentPaymentType_freq: 1,
-        interest_per: 0,
-        is_passed_contract_plan: 0
+        installmentPaymentType_freq: 0,
+        is_passed_contract_plan: 1
       };
       this.$nextTick(function () {
         _this9.$v.$reset();
@@ -2313,7 +2291,6 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         this.errors = {};
         _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].post("/recievable-payable/rp_installment_payment_types", _objectSpread(_objectSpread({}, this.create), {}, {
           installment_payment_type_freq: this.create.installmentPaymentType_freq,
-          installment_payment_type_per: this.create.installmentPaymentType_per,
           freq_period: this.create.Freq_period,
           installment_condation_id: this.create.Condition_id
         })).then(function (res) {
@@ -2361,7 +2338,6 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         this.errors = {};
         _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].put("/recievable-payable/rp_installment_payment_types/".concat(id), _objectSpread(_objectSpread({}, this.edit), {}, {
           installment_payment_type_freq: this.edit.installmentPaymentType_freq,
-          installment_payment_type_per: this.edit.installmentPaymentType_per,
           freq_period: this.edit.Freq_period,
           installment_condation_id: this.edit.Condition_id
         })).then(function (res) {
@@ -2405,9 +2381,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       this.edit.is_passed = module.is_passed;
       this.edit.is_passed_all = module.is_passed_all;
       this.edit.Freq_period = module.freq_period;
-      this.edit.installmentPaymentType_per = module.installment_payment_type_per;
       this.edit.installmentPaymentType_freq = module.installment_payment_type_freq;
-      this.edit.interest_per = module.interest_per;
       this.edit.is_passed_contract_plan = module.is_passed_contract_plan;
       this.edit.is_conditional = module.is_conditional;
       this.edit.Condition_id = module.installment_condation_id;
@@ -2422,16 +2396,14 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         name: "",
         name_e: "",
         auto_freq: 0,
-        is_partially: 0,
-        is_passed: 0,
-        is_passed_all: 0,
-        Freq_period: 0,
+        is_partially: 1,
+        is_passed: 1,
+        is_passed_all: 1,
+        Freq_period: 1,
         is_conditional: 0,
         Condition_id: null,
-        installmentPaymentType_per: 0,
-        installmentPaymentType_freq: 1,
-        interest_per: 0,
-        is_passed_contract_plan: 0
+        installmentPaymentType_freq: 0,
+        is_passed_contract_plan: 1
       };
     },
     /**
@@ -3304,6 +3276,76 @@ var menuItems = [{
       name: 'real estate',
       label: 'general.backup',
       link: '/'
+    }]
+  }]
+}, {
+  id: 1002168,
+  label: "general.boardRent",
+  icon: "fas fa-hotel",
+  name: 'real estate',
+  isMenuCollapsed: false,
+  subItems: [{
+    id: 10211,
+    name: 'real estate',
+    label: 'general.master_file',
+    isMenuCollapsed: false,
+    subItems: [{
+      id: 100024,
+      name: 'board-realEstate unit status',
+      label: 'general.sellMethod',
+      link: '/dashboard/boardRent/sell-method'
+    }, {
+      id: 100023,
+      name: 'board-realEstate unit status',
+      label: 'general.department',
+      link: '/dashboard/boardRent/department'
+    }, {
+      id: 100021,
+      name: 'board-realEstate unit status',
+      label: 'general.panel',
+      link: '/dashboard/boardRent/panel'
+    }, {
+      id: 100022,
+      name: 'board-realEstate unit status',
+      label: 'general.package',
+      link: '/dashboard/boardRent/package'
+    }]
+  }, {
+    id: 14211,
+    name: 'real estate',
+    label: 'general.transaction',
+    isMenuCollapsed: false,
+    subItems: [{
+      id: 102375,
+      name: 'building wallet',
+      label: 'general.tasks',
+      link: '/dashboard/boardRent/tasks'
+    }, {
+      id: 102373,
+      name: 'building wallet',
+      label: 'general.quotation',
+      link: '/dashboard/boardRent/quotation'
+    }, {
+      id: 102372,
+      name: 'building wallet',
+      label: 'general.order',
+      link: '/dashboard/boardRent/order'
+    }, {
+      id: 102374,
+      name: 'building wallet',
+      label: 'general.invoice',
+      link: '/dashboard/boardRent/invoice'
+    }]
+  }, {
+    id: 14211,
+    name: 'real estate',
+    label: 'general.systemSetup',
+    isMenuCollapsed: false,
+    subItems: [{
+      id: 102275,
+      name: 'building wallet',
+      label: 'general.tasks',
+      link: '/dashboard/boardRent/soctor'
     }]
   }]
 }, {
@@ -4758,7 +4800,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.color {\n    color: #6c757d !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.color {\r\n    color: #6c757d !important;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -6829,9 +6871,9 @@ var render = function () {
       _c("div", { staticClass: "row" }, [
         _c("div", { staticClass: "col-md-6 color" }, [
           _vm._v(
-            "\n                " +
+            "\r\n                " +
               _vm._s(new Date().getFullYear()) +
-              " © Al Shamel Al Araby\n                "
+              " © Al Shamel Al Araby\r\n                "
           ),
           _c("span", { staticStyle: { margin: "0px 30px" } }, [
             _vm._v(_vm._s(_vm.version)),
@@ -13234,11 +13276,11 @@ var render = function () {
                   [
                     _c("h4", { staticClass: "header-title" }, [
                       _vm._v(
-                        "\n                " +
+                        "\n                                " +
                           _vm._s(
                             _vm.$t("general.installmentPaymentTypeTable")
                           ) +
-                          "\n              "
+                          "\n                            "
                       ),
                     ]),
                     _vm._v(" "),
@@ -13282,13 +13324,13 @@ var render = function () {
                                   },
                                   [
                                     _vm._v(
-                                      "\n                      " +
+                                      "\n                                            " +
                                         _vm._s(
                                           _vm.getCompanyKey(
                                             "installment_payment_type_name"
                                           )
                                         ) +
-                                        "\n                    "
+                                        "\n                                        "
                                     ),
                                   ]
                                 ),
@@ -13308,13 +13350,13 @@ var render = function () {
                                   },
                                   [
                                     _vm._v(
-                                      "\n                      " +
+                                      "\n                                            " +
                                         _vm._s(
                                           _vm.getCompanyKey(
                                             "installment_payment_type_name_e"
                                           )
                                         ) +
-                                        "\n                    "
+                                        "\n                                        "
                                     ),
                                   ]
                                 ),
@@ -13414,9 +13456,9 @@ var render = function () {
                           },
                           [
                             _vm._v(
-                              "\n                  " +
+                              "\n                                    " +
                                 _vm._s(_vm.$t("general.Create")) +
-                                "\n                  "
+                                "\n                                    "
                             ),
                             _c("i", { staticClass: "fas fa-plus" }),
                           ]
@@ -13526,9 +13568,9 @@ var render = function () {
                                 { staticClass: "mx-1 custom-btn-background" },
                                 [
                                   _vm._v(
-                                    "\n                      " +
+                                    "\n                                            " +
                                       _vm._s(_vm.$t("general.filter")) +
-                                      "\n                      "
+                                      "\n                                            "
                                   ),
                                   _c("i", { staticClass: "fas fa-filter" }),
                                 ]
@@ -13539,9 +13581,9 @@ var render = function () {
                                 { staticClass: "mx-1 custom-btn-background" },
                                 [
                                   _vm._v(
-                                    "\n                      " +
+                                    "\n                                            " +
                                       _vm._s(_vm.$t("general.group")) +
-                                      "\n                      "
+                                      "\n                                            "
                                   ),
                                   _c("i", { staticClass: "fe-menu" }),
                                 ]
@@ -13578,7 +13620,8 @@ var render = function () {
                                           _vm.getCompanyKey(
                                             "installment_payment_type_name"
                                           )
-                                        ) + "\n                      "
+                                        ) +
+                                          "\n                                            "
                                       ),
                                     ]
                                   ),
@@ -13597,13 +13640,13 @@ var render = function () {
                                     },
                                     [
                                       _vm._v(
-                                        "\n                        " +
+                                        "\n                                                " +
                                           _vm._s(
                                             _vm.getCompanyKey(
                                               "installment_payment_type_name_e"
                                             )
                                           ) +
-                                          "\n                      "
+                                          "\n                                            "
                                       ),
                                     ]
                                   ),
@@ -13626,13 +13669,13 @@ var render = function () {
                                     },
                                     [
                                       _vm._v(
-                                        "\n                        " +
+                                        "\n                                                " +
                                           _vm._s(
                                             _vm.getCompanyKey(
                                               "installment_payment_auto_freq"
                                             )
                                           ) +
-                                          "\n                      "
+                                          "\n                                            "
                                       ),
                                     ]
                                   ),
@@ -13655,13 +13698,13 @@ var render = function () {
                                     },
                                     [
                                       _vm._v(
-                                        "\n                        " +
+                                        "\n                                                " +
                                           _vm._s(
                                             _vm.getCompanyKey(
                                               "installment_payment_is_partially"
                                             )
                                           ) +
-                                          "\n                      "
+                                          "\n                                            "
                                       ),
                                     ]
                                   ),
@@ -13704,7 +13747,7 @@ var render = function () {
                                 },
                                 [
                                   _vm._v(
-                                    "\n                      " +
+                                    "\n                                            " +
                                       _vm._s(
                                         _vm.installmentPaymentsPagination.from
                                       ) +
@@ -13712,11 +13755,11 @@ var render = function () {
                                       _vm._s(
                                         _vm.installmentPaymentsPagination.to
                                       ) +
-                                      "\n                      /\n                      " +
+                                      "\n                                            /\n                                            " +
                                       _vm._s(
                                         _vm.installmentPaymentsPagination.total
                                       ) +
-                                      "\n                    "
+                                      "\n                                        "
                                   ),
                                 ]
                               ),
@@ -13859,9 +13902,9 @@ var render = function () {
                             },
                             [
                               _vm._v(
-                                "\n                    " +
+                                "\n                                        " +
                                   _vm._s(_vm.$t("general.AddNewRecord")) +
-                                  "\n                  "
+                                  "\n                                    "
                               ),
                             ]
                           ),
@@ -13889,9 +13932,9 @@ var render = function () {
                                       },
                                       [
                                         _vm._v(
-                                          "\n                      " +
+                                          "\n                                            " +
                                             _vm._s(_vm.$t("general.Add")) +
-                                            "\n                    "
+                                            "\n                                        "
                                         ),
                                       ]
                                     )
@@ -13937,9 +13980,9 @@ var render = function () {
                             },
                             [
                               _vm._v(
-                                "\n                    " +
+                                "\n                                        " +
                                   _vm._s(_vm.$t("general.Cancel")) +
-                                  "\n                  "
+                                  "\n                                    "
                               ),
                             ]
                           ),
@@ -13958,13 +14001,13 @@ var render = function () {
                               [
                                 _c("label", { staticClass: "control-label" }, [
                                   _vm._v(
-                                    "\n                        " +
+                                    "\n                                                " +
                                       _vm._s(
                                         _vm.getCompanyKey(
                                           "installment_payment_type_name"
                                         )
                                       ) +
-                                      "\n                        "
+                                      "\n                                                "
                                   ),
                                   _c("span", { staticClass: "text-danger" }, [
                                     _vm._v("*"),
@@ -14020,18 +14063,18 @@ var render = function () {
                                       { staticClass: "invalid-feedback" },
                                       [
                                         _vm._v(
-                                          "\n                        " +
+                                          "\n                                                " +
                                             _vm._s(
                                               _vm.$t("general.Itmustbeatleast")
                                             ) +
-                                            "\n                        " +
+                                            "\n                                                " +
                                             _vm._s(
                                               _vm.$v.create.name.$params
                                                 .minLength.min
                                             ) +
-                                            "\n                        " +
+                                            "\n                                                " +
                                             _vm._s(_vm.$t("general.letters")) +
-                                            "\n                      "
+                                            "\n                                            "
                                         ),
                                       ]
                                     )
@@ -14043,18 +14086,18 @@ var render = function () {
                                       { staticClass: "invalid-feedback" },
                                       [
                                         _vm._v(
-                                          "\n                        " +
+                                          "\n                                                " +
                                             _vm._s(
                                               _vm.$t("general.Itmustbeatmost")
                                             ) +
-                                            "\n                        " +
+                                            "\n                                                " +
                                             _vm._s(
                                               _vm.$v.create.name.$params
                                                 .maxLength.max
                                             ) +
-                                            "\n                        " +
+                                            "\n                                                " +
                                             _vm._s(_vm.$t("general.letters")) +
-                                            "\n                      "
+                                            "\n                                            "
                                         ),
                                       ]
                                     )
@@ -14069,9 +14112,9 @@ var render = function () {
                                           { key: index },
                                           [
                                             _vm._v(
-                                              "\n                          " +
+                                              "\n                                                    " +
                                                 _vm._s(errorMessage) +
-                                                "\n                        "
+                                                "\n                                                "
                                             ),
                                           ]
                                         )
@@ -14090,13 +14133,13 @@ var render = function () {
                               [
                                 _c("label", { staticClass: "control-label" }, [
                                   _vm._v(
-                                    "\n                        " +
+                                    "\n                                                " +
                                       _vm._s(
                                         _vm.getCompanyKey(
                                           "installment_payment_type_name_e"
                                         )
                                       ) +
-                                      "\n                        "
+                                      "\n                                                "
                                   ),
                                   _c("span", { staticClass: "text-danger" }, [
                                     _vm._v("*"),
@@ -14152,18 +14195,18 @@ var render = function () {
                                       { staticClass: "invalid-feedback" },
                                       [
                                         _vm._v(
-                                          "\n                        " +
+                                          "\n                                                " +
                                             _vm._s(
                                               _vm.$t("general.Itmustbeatleast")
                                             ) +
-                                            "\n                        " +
+                                            "\n                                                " +
                                             _vm._s(
                                               _vm.$v.create.name_e.$params
                                                 .minLength.min
                                             ) +
-                                            "\n                        " +
+                                            "\n                                                " +
                                             _vm._s(_vm.$t("general.letters")) +
-                                            "\n                      "
+                                            "\n                                            "
                                         ),
                                       ]
                                     )
@@ -14175,18 +14218,18 @@ var render = function () {
                                       { staticClass: "invalid-feedback" },
                                       [
                                         _vm._v(
-                                          "\n                        " +
+                                          "\n                                                " +
                                             _vm._s(
                                               _vm.$t("general.Itmustbeatmost")
                                             ) +
-                                            "\n                        " +
+                                            "\n                                                " +
                                             _vm._s(
                                               _vm.$v.create.name_e.$params
                                                 .maxLength.max
                                             ) +
-                                            "\n                        " +
+                                            "\n                                                " +
                                             _vm._s(_vm.$t("general.letters")) +
-                                            "\n                      "
+                                            "\n                                            "
                                         ),
                                       ]
                                     )
@@ -14202,7 +14245,7 @@ var render = function () {
                                           [
                                             _vm._v(
                                               _vm._s(errorMessage) +
-                                                "\n                        "
+                                                "\n                                                "
                                             ),
                                           ]
                                         )
@@ -14221,11 +14264,11 @@ var render = function () {
                               [
                                 _c("label", { staticClass: "mr-2" }, [
                                   _vm._v(
-                                    "\n                        " +
+                                    "\n                                                " +
                                       _vm._s(
                                         _vm.getCompanyKey("is_conditional")
                                       ) +
-                                      "\n                      "
+                                      "\n                                            "
                                   ),
                                 ]),
                                 _vm._v(" "),
@@ -14266,7 +14309,13 @@ var render = function () {
                                             "$v.create.is_conditional.$model",
                                         },
                                       },
-                                      [_vm._v(_vm._s(_vm.$t("general.Yes")))]
+                                      [
+                                        _vm._v(
+                                          "\n                                                    " +
+                                            _vm._s(_vm.$t("general.Yes")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
                                     ),
                                     _vm._v(" "),
                                     _c(
@@ -14291,7 +14340,13 @@ var render = function () {
                                             "$v.create.is_conditional.$model",
                                         },
                                       },
-                                      [_vm._v(_vm._s(_vm.$t("general.No")))]
+                                      [
+                                        _vm._v(
+                                          "\n                                                    " +
+                                            _vm._s(_vm.$t("general.No")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
                                     ),
                                   ],
                                   1
@@ -14307,7 +14362,7 @@ var render = function () {
                                           [
                                             _vm._v(
                                               _vm._s(errorMessage) +
-                                                "\n                        "
+                                                "\n                                                "
                                             ),
                                           ]
                                         )
@@ -14331,11 +14386,11 @@ var render = function () {
                                         { staticClass: "my-1 mr-2" },
                                         [
                                           _vm._v(
-                                            "\n                          " +
+                                            "\n                                                    " +
                                               _vm._s(
                                                 _vm.getCompanyKey("condition")
                                               ) +
-                                              "\n                          "
+                                              "\n                                                    "
                                           ),
                                           _c(
                                             "span",
@@ -14391,13 +14446,13 @@ var render = function () {
                                             { staticClass: "invalid-feedback" },
                                             [
                                               _vm._v(
-                                                "\n                          " +
+                                                "\n                                                    " +
                                                   _vm._s(
                                                     _vm.$t(
                                                       "general.fieldIsRequired"
                                                     )
                                                   ) +
-                                                  "\n                        "
+                                                  "\n                                                "
                                               ),
                                             ]
                                           )
@@ -14413,7 +14468,7 @@ var render = function () {
                                                 [
                                                   _vm._v(
                                                     _vm._s(errorMessage) +
-                                                      "\n                          "
+                                                      "\n                                                    "
                                                   ),
                                                 ]
                                               )
@@ -14434,186 +14489,106 @@ var render = function () {
                               [
                                 _c("label", { staticClass: "control-label" }, [
                                   _vm._v(
-                                    "\n                        " +
-                                      _vm._s(
-                                        _vm.getCompanyKey(
-                                          "installmentPaymentType_per"
-                                        )
-                                      ) +
-                                      "\n                        "
-                                  ),
-                                  _c("span", { staticClass: "text-danger" }, [
-                                    _vm._v("*"),
-                                  ]),
-                                ]),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value:
-                                        _vm.$v.create.installmentPaymentType_per
-                                          .$model,
-                                      expression:
-                                        "$v.create.installmentPaymentType_per.$model",
-                                    },
-                                  ],
-                                  staticClass: "form-control",
-                                  class: {
-                                    "is-invalid":
-                                      _vm.$v.create.installmentPaymentType_per
-                                        .$error ||
-                                      _vm.errors.installmentPaymentType_per,
-                                    "is-valid":
-                                      !_vm.$v.create.installmentPaymentType_per
-                                        .$invalid &&
-                                      !_vm.errors.installmentPaymentType_per,
-                                  },
-                                  attrs: { type: "number", "data-create": "2" },
-                                  domProps: {
-                                    value:
-                                      _vm.$v.create.installmentPaymentType_per
-                                        .$model,
-                                  },
-                                  on: {
-                                    keypress: function ($event) {
-                                      if (
-                                        !$event.type.indexOf("key") &&
-                                        _vm._k(
-                                          $event.keyCode,
-                                          "enter",
-                                          13,
-                                          $event.key,
-                                          "Enter"
-                                        )
-                                      ) {
-                                        return null
-                                      }
-                                      return _vm.moveInput(
-                                        "select",
-                                        "create",
-                                        3
-                                      )
-                                    },
-                                    input: function ($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.$set(
-                                        _vm.$v.create
-                                          .installmentPaymentType_per,
-                                        "$model",
-                                        $event.target.value
-                                      )
-                                    },
-                                  },
-                                }),
-                                _vm._v(" "),
-                                _vm.errors.installmentPaymentType_per
-                                  ? _vm._l(
-                                      _vm.errors.installmentPaymentType_per,
-                                      function (errorMessage, index) {
-                                        return _c(
-                                          "ErrorMessage",
-                                          { key: index },
-                                          [
-                                            _vm._v(
-                                              _vm._s(errorMessage) +
-                                                "\n                        "
-                                            ),
-                                          ]
-                                        )
-                                      }
-                                    )
-                                  : _vm._e(),
-                              ],
-                              2
-                            ),
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "col-md-6" }, [
-                            _c(
-                              "div",
-                              { staticClass: "form-group" },
-                              [
-                                _c("label", { staticClass: "control-label" }, [
-                                  _vm._v(
-                                    "\n                        " +
+                                    "\n                                                " +
                                       _vm._s(
                                         _vm.getCompanyKey(
                                           "installmentPaymentType_freq"
                                         )
                                       ) +
-                                      "\n                        "
+                                      "\n                                                "
                                   ),
                                   _c("span", { staticClass: "text-danger" }, [
                                     _vm._v("*"),
                                   ]),
                                 ]),
                                 _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value:
+                                _c(
+                                  "b-form-group",
+                                  {
+                                    class: {
+                                      "is-invalid":
                                         _vm.$v.create
-                                          .installmentPaymentType_freq.$model,
-                                      expression:
-                                        "$v.create.installmentPaymentType_freq.$model",
+                                          .installmentPaymentType_freq.$error ||
+                                        _vm.errors.installmentPaymentType_freq,
+                                      "is-valid":
+                                        !_vm.$v.create
+                                          .installmentPaymentType_freq
+                                          .$invalid &&
+                                        !_vm.errors.installmentPaymentType_freq,
                                     },
+                                    attrs: { id: "edit-11" },
+                                  },
+                                  [
+                                    _c(
+                                      "b-form-radio",
+                                      {
+                                        staticClass: "d-inline-block",
+                                        attrs: {
+                                          name: "installmentPaymentType_freq",
+                                          value: "1",
+                                        },
+                                        model: {
+                                          value:
+                                            _vm.$v.create
+                                              .installmentPaymentType_freq
+                                              .$model,
+                                          callback: function ($$v) {
+                                            _vm.$set(
+                                              _vm.$v.create
+                                                .installmentPaymentType_freq,
+                                              "$model",
+                                              $$v
+                                            )
+                                          },
+                                          expression:
+                                            "$v.create.installmentPaymentType_freq.$model",
+                                        },
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                                                    " +
+                                            _vm._s(_vm.$t("general.Yes")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "b-form-radio",
+                                      {
+                                        staticClass: "d-inline-block m-1",
+                                        attrs: {
+                                          name: "installmentPaymentType_freq",
+                                          value: "0",
+                                        },
+                                        model: {
+                                          value:
+                                            _vm.$v.create
+                                              .installmentPaymentType_freq
+                                              .$model,
+                                          callback: function ($$v) {
+                                            _vm.$set(
+                                              _vm.$v.create
+                                                .installmentPaymentType_freq,
+                                              "$model",
+                                              $$v
+                                            )
+                                          },
+                                          expression:
+                                            "$v.create.installmentPaymentType_freq.$model",
+                                        },
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                                                    " +
+                                            _vm._s(_vm.$t("general.No")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
+                                    ),
                                   ],
-                                  staticClass: "form-control",
-                                  class: {
-                                    "is-invalid":
-                                      _vm.$v.create.installmentPaymentType_freq
-                                        .$error ||
-                                      _vm.errors.installmentPaymentType_freq,
-                                    "is-valid":
-                                      !_vm.$v.create.installmentPaymentType_freq
-                                        .$invalid &&
-                                      !_vm.errors.installmentPaymentType_freq,
-                                  },
-                                  attrs: { type: "number", "data-create": "2" },
-                                  domProps: {
-                                    value:
-                                      _vm.$v.create.installmentPaymentType_freq
-                                        .$model,
-                                  },
-                                  on: {
-                                    keypress: function ($event) {
-                                      if (
-                                        !$event.type.indexOf("key") &&
-                                        _vm._k(
-                                          $event.keyCode,
-                                          "enter",
-                                          13,
-                                          $event.key,
-                                          "Enter"
-                                        )
-                                      ) {
-                                        return null
-                                      }
-                                      return _vm.moveInput(
-                                        "select",
-                                        "create",
-                                        3
-                                      )
-                                    },
-                                    input: function ($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.$set(
-                                        _vm.$v.create
-                                          .installmentPaymentType_freq,
-                                        "$model",
-                                        $event.target.value
-                                      )
-                                    },
-                                  },
-                                }),
+                                  1
+                                ),
                                 _vm._v(" "),
                                 _vm.errors.installmentPaymentType_freq
                                   ? _vm._l(
@@ -14625,7 +14600,7 @@ var render = function () {
                                           [
                                             _vm._v(
                                               _vm._s(errorMessage) +
-                                                "\n                        "
+                                                "\n                                                "
                                             ),
                                           ]
                                         )
@@ -14637,108 +14612,98 @@ var render = function () {
                             ),
                           ]),
                           _vm._v(" "),
-                          _c("div", { staticClass: "col-md-6" }, [
-                            _c(
-                              "div",
-                              { staticClass: "form-group" },
-                              [
-                                _c(
-                                  "label",
-                                  {
-                                    staticClass: "control-label",
-                                    attrs: { for: "field-2" },
-                                  },
-                                  [
-                                    _vm._v(
-                                      "\n                        " +
-                                        _vm._s(
-                                          _vm.getCompanyKey("interest_per")
-                                        ) +
-                                        "\n                        "
-                                    ),
-                                    _c("span", { staticClass: "text-danger" }, [
-                                      _vm._v("*"),
-                                    ]),
-                                  ]
-                                ),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.$v.create.interest_per.$model,
-                                      expression:
-                                        "$v.create.interest_per.$model",
-                                    },
-                                  ],
-                                  staticClass: "form-control",
-                                  class: {
-                                    "is-invalid":
-                                      _vm.$v.create.interest_per.$error ||
-                                      _vm.errors.interest_per,
-                                    "is-valid":
-                                      !_vm.$v.create.interest_per.$invalid &&
-                                      !_vm.errors.interest_per,
-                                  },
-                                  attrs: { type: "number", "data-create": "2" },
-                                  domProps: {
-                                    value: _vm.$v.create.interest_per.$model,
-                                  },
-                                  on: {
-                                    keypress: function ($event) {
-                                      if (
-                                        !$event.type.indexOf("key") &&
-                                        _vm._k(
-                                          $event.keyCode,
-                                          "enter",
-                                          13,
-                                          $event.key,
-                                          "Enter"
-                                        )
-                                      ) {
-                                        return null
-                                      }
-                                      return _vm.moveInput(
-                                        "select",
-                                        "create",
-                                        3
-                                      )
-                                    },
-                                    input: function ($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.$set(
-                                        _vm.$v.create.interest_per,
-                                        "$model",
-                                        $event.target.value
-                                      )
-                                    },
-                                  },
-                                }),
-                                _vm._v(" "),
-                                _vm.errors.interest_per
-                                  ? _vm._l(
-                                      _vm.errors.interest_per,
-                                      function (errorMessage, index) {
-                                        return _c(
-                                          "ErrorMessage",
-                                          { key: index },
-                                          [
-                                            _vm._v(
-                                              _vm._s(errorMessage) +
-                                                "\n                        "
-                                            ),
-                                          ]
-                                        )
-                                      }
-                                    )
-                                  : _vm._e(),
-                              ],
-                              2
-                            ),
-                          ]),
+                          _vm.create.installmentPaymentType_freq == 1
+                            ? [
+                                _c("div", { staticClass: "col-md-6" }, [
+                                  _c(
+                                    "div",
+                                    { staticClass: "form-group" },
+                                    [
+                                      _c(
+                                        "label",
+                                        { staticClass: "control-label" },
+                                        [
+                                          _vm._v(
+                                            "\n                                                    " +
+                                              _vm._s(
+                                                _vm.getCompanyKey("freq_period")
+                                              ) +
+                                              "\n                                                    "
+                                          ),
+                                          _c(
+                                            "span",
+                                            { staticClass: "text-danger" },
+                                            [_vm._v("*")]
+                                          ),
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value:
+                                              _vm.$v.create.Freq_period.$model,
+                                            expression:
+                                              "$v.create.Freq_period.$model",
+                                          },
+                                        ],
+                                        staticClass: "form-control",
+                                        class: {
+                                          "is-invalid":
+                                            _vm.$v.create.Freq_period.$error ||
+                                            _vm.errors.Freq_period,
+                                          "is-valid":
+                                            !_vm.$v.create.Freq_period
+                                              .$invalid &&
+                                            !_vm.errors.Freq_period,
+                                        },
+                                        attrs: {
+                                          type: "number",
+                                          "data-create": "2",
+                                        },
+                                        domProps: {
+                                          value:
+                                            _vm.$v.create.Freq_period.$model,
+                                        },
+                                        on: {
+                                          input: function ($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.$set(
+                                              _vm.$v.create.Freq_period,
+                                              "$model",
+                                              $event.target.value
+                                            )
+                                          },
+                                        },
+                                      }),
+                                      _vm._v(" "),
+                                      _vm.errors.Freq_period
+                                        ? _vm._l(
+                                            _vm.errors.Freq_period,
+                                            function (errorMessage, index) {
+                                              return _c(
+                                                "ErrorMessage",
+                                                { key: index },
+                                                [
+                                                  _vm._v(
+                                                    _vm._s(errorMessage) +
+                                                      "\n                                                    "
+                                                  ),
+                                                ]
+                                              )
+                                            }
+                                          )
+                                        : _vm._e(),
+                                    ],
+                                    2
+                                  ),
+                                ]),
+                              ]
+                            : _vm._e(),
                           _vm._v(" "),
                           _c("div", { staticClass: "col-md-4" }, [
                             _c(
@@ -14747,13 +14712,13 @@ var render = function () {
                               [
                                 _c("label", { staticClass: "mr-2" }, [
                                   _vm._v(
-                                    "\n                        " +
+                                    "\n                                                " +
                                       _vm._s(
                                         _vm.getCompanyKey(
                                           "installment_payment_is_partially"
                                         )
                                       ) +
-                                      "\n                      "
+                                      "\n                                            "
                                   ),
                                 ]),
                                 _vm._v(" "),
@@ -14793,7 +14758,13 @@ var render = function () {
                                             "$v.create.is_partially.$model",
                                         },
                                       },
-                                      [_vm._v(_vm._s(_vm.$t("general.Yes")))]
+                                      [
+                                        _vm._v(
+                                          "\n                                                    " +
+                                            _vm._s(_vm.$t("general.Yes")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
                                     ),
                                     _vm._v(" "),
                                     _c(
@@ -14818,7 +14789,13 @@ var render = function () {
                                             "$v.create.is_partially.$model",
                                         },
                                       },
-                                      [_vm._v(_vm._s(_vm.$t("general.No")))]
+                                      [
+                                        _vm._v(
+                                          "\n                                                    " +
+                                            _vm._s(_vm.$t("general.No")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
                                     ),
                                   ],
                                   1
@@ -14834,7 +14811,7 @@ var render = function () {
                                           [
                                             _vm._v(
                                               _vm._s(errorMessage) +
-                                                "\n                        "
+                                                "\n                                                "
                                             ),
                                           ]
                                         )
@@ -14859,9 +14836,9 @@ var render = function () {
                                   },
                                   [
                                     _vm._v(
-                                      "\n                        " +
+                                      "\n                                                " +
                                         _vm._s(_vm.getCompanyKey("is_passed")) +
-                                        "\n                      "
+                                        "\n                                            "
                                     ),
                                   ]
                                 ),
@@ -14901,7 +14878,13 @@ var render = function () {
                                             "$v.create.is_passed.$model",
                                         },
                                       },
-                                      [_vm._v(_vm._s(_vm.$t("general.Yes")))]
+                                      [
+                                        _vm._v(
+                                          "\n                                                    " +
+                                            _vm._s(_vm.$t("general.Yes")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
                                     ),
                                     _vm._v(" "),
                                     _c(
@@ -14925,7 +14908,13 @@ var render = function () {
                                             "$v.create.is_passed.$model",
                                         },
                                       },
-                                      [_vm._v(_vm._s(_vm.$t("general.No")))]
+                                      [
+                                        _vm._v(
+                                          "\n                                                    " +
+                                            _vm._s(_vm.$t("general.No")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
                                     ),
                                   ],
                                   1
@@ -14941,7 +14930,7 @@ var render = function () {
                                           [
                                             _vm._v(
                                               _vm._s(errorMessage) +
-                                                "\n                        "
+                                                "\n                                                "
                                             ),
                                           ]
                                         )
@@ -14966,11 +14955,11 @@ var render = function () {
                                   },
                                   [
                                     _vm._v(
-                                      "\n                        " +
+                                      "\n                                                " +
                                         _vm._s(
                                           _vm.getCompanyKey("is_passed_all")
                                         ) +
-                                        "\n                      "
+                                        "\n                                            "
                                     ),
                                   ]
                                 ),
@@ -15011,7 +15000,13 @@ var render = function () {
                                             "$v.create.is_passed_all.$model",
                                         },
                                       },
-                                      [_vm._v(_vm._s(_vm.$t("general.Yes")))]
+                                      [
+                                        _vm._v(
+                                          "\n                                                    " +
+                                            _vm._s(_vm.$t("general.Yes")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
                                     ),
                                     _vm._v(" "),
                                     _c(
@@ -15036,7 +15031,13 @@ var render = function () {
                                             "$v.create.is_passed_all.$model",
                                         },
                                       },
-                                      [_vm._v(_vm._s(_vm.$t("general.No")))]
+                                      [
+                                        _vm._v(
+                                          "\n                                                    " +
+                                            _vm._s(_vm.$t("general.No")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
                                     ),
                                   ],
                                   1
@@ -15052,7 +15053,7 @@ var render = function () {
                                           [
                                             _vm._v(
                                               _vm._s(errorMessage) +
-                                                "\n                        "
+                                                "\n                                                "
                                             ),
                                           ]
                                         )
@@ -15077,13 +15078,13 @@ var render = function () {
                                   },
                                   [
                                     _vm._v(
-                                      "\n                        " +
+                                      "\n                                                " +
                                         _vm._s(
                                           _vm.getCompanyKey(
                                             "is_passed_contract_plan"
                                           )
                                         ) +
-                                        "\n                      "
+                                        "\n                                            "
                                     ),
                                   ]
                                 ),
@@ -15128,7 +15129,12 @@ var render = function () {
                                             "$v.create.is_passed_contract_plan.$model",
                                         },
                                       },
-                                      [_vm._v(_vm._s(_vm.$t("general.Yes")))]
+                                      [
+                                        _vm._v(
+                                          _vm._s(_vm.$t("general.Yes")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
                                     ),
                                     _vm._v(" "),
                                     _c(
@@ -15155,7 +15161,12 @@ var render = function () {
                                             "$v.create.is_passed_contract_plan.$model",
                                         },
                                       },
-                                      [_vm._v(_vm._s(_vm.$t("general.No")))]
+                                      [
+                                        _vm._v(
+                                          _vm._s(_vm.$t("general.No")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
                                     ),
                                   ],
                                   1
@@ -15171,7 +15182,7 @@ var render = function () {
                                           [
                                             _vm._v(
                                               _vm._s(errorMessage) +
-                                                "\n                        "
+                                                "\n                                                "
                                             ),
                                           ]
                                         )
@@ -15196,13 +15207,13 @@ var render = function () {
                                   },
                                   [
                                     _vm._v(
-                                      "\n                        " +
+                                      "\n                                                " +
                                         _vm._s(
                                           _vm.getCompanyKey(
                                             "installment_payment_auto_freq"
                                           )
                                         ) +
-                                        "\n                      "
+                                        "\n                                            "
                                     ),
                                   ]
                                 ),
@@ -15226,9 +15237,6 @@ var render = function () {
                                       {
                                         staticClass: "d-inline-block",
                                         attrs: {
-                                          disabled:
-                                            _vm.create
-                                              .installmentPaymentType_freq <= 1,
                                           name: "some-radioscreate-auto_freq",
                                           value: "1",
                                         },
@@ -15245,7 +15253,12 @@ var render = function () {
                                             "$v.create.auto_freq.$model",
                                         },
                                       },
-                                      [_vm._v(_vm._s(_vm.$t("general.Yes")))]
+                                      [
+                                        _vm._v(
+                                          _vm._s(_vm.$t("general.Yes")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
                                     ),
                                     _vm._v(" "),
                                     _c(
@@ -15253,9 +15266,6 @@ var render = function () {
                                       {
                                         staticClass: "d-inline-block m-1",
                                         attrs: {
-                                          disabled:
-                                            _vm.create
-                                              .installmentPaymentType_freq <= 1,
                                           name: "some-radioscreate-auto_freq",
                                           value: "0",
                                         },
@@ -15272,7 +15282,12 @@ var render = function () {
                                             "$v.create.auto_freq.$model",
                                         },
                                       },
-                                      [_vm._v(_vm._s(_vm.$t("general.No")))]
+                                      [
+                                        _vm._v(
+                                          _vm._s(_vm.$t("general.No")) +
+                                            "\n                                                "
+                                        ),
+                                      ]
                                     ),
                                   ],
                                   1
@@ -15288,82 +15303,7 @@ var render = function () {
                                           [
                                             _vm._v(
                                               _vm._s(errorMessage) +
-                                                "\n                        "
-                                            ),
-                                          ]
-                                        )
-                                      }
-                                    )
-                                  : _vm._e(),
-                              ],
-                              2
-                            ),
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "col-md-6" }, [
-                            _c(
-                              "div",
-                              { staticClass: "form-group" },
-                              [
-                                _c("label", { staticClass: "control-label" }, [
-                                  _vm._v(
-                                    "\n                        " +
-                                      _vm._s(_vm.getCompanyKey("freq_period")) +
-                                      "\n                        "
-                                  ),
-                                  _c("span", { staticClass: "text-danger" }, [
-                                    _vm._v("*"),
-                                  ]),
-                                ]),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.$v.create.Freq_period.$model,
-                                      expression:
-                                        "$v.create.Freq_period.$model",
-                                    },
-                                  ],
-                                  staticClass: "form-control",
-                                  class: {
-                                    "is-invalid":
-                                      _vm.$v.create.Freq_period.$error ||
-                                      _vm.errors.Freq_period,
-                                    "is-valid":
-                                      !_vm.$v.create.Freq_period.$invalid &&
-                                      !_vm.errors.Freq_period,
-                                  },
-                                  attrs: { type: "number", "data-create": "2" },
-                                  domProps: {
-                                    value: _vm.$v.create.Freq_period.$model,
-                                  },
-                                  on: {
-                                    input: function ($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.$set(
-                                        _vm.$v.create.Freq_period,
-                                        "$model",
-                                        $event.target.value
-                                      )
-                                    },
-                                  },
-                                }),
-                                _vm._v(" "),
-                                _vm.errors.Freq_period
-                                  ? _vm._l(
-                                      _vm.errors.Freq_period,
-                                      function (errorMessage, index) {
-                                        return _c(
-                                          "ErrorMessage",
-                                          { key: index },
-                                          [
-                                            _vm._v(
-                                              _vm._s(errorMessage) +
-                                                "\n                        "
+                                                "\n                                                "
                                             ),
                                           ]
                                         )
@@ -15619,9 +15559,9 @@ var render = function () {
                             _vm.enabled3
                               ? _c("th", { staticClass: "do-not-print" }, [
                                   _vm._v(
-                                    "\n                      " +
+                                    "\n                                        " +
                                       _vm._s(_vm.$t("general.Action")) +
-                                      "\n                    "
+                                      "\n                                    "
                                   ),
                                 ])
                               : _vm._e(),
@@ -15786,7 +15726,7 @@ var render = function () {
                                               },
                                               [
                                                 _vm._v(
-                                                  "\n                        " +
+                                                  "\n                                                " +
                                                     _vm._s(
                                                       data.auto_freq == 1
                                                         ? "" +
@@ -15798,7 +15738,7 @@ var render = function () {
                                                               "general.Inactive"
                                                             )
                                                     ) +
-                                                    "\n                      "
+                                                    "\n                                              "
                                                 ),
                                               ]
                                             ),
@@ -15819,7 +15759,7 @@ var render = function () {
                                               },
                                               [
                                                 _vm._v(
-                                                  "\n                        " +
+                                                  "\n                                            " +
                                                     _vm._s(
                                                       data.is_partially == 1
                                                         ? "" +
@@ -15831,14 +15771,14 @@ var render = function () {
                                                               "general.Inactive"
                                                             )
                                                     ) +
-                                                    "\n                      "
+                                                    "\n                                          "
                                                 ),
                                               ]
                                             ),
                                           ])
                                         : _vm._e(),
                                       _vm._v(" "),
-                                      _vm.enabled3
+                                      _vm.enabled3 && data.id > 1
                                         ? _c(
                                             "td",
                                             { staticClass: "do-not-print" },
@@ -15862,13 +15802,13 @@ var render = function () {
                                                     },
                                                     [
                                                       _vm._v(
-                                                        "\n                          " +
+                                                        "\n                                                " +
                                                           _vm._s(
                                                             _vm.$t(
                                                               "general.commands"
                                                             )
                                                           ) +
-                                                          "\n                          "
+                                                          "\n                                                "
                                                       ),
                                                       _c("i", {
                                                         staticClass:
@@ -16038,13 +15978,13 @@ var render = function () {
                                                               },
                                                               [
                                                                 _vm._v(
-                                                                  "\n                              " +
+                                                                  "\n                                                        " +
                                                                     _vm._s(
                                                                       _vm.$t(
                                                                         "general.Edit"
                                                                       )
                                                                     ) +
-                                                                    "\n                            "
+                                                                    "\n                                                    "
                                                                 ),
                                                               ]
                                                             )
@@ -16110,13 +16050,13 @@ var render = function () {
                                                           },
                                                           [
                                                             _vm._v(
-                                                              "\n                              " +
+                                                              "\n                                                        " +
                                                                 _vm._s(
                                                                   _vm.$t(
                                                                     "general.Cancel"
                                                                   )
                                                                 ) +
-                                                                "\n                            "
+                                                                "\n                                                    "
                                                             ),
                                                           ]
                                                         ),
@@ -16153,13 +16093,13 @@ var render = function () {
                                                                   },
                                                                   [
                                                                     _vm._v(
-                                                                      "\n                                  " +
+                                                                      "\n                                                                " +
                                                                         _vm._s(
                                                                           _vm.getCompanyKey(
                                                                             "installment_payment_type_name"
                                                                           )
                                                                         ) +
-                                                                        "\n                                  "
+                                                                        "\n                                                                "
                                                                     ),
                                                                     _c(
                                                                       "span",
@@ -16290,13 +16230,13 @@ var render = function () {
                                                                       },
                                                                       [
                                                                         _vm._v(
-                                                                          "\n                                  " +
+                                                                          "\n                                                                " +
                                                                             _vm._s(
                                                                               _vm.$t(
                                                                                 "general.Itmustbeatleast"
                                                                               )
                                                                             ) +
-                                                                            "\n                                  " +
+                                                                            "\n                                                                " +
                                                                             _vm._s(
                                                                               _vm
                                                                                 .$v
@@ -16306,13 +16246,13 @@ var render = function () {
                                                                                 .minLength
                                                                                 .min
                                                                             ) +
-                                                                            "\n                                  " +
+                                                                            "\n                                                                " +
                                                                             _vm._s(
                                                                               _vm.$t(
                                                                                 "general.letters"
                                                                               )
                                                                             ) +
-                                                                            "\n                                "
+                                                                            "\n                                                            "
                                                                         ),
                                                                       ]
                                                                     )
@@ -16329,13 +16269,13 @@ var render = function () {
                                                                       },
                                                                       [
                                                                         _vm._v(
-                                                                          "\n                                  " +
+                                                                          "\n                                                                " +
                                                                             _vm._s(
                                                                               _vm.$t(
                                                                                 "general.Itmustbeatmost"
                                                                               )
                                                                             ) +
-                                                                            "\n                                  " +
+                                                                            "\n                                                                " +
                                                                             _vm._s(
                                                                               _vm
                                                                                 .$v
@@ -16345,13 +16285,13 @@ var render = function () {
                                                                                 .maxLength
                                                                                 .max
                                                                             ) +
-                                                                            "\n                                  " +
+                                                                            "\n                                                                " +
                                                                             _vm._s(
                                                                               _vm.$t(
                                                                                 "general.letters"
                                                                               )
                                                                             ) +
-                                                                            "\n                                "
+                                                                            "\n                                                            "
                                                                         ),
                                                                       ]
                                                                     )
@@ -16372,11 +16312,11 @@ var render = function () {
                                                                           },
                                                                           [
                                                                             _vm._v(
-                                                                              "\n                                    " +
+                                                                              "\n                                                                    " +
                                                                                 _vm._s(
                                                                                   errorMessage
                                                                                 ) +
-                                                                                "\n                                  "
+                                                                                "\n                                                                "
                                                                             ),
                                                                           ]
                                                                         )
@@ -16414,13 +16354,13 @@ var render = function () {
                                                                   },
                                                                   [
                                                                     _vm._v(
-                                                                      "\n                                  " +
+                                                                      "\n                                                                " +
                                                                         _vm._s(
                                                                           _vm.getCompanyKey(
                                                                             "installment_payment_type_name_e"
                                                                           )
                                                                         ) +
-                                                                        "\n                                  "
+                                                                        "\n                                                                "
                                                                     ),
                                                                     _c(
                                                                       "span",
@@ -16536,13 +16476,13 @@ var render = function () {
                                                                       },
                                                                       [
                                                                         _vm._v(
-                                                                          "\n                                  " +
+                                                                          "\n                                                                " +
                                                                             _vm._s(
                                                                               _vm.$t(
                                                                                 "general.Itmustbeatleast"
                                                                               )
                                                                             ) +
-                                                                            "\n                                  " +
+                                                                            "\n                                                                " +
                                                                             _vm._s(
                                                                               _vm
                                                                                 .$v
@@ -16552,13 +16492,13 @@ var render = function () {
                                                                                 .minLength
                                                                                 .min
                                                                             ) +
-                                                                            "\n                                  " +
+                                                                            "\n                                                                " +
                                                                             _vm._s(
                                                                               _vm.$t(
                                                                                 "general.letters"
                                                                               )
                                                                             ) +
-                                                                            "\n                                "
+                                                                            "\n                                                            "
                                                                         ),
                                                                       ]
                                                                     )
@@ -16575,13 +16515,13 @@ var render = function () {
                                                                       },
                                                                       [
                                                                         _vm._v(
-                                                                          "\n                                  " +
+                                                                          "\n                                                                " +
                                                                             _vm._s(
                                                                               _vm.$t(
                                                                                 "general.Itmustbeatmost"
                                                                               )
                                                                             ) +
-                                                                            "\n                                  " +
+                                                                            "\n                                                                " +
                                                                             _vm._s(
                                                                               _vm
                                                                                 .$v
@@ -16591,13 +16531,13 @@ var render = function () {
                                                                                 .maxLength
                                                                                 .max
                                                                             ) +
-                                                                            "\n                                  " +
+                                                                            "\n                                                                " +
                                                                             _vm._s(
                                                                               _vm.$t(
                                                                                 "general.letters"
                                                                               )
                                                                             ) +
-                                                                            "\n                                "
+                                                                            "\n                                                            "
                                                                         ),
                                                                       ]
                                                                     )
@@ -16622,7 +16562,7 @@ var render = function () {
                                                                               _vm._s(
                                                                                 errorMessage
                                                                               ) +
-                                                                                "\n                                  "
+                                                                                "\n                                                                "
                                                                             ),
                                                                           ]
                                                                         )
@@ -16660,13 +16600,13 @@ var render = function () {
                                                                   },
                                                                   [
                                                                     _vm._v(
-                                                                      "\n                                  " +
+                                                                      "\n                                                                " +
                                                                         _vm._s(
                                                                           _vm.getCompanyKey(
                                                                             "is_conditional"
                                                                           )
                                                                         ) +
-                                                                        "\n                                "
+                                                                        "\n                                                            "
                                                                     ),
                                                                   ]
                                                                 ),
@@ -16737,7 +16677,8 @@ var render = function () {
                                                                             _vm.$t(
                                                                               "general.Yes"
                                                                             )
-                                                                          )
+                                                                          ) +
+                                                                            "\n                                                                "
                                                                         ),
                                                                       ]
                                                                     ),
@@ -16782,7 +16723,8 @@ var render = function () {
                                                                             _vm.$t(
                                                                               "general.No"
                                                                             )
-                                                                          )
+                                                                          ) +
+                                                                            "\n                                                                "
                                                                         ),
                                                                       ]
                                                                     ),
@@ -16809,7 +16751,7 @@ var render = function () {
                                                                               _vm._s(
                                                                                 errorMessage
                                                                               ) +
-                                                                                "\n                                  "
+                                                                                "\n                                                                "
                                                                             ),
                                                                           ]
                                                                         )
@@ -16847,13 +16789,13 @@ var render = function () {
                                                                         },
                                                                         [
                                                                           _vm._v(
-                                                                            "\n                                    " +
+                                                                            "\n                                                                    " +
                                                                               _vm._s(
                                                                                 _vm.getCompanyKey(
                                                                                   "condition"
                                                                                 )
                                                                               ) +
-                                                                              "\n                                    "
+                                                                              "\n                                                                    "
                                                                           ),
                                                                           _c(
                                                                             "span",
@@ -16969,13 +16911,13 @@ var render = function () {
                                                                             },
                                                                             [
                                                                               _vm._v(
-                                                                                "\n                                    " +
+                                                                                "\n                                                                    " +
                                                                                   _vm._s(
                                                                                     _vm.$t(
                                                                                       "general.fieldIsRequired"
                                                                                     )
                                                                                   ) +
-                                                                                  "\n                                  "
+                                                                                  "\n                                                                "
                                                                               ),
                                                                             ]
                                                                           )
@@ -17003,7 +16945,7 @@ var render = function () {
                                                                                     _vm._s(
                                                                                       errorMessage
                                                                                     ) +
-                                                                                      "\n                                    "
+                                                                                      "\n                                                                    "
                                                                                   ),
                                                                                 ]
                                                                               )
@@ -17043,189 +16985,13 @@ var render = function () {
                                                                   },
                                                                   [
                                                                     _vm._v(
-                                                                      "\n                                  " +
-                                                                        _vm._s(
-                                                                          _vm.getCompanyKey(
-                                                                            "installmentPaymentType_per"
-                                                                          )
-                                                                        ) +
-                                                                        "\n                                  "
-                                                                    ),
-                                                                    _c(
-                                                                      "span",
-                                                                      {
-                                                                        staticClass:
-                                                                          "text-danger",
-                                                                      },
-                                                                      [
-                                                                        _vm._v(
-                                                                          "*"
-                                                                        ),
-                                                                      ]
-                                                                    ),
-                                                                  ]
-                                                                ),
-                                                                _vm._v(" "),
-                                                                _c("input", {
-                                                                  directives: [
-                                                                    {
-                                                                      name: "model",
-                                                                      rawName:
-                                                                        "v-model",
-                                                                      value:
-                                                                        _vm.$v
-                                                                          .edit
-                                                                          .installmentPaymentType_per
-                                                                          .$model,
-                                                                      expression:
-                                                                        "$v.edit.installmentPaymentType_per.$model",
-                                                                    },
-                                                                  ],
-                                                                  staticClass:
-                                                                    "form-control",
-                                                                  class: {
-                                                                    "is-invalid":
-                                                                      _vm.$v
-                                                                        .edit
-                                                                        .installmentPaymentType_per
-                                                                        .$error ||
-                                                                      _vm.errors
-                                                                        .installmentPaymentType_per,
-                                                                    "is-valid":
-                                                                      !_vm.$v
-                                                                        .edit
-                                                                        .installmentPaymentType_per
-                                                                        .$invalid &&
-                                                                      !_vm
-                                                                        .errors
-                                                                        .installmentPaymentType_per,
-                                                                  },
-                                                                  attrs: {
-                                                                    type: "number",
-                                                                    "data-create":
-                                                                      "2",
-                                                                    id: "field-2",
-                                                                  },
-                                                                  domProps: {
-                                                                    value:
-                                                                      _vm.$v
-                                                                        .edit
-                                                                        .installmentPaymentType_per
-                                                                        .$model,
-                                                                  },
-                                                                  on: {
-                                                                    keypress:
-                                                                      function (
-                                                                        $event
-                                                                      ) {
-                                                                        if (
-                                                                          !$event.type.indexOf(
-                                                                            "key"
-                                                                          ) &&
-                                                                          _vm._k(
-                                                                            $event.keyCode,
-                                                                            "enter",
-                                                                            13,
-                                                                            $event.key,
-                                                                            "Enter"
-                                                                          )
-                                                                        ) {
-                                                                          return null
-                                                                        }
-                                                                        return _vm.moveInput(
-                                                                          "select",
-                                                                          "create",
-                                                                          3
-                                                                        )
-                                                                      },
-                                                                    input:
-                                                                      function (
-                                                                        $event
-                                                                      ) {
-                                                                        if (
-                                                                          $event
-                                                                            .target
-                                                                            .composing
-                                                                        ) {
-                                                                          return
-                                                                        }
-                                                                        _vm.$set(
-                                                                          _vm.$v
-                                                                            .edit
-                                                                            .installmentPaymentType_per,
-                                                                          "$model",
-                                                                          $event
-                                                                            .target
-                                                                            .value
-                                                                        )
-                                                                      },
-                                                                  },
-                                                                }),
-                                                                _vm._v(" "),
-                                                                _vm.errors
-                                                                  .installmentPaymentType_per
-                                                                  ? _vm._l(
-                                                                      _vm.errors
-                                                                        .installmentPaymentType_per,
-                                                                      function (
-                                                                        errorMessage,
-                                                                        index
-                                                                      ) {
-                                                                        return _c(
-                                                                          "ErrorMessage",
-                                                                          {
-                                                                            key: index,
-                                                                          },
-                                                                          [
-                                                                            _vm._v(
-                                                                              _vm._s(
-                                                                                errorMessage
-                                                                              ) +
-                                                                                "\n                                  "
-                                                                            ),
-                                                                          ]
-                                                                        )
-                                                                      }
-                                                                    )
-                                                                  : _vm._e(),
-                                                              ],
-                                                              2
-                                                            ),
-                                                          ]
-                                                        ),
-                                                        _vm._v(" "),
-                                                        _c(
-                                                          "div",
-                                                          {
-                                                            staticClass:
-                                                              "col-md-6",
-                                                          },
-                                                          [
-                                                            _c(
-                                                              "div",
-                                                              {
-                                                                staticClass:
-                                                                  "form-group",
-                                                              },
-                                                              [
-                                                                _c(
-                                                                  "label",
-                                                                  {
-                                                                    staticClass:
-                                                                      "control-label",
-                                                                    attrs: {
-                                                                      for: "field-2",
-                                                                    },
-                                                                  },
-                                                                  [
-                                                                    _vm._v(
-                                                                      "\n                                  " +
+                                                                      "\n                                                                " +
                                                                         _vm._s(
                                                                           _vm.getCompanyKey(
                                                                             "installmentPaymentType_freq"
                                                                           )
                                                                         ) +
-                                                                        "\n                                  "
+                                                                        "\n                                                                "
                                                                     ),
                                                                     _c(
                                                                       "span",
@@ -17242,101 +17008,126 @@ var render = function () {
                                                                   ]
                                                                 ),
                                                                 _vm._v(" "),
-                                                                _c("input", {
-                                                                  directives: [
-                                                                    {
-                                                                      name: "model",
-                                                                      rawName:
-                                                                        "v-model",
-                                                                      value:
+                                                                _c(
+                                                                  "b-form-group",
+                                                                  {
+                                                                    class: {
+                                                                      "is-invalid":
                                                                         _vm.$v
                                                                           .edit
                                                                           .installmentPaymentType_freq
-                                                                          .$model,
-                                                                      expression:
-                                                                        "$v.edit.installmentPaymentType_freq.$model",
+                                                                          .$error ||
+                                                                        _vm
+                                                                          .errors
+                                                                          .installmentPaymentType_freq,
+                                                                      "is-valid":
+                                                                        !_vm.$v
+                                                                          .edit
+                                                                          .installmentPaymentType_freq
+                                                                          .$invalid &&
+                                                                        !_vm
+                                                                          .errors
+                                                                          .installmentPaymentType_freq,
                                                                     },
+                                                                    attrs: {
+                                                                      id: "edit-11",
+                                                                    },
+                                                                  },
+                                                                  [
+                                                                    _c(
+                                                                      "b-form-radio",
+                                                                      {
+                                                                        staticClass:
+                                                                          "d-inline-block",
+                                                                        attrs: {
+                                                                          name: "some-radios-installmentPaymentType_freq",
+                                                                          value:
+                                                                            "1",
+                                                                        },
+                                                                        model: {
+                                                                          value:
+                                                                            _vm
+                                                                              .$v
+                                                                              .edit
+                                                                              .installmentPaymentType_freq
+                                                                              .$model,
+                                                                          callback:
+                                                                            function (
+                                                                              $$v
+                                                                            ) {
+                                                                              _vm.$set(
+                                                                                _vm
+                                                                                  .$v
+                                                                                  .edit
+                                                                                  .installmentPaymentType_freq,
+                                                                                "$model",
+                                                                                $$v
+                                                                              )
+                                                                            },
+                                                                          expression:
+                                                                            "$v.edit.installmentPaymentType_freq.$model",
+                                                                        },
+                                                                      },
+                                                                      [
+                                                                        _vm._v(
+                                                                          _vm._s(
+                                                                            _vm.$t(
+                                                                              "general.Yes"
+                                                                            )
+                                                                          ) +
+                                                                            "\n                                                                "
+                                                                        ),
+                                                                      ]
+                                                                    ),
+                                                                    _vm._v(" "),
+                                                                    _c(
+                                                                      "b-form-radio",
+                                                                      {
+                                                                        staticClass:
+                                                                          "d-inline-block m-1",
+                                                                        attrs: {
+                                                                          name: "some-radios-installmentPaymentType_freq",
+                                                                          value:
+                                                                            "0",
+                                                                        },
+                                                                        model: {
+                                                                          value:
+                                                                            _vm
+                                                                              .$v
+                                                                              .edit
+                                                                              .installmentPaymentType_freq
+                                                                              .$model,
+                                                                          callback:
+                                                                            function (
+                                                                              $$v
+                                                                            ) {
+                                                                              _vm.$set(
+                                                                                _vm
+                                                                                  .$v
+                                                                                  .edit
+                                                                                  .installmentPaymentType_freq,
+                                                                                "$model",
+                                                                                $$v
+                                                                              )
+                                                                            },
+                                                                          expression:
+                                                                            "$v.edit.installmentPaymentType_freq.$model",
+                                                                        },
+                                                                      },
+                                                                      [
+                                                                        _vm._v(
+                                                                          _vm._s(
+                                                                            _vm.$t(
+                                                                              "general.No"
+                                                                            )
+                                                                          ) +
+                                                                            "\n                                                                "
+                                                                        ),
+                                                                      ]
+                                                                    ),
                                                                   ],
-                                                                  staticClass:
-                                                                    "form-control",
-                                                                  class: {
-                                                                    "is-invalid":
-                                                                      _vm.$v
-                                                                        .edit
-                                                                        .installmentPaymentType_freq
-                                                                        .$error ||
-                                                                      _vm.errors
-                                                                        .installmentPaymentType_freq,
-                                                                    "is-valid":
-                                                                      !_vm.$v
-                                                                        .edit
-                                                                        .installmentPaymentType_freq
-                                                                        .$invalid &&
-                                                                      !_vm
-                                                                        .errors
-                                                                        .installmentPaymentType_freq,
-                                                                  },
-                                                                  attrs: {
-                                                                    type: "number",
-                                                                    "data-create":
-                                                                      "2",
-                                                                    id: "field-2",
-                                                                  },
-                                                                  domProps: {
-                                                                    value:
-                                                                      _vm.$v
-                                                                        .edit
-                                                                        .installmentPaymentType_freq
-                                                                        .$model,
-                                                                  },
-                                                                  on: {
-                                                                    keypress:
-                                                                      function (
-                                                                        $event
-                                                                      ) {
-                                                                        if (
-                                                                          !$event.type.indexOf(
-                                                                            "key"
-                                                                          ) &&
-                                                                          _vm._k(
-                                                                            $event.keyCode,
-                                                                            "enter",
-                                                                            13,
-                                                                            $event.key,
-                                                                            "Enter"
-                                                                          )
-                                                                        ) {
-                                                                          return null
-                                                                        }
-                                                                        return _vm.moveInput(
-                                                                          "select",
-                                                                          "create",
-                                                                          3
-                                                                        )
-                                                                      },
-                                                                    input:
-                                                                      function (
-                                                                        $event
-                                                                      ) {
-                                                                        if (
-                                                                          $event
-                                                                            .target
-                                                                            .composing
-                                                                        ) {
-                                                                          return
-                                                                        }
-                                                                        _vm.$set(
-                                                                          _vm.$v
-                                                                            .edit
-                                                                            .installmentPaymentType_freq,
-                                                                          "$model",
-                                                                          $event
-                                                                            .target
-                                                                            .value
-                                                                        )
-                                                                      },
-                                                                  },
-                                                                }),
+                                                                  1
+                                                                ),
                                                                 _vm._v(" "),
                                                                 _vm.errors
                                                                   .installmentPaymentType_freq
@@ -17357,7 +17148,7 @@ var render = function () {
                                                                               _vm._s(
                                                                                 errorMessage
                                                                               ) +
-                                                                                "\n                                  "
+                                                                                "\n                                                                "
                                                                             ),
                                                                           ]
                                                                         )
@@ -17370,181 +17161,201 @@ var render = function () {
                                                           ]
                                                         ),
                                                         _vm._v(" "),
-                                                        _c(
-                                                          "div",
-                                                          {
-                                                            staticClass:
-                                                              "col-md-6",
-                                                          },
-                                                          [
-                                                            _c(
-                                                              "div",
-                                                              {
-                                                                staticClass:
-                                                                  "form-group",
-                                                              },
-                                                              [
-                                                                _c(
-                                                                  "label",
-                                                                  {
-                                                                    staticClass:
-                                                                      "control-label",
-                                                                    attrs: {
-                                                                      for: "field-2",
-                                                                    },
-                                                                  },
-                                                                  [
-                                                                    _vm._v(
-                                                                      "\n                                  " +
-                                                                        _vm._s(
-                                                                          _vm.getCompanyKey(
-                                                                            "interest_per"
-                                                                          )
-                                                                        ) +
-                                                                        "\n                                  "
-                                                                    ),
-                                                                    _c(
-                                                                      "span",
-                                                                      {
-                                                                        staticClass:
-                                                                          "text-danger",
-                                                                      },
-                                                                      [
-                                                                        _vm._v(
-                                                                          "*"
-                                                                        ),
-                                                                      ]
-                                                                    ),
-                                                                  ]
-                                                                ),
-                                                                _vm._v(" "),
-                                                                _c("input", {
-                                                                  directives: [
-                                                                    {
-                                                                      name: "model",
-                                                                      rawName:
-                                                                        "v-model",
-                                                                      value:
-                                                                        _vm.$v
-                                                                          .edit
-                                                                          .interest_per
-                                                                          .$model,
-                                                                      expression:
-                                                                        "$v.edit.interest_per.$model",
-                                                                    },
-                                                                  ],
+                                                        _vm.edit
+                                                          .installmentPaymentType_freq ==
+                                                        1
+                                                          ? [
+                                                              _c(
+                                                                "div",
+                                                                {
                                                                   staticClass:
-                                                                    "form-control",
-                                                                  class: {
-                                                                    "is-invalid":
-                                                                      _vm.$v
-                                                                        .edit
-                                                                        .interest_per
-                                                                        .$error ||
-                                                                      _vm.errors
-                                                                        .interest_per,
-                                                                    "is-valid":
-                                                                      !_vm.$v
-                                                                        .edit
-                                                                        .interest_per
-                                                                        .$invalid &&
-                                                                      !_vm
-                                                                        .errors
-                                                                        .interest_per,
-                                                                  },
-                                                                  attrs: {
-                                                                    type: "number",
-                                                                    "data-create":
-                                                                      "2",
-                                                                    id: "field-2",
-                                                                  },
-                                                                  domProps: {
-                                                                    value:
-                                                                      _vm.$v
-                                                                        .edit
-                                                                        .interest_per
-                                                                        .$model,
-                                                                  },
-                                                                  on: {
-                                                                    keypress:
-                                                                      function (
-                                                                        $event
-                                                                      ) {
-                                                                        if (
-                                                                          !$event.type.indexOf(
-                                                                            "key"
-                                                                          ) &&
-                                                                          _vm._k(
-                                                                            $event.keyCode,
-                                                                            "enter",
-                                                                            13,
-                                                                            $event.key,
-                                                                            "Enter"
-                                                                          )
-                                                                        ) {
-                                                                          return null
-                                                                        }
-                                                                        return _vm.moveInput(
-                                                                          "select",
-                                                                          "create",
-                                                                          3
-                                                                        )
-                                                                      },
-                                                                    input:
-                                                                      function (
-                                                                        $event
-                                                                      ) {
-                                                                        if (
-                                                                          $event
-                                                                            .target
-                                                                            .composing
-                                                                        ) {
-                                                                          return
-                                                                        }
-                                                                        _vm.$set(
-                                                                          _vm.$v
-                                                                            .edit
-                                                                            .interest_per,
-                                                                          "$model",
-                                                                          $event
-                                                                            .target
-                                                                            .value
-                                                                        )
-                                                                      },
-                                                                  },
-                                                                }),
-                                                                _vm._v(" "),
-                                                                _vm.errors
-                                                                  .interest_per
-                                                                  ? _vm._l(
-                                                                      _vm.errors
-                                                                        .interest_per,
-                                                                      function (
-                                                                        errorMessage,
-                                                                        index
-                                                                      ) {
-                                                                        return _c(
-                                                                          "ErrorMessage",
-                                                                          {
-                                                                            key: index,
-                                                                          },
-                                                                          [
-                                                                            _vm._v(
+                                                                    "col-md-6",
+                                                                },
+                                                                [
+                                                                  _c(
+                                                                    "div",
+                                                                    {
+                                                                      staticClass:
+                                                                        "form-group",
+                                                                    },
+                                                                    [
+                                                                      _c(
+                                                                        "label",
+                                                                        {
+                                                                          staticClass:
+                                                                            "control-label",
+                                                                        },
+                                                                        [
+                                                                          _vm._v(
+                                                                            "\n                                                                    " +
                                                                               _vm._s(
-                                                                                errorMessage
+                                                                                _vm.getCompanyKey(
+                                                                                  "freq_period"
+                                                                                )
                                                                               ) +
-                                                                                "\n                                  "
-                                                                            ),
-                                                                          ]
-                                                                        )
-                                                                      }
-                                                                    )
-                                                                  : _vm._e(),
-                                                              ],
-                                                              2
-                                                            ),
-                                                          ]
-                                                        ),
+                                                                              "\n                                                                    "
+                                                                          ),
+                                                                          _c(
+                                                                            "span",
+                                                                            {
+                                                                              staticClass:
+                                                                                "text-danger",
+                                                                            },
+                                                                            [
+                                                                              _vm._v(
+                                                                                "*"
+                                                                              ),
+                                                                            ]
+                                                                          ),
+                                                                        ]
+                                                                      ),
+                                                                      _vm._v(
+                                                                        " "
+                                                                      ),
+                                                                      _c(
+                                                                        "input",
+                                                                        {
+                                                                          directives:
+                                                                            [
+                                                                              {
+                                                                                name: "model",
+                                                                                rawName:
+                                                                                  "v-model",
+                                                                                value:
+                                                                                  _vm
+                                                                                    .$v
+                                                                                    .edit
+                                                                                    .Freq_period
+                                                                                    .$model,
+                                                                                expression:
+                                                                                  "$v.edit.Freq_period.$model",
+                                                                              },
+                                                                            ],
+                                                                          staticClass:
+                                                                            "form-control",
+                                                                          class:
+                                                                            {
+                                                                              "is-invalid":
+                                                                                _vm
+                                                                                  .$v
+                                                                                  .edit
+                                                                                  .Freq_period
+                                                                                  .$error ||
+                                                                                _vm
+                                                                                  .errors
+                                                                                  .Freq_period,
+                                                                              "is-valid":
+                                                                                !_vm
+                                                                                  .$v
+                                                                                  .edit
+                                                                                  .Freq_period
+                                                                                  .$invalid &&
+                                                                                !_vm
+                                                                                  .errors
+                                                                                  .Freq_period,
+                                                                            },
+                                                                          attrs:
+                                                                            {
+                                                                              type: "number",
+                                                                              "data-create":
+                                                                                "2",
+                                                                            },
+                                                                          domProps:
+                                                                            {
+                                                                              value:
+                                                                                _vm
+                                                                                  .$v
+                                                                                  .edit
+                                                                                  .Freq_period
+                                                                                  .$model,
+                                                                            },
+                                                                          on: {
+                                                                            keypress:
+                                                                              function (
+                                                                                $event
+                                                                              ) {
+                                                                                if (
+                                                                                  !$event.type.indexOf(
+                                                                                    "key"
+                                                                                  ) &&
+                                                                                  _vm._k(
+                                                                                    $event.keyCode,
+                                                                                    "enter",
+                                                                                    13,
+                                                                                    $event.key,
+                                                                                    "Enter"
+                                                                                  )
+                                                                                ) {
+                                                                                  return null
+                                                                                }
+                                                                                return _vm.moveInput(
+                                                                                  "select",
+                                                                                  "create",
+                                                                                  3
+                                                                                )
+                                                                              },
+                                                                            input:
+                                                                              function (
+                                                                                $event
+                                                                              ) {
+                                                                                if (
+                                                                                  $event
+                                                                                    .target
+                                                                                    .composing
+                                                                                ) {
+                                                                                  return
+                                                                                }
+                                                                                _vm.$set(
+                                                                                  _vm
+                                                                                    .$v
+                                                                                    .edit
+                                                                                    .Freq_period,
+                                                                                  "$model",
+                                                                                  $event
+                                                                                    .target
+                                                                                    .value
+                                                                                )
+                                                                              },
+                                                                          },
+                                                                        }
+                                                                      ),
+                                                                      _vm._v(
+                                                                        " "
+                                                                      ),
+                                                                      _vm.errors
+                                                                        .Freq_period
+                                                                        ? _vm._l(
+                                                                            _vm
+                                                                              .errors
+                                                                              .Freq_period,
+                                                                            function (
+                                                                              errorMessage,
+                                                                              index
+                                                                            ) {
+                                                                              return _c(
+                                                                                "ErrorMessage",
+                                                                                {
+                                                                                  key: index,
+                                                                                },
+                                                                                [
+                                                                                  _vm._v(
+                                                                                    _vm._s(
+                                                                                      errorMessage
+                                                                                    ) +
+                                                                                      "\n                                                                    "
+                                                                                  ),
+                                                                                ]
+                                                                              )
+                                                                            }
+                                                                          )
+                                                                        : _vm._e(),
+                                                                    ],
+                                                                    2
+                                                                  ),
+                                                                ]
+                                                              ),
+                                                            ]
+                                                          : _vm._e(),
                                                         _vm._v(" "),
                                                         _c(
                                                           "div",
@@ -17571,13 +17382,13 @@ var render = function () {
                                                                   },
                                                                   [
                                                                     _vm._v(
-                                                                      "\n                                  " +
+                                                                      "\n                                                                " +
                                                                         _vm._s(
                                                                           _vm.getCompanyKey(
                                                                             "installment_payment_is_partially"
                                                                           )
                                                                         ) +
-                                                                        "\n                                "
+                                                                        "\n                                                            "
                                                                     ),
                                                                   ]
                                                                 ),
@@ -17644,11 +17455,13 @@ var render = function () {
                                                                       },
                                                                       [
                                                                         _vm._v(
-                                                                          _vm._s(
-                                                                            _vm.$t(
-                                                                              "general.Yes"
-                                                                            )
-                                                                          )
+                                                                          "\n                                                                    " +
+                                                                            _vm._s(
+                                                                              _vm.$t(
+                                                                                "general.Yes"
+                                                                              )
+                                                                            ) +
+                                                                            "\n                                                                "
                                                                         ),
                                                                       ]
                                                                     ),
@@ -17689,11 +17502,13 @@ var render = function () {
                                                                       },
                                                                       [
                                                                         _vm._v(
-                                                                          _vm._s(
-                                                                            _vm.$t(
-                                                                              "general.No"
-                                                                            )
-                                                                          )
+                                                                          "\n                                                                    " +
+                                                                            _vm._s(
+                                                                              _vm.$t(
+                                                                                "general.No"
+                                                                              )
+                                                                            ) +
+                                                                            "\n                                                                "
                                                                         ),
                                                                       ]
                                                                     ),
@@ -17720,7 +17535,7 @@ var render = function () {
                                                                               _vm._s(
                                                                                 errorMessage
                                                                               ) +
-                                                                                "\n                                  "
+                                                                                "\n                                                                "
                                                                             ),
                                                                           ]
                                                                         )
@@ -17758,13 +17573,13 @@ var render = function () {
                                                                   },
                                                                   [
                                                                     _vm._v(
-                                                                      "\n                                  " +
+                                                                      "\n                                                                " +
                                                                         _vm._s(
                                                                           _vm.getCompanyKey(
                                                                             "is_passed"
                                                                           )
                                                                         ) +
-                                                                        "\n                                "
+                                                                        "\n                                                            "
                                                                     ),
                                                                   ]
                                                                 ),
@@ -17835,7 +17650,8 @@ var render = function () {
                                                                             _vm.$t(
                                                                               "general.Yes"
                                                                             )
-                                                                          )
+                                                                          ) +
+                                                                            "\n                                                                "
                                                                         ),
                                                                       ]
                                                                     ),
@@ -17880,7 +17696,8 @@ var render = function () {
                                                                             _vm.$t(
                                                                               "general.No"
                                                                             )
-                                                                          )
+                                                                          ) +
+                                                                            "\n                                                                "
                                                                         ),
                                                                       ]
                                                                     ),
@@ -17907,7 +17724,7 @@ var render = function () {
                                                                               _vm._s(
                                                                                 errorMessage
                                                                               ) +
-                                                                                "\n                                  "
+                                                                                "\n                                                                "
                                                                             ),
                                                                           ]
                                                                         )
@@ -17945,13 +17762,13 @@ var render = function () {
                                                                   },
                                                                   [
                                                                     _vm._v(
-                                                                      "\n                                  " +
+                                                                      "\n                                                                " +
                                                                         _vm._s(
                                                                           _vm.getCompanyKey(
                                                                             "is_passed_all"
                                                                           )
                                                                         ) +
-                                                                        "\n                                "
+                                                                        "\n                                                            "
                                                                     ),
                                                                   ]
                                                                 ),
@@ -18022,7 +17839,8 @@ var render = function () {
                                                                             _vm.$t(
                                                                               "general.Yes"
                                                                             )
-                                                                          )
+                                                                          ) +
+                                                                            "\n                                                                "
                                                                         ),
                                                                       ]
                                                                     ),
@@ -18067,7 +17885,8 @@ var render = function () {
                                                                             _vm.$t(
                                                                               "general.No"
                                                                             )
-                                                                          )
+                                                                          ) +
+                                                                            "\n                                                                "
                                                                         ),
                                                                       ]
                                                                     ),
@@ -18094,7 +17913,7 @@ var render = function () {
                                                                               _vm._s(
                                                                                 errorMessage
                                                                               ) +
-                                                                                "\n                                  "
+                                                                                "\n                                                                "
                                                                             ),
                                                                           ]
                                                                         )
@@ -18132,13 +17951,13 @@ var render = function () {
                                                                   },
                                                                   [
                                                                     _vm._v(
-                                                                      "\n                                  " +
+                                                                      "\n                                                                " +
                                                                         _vm._s(
                                                                           _vm.getCompanyKey(
                                                                             "is_passed_contract_plan"
                                                                           )
                                                                         ) +
-                                                                        "\n                                "
+                                                                        "\n                                                            "
                                                                     ),
                                                                   ]
                                                                 ),
@@ -18209,7 +18028,8 @@ var render = function () {
                                                                             _vm.$t(
                                                                               "general.Yes"
                                                                             )
-                                                                          )
+                                                                          ) +
+                                                                            "\n                                                                "
                                                                         ),
                                                                       ]
                                                                     ),
@@ -18254,7 +18074,8 @@ var render = function () {
                                                                             _vm.$t(
                                                                               "general.No"
                                                                             )
-                                                                          )
+                                                                          ) +
+                                                                            "\n                                                                "
                                                                         ),
                                                                       ]
                                                                     ),
@@ -18281,7 +18102,7 @@ var render = function () {
                                                                               _vm._s(
                                                                                 errorMessage
                                                                               ) +
-                                                                                "\n                                  "
+                                                                                "\n                                                                "
                                                                             ),
                                                                           ]
                                                                         )
@@ -18319,13 +18140,13 @@ var render = function () {
                                                                   },
                                                                   [
                                                                     _vm._v(
-                                                                      "\n                                  " +
+                                                                      "\n                                                                " +
                                                                         _vm._s(
                                                                           _vm.getCompanyKey(
                                                                             "installment_payment_auto_freq"
                                                                           )
                                                                         ) +
-                                                                        "\n                                "
+                                                                        "\n                                                            "
                                                                     ),
                                                                   ]
                                                                 ),
@@ -18362,11 +18183,6 @@ var render = function () {
                                                                         staticClass:
                                                                           "d-inline-block",
                                                                         attrs: {
-                                                                          disabled:
-                                                                            _vm
-                                                                              .edit
-                                                                              .installmentPaymentType_freq <=
-                                                                            1,
                                                                           name: "some-radioscreate-auto_freq",
                                                                           value:
                                                                             "1",
@@ -18401,7 +18217,8 @@ var render = function () {
                                                                             _vm.$t(
                                                                               "general.Yes"
                                                                             )
-                                                                          )
+                                                                          ) +
+                                                                            "\n                                                                "
                                                                         ),
                                                                       ]
                                                                     ),
@@ -18412,11 +18229,6 @@ var render = function () {
                                                                         staticClass:
                                                                           "d-inline-block m-1",
                                                                         attrs: {
-                                                                          disabled:
-                                                                            _vm
-                                                                              .edit
-                                                                              .installmentPaymentType_freq <=
-                                                                            1,
                                                                           name: "some-radioscreate-auto_freq",
                                                                           value:
                                                                             "0",
@@ -18451,7 +18263,8 @@ var render = function () {
                                                                             _vm.$t(
                                                                               "general.No"
                                                                             )
-                                                                          )
+                                                                          ) +
+                                                                            "\n                                                                "
                                                                         ),
                                                                       ]
                                                                     ),
@@ -18478,183 +18291,7 @@ var render = function () {
                                                                               _vm._s(
                                                                                 errorMessage
                                                                               ) +
-                                                                                "\n                                  "
-                                                                            ),
-                                                                          ]
-                                                                        )
-                                                                      }
-                                                                    )
-                                                                  : _vm._e(),
-                                                              ],
-                                                              2
-                                                            ),
-                                                          ]
-                                                        ),
-                                                        _vm._v(" "),
-                                                        _c(
-                                                          "div",
-                                                          {
-                                                            staticClass:
-                                                              "col-md-6",
-                                                          },
-                                                          [
-                                                            _c(
-                                                              "div",
-                                                              {
-                                                                staticClass:
-                                                                  "form-group",
-                                                              },
-                                                              [
-                                                                _c(
-                                                                  "label",
-                                                                  {
-                                                                    staticClass:
-                                                                      "control-label",
-                                                                    attrs: {
-                                                                      for: "field-2",
-                                                                    },
-                                                                  },
-                                                                  [
-                                                                    _vm._v(
-                                                                      "\n                                  " +
-                                                                        _vm._s(
-                                                                          _vm.getCompanyKey(
-                                                                            "freq_period"
-                                                                          )
-                                                                        ) +
-                                                                        "\n                                  "
-                                                                    ),
-                                                                    _c(
-                                                                      "span",
-                                                                      {
-                                                                        staticClass:
-                                                                          "text-danger",
-                                                                      },
-                                                                      [
-                                                                        _vm._v(
-                                                                          "*"
-                                                                        ),
-                                                                      ]
-                                                                    ),
-                                                                  ]
-                                                                ),
-                                                                _vm._v(" "),
-                                                                _c("input", {
-                                                                  directives: [
-                                                                    {
-                                                                      name: "model",
-                                                                      rawName:
-                                                                        "v-model",
-                                                                      value:
-                                                                        _vm.$v
-                                                                          .edit
-                                                                          .Freq_period
-                                                                          .$model,
-                                                                      expression:
-                                                                        "$v.edit.Freq_period.$model",
-                                                                    },
-                                                                  ],
-                                                                  staticClass:
-                                                                    "form-control",
-                                                                  class: {
-                                                                    "is-invalid":
-                                                                      _vm.$v
-                                                                        .edit
-                                                                        .Freq_period
-                                                                        .$error ||
-                                                                      _vm.errors
-                                                                        .Freq_period,
-                                                                    "is-valid":
-                                                                      !_vm.$v
-                                                                        .edit
-                                                                        .Freq_period
-                                                                        .$invalid &&
-                                                                      !_vm
-                                                                        .errors
-                                                                        .Freq_period,
-                                                                  },
-                                                                  attrs: {
-                                                                    type: "number",
-                                                                    "data-create":
-                                                                      "2",
-                                                                    id: "field-2",
-                                                                  },
-                                                                  domProps: {
-                                                                    value:
-                                                                      _vm.$v
-                                                                        .edit
-                                                                        .Freq_period
-                                                                        .$model,
-                                                                  },
-                                                                  on: {
-                                                                    keypress:
-                                                                      function (
-                                                                        $event
-                                                                      ) {
-                                                                        if (
-                                                                          !$event.type.indexOf(
-                                                                            "key"
-                                                                          ) &&
-                                                                          _vm._k(
-                                                                            $event.keyCode,
-                                                                            "enter",
-                                                                            13,
-                                                                            $event.key,
-                                                                            "Enter"
-                                                                          )
-                                                                        ) {
-                                                                          return null
-                                                                        }
-                                                                        return _vm.moveInput(
-                                                                          "select",
-                                                                          "create",
-                                                                          3
-                                                                        )
-                                                                      },
-                                                                    input:
-                                                                      function (
-                                                                        $event
-                                                                      ) {
-                                                                        if (
-                                                                          $event
-                                                                            .target
-                                                                            .composing
-                                                                        ) {
-                                                                          return
-                                                                        }
-                                                                        _vm.$set(
-                                                                          _vm.$v
-                                                                            .edit
-                                                                            .Freq_period,
-                                                                          "$model",
-                                                                          $event
-                                                                            .target
-                                                                            .value
-                                                                        )
-                                                                      },
-                                                                  },
-                                                                }),
-                                                                _vm._v(" "),
-                                                                _vm.errors
-                                                                  .Freq_period
-                                                                  ? _vm._l(
-                                                                      _vm.errors
-                                                                        .Freq_period,
-                                                                      function (
-                                                                        errorMessage,
-                                                                        index
-                                                                      ) {
-                                                                        return _c(
-                                                                          "ErrorMessage",
-                                                                          {
-                                                                            key: index,
-                                                                          },
-                                                                          [
-                                                                            _vm._v(
-                                                                              _vm._s(
-                                                                                errorMessage
-                                                                              ) +
-                                                                                "\n                                  "
+                                                                                "\n                                                                "
                                                                             ),
                                                                           ]
                                                                         )
@@ -18736,9 +18373,9 @@ var render = function () {
                                   },
                                   [
                                     _vm._v(
-                                      "\n                      " +
+                                      "\n                                        " +
                                         _vm._s(_vm.$t("general.notDataFound")) +
-                                        "\n                    "
+                                        "\n                                    "
                                     ),
                                   ]
                                 ),

@@ -2,17 +2,14 @@
 
 namespace App\Models;
 
-use App\Traits\CompanyScopeTrait;
-use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class City extends Model
 {
-    use HasFactory, LogTrait, CompanyScopeTrait;
+    use HasFactory, LogTrait;
     protected $table = 'general_cities';
-
 
     protected $guarded = ['id'];
 
@@ -34,13 +31,17 @@ class City extends Model
     {
         return $this->hasMany(Avenue::class);
     }
+    public function customerBranches()
+    {
+        return $this->hasMany(\App\Models\CustomerBranch::class);
+    }
 
     public function hasChildren()
     {
-        if ($this->avenues()->count() > 0) {
-            return true;
-        }
-        return false;
+        return $this->avenues()->count() > 0 ||
+        $this->customerBranches()->count() > 0 ||
+        $this->rlstOwners()->count() > 0;
+
     }
 
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions

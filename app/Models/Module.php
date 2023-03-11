@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Traits\CompanyScopeTrait;
-use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Module extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait, CompanyScopeTrait;
+    use HasFactory, SoftDeletes, LogTrait   ;
     protected $table = 'general_modules';
 
     protected $fillable = [

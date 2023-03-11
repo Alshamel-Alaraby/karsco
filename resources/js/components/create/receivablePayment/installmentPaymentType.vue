@@ -471,7 +471,7 @@ export default {
           </div>
           <div class="col-md-4">
               <div class="form-group">
-                  <label class="mr-2" for="field-11">
+                  <label class="mr-2">
                       {{ getCompanyKey("is_passed") }}
                   </label>
                   <b-form-group id="edit-11" :class="{

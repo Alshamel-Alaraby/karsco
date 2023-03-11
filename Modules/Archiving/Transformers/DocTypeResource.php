@@ -24,9 +24,9 @@ class DocTypeResource extends JsonResource
      */
     public function toArray($request)
     {
-        $arch_file = null;
-        $key = $this->key;
-        $subIds = [];
+        $arch_file  = null;
+        $key        = $this->key;
+        $subIds     = [];
         $archFiles = ArchiveFile::get();
         foreach ($archFiles as $file) {
             $docType = DocType::find($file->arch_doc_type_id);

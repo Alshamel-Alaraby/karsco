@@ -2,13 +2,13 @@
 
 namespace App\Http\Requests\Bank;
 
-use App\Traits\ValidationTrait;
+
 use App\Rules\BankUniqueNameCountryRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateBankRequest extends FormRequest
 {
-    use ValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      *

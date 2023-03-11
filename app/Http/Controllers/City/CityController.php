@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\City;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\City\CreateCityRequest;
-use App\Http\Requests\City\EditCityRequest;
+use App\Http\Requests\CityRequest;
 use App\Http\Resources\City\CityResource;
 use App\Repositories\City\CityRepositoryInterface;
 use App\Traits\CanDeleteTrait;
@@ -50,7 +49,7 @@ class CityController extends Controller
      * @param Request $request
      * @return \response
      */
-    public function store(CreateCityRequest $request)
+    public function store(CityRequest $request)
     {
 
         if (!DB::table('general_countries')->find($request->country_id)) {
@@ -93,7 +92,7 @@ class CityController extends Controller
      * @param int $id
      * @return \response
      */
-    public function update(EditCityRequest $request, $id)
+    public function update(CityRequest $request, $id)
     {
 
         $data = [];

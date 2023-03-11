@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Color;
 
 use App\Http\Requests\Color\StoreColorRequest;
 use App\Http\Requests\Color\UpdateColorRequest;
+use App\Http\Requests\ColorRequest;
 use App\Http\Resources\Color\ColorResource;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -44,13 +45,13 @@ class ColorController extends Controller
         return responseJson(200, 'success', ColorResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
-    public function create(StoreColorRequest $request)
+    public function create(ColorRequest $request)
     {
         $model = $this->modelInterface->create($request);
         return responseJson(200, 'success');
     }
 
-    public function update(UpdateColorRequest $request, $id)
+    public function update(ColorRequest $request, $id)
     {
         $model = $this->modelInterface->find($id);
         if (!$model) {

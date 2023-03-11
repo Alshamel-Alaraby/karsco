@@ -30,13 +30,13 @@ trait LogTrait
     public function scopeFilter($query, $request)
     {
         return $query->where(function ($q) use ($request) {
-             if ($request->search) {
+            if ($request->search) {
 //                 $q->where('name', 'like', '%' . $request->search . '%');
-//                 $q->orWhere('name_e', 'like', '%' . $request->search . '%');
-             }
-             if ($request->has('date')){
-                 $q->whereDate('date',$request->date);
-             }
+                //                 $q->orWhere('name_e', 'like', '%' . $request->search . '%');
+            }
+            if ($request->has('date')) {
+                $q->whereDate('date', $request->date);
+            }
 
             if ($request->search && $request->columns) {
                 foreach ($request->columns as $column) {
@@ -49,6 +49,12 @@ trait LogTrait
                     } else {
                         $q->orWhere($column, 'like', '%' . $request->search . '%');
                     }
+                }
+            }
+
+            if (request()->header('company-id')) {
+                if (in_array('company_id', $this->fillable)) {
+                    $q->where('company_id', request()->header('company-id'));
                 }
             }
 

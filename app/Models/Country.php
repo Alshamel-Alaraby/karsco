@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Traits\CompanyScopeTrait;
-use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use App\Traits\MediaTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,8 +12,8 @@ use Spatie\MediaLibrary\HasMedia;
 
 class Country extends Model implements HasMedia
 {
-    use HasFactory, MediaTrait, SoftDeletes, LogTrait, CompanyScopeTrait;
-    protected $table="general_countries";
+    use HasFactory, MediaTrait, SoftDeletes, LogTrait;
+    protected $table = "general_countries";
     protected $fillable = [
         'name',
         'name_e',
@@ -37,7 +35,7 @@ class Country extends Model implements HasMedia
     // relations
     public function governorates()
     {
-        return $this->hasMany(\App\Models\Governorate::class,"country_id");
+        return $this->hasMany(\App\Models\Governorate::class, "country_id");
     }
 
     public function externalSalesmen()
@@ -64,6 +62,11 @@ class Country extends Model implements HasMedia
     {
         return $this->hasMany(\App\Models\Bank::class);
     }
+
+    public function customerBranches()
+    {
+        return $this->hasMany(\App\Models\CustomerBranch::class);
+    }
     // logs activities
 
     public function getActivitylogOptions(): LogOptions
@@ -83,7 +86,9 @@ class Country extends Model implements HasMedia
         $this->cities()->count() > 0 ||
         $this->banks()->count() > 0 ||
         $this->rlstOwners()->count() > 0 ||
-        $this->externalSalesmen()->count() > 0;
+        $this->externalSalesmen()->count() > 0
+        ||
+        $this->customerBranches()->count() > 0;
         return $h;
     }
 }

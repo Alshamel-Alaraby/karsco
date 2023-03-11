@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RoleUser extends Model
 {
-    use HasFactory, LogTrait, CompanyScopeTrait;
+    use HasFactory, LogTrait   ;
 
     protected $table = 'general_role_user';
 

@@ -30,22 +30,5 @@ class UpdateExternalSalesmenRequest extends FormRequest
         ];
     }
 
-    /**
-     * Get the error messages for the defined validation rules.
-     *
-     * @return array<string, string>
-     */
 
-    public function messages()
-    {
-        return [
-            'phone.unique' => __('message.field must be unique'),
-            'rp_code.unique' => __('message.field must be unique'),
-            'email.email' => __('message.field must be email'),
-            'email.unique' => __('message.field must be unique'),
-            'country_id.exists' => __('message.field must be exists'),
-            'national_id.integer' => __('message.field must be integer'),
-            'is_active.in' => __('message.field must be in active,inactive'),
-        ];
-    }
 }

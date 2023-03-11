@@ -32,12 +32,6 @@ class WalletRequest extends FormRequest
         ];
     }
 
-    public function messages()
-    {
-        return [
-            'required'    => 'field is required',
-        ];
-    }
 
     protected function failedValidation(Validator $validator, $code = 400)
     {

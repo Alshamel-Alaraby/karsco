@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests\TreeProperty;
 
-use App\Traits\ValidationTrait;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class EditTreePropertyRequest extends FormRequest
 {
-    use ValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      *

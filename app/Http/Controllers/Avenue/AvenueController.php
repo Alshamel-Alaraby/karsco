@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Avenue;
 
+use Illuminate\Http\Request;
 use App\Http\Requests\AllRequest;
+use Illuminate\Routing\Controller;
+use App\Http\Requests\AvenueRequest;
+use App\Http\Resources\Avenue\AvenueResource;
 use App\Http\Requests\Avenue\StoreAvenueRequest;
 use App\Http\Requests\Avenue\UpdateAvenueRequest;
-use App\Http\Resources\Avenue\AvenueResource;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 
 class AvenueController extends Controller
 {
@@ -49,13 +50,13 @@ class AvenueController extends Controller
         return responseJson(200, 'success', AvenueResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
-    public function create(StoreAvenueRequest $request)
+    public function create(AvenueRequest $request)
     {
         $model = $this->modelInterface->create($request);
         return responseJson(200, 'success');
     }
 
-    public function update(UpdateAvenueRequest $request, $id)
+    public function update(AvenueRequest $request, $id)
     {
         $model = $this->modelInterface->find($id);
         if (!$model) {

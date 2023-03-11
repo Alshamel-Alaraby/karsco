@@ -6886,7 +6886,6 @@ class TranslationSeeder extends Seeder
 
             ],
         ]);
-
         //document
         Translation::insert([
             [
@@ -6939,7 +6938,6 @@ class TranslationSeeder extends Seeder
 
             ],
         ]);
-
         // installment opening balance
         Translation::insert([
             [
@@ -7069,6 +7067,109 @@ class TranslationSeeder extends Seeder
                 "new_en" => "",
                 "company_id" => 0,
                 "screen" => "receivable payable"
+
+            ],
+        ]);
+        //departments
+        Translation::insert([
+            [
+                "key" => "department_create_form",
+                "default_en" => "Add new department",
+                "default_ar" => "اضف قسم جديدة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "units"
+            ],
+            [
+                "key" => "department_edit_form",
+                "default_en" => "Edit department form",
+                "default_ar" => "نموذج تعديل القسم",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "units"
+
+            ],
+            [
+                "key" => "department_name_ar",
+                "default_en" => "department name (arabic)",
+                "default_ar" => "اسم القسم (عربي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "units"
+
+            ],
+            [
+                "key" => "department_name_en",
+                "default_en" => "department name (english)",
+                "default_ar" => "اسم قسم (انجليزي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "units"
+
+            ],
+        ]);
+        //boardRealestate
+        Translation::insert([
+            [
+                "key" => "boardRealestate_sellMethod_create_form",
+                "default_en" => "Add new sell Method",
+                "default_ar" => "اضف طريقه بيع جديدة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "units"
+            ],
+            [
+                "key" => "boardRealestate_sellMethod_edit_form",
+                "default_en" => "Edit Sell Method form",
+                "default_ar" => "تعديل طريقه البيع ",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "units"
+
+            ],
+            [
+                "key" => "boardRealestate_sellMethod_name_ar",
+                "default_en" => "Sell Method name (arabic)",
+                "default_ar" => "اسم طريقه البيع (عربي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "units"
+
+            ],
+            [
+                "key" => "boardRealestate_sellMethod_name_en",
+                "default_en" => "Sell Method name (english)",
+                "default_ar" => "اسم طريقه اليع (انجليزي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "units"
+
+            ],
+            [
+                "key" => "boardRealestate_sellMethod_commission_ratio",
+                "default_en" => "Commission Ratio",
+                "default_ar" => "نسبة العمولة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "units"
+            ],
+            [
+                "key" => "boardRealestate_sellMethod_target_ratio",
+                "default_en" => "target ratio",
+                "default_ar" => "النسبة المستهدفة",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "units"
 
             ],
         ]);

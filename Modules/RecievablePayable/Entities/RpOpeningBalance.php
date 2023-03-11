@@ -12,6 +12,11 @@ class RpOpeningBalance extends Model
 
     protected $guarded = ['id'];
 
+    public function customer()
+    {
+        return $this->belongsTo(\App\Models\GeneralCustomer::class,'customer_id','id');
+    }
+
 
     protected static function newFactory()
     {

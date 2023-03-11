@@ -10,6 +10,7 @@ use Modules\Archiving\Http\Requests\DocTypeRequest;
 use Modules\Archiving\Repositories\DocTypeInterface;
 use Modules\Archiving\Transformers\DocTypeResource;
 use Modules\Archiving\Transformers\DocTypeTreeResource;
+use Modules\Archiving\Transformers\NewDocTypeResource;
 
 class DocTypeController extends Controller
 {
@@ -22,7 +23,7 @@ class DocTypeController extends Controller
     {
 
         $models = $this->modelInterface->all($request);
-        return responseJson(200, 'success', DocTypeResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
+        return responseJson(200, 'success', NewDocTypeResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
     public function find($id)
@@ -31,14 +32,14 @@ class DocTypeController extends Controller
         if (!$model) {
             return responseJson(404, 'data not found');
         }
-        return responseJson(200, 'success', new DocTypeResource($model));
+        return responseJson(200, 'success', new NewDocTypeResource($model));
     }
 
     public function create(DocTypeRequest $request)
     {
         $model = $this->modelInterface->create($request);
         $model->refresh();
-        return responseJson(200, 'success', new DocTypeResource($model));
+        return responseJson(200, 'success', new NewDocTypeResource($model));
 
     }
 
@@ -81,7 +82,7 @@ class DocTypeController extends Controller
         }
         $this->modelInterface->update($request, $id);
         $model->refresh();
-        return responseJson(200, 'success', new DocTypeResource($model));
+        return responseJson(200, 'success', new NewDocTypeResource($model));
     }
 
     public function logs($id)

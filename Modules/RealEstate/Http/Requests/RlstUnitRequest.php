@@ -47,40 +47,5 @@ class RlstUnitRequest extends FormRequest
         ];
     }
 
-    public function messages()
-    {
-        return [
-            'code.required' => __("message.field is required"),
-            'code.string' => __("message.field must be string"),
-            'code.max' => __("message.field must be less than 20 characters"),
-            'name.required' => __("message.field is required"),
-            'name.string' => __("message.field must be string"),
-            'name.max' => __("message.field must be less than 100 characters"),
-            'name_e.required' => __("message.field is required"),
-            'name_e.string' => __("message.field must be string"),
-            'name_e.max' => __("message.field must be less than 100 characters"),
-            'description.string' => __("message.field must be string"),
-            'description_e.string' => __("message.field must be string"),
-            'unit_ty.integer' => __("message.field must be integer"),
-            'status_date.date' => __("message.field must be date"),
-            'unit_area.numeric' => __("message.field must be numeric"),
-            'building_id.integer' => __("message.field must be integer"),
-            'owner_id.integer' => __("message.field must be integer"),
-            'currency_id.integer' => __("message.field must be integer"),
-            'wallet_id.integer' => __("message.field must be integer"),
-            'unit_status_id.integer' => __("message.field must be integer"),
-            'commission_ty.integer' => __("message.field must be integer"),
-            'commission_value.numeric' => __("message.field must be numeric"),
-            'price.numeric' => __("message.field must be numeric"),
-            'rooms.integer' => __("message.field must be integer"),
-            'path.integer' => __("message.field must be integer"),
-            'view.integer' => __("message.field must be integer"),
-            'floor.integer' => __("message.field must be integer"),
-            'rank.integer' => __("message.field must be integer"),
-            'properties.array' => __("message.field must be array"),
-            'attachments.array' => __("message.field must be array"),
-            'module_id.required' => __("message.field is required"),
-            'module_id.integer' => __("message.field must be integer"),
-        ];
-    }
+
 }

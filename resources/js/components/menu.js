@@ -333,6 +333,93 @@ export const menuItems = [
         ]
     },
     {
+        id: 1002168,
+        label: "general.boardRent",
+        icon: "fas fa-hotel",
+        name: 'real estate',
+        isMenuCollapsed: false,
+        subItems: [
+            {
+                id: 10211,
+                name: 'real estate',
+                label: 'general.master_file',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 100024,
+                        name: 'board-realEstate unit status',
+                        label: 'general.sellMethod',
+                        link: '/dashboard/boardRent/sell-method'
+                    },
+                    {
+                        id: 100023,
+                        name: 'board-realEstate unit status',
+                        label: 'general.department',
+                        link: '/dashboard/boardRent/department'
+                    },
+                    {
+                        id: 100021,
+                        name: 'board-realEstate unit status',
+                        label: 'general.panel',
+                        link: '/dashboard/boardRent/panel'
+                    },
+                    {
+                        id: 100022,
+                        name: 'board-realEstate unit status',
+                        label: 'general.package',
+                        link: '/dashboard/boardRent/package'
+                    },
+                ]
+            },
+            {
+                id: 14211,
+                name: 'real estate',
+                label: 'general.transaction',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 102375,
+                        name: 'building wallet',
+                        label: 'general.tasks',
+                        link: '/dashboard/boardRent/tasks'
+                    },
+                    {
+                        id: 102373,
+                        name: 'building wallet',
+                        label: 'general.quotation',
+                        link: '/dashboard/boardRent/quotation'
+                    },
+                    {
+                        id: 102372,
+                        name: 'building wallet',
+                        label: 'general.order',
+                        link: '/dashboard/boardRent/order'
+                    },
+                    {
+                        id: 102374,
+                        name: 'building wallet',
+                        label: 'general.invoice',
+                        link: '/dashboard/boardRent/invoice'
+                    }
+                ]
+            },
+            {
+                id: 14211,
+                name: 'real estate',
+                label: 'general.systemSetup',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 102275,
+                        name: 'building wallet',
+                        label: 'general.tasks',
+                        link: '/dashboard/boardRent/soctor'
+                    },
+                ]
+            }
+        ]
+    },
+    {
         id: 1004346756,
         label: "general.archive",
         name: 'archiving',
@@ -649,8 +736,6 @@ export const menuItems = [
         icon: 'fas fa-palette',
         link: '/dashboard/colors'
     },
-
-
 
     // {
     //     id: 1115,

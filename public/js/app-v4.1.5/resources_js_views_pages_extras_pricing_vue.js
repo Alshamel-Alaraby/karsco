@@ -2328,6 +2328,76 @@ var menuItems = [{
     }]
   }]
 }, {
+  id: 1002168,
+  label: "general.boardRent",
+  icon: "fas fa-hotel",
+  name: 'real estate',
+  isMenuCollapsed: false,
+  subItems: [{
+    id: 10211,
+    name: 'real estate',
+    label: 'general.master_file',
+    isMenuCollapsed: false,
+    subItems: [{
+      id: 100024,
+      name: 'board-realEstate unit status',
+      label: 'general.sellMethod',
+      link: '/dashboard/boardRent/sell-method'
+    }, {
+      id: 100023,
+      name: 'board-realEstate unit status',
+      label: 'general.department',
+      link: '/dashboard/boardRent/department'
+    }, {
+      id: 100021,
+      name: 'board-realEstate unit status',
+      label: 'general.panel',
+      link: '/dashboard/boardRent/panel'
+    }, {
+      id: 100022,
+      name: 'board-realEstate unit status',
+      label: 'general.package',
+      link: '/dashboard/boardRent/package'
+    }]
+  }, {
+    id: 14211,
+    name: 'real estate',
+    label: 'general.transaction',
+    isMenuCollapsed: false,
+    subItems: [{
+      id: 102375,
+      name: 'building wallet',
+      label: 'general.tasks',
+      link: '/dashboard/boardRent/tasks'
+    }, {
+      id: 102373,
+      name: 'building wallet',
+      label: 'general.quotation',
+      link: '/dashboard/boardRent/quotation'
+    }, {
+      id: 102372,
+      name: 'building wallet',
+      label: 'general.order',
+      link: '/dashboard/boardRent/order'
+    }, {
+      id: 102374,
+      name: 'building wallet',
+      label: 'general.invoice',
+      link: '/dashboard/boardRent/invoice'
+    }]
+  }, {
+    id: 14211,
+    name: 'real estate',
+    label: 'general.systemSetup',
+    isMenuCollapsed: false,
+    subItems: [{
+      id: 102275,
+      name: 'building wallet',
+      label: 'general.tasks',
+      link: '/dashboard/boardRent/soctor'
+    }]
+  }]
+}, {
   id: 1004346756,
   label: "general.archive",
   name: 'archiving',
@@ -3350,7 +3420,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.color {\n    color: #6c757d !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.color {\r\n    color: #6c757d !important;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -4837,9 +4907,9 @@ var render = function () {
       _c("div", { staticClass: "row" }, [
         _c("div", { staticClass: "col-md-6 color" }, [
           _vm._v(
-            "\n                " +
+            "\r\n                " +
               _vm._s(new Date().getFullYear()) +
-              " © Al Shamel Al Araby\n                "
+              " © Al Shamel Al Araby\r\n                "
           ),
           _c("span", { staticStyle: { margin: "0px 30px" } }, [
             _vm._v(_vm._s(_vm.version)),

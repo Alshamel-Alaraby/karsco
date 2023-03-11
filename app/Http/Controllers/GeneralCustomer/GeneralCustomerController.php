@@ -26,6 +26,7 @@ class GeneralCustomerController extends Controller
 
     public function index(Request $request)
     {
+        return "sss";
         // if (count($_GET) == 0) {
         //     $models = cacheGet('GeneralCustomer');
 

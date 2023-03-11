@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests\PaymentType;
 
-use App\Traits\ValidationTrait;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePaymentTypeRequest extends FormRequest
 {
-    use ValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      *

@@ -14,7 +14,7 @@ import DatePicker from "vue2-datepicker";
 import customerGeneral from "../../../../components/create/customerGeneral";
 import Multiselect from "vue-multiselect";
 import currency from "../../../../components/create/currency";
-import transactionBreak from "../../../../components/create/receivablePayment/transactionBreak";
+import transactionBreak from "../../../../components/create/receivablePayment/transactionBreak/transactionBreak";
 
 /**
  * Advanced Table component
@@ -1840,7 +1840,7 @@ export default {
                                 </tbody>
                                 <tbody v-else>
                                 <tr>
-                                    <th class="text-center" colspan="6">{{ $t('general.notDataFound') }}</th>
+                                    <th class="text-center" colspan="8">{{ $t('general.notDataFound') }}</th>
                                 </tr>
                                 </tbody>
                             </table>

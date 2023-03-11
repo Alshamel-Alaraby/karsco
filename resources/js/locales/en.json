@@ -950,6 +950,25 @@
         "totalAmount": "Total Amount",
         "totalDivision": "Total Division",
         "Residual": "Residual",
-        "Invoice": "Invoice"
+        "Invoice": "Invoice",
+        "rebates": "Rebates",
+        "Total": "Total",
+        "details": "Details",
+        "status": "Status",
+        "ShowBreak": "Show Break",
+        "repeat": "Repeat",
+        "departments": "Departments",
+        "DepartmentTable": "Departments Table",
+        "sellMethodsTable": "Sell Methods Table",
+        "sellMethods": "Sell Methods",
+        "boardRent": "Board Rent",
+        "sellMethod": "Sell Method",
+        "panel": "Panel",
+        "package": "Packages",
+        "quotation": "Quotations",
+        "order": "Orders",
+        "invoice": "Invoices",
+        "tasks": "Tasks",
+        "systemSetup": "System Setup"
     }
 }

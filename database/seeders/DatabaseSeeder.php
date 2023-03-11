@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
              UserSeeder::class,
              GeneralCustomerSeeder::class,
              NewCustomerSeeder::class,
+            RpInstallmentPaymentTypeSeeder::class,
+            RpInstallmentStatusSeeder::class,
             //  DataTypeSeeder::class,
             //   UserSeeder::class
         //    ArchiveFileSeeder::class

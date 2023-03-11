@@ -32,15 +32,6 @@ class ClosingBalanceRequest extends FormRequest
         ];
     }
 
-     /**
-     * show required massages
-     */
-    public function messages()
-    {
-        return [
-            'required'    => 'field is required',
-        ];
-    }
 
     protected function failedValidation(Validator $validator, $code = 400)
     {

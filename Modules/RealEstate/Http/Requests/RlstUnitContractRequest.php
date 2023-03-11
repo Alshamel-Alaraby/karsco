@@ -22,12 +22,5 @@ class RlstUnitContractRequest extends FormRequest
         ];
     }
 
-    public function messages()
-    {
-        return [
-            "unit_code.required" => __("message.field is required"),
-            "unit_code.exists" => __("message.field must be exists"),
 
-        ];
-    }
 }

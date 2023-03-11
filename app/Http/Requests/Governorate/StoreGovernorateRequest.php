@@ -40,25 +40,9 @@ class StoreGovernorateRequest extends FormRequest
             "country_id" => "nullable|exists:general_countries,id",
             'phone_key' => "nullable|max:10",
         ];
+
     }
 
-    public function messages()
-    {
-        return [
-            'name.required' => __('message.field is required'),
-            'name.string' => __('message.field must be string'),
-            'name.max' => __('message.field must be less than 255 character'),
-            'name_e.required' => __('message.field is required'),
-            'name_e.string' => __('message.field must be string'),
-            'name_e.max' => __('message.field must be less than 255 character'),
-            'country_id.required' => __('message.field is required'),
-            'country_id.exists' => __('message.field must be exists'),
-            'is_default.required' => __('message.field is required'),
-            'is_default.in' => __('message.field must be in 0,1'),
-            'phone_key.required' => __('message.field is required'),
-            'phone_key.unique' => __('message.field must be unique'),
-            'is_active.in' => __('message.field must be in active,inactive'),
-        ];
-    }
+
 
 }

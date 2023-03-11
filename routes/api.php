@@ -108,6 +108,44 @@ Route::group(['prefix' => 'governorates'], function () {
     });
 });
 
+Route::group(['prefix' => 'streets'], function () {
+    Route::controller(\App\Http\Controllers\StreetController::class)->group(function () {
+        Route::get('/', 'all')->name('streets.index');
+        Route::get('/{id}', 'find');
+        Route::post('/', 'create')->name('streets.create');
+        Route::put('/{id}', 'update')->name('streets.update');
+        Route::delete('/{id}', 'delete')->name('streets.destroy');
+        Route::get('logs/{id}', 'logs');
+        Route::post("bulk-delete", "bulkDelete");
+    });
+});
+
+// customer branches
+Route::group(['prefix' => 'customer-branches'], function () {
+    Route::controller(\App\Http\Controllers\CustomerBranchController::class)->group(function () {
+        Route::get('/', 'all')->name('customer-branches.index');
+        Route::get('/{id}', 'find');
+        Route::post('/', 'create')->name('customer-branches.create');
+        Route::put('/{id}', 'update')->name('customer-branches.update');
+        Route::delete('/{id}', 'delete')->name('customer-branches.destroy');
+        Route::get('logs/{id}', 'logs');
+        Route::post("bulk-delete", "bulkDelete");
+    });
+});
+
+// contacts routes
+Route::group(['prefix' => 'contacts'], function () {
+    Route::controller(\App\Http\Controllers\ContactController::class)->group(function () {
+        Route::get('/', 'all')->name('contacts.index');
+        Route::get('/{id}', 'find');
+        Route::post('/', 'create')->name('contacts.create');
+        Route::put('/{id}', 'update')->name('contacts.update');
+        Route::delete('/{id}', 'delete')->name('contacts.destroy');
+        Route::get('logs/{id}', 'logs');
+        Route::post("bulk-delete", "bulkDelete");
+    });
+});
+
 Route::group(['prefix' => 'employees'], function () {
     Route::controller(\App\Http\Controllers\Employee\EmployeeController::class)->group(function () {
         Route::get('logs/{id}', 'logs')->name('employees.logs');
@@ -120,6 +158,7 @@ Route::group(['prefix' => 'employees'], function () {
     });
 
 });
+
 Route::group(['prefix' => 'customTable'], function () {
     Route::controller(\App\Http\Controllers\CustomTable\GeneralCustomTableController::class)->group(function () {
         Route::get('/', 'all')->name('customTable.index');
@@ -127,14 +166,12 @@ Route::group(['prefix' => 'customTable'], function () {
         Route::get('logs/{id}', 'logs')->name('customTable.logs');
         Route::get('/{id}', 'find');
         Route::post('/', 'create')->name('customTable.create');
-        Route::put( '/update','update')->name('customTable.update');
+        Route::put('/update', 'update')->name('customTable.update');
         Route::delete('/{id}', 'delete')->name('customTable.destroy');
         Route::post("bulk-delete", "bulkDelete");
 
     });
 });
-
-
 
 Route::group(['prefix' => 'document'], function () {
     Route::controller(\App\Http\Controllers\Document\DocumentController::class)->group(function () {

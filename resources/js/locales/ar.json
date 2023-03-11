@@ -930,6 +930,25 @@
         "totalAmount": "اجمالى المبلغ",
         "totalDivision": "اجمالى التقسيم",
         "Residual": "المتبقى",
-        "Invoice": "فاتورة"
+        "Invoice": "فاتورة",
+        "rebates": "الدفعات",
+        "Total": "الاجمالى",
+        "details": "تفاصيل",
+        "status": "الحالة",
+        "ShowBreak": "Show Break",
+        "repeat": "التكرار",
+        "departments": "الاقسام",
+        "DepartmentTable": "جدول الاقسام",
+        "sellMethodsTable": "جدول طرق البيع",
+        "sellMethods": "طرق البيع",
+        "boardRent": "إيجار مجلس",
+        "sellMethod": "طرق بيع",
+        "panel": "لوحة",
+        "package": "الباقات",
+        "quotation": "الاقتباسات",
+        "order": "طلبات",
+        "invoice": "فواتير",
+        "tasks": "مهام",
+        "systemSetup": "إعدادت النظام "
     }
 }

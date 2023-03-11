@@ -33,6 +33,7 @@ import realEstate from  "./routeChild/realEstate";
 import archiving from "./routeChild/archiving";
 import recievablePayable from "./routeChild/recievablePayable";
 import customer from "./routeChild/customer";
+import boardRent from "./routeChild/boardRent";
 
 
 export default [
@@ -69,6 +70,7 @@ export default [
     ...recievablePayable,
     ...customer,
     ...document,
+    ...boardRent,
     {
         path: '/dashboard/notifications',
         name: 'notifications',

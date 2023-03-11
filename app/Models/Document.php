@@ -11,7 +11,7 @@ use Modules\RecievablePayable\Entities\RpPaymentPlanInstallment;
 
 class Document extends Model
 {
-    use HasFactory,LogTrait, CompanyScopeTrait;
+    use HasFactory,LogTrait   ;
 
     protected $table = 'general_documents';
 

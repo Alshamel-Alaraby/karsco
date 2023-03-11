@@ -29,15 +29,6 @@ class ClosedReferenceRequest extends FormRequest
         ];
     }
 
-    public function messages()
-    {
-        return [
-            'docfields_id.required' => __("message.field is required"),
-            'docfields_id.integer' => __("message.field must be integer"),
-            'docfields_id.exists' => __("message.field not found"),
-            'field_value.required' => __("message.field is required"),
 
-        ];
-    }
 
 }

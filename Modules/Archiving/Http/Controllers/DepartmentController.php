@@ -8,6 +8,7 @@ use Modules\Archiving\Entities\DocumentField;
 use Modules\Archiving\Http\Requests\DepartmentRequest;
 use Modules\Archiving\Repositories\DepartmentInterface;
 use Modules\Archiving\Transformers\DepartmentResource;
+use Modules\Archiving\Transformers\NewDepartmentResource;
 
 class DepartmentController extends Controller
 {
@@ -20,7 +21,7 @@ class DepartmentController extends Controller
     {
 
         $models = $this->modelInterface->all($request);
-        return responseJson(200, 'success', DepartmentResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
+        return responseJson(200, 'success', NewDepartmentResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
     public function tree(Request $request)
@@ -39,7 +40,7 @@ class DepartmentController extends Controller
     {
         $model = $this->modelInterface->create($request);
 
-        return responseJson(200, 'success', new DepartmentResource($model));
+        return responseJson(200, 'success', new NewDepartmentResource($model));
     }
 
     public function delete($id)
@@ -81,7 +82,7 @@ class DepartmentController extends Controller
         }
         $this->modelInterface->update($request, $id);
         $model->refresh();
-        return responseJson(200, 'success', new DepartmentResource($model));
+        return responseJson(200, 'success', new NewDepartmentResource($model));
     }
 
     public function logs($id)
