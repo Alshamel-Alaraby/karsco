@@ -3,6 +3,7 @@
 namespace Modules\Archiving\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Archiving\Entities\DocTypeField;
 
 class NewDocTypeResource extends JsonResource
 {
@@ -19,7 +20,8 @@ class NewDocTypeResource extends JsonResource
             'name' => $this->name,
             'name_e' => $this->name_e,
             'is_valid' => $this->is_valid,
-            "parent_id" => $this->parent_id,
+            'parent_id' => new DocRelationResource($this->parent),
+            'doc_type_field' => DocTypeFieldResource::collection(DocTypeField::where('doc_type_id', $this->id)->get()),
             "company_id" => $this->company_id,
         ];
     }
