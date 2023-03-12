@@ -23,20 +23,11 @@ class ColorRequest extends FormRequest
      */
     public function rules()
     {
-//        dd($this->id);
-        if ($this->method() == 'PUT'){
-            return [
-                'name' => 'nullable|string|max:255|unique:general_colors,name,'.$this->id,
-                'name_e' => 'nullable|string|max:255|unique:general_colors,name_e,'.$this->id,
-                "is_active" => "nullable|in:active,inactive",
-            ];
-        }else{
-            return [
-                'name' => 'nullable|string|max:255|unique:general_colors,name',
-                'name_e' => 'nullable|string|max:255|unique:general_colors,name_e',
-                "is_active" => "nullable|in:active,inactive",
-            ];
-        }
+        return [
+            'name' => 'nullable|string|max:255|unique:general_colors,name,'. ($this->method() == 'PUT' ?  $this->id : ''),
+            'name_e' => 'nullable|string|max:255|unique:general_colors,name_e,'. ($this->method() == 'PUT' ?  $this->id : ''),
+            "is_active" => "nullable|in:active,inactive",
+        ];
 
     }
 

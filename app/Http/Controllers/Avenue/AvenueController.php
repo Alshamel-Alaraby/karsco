@@ -53,18 +53,25 @@ class AvenueController extends Controller
     public function create(AvenueRequest $request)
     {
         $model = $this->modelInterface->create($request);
-        return responseJson(200, 'success');
+        return responseJson(200, 'success', new AvenueResource($model));
     }
 
     public function update(AvenueRequest $request, $id)
     {
-        $model = $this->modelInterface->find($id);
+        // $model = $this->modelInterface->find($id);
+        // if (!$model) {
+        //     return responseJson(404, __('message.data not found'));
+        // }
+        // $model = $this->modelInterface->update($request, $id);
+
+        // return responseJson(200, 'success', new AvenueResource($model));
+        $model = $this->modelInterface->update($request, $id);
+
         if (!$model) {
             return responseJson(404, __('message.data not found'));
         }
-        $model = $this->modelInterface->update($request, $id);
 
-        return responseJson(200, 'success');
+        return responseJson(200, 'success', new AvenueResource($model));
     }
 
     public function delete($id)

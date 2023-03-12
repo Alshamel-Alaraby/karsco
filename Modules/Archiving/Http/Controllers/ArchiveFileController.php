@@ -289,9 +289,7 @@ class ArchiveFileController extends Controller
                     $q->where('arch_doc_type_id', $request->arch_doc_type_id);
                 });
             });
-        if (!$model) {
-            return responseJson(404, 'not found');
-        }
+
         if ($request->per_page) {
             $model = ['data' => $model->paginate($request->per_page), 'paginate' => true];
         } else {
@@ -346,10 +344,68 @@ class ArchiveFileController extends Controller
 
     public function  docTypeChildArchiveFiles(Request $request)
     {
-        $model = $this->model->whereHas('docType',function ($q)use ($request){
-            $q->where('parent_id',$request->doc_type_id);
+        $models = $this->model->whereHas('docType', function ($q) use ($request) {
+            $q->where('parent_id', $request->doc_type_id);
         })->get();
-        return  $model;
-        return responseJson(200, 'success',$model);
+        $result = [];
+        foreach ($models as $model) {
+            $result = array_merge($result, $model->data_type_value);
+        }
+        $fields = [];
+        foreach ($result as $item) {
+            if (!$this->isExist($fields, $item)) {
+                $fields[] = $item;
+            }
+        }
+        return $fields;
+    }
+    //Commons
+    private function isExist($result, $model)
+    {
+        foreach ($result as $item) {
+            if ($item->name_e == $model->name_e) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function filesDocType($id)
+    {
+        $model = $this->model->whereHas('docType', function ($q) use ($id) {
+            $q->where('id', $id);
+        })->get();
+        return responseJson(200, 'success', $model);
+    }
+
+    public function getKeys(Request $request)
+    {
+        $arch_file  = null;
+        $subIds     = [];
+        $archFiles = $this->model->get();
+        foreach ($archFiles as $file) {
+            $docType = DocType::find($file->arch_doc_type_id);
+            if ($docType) {
+                if ($docType->parent_id == $request->doc_type_id && $file->arch_department_id == $request->arch_department_id) {
+                    $keyField = null;
+                    foreach ($file->data_type_value as $field) {
+                        if ($field->name_e == $request->key_name_e) {
+                            $arch_file = $file;
+                            $keyField = $field;
+                            break;
+                        }
+                    }
+                    if ($keyField && !in_array($keyField->value, $subIds)) {
+                        $subIds[] = $keyField->value;
+                    }
+                }
+            }
+        }
+        return  collect($subIds)->map(function ($id) use ($arch_file, $request) {
+            return [
+                "name" => $id, "name_e" => $id, "archive_file" => $arch_file,
+                "parent_doc_id" => $request->doc_type_id, "parent_doc_type_children" => DocType::find($request->doc_type_id)->children
+            ];
+        });
     }
 }

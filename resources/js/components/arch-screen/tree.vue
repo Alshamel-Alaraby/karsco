@@ -1,54 +1,33 @@
 <template>
   <draggable class="dragArea" tag="div" :list="nodes">
-    <div
-      class="tree-container"
-      v-for="(node, index) in nodes"
-      :key="index"
-      :style="
-        $i18n.locale == 'ar'
-          ? 'margin-right:10px; text-align: right;'
-          : 'margin-left:10px; text-align: left; '
-      "
-      :class="[$i18n.locale == 'ar' ? 'dir-node' : '', 'node']"
-    >
-      <span class="type" @click="nodeClicked(node)"
-        ><i
-          v-if="
-            (node.children && node.children.length) ||
-            (node.arch_documents && node.arch_documents.length)||
-            (node.key && node.key.length)
-          "
-          :class="isExpanded(node) ? 'fas fa-minus' : 'fas fa-plus'"
-        ></i
-      ></span>
-      <span
-        :class="{ active: node == currentNode && (depth > 1 && !node.parent_id) }"
-        style="cursor:pointer"
-        class="title-tree"
-        @click="onNodeSelected(node)"
-        @dblclick="onDoubleClicked(node)"
-      >
+    <!-- (node.children && node.children.length) ||
+        (node.arch_documents && node.arch_documents.length) ||
+        (node.key && node.key.length) -->
+      
+    <div class="tree-container" v-for="(node, index) in nodes" :key="index" :style="
+      $i18n.locale == 'ar'
+        ? 'margin-right:10px; text-align: right;'
+        : 'margin-left:10px; text-align: left; '
+    " :class="[$i18n.locale == 'ar' ? 'dir-node' : '', 'node']">
+      <span v-if="node.is_key||node.arch_documents||node.key" class="type" @click="nodeClicked(node)"><i :class="isExpanded(node) ? 'fas fa-minus' : 'fas fa-plus'"></i></span>
+      <span :class="{ active: node == currentNode && (depth > 1 && !node.parent_id) }" style="cursor:pointer"
+        class="title-tree" @click="onNodeSelected(node)" @dblclick="onDoubleClicked(node)">
         {{
           node.doc_field_id
-            ? $i18n.locale == "ar"
-              ? node.doc_field_id.name
-              : node.doc_field_id.name_e
-            : $i18n.locale == "ar"
-            ? (typeof node.name === 'object'?($i18n.locale == "ar"?node.name.name:node.name.name_e):node.name)
-            : (typeof node.name_e==='object'?($i18n.locale == "ar"?node.name_e.name:node.name_e.name_e):node.name_e)
+          ? $i18n.locale == "ar"
+            ? node.doc_field_id.name
+            : node.doc_field_id.name_e
+          : $i18n.locale == "ar"
+            ? (typeof node.name === 'object' ? ($i18n.locale == "ar" ? node.name.name : node.name.name_e) : node.name)
+            : (typeof node.name_e === 'object' ? ($i18n.locale == "ar" ? node.name_e.name : node.name_e.name_e) : node.name_e)
         }}
         <!-- <span v-if="depth > 1 && !node.parent_id">({{ node.files_count }})</span> -->
       </span>
-      <TreeBrowser
-        v-if="
-          isExpanded(node) &&
-          (node.children || (node.arch_documents && node.arch_documents.length) ||(node.key && node.key.length))
-        "
-        :nodes="getAppropriateNodes(node)"
-        :depth="depth + 1"
-        @onClick="(node) => $emit('onClick', node)"
-        @onDoubleClicked="(node) => $emit('onDoubleClicked', node)"
-      />
+      <TreeBrowser v-if="
+        isExpanded(node) && (node.children || (node.arch_documents && node.arch_documents.length) || (node.key && node.key.length))
+      " :nodes="getAppropriateNodes(node)" :depth="depth + 1" @onClick="(node) => $emit('onClick', node)"
+        @nodeExpanded="(node) => $emit('nodeExpanded', node)"
+        @onDoubleClicked="(node) => $emit('onDoubleClicked', node)" />
     </div>
   </draggable>
 </template>
@@ -76,33 +55,38 @@ export default {
     };
   },
   methods: {
-    getAppropriateNodes(node){
-      if(node.arch_documents && node.arch_documents.length){
+    getAppropriateNodes(node) {
+      if (node.arch_documents && node.arch_documents.length) {
         return node.arch_documents;
       }
-      else if(node.key && node.key.length){
+      else if (node.key && node.key.length) {
         return node.key;
       }
-      else{
-            return node.children
+      else {
+        return node.children
       }
     },
     onNodeSelected(node) {
       // if (this.depth > 1 && !node.parent_id) {
-        this.$emit("onClick", node);
+      this.$emit("onClick", node);
       // }
     },
     isExpanded(node) {
       return this.expanded.indexOf(node) !== -1;
     },
     onDoubleClicked(node) {
-      if (this.depth >= 1 && node.parent_id===null) {
+      if (this.depth >= 1 && node.parent_id === null) {
         this.$emit("onDoubleClicked", node);
       }
     },
     nodeClicked(node) {
       if (!this.isExpanded(node)) {
-        this.expanded.push(node);
+        if (node.is_key) {
+          this.$emit("nodeExpanded", { node: node, expanded: this.expanded });
+        }
+        else {
+          this.expanded.push(node);
+        }
       } else {
         this.expanded.splice(this.expanded.indexOf(node));
       }
@@ -120,9 +104,11 @@ export default {
   font-size: 12px !important;
   font-weight: 500;
 }
-span.type i{
+
+span.type i {
   font-size: 10px;
 }
+
 .type {
   margin-right: 10px;
 }
@@ -148,6 +134,7 @@ span.type i{
 .node .dragArea .node {
   border-left: 2px solid #ddd;
 }
+
 .node .dragArea .node.dir-node {
   border-right: 2px solid #ddd;
   border-left: unset;
@@ -197,7 +184,8 @@ i {
   color: #159a80 !important;
 }
 
-span,.tree-container{
-      white-space: nowrap;
+span,
+.tree-container {
+  white-space: nowrap;
 }
 </style>

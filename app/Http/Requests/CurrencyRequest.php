@@ -24,14 +24,13 @@ class CurrencyRequest extends FormRequest
      */
     public function rules()
     {
-
         return [
-            'name' => 'nullable|unique:general_currencies,name',
-            'name_e' => 'nullable|unique:general_currencies,name_e',
-            'symbol' => 'nullable|unique:general_currencies,symbol',
-            'symbol_e' => 'nullable|unique:general_currencies,symbol_e',
-            'code' => 'nullable|unique:general_currencies,code',
-            'code_e' => 'nullable|unique:general_currencies,code_e',
+            'name' => 'nullable|unique:general_currencies,name,'. ($this->method() == 'PUT' ?  $this->currency : ''),
+            'name_e' => 'nullable|unique:general_currencies,name_e,'. ($this->method() == 'PUT' ?  $this->currency : ''),
+            'symbol' => 'nullable|unique:general_currencies,symbol,'. ($this->method() == 'PUT' ?  $this->currency : ''),
+            'symbol_e' => 'nullable|unique:general_currencies,symbol_e,'. ($this->method() == 'PUT' ?  $this->currency : ''),
+            'code' => 'nullable|unique:general_currencies,code,'. ($this->method() == 'PUT' ?  $this->currency : ''),
+            'code_e' => 'nullable|unique:general_currencies,code_e,'. ($this->method() == 'PUT' ?  $this->currency : ''),
             'is_active' => 'nullable|in:0,1',
             "is_default" => "nullable|in:0,1",
             'fraction' => [],
@@ -39,6 +38,7 @@ class CurrencyRequest extends FormRequest
             'fraction_no' => [],
             "company_id"=>"required"
         ];
+
     }
 
 }

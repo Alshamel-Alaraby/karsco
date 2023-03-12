@@ -23,11 +23,12 @@ class CountryRequest extends FormRequest
      */
     public function rules()
     {
+
         return [
-            'name' => 'nullable|string|max:255',
+            'name' => 'nullable|string|max:255,',
             'name_e' => 'nullable|string|max:255',
             "is_default" => "nullable|in:0,1",
-            "phone_key" => "nullable|unique:general_countries,phone_key",
+            "phone_key" => "nullable|unique:general_countries,phone_key,". ($this->method() == 'PUT' ?  $this->id : ''),
             'national_id_length' => "nullable|integer",
             'long_name' => "nullable|max:100",
             'long_name_e' => "nullable|max:100",
@@ -35,9 +36,9 @@ class CountryRequest extends FormRequest
             'is_active' => 'nullable|in:active,inactive',
             // "media" => "nullable|array",
             // "media.*" => ["nullable", "exists:media,id", new \App\Rules\MediaRule()],
-
-
         ];
+
+
     }
 
 

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\CustomTable;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CustomTable\CustomTableRequest;
+use App\Http\Requests\CustomTableRequest;
 use App\Http\Resources\CustomTable\CustomTableResource;
 use App\Models\GeneralCustomTable;
 use Illuminate\Http\Request;

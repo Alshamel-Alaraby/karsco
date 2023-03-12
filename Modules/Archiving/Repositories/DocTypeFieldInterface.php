@@ -16,4 +16,6 @@ interface DocTypeFieldInterface
     public function update($request, $id);
 
     public function delete($id);
+
+    public function idDocTypeField($id);
 }

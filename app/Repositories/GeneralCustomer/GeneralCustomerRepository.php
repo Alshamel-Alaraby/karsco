@@ -50,12 +50,17 @@ class GeneralCustomerRepository implements GeneralCustomerRepositoryInterface
 
     public function update($data, $id)
     {
-        DB::transaction(function () use ($id, $data) {
-            $model = $this->model->find($id);
-            $model->update($data);
+        // DB::transaction(function () use ($id, $data) {
+        //     $model = $this->model->find($id);
+        //     $model->update($data);
 
-            $this->forget($id);
+        //     $this->forget($id);
 
+        // });
+
+        return DB::transaction(function () use ($id, $data) {
+            $this->model->where("id", $id)->update($data->all());
+            return $this->model->find($id);
         });
 
     }

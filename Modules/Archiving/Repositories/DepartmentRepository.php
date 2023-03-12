@@ -31,6 +31,21 @@ class DepartmentRepository implements DepartmentInterface
             return ['data' => $models->get(), 'paginate' => false];
         }
     }
+    public function parentDepartment($request){
+        $models = $this->model->whereNull('parent_id')->filter($request)->orderBy($request->order ? $request->order : 'updated_at', $request->sort ? $request->sort : 'DESC');
+
+        if ($request->is_key)
+        {
+            $models->where('is_key',$request->is_key);
+        }
+
+        if ($request->per_page) {
+            return ['data' => $models->paginate($request->per_page), 'paginate' => true];
+        } else {
+            return ['data' => $models->get(), 'paginate' => false];
+        }
+
+    }
 
     public function tree($request){
         $models = $this->model

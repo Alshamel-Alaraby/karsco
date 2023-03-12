@@ -29,19 +29,22 @@ class AvenueRepository implements AvenueInterface
 
     public function create($request)
     {
-        DB::transaction(function () use ($request) {
-            $this->model->create($request->all());
-
-            cacheForget("avenues");
+        return DB::transaction(function () use ($request) {
+            $model = $this->model->create($request->all());
+            return $model;
+            // cacheForget("avenues");
         });
     }
 
     public function update($request, $id)
     {
-        DB::transaction(function () use ($id, $request) {
+        // return DB::transaction(function () use ($id, $request) {
+        //     $this->model->where("id", $id)->update($request->all());
+        //     return $this->model->find($id);
+        // });
+        return DB::transaction(function () use ($id, $request) {
             $this->model->where("id", $id)->update($request->all());
-            $this->forget($id);
-
+            return $this->model->find($id);
         });
 
     }

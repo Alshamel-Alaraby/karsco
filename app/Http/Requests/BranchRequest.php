@@ -24,21 +24,12 @@ class BranchRequest extends FormRequest
      */
     public function rules()
     {
-        if ($this->method() == 'PUT'){
-            return [
-                "name" => "sometimes|unique:general_branches,name,". $this->branch,
-                "name_e" => "sometimes|unique:general_branches,name_e,". $this->branch,
-                "country_id" => "nullable|exists:general_countries,id",
-                "is_active"=>"nullable"
-            ];
-        }else{
-            return [
-                "name" => "sometimes|unique:general_branches,name",
-                "name_e" => "sometimes|unique:general_branches,name_e",
-                "company_id" => "nullable",
-                "is_active"=>"nullable"
-            ];
-        }
+        return [
+            "name" => "nullable|unique:general_branches,name,". ($this->method() == 'PUT' ?  $this->branch : ''),
+            "name_e" => "nullable|unique:general_branches,name_e,". ($this->method() == 'PUT' ?  $this->branch : ''),
+            "country_id" => "nullable|exists:general_countries,id",
+            "is_active"=>"nullable"
+        ];
     }
 
 }

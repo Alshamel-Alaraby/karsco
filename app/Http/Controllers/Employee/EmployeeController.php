@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Employee;
 
-use App\Http\Requests\Employee\StoreEmployeeRequest;
+use App\Http\Requests\EmployeeRequest;
 use App\Http\Requests\Employee\UpdateEmployeeRequest;
 use App\Http\Resources\Employee\EmployeeResource;
 use Illuminate\Http\Request;
@@ -49,13 +49,13 @@ class EmployeeController extends Controller
         return responseJson(200, 'success', EmployeeResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
-    public function create(StoreEmployeeRequest $request)
+    public function create(EmployeeRequest $request)
     {
         $model = $this->modelInterface->create($request);
         return responseJson(200, 'success');
     }
 
-    public function update(UpdateEmployeeRequest $request, $id)
+    public function update(EmployeeRequest $request, $id)
     {
         $model = $this->modelInterface->find($id);
         if (!$model) {

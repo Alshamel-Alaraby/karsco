@@ -24,10 +24,9 @@ class AvenueRequest extends FormRequest
     public function rules()
     {
 
-//        dd($this->route());
         return [
-            'name' => 'required|string|max:255|unique:general_avenues,name,' . ($this->method() == 'PUT' ? ',' . $this->id : ''),
-            'name_e' => 'required|string|max:255|unique:general_avenues,name_e,' . ($this->method() == 'PUT' ? ',' . $this->id : ''),
+            'name' => 'required|string|max:255|unique:general_avenues,name,' . ($this->method() == 'PUT' ?  $this->id : ''),
+            'name_e' => 'required|string|max:255|unique:general_avenues,name_e,' . ($this->method() == 'PUT' ?  $this->id : ''),
             "is_active" => "nullable|in:active,inactive",
             "country_id" => "nullable|exists:general_countries,id",
             "city_id" => "nullable|exists:general_cities,id",

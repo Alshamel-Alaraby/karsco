@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Document;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Document\CreateDocumentRequest;
-use App\Http\Requests\Document\CreateFromAdminDocumentRequest;
+use App\Http\Requests\DocumentRequest;
+use App\Http\Requests\FromAdminDocumentRequest;
 use App\Http\Requests\Document\EditDocumentRequest;
 use App\Http\Resources\Document\DocumentResource;
 use App\Models\Document;
@@ -37,7 +37,7 @@ class DocumentController extends Controller
 
 
 
-    public function create(CreateDocumentRequest $request)
+    public function create(DocumentRequest $request)
     {
         $model = $this->modelInterface->create($request->validated());
         return responseJson(200, 'success');
@@ -45,7 +45,7 @@ class DocumentController extends Controller
 
 
 
-    public function update(EditDocumentRequest $request, $id)
+    public function update(DocumentRequest $request, $id)
     {
         $model = $this->modelInterface->find($id);
         if (!$model) {
@@ -96,9 +96,9 @@ class DocumentController extends Controller
 
     }
 
-    public function createFromAdmin(CreateFromAdminDocumentRequest $request)
+    public function createFromAdmin(FromAdminDocumentRequest $request)
     {
-         return $this->modelInterface->createFromAdmin($request->validated());
+        $this->modelInterface->createFromAdmin($request->validated());
         return responseJson(200, 'success');
     }
 }

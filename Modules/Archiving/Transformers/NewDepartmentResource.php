@@ -21,8 +21,6 @@ class NewDepartmentResource extends JsonResource
             'name_e' => $this->name_e,
             'parent_id' => $this->parent_id,
             'is_active' => $this->is_active,
-            'is_key' => (bool) $this->is_key,
-            'key_value' =>  $this->key_value,
         ];
     }
 }

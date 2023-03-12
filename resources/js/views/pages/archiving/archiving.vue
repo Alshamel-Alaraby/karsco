@@ -12,7 +12,7 @@ import { formatDateTime } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
 import DatePicker from "vue2-datepicker";
 import rootData from "./root.json";
-import TreeBrowser from "../../../components/arch-screen/lazy-tree";
+import TreeBrowser from "../../../components/arch-screen/tree";
 import Files from "../../../components/arch-screen/files.vue";
 import Details from "../../../components/arch-screen/details.vue";
 import General from "../../../components/create/general";
@@ -40,28 +40,28 @@ export default {
     VueHtml2pdf,
     General,
   },
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      if (vm.$store.state.auth.work_flow_trees.includes("archiving-e")) {
-        Swal.fire({
-          icon: "error",
-          title: `${vm.$t("general.Error")}`,
-          text: `${vm.$t("general.ModuleExpired")}`,
-        });
-        return vm.$router.push({ name: "home" });
-      }
+  // beforeRouteEnter(to, from, next) {
+  //   next((vm) => {
+  //     if (vm.$store.state.auth.work_flow_trees.includes("archiving-e")) {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: `${vm.$t("general.Error")}`,
+  //         text: `${vm.$t("general.ModuleExpired")}`,
+  //       });
+  //       return vm.$router.push({ name: "home" });
+  //     }
 
-      if (
-        vm.$store.state.auth.work_flow_trees.includes("archiving screen") ||
-        vm.$store.state.auth.work_flow_trees.includes("archiving") ||
-        vm.$store.state.auth.user.type == "super_admin"
-      ) {
-        return true;
-      } else {
-        return vm.$router.push({ name: "home" });
-      }
-    });
-  },
+  //     if (
+  //       vm.$store.state.auth.work_flow_trees.includes("archiving screen") ||
+  //       vm.$store.state.auth.work_flow_trees.includes("archiving") ||
+  //       vm.$store.state.auth.user.type == "super_admin"
+  //     ) {
+  //       return true;
+  //     } else {
+  //       return vm.$router.push({ name: "home" });
+  //     }
+  //   });
+  // },
   data() {
     return {
       printLoading: true,
@@ -190,6 +190,14 @@ export default {
     this.getSecondLevelNodes();
   },
   methods: {
+    setChildNodes(result) {
+      adminApi.get(`/arch-archive-files/getKeys?doc_type_id=${result.node.doc_type_id}
+      &arch_department_id=${result.node.arch_department_id}&key_name_e=${result.node.name_e}`)
+        .then((res) => {
+          result.node.children = res.data;
+          result.expanded.push(result.node);
+        });
+    },
     getFieldData() {
       this.getPaginatedArchFiles(1);
       this.currentNode = null;
@@ -268,27 +276,32 @@ export default {
         });
     },
     getDocumentFields(node) {
-      this.lockups = [];
-      node.doc_type_field.sort((a, b) =>
-        parseInt(a.field_order) > parseInt(b.field_order) ? 1 : -1
-      );
-      this.nodeFields = [...node.doc_type_field].map((field) => {
-        if (field.doc_field_id.data_type.name_e == "Lookup (table)") {
-          this.getLookup(
-            field.doc_field_id.lookup_table,
-            field.doc_field_id.lookup_table_column,
-            field.doc_field_id.name_e
+      adminApi
+        .get(`/arch-doc-type-field/id-doctype-field/${node.id}`)
+        .then((res) => {
+          node.doc_type_field = res.data.data;
+          this.lockups = [];
+          node.doc_type_field.sort((a, b) =>
+            parseInt(a.field_order) > parseInt(b.field_order) ? 1 : -1
           );
-        }
-        // if (field.doc_field_id.data_type.name_e == "ENUM (droplist)") {
-        //    this.getProperties();
-        // }
-        return {
-          ...field,
-          value: "",
-        };
-      });
-      this.getProperties();
+          this.nodeFields = [...node.doc_type_field].map((field) => {
+            if (field.doc_field_id.data_type.name_e == "Lookup (table)") {
+              this.getLookup(
+                field.doc_field_id.lookup_table,
+                field.doc_field_id.lookup_table_column,
+                field.doc_field_id.name_e
+              );
+            }
+            // if (field.doc_field_id.data_type.name_e == "ENUM (droplist)") {
+            //    this.getProperties();
+            // }
+            return {
+              ...field,
+              value: "",
+            };
+          });
+          this.getProperties();
+        });
     },
     getCurrentTreeProps(treePropertyId) {
       let res = this.properties.filter((prop) => {
@@ -519,7 +532,7 @@ export default {
     async getTree() {
       this.isLoader = true;
       await adminApi
-        .get(`/arch-department/tree`)
+        .get(`/arch-department/parent_department`)
         .then((res) => {
           let root = res.data.data;
           root.forEach((node) => {
@@ -1510,9 +1523,9 @@ export default {
               <div class="col-xs-10 col-md-9 col-lg-3 d-flex align-items-center justify-content-end">
                 <div>
                   <!-- <b-button class="mx-1 custom-btn-background">
-                                                  {{ $t("general.filter") }}
-                                                  <i class="fas fa-filter"></i>
-                                                </b-button> -->
+                                                          {{ $t("general.filter") }}
+                                                          <i class="fas fa-filter"></i>
+                                                        </b-button> -->
                   <!-- start Pagination -->
                   <div class="d-inline-flex align-items-center pagination-custom">
                     <div class="d-inline-block" style="font-size: 15px">
@@ -1948,7 +1961,8 @@ export default {
                   </template>
                 </div>
                 <div class="references border">
-                  <TreeBrowser @onClick="nodeWasClicked" @onDoubleClicked="showModal" :nodes="root" />
+                  <TreeBrowser @nodeExpanded="setChildNodes" @onClick="nodeWasClicked" @onDoubleClicked="showModal"
+                    :nodes="root" />
                 </div>
               </div>
               <div class="col-lg-5">

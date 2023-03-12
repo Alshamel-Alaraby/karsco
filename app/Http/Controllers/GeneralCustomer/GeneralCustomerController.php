@@ -68,20 +68,30 @@ class GeneralCustomerController extends Controller
     public function store(CreateGeneralCustomerRequest $request)
     {
 
-        return responseJson(200, __('Done'), $this->repository->create($request->validated()));
+        // return responseJson(200, __('Done'), $this->repository->create($request->validated()));
+        $model = $this->repository->create($request);
+        return responseJson(200, 'success', new GeneralCustomerResource($model));
 
     }
 
     public function update(EditGeneralCustomerRequest $request, $id)
     {
 
-        $model = $this->repository->find($id);
+        // $model = $this->repository->find($id);
+        // if (!$model) {
+        //     return responseJson(404, __('message.data not found'));
+        // }
+        // $model = $this->repository->update($request->validated(), $id);
+
+        // return responseJson(200, __('Done'), new GeneralCustomerResource($model));
+
+        $model = $this->repository->update($request, $id);
+
         if (!$model) {
             return responseJson(404, __('message.data not found'));
         }
-        $model = $this->repository->update($request->validated(), $id);
 
-        return responseJson(200, __('Done'));
+        return responseJson(200, 'success', new GeneralCustomerResource($model));
 
     }
 
