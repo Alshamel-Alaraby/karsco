@@ -837,9 +837,9 @@ export default {
      *  reset Modal (create)
      */
     async resetModalHidden() {
-      if (this.images.length > 0) {
-        await this.getPdf(this.archive_id);
-      }
+      // if (this.images.length > 0) {
+      //   await this.getPdf(this.archive_id);
+      // }
       await this.getArchiveFiles();
       this.create = {
         job_file_number: null,
