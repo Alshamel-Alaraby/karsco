@@ -426,7 +426,6 @@ export default {
     showModal(node) {
       this.currentDocument = null;
       this.$bvModal.show("create");
-      console.log("dbl clicked");
     },
     async getLookup(table, column, field_name) {
       await adminApi
@@ -572,7 +571,6 @@ export default {
       await adminApi
         .get(`/arch-archive-files/pdf/${id}`)
         .then((res) => {
-          console.log(res);
         })
         .catch((err) => {
           Swal.fire({
@@ -838,7 +836,7 @@ export default {
      */
     async resetModalHidden() {
       // if (this.images.length > 0) {
-      //   await this.getPdf(this.archive_id);
+        // await this.getPdf(this.archive_id);
       // }
       await this.getArchiveFiles();
       this.create = {
@@ -935,24 +933,25 @@ export default {
             });
             archFileKeyValue = archFileKeyValue.length > 0 ? archFileKeyValue[0] : null;
             if (archFileKeyValue) {
-              let check = this.currentNode.key[0].children.filter((element) => {
-                return archFileKeyValue.value == element.name_e;
-              });
-              if (check.length == 0) {
-                this.currentNode.key[0].children.push({
-                  name: archFileKeyValue.value,
-                  name_e: archFileKeyValue.value,
-                  archive_file: res.data.data,
-                  parent_doc_type_children: this.currentNode.sub_docs,
-                  parent_doc_id: res.data.data.parent_doc_id,
-                });
-                let index = this.expanded.findIndex(this.currentNode.key[0]);
-                this.expanded.splice(2, 1);
-                this.expanded.push(this.currentNode.key[0]);
+              if(this.currentNode.key[0].children){
+                  let check = this.currentNode.key[0].children.filter((element) => {
+                      return archFileKeyValue.value == element.name_e;
+                  });
+                  if (check.length == 0) {
+                      this.currentNode.key[0].children.push({
+                          name: archFileKeyValue.value,
+                          name_e: archFileKeyValue.value,
+                          archive_file: res.data.data,
+                          parent_doc_type_children: this.currentNode.sub_docs,
+                          parent_doc_id: res.data.data.parent_doc_id,
+                      });
+                      let index = this.expanded.findIndex(this.currentNode.key[0]);
+                      this.expanded.splice(2, 1);
+                      this.expanded.push(this.currentNode.key[0]);
+                  }
               }
             }
           }
-
           //Update tree
           this.archive_id = res.data.data.id;
           this.is_disabled = true;
@@ -2151,3 +2150,6 @@ input[type="file"] {
   }
 }
 </style>
+
+
+

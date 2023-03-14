@@ -45,7 +45,7 @@ class ArchiveFileController extends Controller
                 $q->whereIn("arch_doc_type_id", $arch_doc_type_id);
             }
 
-                if ($request->favourite == "true") {
+            if ($request->favourite == "true") {
                 $q->whereHas("favourites", function ($q) use ($request) {
                     $favourite = null;
                     $user_id = $request->header('user_id');
@@ -203,25 +203,25 @@ class ArchiveFileController extends Controller
                 'created_at' => $model->created_at,
                 'updated_at' => $model->updated_at,
             ];
-            // $oMerger = \Webklex\PDFMerger\Facades\PDFMergerFacade::init();
-            // $pdfs = $model->files->where('mime_type', 'application/pdf');
-            // $lastPdf = $pdfs->last();
-            // if ($lastPdf) {
-            //     Pdf::loadView('pdf', $data)->save($path);
-            //     // $oMerger->addPDF($path, 'all');
-            //     $oMerger->addPDF($lastPdf->getPath(), 'all');
-            //     $oMerger->merge('file');
-            //     $oMerger->save($path);
-            //     $model->addMedia($path)->toMediaCollection('media');
-            //     $lastPdf->delete();
-            //     $model->refresh();
-            //     return responseJson(200, 'done', new ArchiveFileResource($model));
-            // } else {
-            Pdf::loadView('pdf', $data)->save($path);
-            $model->addMedia($path)->toMediaCollection('media');
-            $model->refresh();
-            return responseJson(200, 'done', new ArchiveFileResource($model));
-            //     }
+            $oMerger = \Webklex\PDFMerger\Facades\PDFMergerFacade::init();
+            $pdfs = $model->files->where('mime_type', 'application/pdf');
+            $lastPdf = $pdfs->last();
+            if ($lastPdf) {
+                Pdf::loadView('pdf', $data)->save($path);
+                // $oMerger->addPDF($path, 'all');
+                $oMerger->addPDF($lastPdf->getPath(), 'all');
+                $oMerger->merge('file');
+                $oMerger->save($path);
+                $model->addMedia($path)->toMediaCollection('media');
+                $lastPdf->delete();
+                $model->refresh();
+                return responseJson(200, 'done', new ArchiveFileResource($model));
+            } else {
+                Pdf::loadView('pdf', $data)->save($path);
+                $model->addMedia($path)->toMediaCollection('media');
+                $model->refresh();
+                return responseJson(200, 'done', new ArchiveFileResource($model));
+            }
         });
     }
 
@@ -305,7 +305,7 @@ class ArchiveFileController extends Controller
                 $q->where('arch_department_id', $request->arch_department_id);
             });
         });
-        if(!$request->search){
+        if (!$request->search) {
             $model->where(function ($q) use ($request) {
                 $q->when($request->arch_doc_type_id, function ($q) use ($request) {
                     $q->whereHas('docType', function ($q) use ($request) {
@@ -314,7 +314,7 @@ class ArchiveFileController extends Controller
                 });
             });
         }
-        if($request->search){
+        if ($request->search) {
             $model->where(function ($q) use ($request) {
                 $q->when($request->doc_type_id, function ($q) use ($request) {
                     $q->where('arch_doc_type_id', $request->doc_type_id);
