@@ -52,6 +52,7 @@ trait LogTrait
                 }
             }
 
+
             if (request()->header('company-id')) {
                 if (in_array('company_id', $this->fillable)) {
                     $q->where('company_id', request()->header('company-id'));

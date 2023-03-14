@@ -145,6 +145,12 @@ export const menuItems = [
                 name: "avenue",
                 link: '/dashboard/avenue'
             },
+            {
+                id: 8,
+                label: 'general.street',
+                name: "street",
+                link: '/dashboard/street'
+            },
         ]
     },
     {
@@ -412,8 +418,8 @@ export const menuItems = [
                     {
                         id: 102275,
                         name: 'building wallet',
-                        label: 'general.tasks',
-                        link: '/dashboard/boardRent/soctor'
+                        label: 'general.sector',
+                        link: '/dashboard/boardRent/sector'
                     },
                 ]
             }

@@ -949,6 +949,9 @@
         "order": "طلبات",
         "invoice": "فواتير",
         "tasks": "مهام",
-        "systemSetup": "إعدادت النظام "
+        "systemSetup": "إعدادت النظام ",
+        "sector": "قطاع",
+        "sectorsTable": "جدول القطاعات",
+        "customerBranch": "فرع العميل"
     }
 }

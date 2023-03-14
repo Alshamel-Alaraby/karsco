@@ -19,6 +19,8 @@ import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import translation from "../../../helper/translation-mixin";
 import { arabicValue, englishValue } from "../../../helper/langTransform";
+import Avenue from "../../../components/create/avenue";
+import Street from "../../../components/create/street";
 
 /**
  * Advanced Table component
@@ -46,9 +48,11 @@ export default {
         ErrorMessage,
         loader,
         Country,
+        Avenue,
         City,
         Multiselect,
-        bankAccount
+        bankAccount,
+        Street
     },
     data() {
         return {
@@ -61,6 +65,10 @@ export default {
             cities: [],
             countries: [],
             bank_accounts: [],
+            branchCities: [],
+            branchCountries: [],
+            streets: [],
+            avenues: [],
             isLoader: false,
             create: {
                 name: '',
@@ -102,6 +110,29 @@ export default {
                 Note3: '',
                 Note4: ''
             },
+            branchCreate: {
+                name: '',
+                name_e: '',
+                country_id: null,
+                city_id: null,
+                governorate_id: null,
+                avenue_id: null,
+                street_id: null,
+                latitude: '',
+                longitude: ''
+            },
+            branchEdit: {
+                name: '',
+                name_e: '',
+                country_id: null,
+                city_id: null,
+                governorate_id: null,
+                avenue_id: null,
+                street_id: null,
+                latitude: '',
+                longitude: ''
+            },
+            customer_id: null,
             errors: {},
             isCheckAll: false,
             checkAll: [],
@@ -238,6 +269,28 @@ export default {
                     return this.isRequired("passport_no");
                 }),integer,maxLength: maxLength(20)}
         },
+        branchCreate: {
+            name: {required,minLength: minLength(2),maxLength: maxLength(100),},
+            name_e: {required,minLength: minLength(2),maxLength: maxLength(100),},
+            country_id: {required},
+            city_id: {required},
+            governorate_id: {required},
+            avenue_id: {required},
+            street_id: {required},
+            latitude: {required},
+            longitude: {required}
+        },
+        branchEdit: {
+            name: {required,minLength: minLength(2),maxLength: maxLength(100),},
+            name_e: {required,minLength: minLength(2),maxLength: maxLength(100),},
+            country_id: {required},
+            city_id: {required},
+            governorate_id: {required},
+            avenue_id: {required},
+            street_id: {required},
+            latitude: {required},
+            longitude: {required}
+        }
     },
     watch: {
         /**
@@ -276,43 +329,50 @@ export default {
     },
     methods: {
         getCustomTableFields() {
-            adminApi
-                .get(`/customTable/table-columns/general_customers`)
-                .then((res) => {
-                    this.fields = res.data;
-                })
-                .catch((err) => {
-                    Swal.fire({
-                        icon: "error",
-                        title: `${this.$t("general.Error")}`,
-                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                adminApi
+                    .get(`/customTable/table-columns/general_customers`)
+                    .then((res) => {
+                        this.fields = res.data;
+                    })
+                    .catch((err) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: `${this.$t("general.Error")}`,
+                            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                        });
+                    })
+                    .finally(() => {
+                        this.isLoader = false;
                     });
-                })
-                .finally(() => {
-                    this.isLoader = false;
-                });
-        },
+            },
         isVisible(fieldName) {
-            let res = this.fields.filter((field) => {
-                return field.column_name == fieldName;
-            });
-            return res.length > 0 && res[0].is_visible == 1 ? true : false;
-        },
+                let res = this.fields.filter((field) => {
+                    return field.column_name == fieldName;
+                });
+                return res.length > 0 && res[0].is_visible == 1 ? true : false;
+            },
         isRequired(fieldName) {
-            let res = this.fields.filter((field) => {
-                return field.column_name == fieldName;
-            });
-            return res.length > 0 && res[0].is_required == 1 ? true : false;
+                let res = this.fields.filter((field) => {
+                    return field.column_name == fieldName;
+                });
+                return res.length > 0 && res[0].is_required == 1 ? true : false;
+            },
+        arabicValue(txt) {
+          this.create.name = arabicValue(txt);
+          this.edit.name = arabicValue(txt);
         },
-    arabicValue(txt) {
-      this.create.name = arabicValue(txt);
-      this.edit.name = arabicValue(txt);
-    },
-
-    englishValue(txt) {
-      this.create.name_e = englishValue(txt);
-      this.edit.name_e = englishValue(txt);
-    },
+        englishValue(txt) {
+          this.create.name_e = englishValue(txt);
+          this.edit.name_e = englishValue(txt);
+        },
+        arabicValueBranch(txt) {
+            this.branchCreate.name = arabicValue(txt);
+            this.branchEdit.name = arabicValue(txt);
+        },
+        englishValueBranch(txt) {
+            this.branchCreate.name_e = arabicValue(txt);
+            this.branchEdit.name_e = arabicValue(txt);
+        },
         /**
          *  start get Data customers && pagination
          */
@@ -533,12 +593,10 @@ export default {
         /**
          *  create countrie
          */
-        async resetForm(){
+        resetForm(){
             this.countries = [];
             this.cities = [];
             this.bank_accounts = [];
-            if(this.isVisible('country_id'))await this.getCategory();
-            if(this.isVisible('bank_account_id'))await this.getBankAcount();
             this.create = {
                 name: '',
                 name_e: '',
@@ -558,7 +616,6 @@ export default {
             this.errors = {};
             this.is_disabled = false;
         },
-
         AddSubmit(){
             if(!this.create.name){ this.create.name = this.create.name_e}
             if(!this.create.name_e){ this.create.name_e = this.create.name}
@@ -574,6 +631,7 @@ export default {
                 adminApi.post(`/general-customer`,this.create)
                     .then((res) => {
                         this.is_disabled = true;
+                        this.customer_id = res.data.data.id;
                         this.getData();
                         setTimeout(() => {
                             Swal.fire({
@@ -755,6 +813,7 @@ export default {
                     let l = res.data.data;
                     l.unshift({ id: 0, name: "اضافة دولة", name_e: "Add Country" });
                     this.countries = l;
+                    this.branchCountries = l;
                 })
                 .catch((err) => {
                     Swal.fire({
@@ -811,22 +870,159 @@ export default {
                         });
                 }
             }
+        },
+        async getCitybranch(id = null){
+            if (id) {
+                this.branchCities = [];
+                this.branchCreate.city_id = null;
+                this.branchEdit.city_id = null;
+                await adminApi
+                    .get(`/cities?country_id=${id}`)
+                    .then((res) => {
+                        let l = res.data.data;
+                        l.unshift({ id: 0, name: "اضافة مدينة", name_e: "Add City" });
+                        this.branchCities = l;
+                    })
+                    .catch((err) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: `${this.$t("general.Error")}`,
+                            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                        });
+                    });
+            }
 
+            if(this.branchCreate.city_id  == 0 || this.create.branchCreate == 0){
+                this.$bvModal.show("city-create");
+                this.branchCreate.city_id = null;
+                this.branchCreate.city_id = null;
+            }else if(this.branchCreate.city_id  > 0 || this.create.branchCreate > 0){
+                this.branchCreate.avenue_id = null;
+                this.branchCreate.avenue_id = null;
+                let country = this.branchCreate.country_id ? this.branchCreate.country_id : this.branchCreate.country_id;
+                let city =    this.branchCreate.city_id ? this.branchCreate.city_id : this.branchCreate.city_id;
+                await adminApi
+                    .get(`/avenues?country_id=${country}&city_id=${city}`)
+                    .then((res) => {
+                        let l = res.data.data;
+                        l.unshift({ id: 0, name: "اضافة منطقه", name_e: "Add Avenue" });
+                        this.avenues = l;
+                    })
+                    .catch((err) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: `${this.$t("general.Error")}`,
+                            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                        });
+                    });
+            }
+        },
+        async getAvenue(){
+            this.branchEdit.street_id = null;
+            this.branchCreate.street_id = null;
+            let country = this.branchCreate.country_id ? this.branchCreate.country_id : this.branchEdit.country_id;
+            let city =    this.branchCreate.city_id ? this.branchCreate.city_id : this.branchEdit.city_id;
+            await adminApi
+                .get(`/avenues?country_id=${country}&city_id=${city}`)
+                .then((res) => {
+                    let l = res.data.data;
+                    l.unshift({ id: 0, name: "اضافة منطقه", name_e: "Add Avenue" });
+                    this.avenues = l;
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: `${this.$t("general.Error")}`,
+                        text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                    });
+                });
+        },
+        async showAvenueModal(id = null, id2 = null) {
+            if (this.branchCreate.avenue_id == 0 || this.branchEdit.avenue_id == 0) {
+                this.$bvModal.show("avenue-create");
+                this.branchCreate.avenue_id = null;
+                this.branchEdit.avenue_id = null;
+            }else if(this.branchCreate.avenue_id > 0 || this.branchEdit.avenue_id > 0){
+                let avenue = this.branchCreate.avenue_id ? this.branchCreate.avenue_id : this.branchEdit.avenue_id;
+                this.branchCreate.street_id = null;
+                this.branchEdit.street_id = null;
+                await
+                    adminApi
+                        .get(
+                            `/streets?avenue_id=${avenue}`
+                        )
+                        .then((res) => {
+                            let l = res.data.data;
+                            l.unshift({ id: 0, name: "اضافة شارع", name_e: "Add Street" });
+                            this.streets = l;
+                        })
+                        .catch((err) => {
+                            Swal.fire({
+                                icon: "error",
+                                title: `${this.$t("general.Error")}`,
+                                text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                            });
+                        })
+                        .finally(() => {
+                            this.isLoader = false;
+                        });
+            }
+        },
+        async getStreet(){
+            let avenue = this.branchCreate.avenue_id ? this.branchCreate.avenue_id : this.branchEdit.avenue_id;
+            this.branchCreate.street_id = null;
+            this.branchEdit.street_id = null;
+            await
+                adminApi
+                    .get(
+                        `/streets?avenue_id=${avenue}`
+                    )
+                    .then((res) => {
+                        let l = res.data.data;
+                        l.unshift({ id: 0, name: "اضافة شارع", name_e: "Add Street" });
+                        this.streets = l;
+                    })
+                    .catch((err) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: `${this.$t("general.Error")}`,
+                            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                        });
+                    })
+                    .finally(() => {
+                        this.isLoader = false;
+                    });
         },
         showCountryModal() {
-            if (this.create.country_id == 0) {
+            if (this.branchCreate.country_id == 0) {
                 this.$bvModal.show("country-create");
-                this.create.country_id = null;
-            }else {
-                this.getCity(this.create.country_id);
+                this.branchCreate.country_id = null;
+            }else if(this.branchCreate.country_id > 0){
+                this.getCity(this.branchCreate.country_id);
+            }
+        },
+        showCountryBranchModal() {
+            if (this.branchCreate.country_id == 0) {
+                this.$bvModal.show("country-create");
+                this.branchCreate.country_id = null;
+            }else if(this.branchCreate.country_id > 0){
+                this.getCitybranch(this.branchCreate.country_id);
             }
         },
         showCountryModalEdit() {
             if (this.edit.country_id == 0) {
                 this.$bvModal.show("country-create");
                 this.edit.country_id = null;
-            }else {
+            }else if(this.edit.country_id > 0){
                 this.getCity(this.edit.country_id);
+            }
+        },
+        showCountryBranchModalEdit() {
+            if (this.branchEdit.country_id == 0) {
+                this.$bvModal.show("country-create");
+                this.branchEdit.country_id = null;
+            }else if(this.branchEdit.country_id > 0){
+                this.getCitybranch(this.branchEdit.country_id);
             }
         },
         showBankAccountModal() {
@@ -841,6 +1037,13 @@ export default {
                 this.edit.bank_account_id = null;
             }
         },
+        showStreetModal(){
+            if (this.branchCreate.street_id == 0 || this.branchEdit.street_id == 0) {
+                this.$bvModal.show("create-street");
+                this.branchCreate.street_id = null;
+                this.branchEdit.street_id = null;
+            }
+        },
         ExportExcel(type, fn, dl) {
             this.enabled3 = false;
             setTimeout(() => {
@@ -853,6 +1056,17 @@ export default {
                 }
                 this.enabled3 = true;
             }, 100);
+        },
+        async getLocation() {
+            if (navigator.geolocation) {
+                return await navigator.geolocation.getCurrentPosition(this.showPosition);
+            }
+        },
+        showPosition(position) {
+            this.branchCreate.latitude = position.coords.latitude;
+            this.branchCreate.longitude = position.coords.longitude;
+            this.branchEdit.latitude = position.coords.latitude;
+            this.branchEdit.longitude = position.coords.longitude;
         }
     },
 };
@@ -864,6 +1078,8 @@ export default {
         <bankAccount :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getBankAcount" />
         <Country :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCategory" />
         <City :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getCity(create.country_id ? create.country_id: edit.country_id)" />
+        <Avenue :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getAvenue"/>
+        <Street :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getStreet" />
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -1048,368 +1264,619 @@ export default {
                             @hidden="resetModalHidden"
                         >
                             <form>
-                                <div class="mb-3 d-flex justify-content-end">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="mb-3 d-flex justify-content-end">
 
-                                    <b-button
-                                        variant="success"
-                                        :disabled="!is_disabled"
-                                        @click.prevent="resetForm"
-                                        type="button" :class="['font-weight-bold px-2',is_disabled?'mx-2': '']"
-                                    >
-                                        {{ $t('general.AddNewRecord') }}
-                                    </b-button>
-                                    <template v-if="!is_disabled">
-                                        <b-button
-                                            variant="success"
-                                            type="button" class="mx-1"
-                                            v-if="!isLoader"
-                                            @click.prevent="AddSubmit"
-                                        >
-                                            {{ $t('general.Add') }}
-                                        </b-button>
-
-                                        <b-button variant="success" class="mx-1" disabled v-else>
-                                            <b-spinner small></b-spinner>
-                                            <span class="sr-only">{{ $t('login.Loading') }}...</span>
-                                        </b-button>
-                                    </template>
-                                    <!-- Emulate built in modal footer ok and cancel button actions -->
-
-                                    <b-button variant="danger" type="button" @click.prevent="resetModalHidden">
-                                        {{ $t('general.Cancel') }}
-                                    </b-button>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4" v-if="isVisible('country_id')">
-                                        <div class="form-group position-relative">
-                                            <label class="control-label">
-                                                {{ getCompanyKey('general_customer_country') }}
-                                                <span v-if="isRequired('country_id')" class="text-danger">*</span>
-                                            </label>
-                                            <multiselect
-                                                @input="showCountryModal"
-                                                v-model="$v.create.country_id.$model"
-                                                :options="countries.map((type) => type.id)"
-                                                :custom-label="(opt) => countries.find((x) => x.id == opt).name"
+                                            <b-button
+                                                variant="success"
+                                                :disabled="!is_disabled"
+                                                @click.prevent="resetForm"
+                                                type="button" :class="['font-weight-bold px-2',is_disabled?'mx-2': '']"
                                             >
-                                            </multiselect>
-                                            <div
-                                                v-if="$v.create.country_id.$error || errors.country_id"
-                                                class="text-danger"
-                                            >
-                                                {{ $t("general.fieldIsRequired") }}
-                                            </div>
-                                            <template v-if="errors.country_id">
-                                                <ErrorMessage
-                                                    v-for="(errorMessage, index) in errors.country_id"
-                                                    :key="index"
-                                                >{{ errorMessage }}</ErrorMessage
+                                                {{ $t('general.AddNewRecord') }}
+                                            </b-button>
+                                            <template v-if="!is_disabled">
+                                                <b-button
+                                                    variant="success"
+                                                    type="button" class="mx-1"
+                                                    v-if="!isLoader"
+                                                    @click.prevent="AddSubmit"
                                                 >
+                                                    {{ $t('general.Add') }}
+                                                </b-button>
+
+                                                <b-button variant="success" class="mx-1" disabled v-else>
+                                                    <b-spinner small></b-spinner>
+                                                    <span class="sr-only">{{ $t('login.Loading') }}...</span>
+                                                </b-button>
                                             </template>
+                                            <!-- Emulate built in modal footer ok and cancel button actions -->
+
+                                            <b-button variant="danger" type="button" @click.prevent="resetModalHidden">
+                                                {{ $t('general.Cancel') }}
+                                            </b-button>
                                         </div>
                                     </div>
-                                    <div class="col-md-4" v-if="isVisible('city_id')">
-                                        <div class="form-group position-relative">
-                                            <label class="control-label">
-                                                {{ getCompanyKey('general_customer_city') }}
-                                                <span v-if="isRequired('city_id')" class="text-danger">*</span>
-                                            </label>
-                                            <multiselect
-                                                @input="getCity()"
-                                                v-model="$v.create.city_id.$model"
-                                                :options="cities.map((type) => type.id)"
-                                                :custom-label="(opt) => cities.find((x) => x.id == opt).name"
-                                            >
-                                            </multiselect>
-                                            <div
-                                                v-if="$v.create.city_id.$error || errors.city_id"
-                                                class="text-danger"
-                                            >
-                                                {{ $t("general.fieldIsRequired") }}
-                                            </div>
-                                            <template v-if="errors.city_id">
-                                                <ErrorMessage
-                                                    v-for="(errorMessage, index) in errors.city_id"
-                                                    :key="index"
-                                                >{{ errorMessage }}</ErrorMessage
-                                                >
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4"  v-if="isVisible('bank_account_id')">
-                                        <div class="form-group position-relative">
-                                            <label class="control-label">
-                                                {{ getCompanyKey('bank_account') }}
-                                                <span  v-if="isRequired('bank_account_id')" class="text-danger">*</span>
-                                            </label>
-                                            <multiselect
-                                                @input="showBankAccountModal"
-                                                v-model="$v.create.bank_account_id.$model"
-                                                :options="bank_accounts.map((type) => type.id)"
-                                                :custom-label="(opt) => bank_accounts.find((x) => x.id == opt).account_number"
-                                            >
-                                            </multiselect>
-                                            <div
-                                                v-if="$v.create.bank_account_id.$error || errors.bank_account_id"
-                                                class="text-danger"
-                                            >
-                                                {{ $t("general.fieldIsRequired") }}
-                                            </div>
-                                            <template v-if="errors.bank_account_id">
-                                                <ErrorMessage
-                                                    v-for="(errorMessage, index) in errors.bank_account_id"
-                                                    :key="index"
-                                                >{{ errorMessage }}</ErrorMessage
-                                                >
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" v-if="isVisible('name')">
-                                        <div class="form-group">
-                                            <label for="field-1" class="control-label">
-                                                {{ getCompanyKey('general_customer_name_ar') }}
-                                                <span v-if="isRequired('name')" class="text-danger">*</span>
-                                            </label>
-                                            <div dir="rtl">
-                                                <input
-                                                @keyup="arabicValue(create.name)"
-                                                    type="text"
-                                                    class="form-control"
-                                                    data-create="1"
-                                                    v-model="$v.create.name.$model"
-                                                    :class="{
+
+                                    <b-tabs nav-class="nav-tabs nav-bordered">
+                                        <b-tab :title="$t('general.DataEntry')" active>
+                                            <div class="row">
+                                                <div class="col-md-4" v-if="isVisible('country_id')">
+                                                    <div class="form-group position-relative">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey('general_customer_country') }}
+                                                            <span v-if="isRequired('country_id')" class="text-danger">*</span>
+                                                        </label>
+                                                        <multiselect
+                                                            @input="showCountryModal"
+                                                            v-model="$v.create.country_id.$model"
+                                                            :options="countries.map((type) => type.id)"
+                                                            :custom-label="(opt) => countries.find((x) => x.id == opt).name"
+                                                        >
+                                                        </multiselect>
+                                                        <div
+                                                            v-if="$v.create.country_id.$error || errors.country_id"
+                                                            class="text-danger"
+                                                        >
+                                                            {{ $t("general.fieldIsRequired") }}
+                                                        </div>
+                                                        <template v-if="errors.country_id">
+                                                            <ErrorMessage
+                                                                v-for="(errorMessage, index) in errors.country_id"
+                                                                :key="index"
+                                                            >{{ errorMessage }}</ErrorMessage
+                                                            >
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4" v-if="isVisible('city_id')">
+                                                    <div class="form-group position-relative">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey('general_customer_city') }}
+                                                            <span v-if="isRequired('city_id')" class="text-danger">*</span>
+                                                        </label>
+                                                        <multiselect
+                                                            @input="getCity()"
+                                                            v-model="$v.create.city_id.$model"
+                                                            :options="cities.map((type) => type.id)"
+                                                            :custom-label="(opt) => cities.find((x) => x.id == opt).name"
+                                                        >
+                                                        </multiselect>
+                                                        <div
+                                                            v-if="$v.create.city_id.$error || errors.city_id"
+                                                            class="text-danger"
+                                                        >
+                                                            {{ $t("general.fieldIsRequired") }}
+                                                        </div>
+                                                        <template v-if="errors.city_id">
+                                                            <ErrorMessage
+                                                                v-for="(errorMessage, index) in errors.city_id"
+                                                                :key="index"
+                                                            >{{ errorMessage }}</ErrorMessage
+                                                            >
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4"  v-if="isVisible('bank_account_id')">
+                                                    <div class="form-group position-relative">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey('bank_account') }}
+                                                            <span  v-if="isRequired('bank_account_id')" class="text-danger">*</span>
+                                                        </label>
+                                                        <multiselect
+                                                            @input="showBankAccountModal"
+                                                            v-model="$v.create.bank_account_id.$model"
+                                                            :options="bank_accounts.map((type) => type.id)"
+                                                            :custom-label="(opt) => bank_accounts.find((x) => x.id == opt).account_number"
+                                                        >
+                                                        </multiselect>
+                                                        <div
+                                                            v-if="$v.create.bank_account_id.$error || errors.bank_account_id"
+                                                            class="text-danger"
+                                                        >
+                                                            {{ $t("general.fieldIsRequired") }}
+                                                        </div>
+                                                        <template v-if="errors.bank_account_id">
+                                                            <ErrorMessage
+                                                                v-for="(errorMessage, index) in errors.bank_account_id"
+                                                                :key="index"
+                                                            >{{ errorMessage }}</ErrorMessage
+                                                            >
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3" v-if="isVisible('name')">
+                                                    <div class="form-group">
+                                                        <label for="field-1" class="control-label">
+                                                            {{ getCompanyKey('general_customer_name_ar') }}
+                                                            <span v-if="isRequired('name')" class="text-danger">*</span>
+                                                        </label>
+                                                        <div dir="rtl">
+                                                            <input
+                                                                @keyup="arabicValue(create.name)"
+                                                                type="text"
+                                                                class="form-control"
+                                                                data-create="1"
+                                                                v-model="$v.create.name.$model"
+                                                                :class="{
                                                     'is-invalid':$v.create.name.$error || errors.name,
                                                     'is-valid':!$v.create.name.$invalid && !errors.name
                                                 }"
-                                                    id="field-1"
-                                                />
-                                            </div>
-                                            <div v-if="!$v.create.name.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.create.name.$params.minLength.min }} {{ $t('general.letters') }}</div>
-                                            <div v-if="!$v.create.name.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.create.name.$params.maxLength.max }} {{ $t('general.letters') }}</div>
-                                            <template v-if="errors.name">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.name" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3"  v-if="isVisible('name_e')">
-                                        <div class="form-group">
-                                            <label for="field-2" class="control-label">
-                                                {{ getCompanyKey('general_customer_name_en') }}
-                                                <span  v-if="isRequired('name_e')" class="text-danger">*</span>
-                                            </label>
-                                            <div dir="ltr">
-                                                <input
-                                                @keyup="englishValue(create.name_e)"
-                                                    type="text"
-                                                    class="form-control"
-                                                    data-create="2"
-                                                    v-model="$v.create.name_e.$model"
-                                                    :class="{
+                                                                id="field-1"
+                                                            />
+                                                        </div>
+                                                        <div v-if="!$v.create.name.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.create.name.$params.minLength.min }} {{ $t('general.letters') }}</div>
+                                                        <div v-if="!$v.create.name.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.create.name.$params.maxLength.max }} {{ $t('general.letters') }}</div>
+                                                        <template v-if="errors.name">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.name" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3"  v-if="isVisible('name_e')">
+                                                    <div class="form-group">
+                                                        <label for="field-2" class="control-label">
+                                                            {{ getCompanyKey('general_customer_name_en') }}
+                                                            <span  v-if="isRequired('name_e')" class="text-danger">*</span>
+                                                        </label>
+                                                        <div dir="ltr">
+                                                            <input
+                                                                @keyup="englishValue(create.name_e)"
+                                                                type="text"
+                                                                class="form-control"
+                                                                data-create="2"
+                                                                v-model="$v.create.name_e.$model"
+                                                                :class="{
                                                         'is-invalid':$v.create.name_e.$error || errors.name_e,
                                                         'is-valid':!$v.create.name_e.$invalid && !errors.name_e
                                                     }"
-                                                    id="field-2"
-                                                />
-                                            </div>
-                                            <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.create.name_e.$params.minLength.min }} {{ $t('general.letters') }}</div>
-                                            <div v-if="!$v.create.name_e.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.create.name_e.$params.maxLength.max }} {{ $t('general.letters') }}</div>
-                                            <template v-if="errors.name_e">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.name_e" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" v-if="isVisible('phone')">
-                                        <div class="form-group">
-                                            <label class="control-label">
-                                                {{ getCompanyKey('general_customer_phone') }}
-                                                <span v-if="isRequired('phone')" class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                data-create="9"
-                                                v-model="$v.create.phone.$model"
-                                                :class="{
+                                                                id="field-2"
+                                                            />
+                                                        </div>
+                                                        <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.create.name_e.$params.minLength.min }} {{ $t('general.letters') }}</div>
+                                                        <div v-if="!$v.create.name_e.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.create.name_e.$params.maxLength.max }} {{ $t('general.letters') }}</div>
+                                                        <template v-if="errors.name_e">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.name_e" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3" v-if="isVisible('phone')">
+                                                    <div class="form-group">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey('general_customer_phone') }}
+                                                            <span v-if="isRequired('phone')" class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            data-create="9"
+                                                            v-model="$v.create.phone.$model"
+                                                            :class="{
                                                 'is-invalid':$v.create.phone.$error || errors.phone,
                                                 'is-valid':!$v.create.phone.$invalid && !errors.phone
                                             }"
-                                            />
-                                            <template v-if="errors.phone">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.phone" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" v-if="isVisible('email')">
-                                        <div class="form-group">
-                                            <label class="control-label">
-                                                {{ getCompanyKey('general_customer_email') }}
-                                                <span v-if="isRequired('email')" class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                data-create="9"
-                                                v-model="$v.create.email.$model"
-                                                :class="{
+                                                        />
+                                                        <template v-if="errors.phone">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.phone" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3" v-if="isVisible('email')">
+                                                    <div class="form-group">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey('general_customer_email') }}
+                                                            <span v-if="isRequired('email')" class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            data-create="9"
+                                                            v-model="$v.create.email.$model"
+                                                            :class="{
                                                 'is-invalid':$v.create.email.$error || errors.email,
                                                 'is-valid':!$v.create.email.$invalid && !errors.email
                                             }"
-                                            />
-                                            <template v-if="errors.email">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.email" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" v-if="isVisible('contact_person')">
-                                        <div class="form-group">
-                                            <label class="control-label">
-                                                {{ getCompanyKey('general_customer_contact_person') }}
-                                                <span v-if="isRequired('contact_person')" class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                data-create="9"
-                                                v-model="$v.create.contact_person.$model"
-                                                :class="{
+                                                        />
+                                                        <template v-if="errors.email">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.email" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3" v-if="isVisible('contact_person')">
+                                                    <div class="form-group">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey('general_customer_contact_person') }}
+                                                            <span v-if="isRequired('contact_person')" class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            data-create="9"
+                                                            v-model="$v.create.contact_person.$model"
+                                                            :class="{
                                                 'is-invalid':$v.create.contact_person.$error || errors.contact_person,
                                                 'is-valid':!$v.create.contact_person.$invalid && !errors.contact_person
                                             }"
-                                            />
-                                            <template v-if="errors.contact_person">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.contact_person" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" v-if="isVisible('rp_code')">
-                                        <div class="form-group">
-                                            <label  class="control-label">
-                                                {{ getCompanyKey('general_customer_code') }}
-                                                <span v-if="isRequired('rp_code')" class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                data-create="9"
-                                                v-model="$v.create.rp_code.$model"
-                                                :class="{
+                                                        />
+                                                        <template v-if="errors.contact_person">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.contact_person" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3" v-if="isVisible('rp_code')">
+                                                    <div class="form-group">
+                                                        <label  class="control-label">
+                                                            {{ getCompanyKey('general_customer_code') }}
+                                                            <span v-if="isRequired('rp_code')" class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            data-create="9"
+                                                            v-model="$v.create.rp_code.$model"
+                                                            :class="{
                                                 'is-invalid':$v.create.rp_code.$error || errors.rp_code,
                                                 'is-valid':!$v.create.rp_code.$invalid && !errors.rp_code
                                             }"
-                                            />
-                                            <template v-if="errors.rp_code">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.rp_code" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" v-if="isVisible('national_id')">
-                                        <div class="form-group">
-                                            <label  class="control-label">
-                                                {{ getCompanyKey('general_customer_national_id') }}
-                                                <span v-if="isRequired('national_id')" class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="number"
-                                                class="form-control"
-                                                data-create="9"
-                                                step="0.1"
-                                                v-model="$v.create.$model"
-                                                :class="{
+                                                        />
+                                                        <template v-if="errors.rp_code">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.rp_code" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3" v-if="isVisible('national_id')">
+                                                    <div class="form-group">
+                                                        <label  class="control-label">
+                                                            {{ getCompanyKey('general_customer_national_id') }}
+                                                            <span v-if="isRequired('national_id')" class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            class="form-control"
+                                                            data-create="9"
+                                                            step="0.1"
+                                                            v-model="$v.create.$model"
+                                                            :class="{
                                                 'is-invalid':$v.create.national_id.$error || errors.national_id,
                                                 'is-valid':!$v.create.national_id.$invalid && !errors.national_id
                                             }"
-                                            />
-                                            <template v-if="errors.national_id">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.national_id" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" v-if="isVisible('passport_no')">
-                                        <div class="form-group">
-                                            <label  class="control-label">
-                                                {{ getCompanyKey('general_customer_passport_number') }}
-                                                <span v-if="isRequired('passport_no')" class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="number"
-                                                class="form-control"
-                                                data-create="9"
-                                                step="0.1"
-                                                v-model="$v.create.passport_no.$model"
-                                                :class="{
+                                                        />
+                                                        <template v-if="errors.national_id">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.national_id" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3" v-if="isVisible('passport_no')">
+                                                    <div class="form-group">
+                                                        <label  class="control-label">
+                                                            {{ getCompanyKey('general_customer_passport_number') }}
+                                                            <span v-if="isRequired('passport_no')" class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            class="form-control"
+                                                            data-create="9"
+                                                            step="0.1"
+                                                            v-model="$v.create.passport_no.$model"
+                                                            :class="{
                                                 'is-invalid':$v.create.passport_no.$error || errors.passport_no,
                                                 'is-valid':!$v.create.passport_no.$invalid && !errors.passport_no
                                             }"
-                                            />
-                                            <template v-if="errors.passport_no">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.passport_no" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4" v-if="isVisible('contact_phone')">
-                                        <div class="form-group">
-                                            <label  class="control-label">
-                                                {{ getCompanyKey('general_customer_contact_phones') }}
-                                                <span v-if="isRequired('contact_phone')" class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="number"
-                                                class="form-control"
-                                                data-create="9"
-                                                step="0.1"
-                                                v-model="$v.create.contact_phone.$model"
-                                                :class="{
+                                                        />
+                                                        <template v-if="errors.passport_no">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.passport_no" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4" v-if="isVisible('contact_phone')">
+                                                    <div class="form-group">
+                                                        <label  class="control-label">
+                                                            {{ getCompanyKey('general_customer_contact_phones') }}
+                                                            <span v-if="isRequired('contact_phone')" class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            class="form-control"
+                                                            data-create="9"
+                                                            step="0.1"
+                                                            v-model="$v.create.contact_phone.$model"
+                                                            :class="{
                                                 'is-invalid':$v.create.contact_phone.$error || errors.contact_phone,
                                                 'is-valid':!$v.create.contact_phone.$invalid && !errors.contact_phone
                                             }"
-                                            />
-                                            <template v-if="errors.contact_phone">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.contact_phone" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" v-if="isVisible('whatsapp')">
-                                        <div class="form-group">
-                                            <label class="control-label">
-                                                {{ getCompanyKey('general_customer_whatsapp') }}
-                                                <span v-if="isRequired('whatsapp')" class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                data-create="9"
-                                                v-model="$v.create.whatsapp.$model"
-                                                :class="{
+                                                        />
+                                                        <template v-if="errors.contact_phone">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.contact_phone" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3" v-if="isVisible('whatsapp')">
+                                                    <div class="form-group">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey('general_customer_whatsapp') }}
+                                                            <span v-if="isRequired('whatsapp')" class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            data-create="9"
+                                                            v-model="$v.create.whatsapp.$model"
+                                                            :class="{
                                                 'is-invalid':$v.create.whatsapp.$error || errors.whatsapp,
                                                 'is-valid':!$v.create.whatsapp.$invalid && !errors.whatsapp
                                             }"
-                                            />
-                                            <template v-if="errors.whatsapp">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.whatsapp" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" v-if="isVisible('nationality')">
-                                        <div class="form-group">
-                                            <label class="control-label">
-                                                {{ getCompanyKey('general_customer_nationality') }}
-                                                <span v-if="isRequired('nationality')" class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                data-create="9"
-                                                v-model="$v.create.nationality.$model"
-                                                :class="{
+                                                        />
+                                                        <template v-if="errors.whatsapp">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.whatsapp" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3" v-if="isVisible('nationality')">
+                                                    <div class="form-group">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey('general_customer_nationality') }}
+                                                            <span v-if="isRequired('nationality')" class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            data-create="9"
+                                                            v-model="$v.create.nationality.$model"
+                                                            :class="{
                                                 'is-invalid':$v.create.nationality.$error || errors.nationality,
                                                 'is-valid':!$v.create.nationality.$invalid && !errors.nationality
                                             }"
-                                            />
-                                            <template v-if="errors.nationality">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.nationality" :key="index">{{ errorMessage }}</ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
+                                                        />
+                                                        <template v-if="errors.nationality">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.nationality" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </b-tab>
+                                        <b-tab
+                                            :title="$t('general.customerBranch')"
+                                        >
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="field-16" class="control-label">
+                                                            {{ getCompanyKey('general_customer_name_ar') }}
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <div dir="rtl">
+                                                            <input
+                                                                @keyup="arabicValueBranch(branchCreate.name)"
+                                                                type="text"
+                                                                class="form-control"
+                                                                data-create="1"
+                                                                v-model="$v.branchCreate.name.$model"
+                                                                :class="{
+                                                                'is-invalid':$v.branchCreate.name.$error || errors.name,
+                                                                'is-valid':!$v.branchCreate.name.$invalid && !errors.name
+                                                            }"
+                                                                id="field-16"
+                                                            />
+                                                        </div>
+                                                        <div v-if="!$v.branchCreate.name.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.branchCreate.name.$params.minLength.min }} {{ $t('general.letters') }}</div>
+                                                        <div v-if="!$v.branchCreate.name.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.branchCreate.name.$params.maxLength.max }} {{ $t('general.letters') }}</div>
+                                                        <template v-if="errors.name">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.name" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group">
+                                                        <label for="field-21" class="control-label">
+                                                            {{ getCompanyKey('general_customer_name_en') }}
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <div dir="ltr">
+                                                            <input
+                                                                @keyup="englishValueBranch(branchCreate.name_e)"
+                                                                type="text"
+                                                                class="form-control"
+                                                                data-create="2"
+                                                                v-model="$v.branchCreate.name_e.$model"
+                                                                :class="{
+                                                                'is-invalid':$v.branchCreate.name_e.$error || errors.name_e,
+                                                                'is-valid':!$v.branchCreate.name_e.$invalid && !errors.name_e
+                                                            }"
+                                                                id="field-21"
+                                                            />
+                                                        </div>
+                                                        <div v-if="!$v.branchCreate.name_e.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.branchCreate.name_e.$params.minLength.min }} {{ $t('general.letters') }}</div>
+                                                        <div v-if="!$v.branchCreate.name_e.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.branchCreate.name_e.$params.maxLength.max }} {{ $t('general.letters') }}</div>
+                                                        <template v-if="errors.name_e">
+                                                            <ErrorMessage v-for="(errorMessage,index) in errors.name_e" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6"></div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey("building_longitude") }}
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            class="form-control"
+                                                            step="0.00000000000001"
+                                                            v-model="$v.branchCreate.longitude.$model"
+                                                            :class="{
+                                                                'is-invalid': $v.branchCreate.longitude.$error || errors.longitude,
+                                                                'is-valid': !$v.branchCreate.longitude.$invalid && !errors.longitude,
+                                                              }"
+                                                        />
+                                                        <template v-if="errors.longitude">
+                                                            <ErrorMessage
+                                                                v-for="(errorMessage, index) in errors.longitude"
+                                                                :key="index"
+                                                            >{{ errorMessage }}</ErrorMessage
+                                                            >
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey("building_latitude") }}
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            class="form-control"
+                                                            data-create="9"
+                                                            step="0.00000000000001"
+                                                            v-model="$v.branchCreate.latitude.$model"
+                                                            :class="{
+                                                            'is-invalid': $v.branchCreate.latitude.$error || errors.latitude,
+                                                            'is-valid': !$v.branchCreate.latitude.$invalid && !errors.latitude,
+                                                          }"
+                                                        />
+                                                        <template v-if="errors.lat">
+                                                            <ErrorMessage
+                                                                v-for="(errorMessage, index) in errors.latitude"
+                                                                :key="index"
+                                                            >{{ errorMessage }}</ErrorMessage
+                                                            >
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 d-flex align-items-center mt-3">
+                                                    <button
+                                                        class="btn btn-primary"
+                                                        type="button"
+                                                        @click="getLocation"
+                                                    >
+                                                        {{ $t('general.location') }}
+                                                    </button>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group position-relative">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey('general_customer_country') }}
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <multiselect
+                                                            @input="showCountryBranchModal"
+                                                            v-model="$v.branchCreate.country_id.$model"
+                                                            :options="branchCountries.map((type) => type.id)"
+                                                            :custom-label="(opt) => branchCountries.find((x) => x.id == opt).name"
+                                                        >
+                                                        </multiselect>
+                                                        <div
+                                                            v-if="$v.branchCreate.country_id.$error || errors.country_id"
+                                                            class="text-danger"
+                                                        >
+                                                            {{ $t("general.fieldIsRequired") }}
+                                                        </div>
+                                                        <template v-if="errors.country_id">
+                                                            <ErrorMessage
+                                                                v-for="(errorMessage, index) in errors.country_id"
+                                                                :key="index"
+                                                            >{{ errorMessage }}</ErrorMessage
+                                                            >
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3" >
+                                                    <div class="form-group position-relative">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey('general_customer_city') }}
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <multiselect
+                                                            @input="getCitybranch()"
+                                                            v-model="$v.branchCreate.city_id.$model"
+                                                            :options="branchCities.map((type) => type.id)"
+                                                            :custom-label="(opt) => branchCities.find((x) => x.id == opt).name"
+                                                        >
+                                                        </multiselect>
+                                                        <div
+                                                            v-if="$v.branchCreate.city_id.$error || errors.city_id"
+                                                            class="text-danger"
+                                                        >
+                                                            {{ $t("general.fieldIsRequired") }}
+                                                        </div>
+                                                        <template v-if="errors.city_id">
+                                                            <ErrorMessage
+                                                                v-for="(errorMessage, index) in errors.city_id"
+                                                                :key="index"
+                                                            >{{ errorMessage }}</ErrorMessage
+                                                            >
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group position-relative">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey("avenue") }}
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <multiselect
+                                                            @input="showAvenueModal"
+                                                            v-model="$v.branchCreate.avenue_id.$model"
+                                                            :options="avenues.map((type) => type.id)"
+                                                            :custom-label="
+                                                                (opt) => avenues.find((x) => x.id == opt).name
+                                                            "
+                                                        >
+                                                        </multiselect>
+                                                        <div
+                                                            v-if="$v.branchCreate.avenue_id.$error || errors.avenue_id"
+                                                            class="text-danger"
+                                                        >
+                                                            {{ $t("general.fieldIsRequired") }}
+                                                        </div>
+                                                        <template v-if="errors.avenue_id">
+                                                            <ErrorMessage
+                                                                v-for="(errorMessage, index) in errors.avenue_id"
+                                                                :key="index"
+                                                            >{{ errorMessage }}</ErrorMessage
+                                                            >
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group position-relative">
+                                                        <label class="control-label">
+                                                            {{ getCompanyKey("street") }}
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <multiselect
+                                                            @input="showStreetModal"
+                                                            v-model="$v.branchCreate.street_id.$model"
+                                                            :options="streets.map((type) => type.id)"
+                                                            :custom-label="
+                                                                (opt) => streets.find((x) => x.id == opt).name
+                                                            "
+                                                        >
+                                                        </multiselect>
+                                                        <div
+                                                            v-if="$v.branchCreate.street_id.$error || errors.street_id"
+                                                            class="text-danger"
+                                                        >
+                                                            {{ $t("general.fieldIsRequired") }}
+                                                        </div>
+                                                        <template v-if="errors.street_id">
+                                                            <ErrorMessage
+                                                                v-for="(errorMessage, index) in errors.street_id"
+                                                                :key="index"
+                                                            >{{ errorMessage }}</ErrorMessage
+                                                            >
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </b-tab>
+                                        <b-tab
+                                            :disabled="!customer_id"
+                                            :title="$t('general.ImageUploads')"
+                                        >
+                                        </b-tab>
+                                    </b-tabs>
                                 </div>
                             </form>
                         </b-modal>
@@ -1626,356 +2093,373 @@ export default {
                                             @hidden="resetModalHiddenEdit(data.id)"
                                         >
                                             <form>
-                                                <div class="mb-3 d-flex justify-content-end">
-                                                    <!-- Emulate built in modal footer ok and cancel button actions -->
-                                                    <b-button variant="success" type="submit" class="mx-1"
-                                                              v-if="!isLoader"
-                                                              @click.prevent="editSubmit(data.id)"
-                                                    >
-                                                        {{ $t('general.Edit') }}
-                                                    </b-button>
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="mb-3 d-flex justify-content-end">
+                                                            <!-- Emulate built in modal footer ok and cancel button actions -->
+                                                            <b-button variant="success" type="submit" class="mx-1"
+                                                                      v-if="!isLoader"
+                                                                      @click.prevent="editSubmit(data.id)"
+                                                            >
+                                                                {{ $t('general.Edit') }}
+                                                            </b-button>
 
-                                                    <b-button variant="success" class="mx-1" disabled v-else>
-                                                        <b-spinner small></b-spinner>
-                                                        <span class="sr-only">{{ $t('login.Loading') }}...</span>
-                                                    </b-button>
+                                                            <b-button variant="success" class="mx-1" disabled v-else>
+                                                                <b-spinner small></b-spinner>
+                                                                <span class="sr-only">{{ $t('login.Loading') }}...</span>
+                                                            </b-button>
 
-                                                    <b-button
-                                                        variant="danger"
-                                                        type="button"
-                                                        @click.prevent="$bvModal.hide(`modal-edit-${data.id}`)"
-                                                    >
-                                                        {{ $t('general.Cancel') }}
-                                                    </b-button>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-4" v-if="isVisible('country_id')">
-                                                        <div class="form-group position-relative">
-                                                            <label class="control-label">
-                                                                {{ getCompanyKey('general_customer_country') }}
-                                                                <span v-if="isRequired('country_id')" class="text-danger">*</span>
-                                                            </label>
-                                                            <multiselect
-                                                                @input="showCountryModalEdit"
-                                                                v-model="$v.edit.country_id.$model"
-                                                                :options="countries.map((type) => type.id)"
-                                                                :custom-label="(opt) => countries.find((x) => x.id == opt).name"
+                                                            <b-button
+                                                                variant="danger"
+                                                                type="button"
+                                                                @click.prevent="$bvModal.hide(`modal-edit-${data.id}`)"
                                                             >
-                                                            </multiselect>
-                                                            <div
-                                                                v-if="$v.edit.country_id.$error || errors.country_id"
-                                                                class="text-danger"
-                                                            >
-                                                                {{ $t("general.fieldIsRequired") }}
-                                                            </div>
-                                                            <template v-if="errors.country_id">
-                                                                <ErrorMessage
-                                                                    v-for="(errorMessage, index) in errors.country_id"
-                                                                    :key="index"
-                                                                >{{ errorMessage }}</ErrorMessage
-                                                                >
-                                                            </template>
+                                                                {{ $t('general.Cancel') }}
+                                                            </b-button>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4" v-if="isVisible('city_id')">
-                                                        <div class="form-group position-relative">
-                                                            <label class="control-label">
-                                                                {{ getCompanyKey('general_customer_city') }}
-                                                                <span v-if="isRequired('city_id')" class="text-danger">*</span>
-                                                            </label>
-                                                            <multiselect
-                                                                @input="getCity"
-                                                                v-model="$v.edit.city_id.$model"
-                                                                :options="cities.map((type) => type.id)"
-                                                                :custom-label="(opt) => cities.find((x) => x.id == opt).name"
-                                                            >
-                                                            </multiselect>
-                                                            <div
-                                                                v-if="$v.edit.city_id.$error || errors.city_id"
-                                                                class="text-danger"
-                                                            >
-                                                                {{ $t("general.fieldIsRequired") }}
-                                                            </div>
-                                                            <template v-if="errors.city_id">
-                                                                <ErrorMessage
-                                                                    v-for="(errorMessage, index) in errors.city_id"
-                                                                    :key="index"
-                                                                >{{ errorMessage }}</ErrorMessage
-                                                                >
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4" v-if="isVisible('bank_account_id')">
-                                                        <div class="form-group position-relative">
-                                                            <label class="control-label">
-                                                                {{ getCompanyKey('bank_account') }}
-                                                                <span v-if="isRequired('bank_account_id')" class="text-danger">*</span>
-                                                            </label>
-                                                            <multiselect
-                                                                @input="showBankAccountEdit"
-                                                                v-model="$v.edit.bank_account_id.$model"
-                                                                :options="bank_accounts.map((type) => type.id)"
-                                                                :custom-label="(opt) => bank_accounts.find((x) => x.id == opt).account_number"
-                                                            >
-                                                            </multiselect>
-                                                            <div
-                                                                v-if="$v.edit.bank_account_id.$error || errors.bank_account_id"
-                                                                class="text-danger"
-                                                            >
-                                                                {{ $t("general.fieldIsRequired") }}
-                                                            </div>
-                                                            <template v-if="errors.bank_account_id">
-                                                                <ErrorMessage
-                                                                    v-for="(errorMessage, index) in errors.bank_account_id"
-                                                                    :key="index"
-                                                                >{{ errorMessage }}</ErrorMessage
-                                                                >
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3" v-if="isVisible('name')">
-                                                        <div class="form-group">
-                                                            <label for="field-1" class="control-label">
-                                                                {{ getCompanyKey('general_customer_name_ar') }}
-                                                                <span v-if="isRequired('name')" class="text-danger">*</span>
-                                                            </label>
-                                                            <div dir="rtl">
-                                                                <input
-                                                                @keyup="arabicValue(edit.name)"
-                                                                    type="text"
-                                                                    class="form-control"
-                                                                    data-edit="1"
-                                                                    v-model="$v.edit.name.$model"
-                                                                    :class="{
+
+                                                    <b-tabs nav-class="nav-tabs nav-bordered">
+                                                        <b-tab :title="$t('general.DataEntry')" active>
+                                                            <div class="row">
+                                                                <div class="col-md-4" v-if="isVisible('country_id')">
+                                                                    <div class="form-group position-relative">
+                                                                        <label class="control-label">
+                                                                            {{ getCompanyKey('general_customer_country') }}
+                                                                            <span v-if="isRequired('country_id')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <multiselect
+                                                                            @input="showCountryModalEdit"
+                                                                            v-model="$v.edit.country_id.$model"
+                                                                            :options="countries.map((type) => type.id)"
+                                                                            :custom-label="(opt) => countries.find((x) => x.id == opt).name"
+                                                                        >
+                                                                        </multiselect>
+                                                                        <div
+                                                                            v-if="$v.edit.country_id.$error || errors.country_id"
+                                                                            class="text-danger"
+                                                                        >
+                                                                            {{ $t("general.fieldIsRequired") }}
+                                                                        </div>
+                                                                        <template v-if="errors.country_id">
+                                                                            <ErrorMessage
+                                                                                v-for="(errorMessage, index) in errors.country_id"
+                                                                                :key="index"
+                                                                            >{{ errorMessage }}</ErrorMessage
+                                                                            >
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4" v-if="isVisible('city_id')">
+                                                                    <div class="form-group position-relative">
+                                                                        <label class="control-label">
+                                                                            {{ getCompanyKey('general_customer_city') }}
+                                                                            <span v-if="isRequired('city_id')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <multiselect
+                                                                            @input="getCity"
+                                                                            v-model="$v.edit.city_id.$model"
+                                                                            :options="cities.map((type) => type.id)"
+                                                                            :custom-label="(opt) => cities.find((x) => x.id == opt).name"
+                                                                        >
+                                                                        </multiselect>
+                                                                        <div
+                                                                            v-if="$v.edit.city_id.$error || errors.city_id"
+                                                                            class="text-danger"
+                                                                        >
+                                                                            {{ $t("general.fieldIsRequired") }}
+                                                                        </div>
+                                                                        <template v-if="errors.city_id">
+                                                                            <ErrorMessage
+                                                                                v-for="(errorMessage, index) in errors.city_id"
+                                                                                :key="index"
+                                                                            >{{ errorMessage }}</ErrorMessage
+                                                                            >
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4" v-if="isVisible('bank_account_id')">
+                                                                    <div class="form-group position-relative">
+                                                                        <label class="control-label">
+                                                                            {{ getCompanyKey('bank_account') }}
+                                                                            <span v-if="isRequired('bank_account_id')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <multiselect
+                                                                            @input="showBankAccountEdit"
+                                                                            v-model="$v.edit.bank_account_id.$model"
+                                                                            :options="bank_accounts.map((type) => type.id)"
+                                                                            :custom-label="(opt) => bank_accounts.find((x) => x.id == opt).account_number"
+                                                                        >
+                                                                        </multiselect>
+                                                                        <div
+                                                                            v-if="$v.edit.bank_account_id.$error || errors.bank_account_id"
+                                                                            class="text-danger"
+                                                                        >
+                                                                            {{ $t("general.fieldIsRequired") }}
+                                                                        </div>
+                                                                        <template v-if="errors.bank_account_id">
+                                                                            <ErrorMessage
+                                                                                v-for="(errorMessage, index) in errors.bank_account_id"
+                                                                                :key="index"
+                                                                            >{{ errorMessage }}</ErrorMessage
+                                                                            >
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3" v-if="isVisible('name')">
+                                                                    <div class="form-group">
+                                                                        <label for="field-1" class="control-label">
+                                                                            {{ getCompanyKey('general_customer_name_ar') }}
+                                                                            <span v-if="isRequired('name')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <div dir="rtl">
+                                                                            <input
+                                                                                @keyup="arabicValue(edit.name)"
+                                                                                type="text"
+                                                                                class="form-control"
+                                                                                data-edit="1"
+                                                                                v-model="$v.edit.name.$model"
+                                                                                :class="{
                                                     'is-invalid':$v.edit.name.$error || errors.name,
                                                     'is-valid':!$v.edit.name.$invalid && !errors.name
                                                 }"
-                                                                />
-                                                            </div>
-                                                            <div v-if="!$v.edit.name.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.edit.name.$params.minLength.min }} {{ $t('general.letters') }}</div>
-                                                            <div v-if="!$v.edit.name.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.edit.name.$params.maxLength.max }} {{ $t('general.letters') }}</div>
-                                                            <template v-if="errors.name">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.name" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3" v-if="isVisible('name_e')">
-                                                        <div class="form-group">
-                                                            <label for="field-2" class="control-label">
-                                                                {{ getCompanyKey('general_customer_name_en') }}
-                                                                <span v-if="isRequired('name_e')" class="text-danger">*</span>
-                                                            </label>
-                                                            <div dir="ltr">
-                                                                <input
-                                                                @keyup="englishValue(edit.name_e)"
-                                                                    type="text"
-                                                                    class="form-control"
-                                                                    data-edit="2"
-                                                                    v-model="$v.edit.name_e.$model"
-                                                                    :class="{
+                                                                            />
+                                                                        </div>
+                                                                        <div v-if="!$v.edit.name.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.edit.name.$params.minLength.min }} {{ $t('general.letters') }}</div>
+                                                                        <div v-if="!$v.edit.name.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.edit.name.$params.maxLength.max }} {{ $t('general.letters') }}</div>
+                                                                        <template v-if="errors.name">
+                                                                            <ErrorMessage v-for="(errorMessage,index) in errors.name" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3" v-if="isVisible('name_e')">
+                                                                    <div class="form-group">
+                                                                        <label for="field-2" class="control-label">
+                                                                            {{ getCompanyKey('general_customer_name_en') }}
+                                                                            <span v-if="isRequired('name_e')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <div dir="ltr">
+                                                                            <input
+                                                                                @keyup="englishValue(edit.name_e)"
+                                                                                type="text"
+                                                                                class="form-control"
+                                                                                data-edit="2"
+                                                                                v-model="$v.edit.name_e.$model"
+                                                                                :class="{
                                                         'is-invalid':$v.edit.name_e.$error || errors.name_e,
                                                         'is-valid':!$v.edit.name_e.$invalid && !errors.name_e
                                                     }"
-                                                                />
-                                                            </div>
-                                                            <div v-if="!$v.edit.name_e.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.edit.name_e.$params.minLength.min }} {{ $t('general.letters') }}</div>
-                                                            <div v-if="!$v.edit.name_e.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.edit.name_e.$params.maxLength.max }} {{ $t('general.letters') }}</div>
-                                                            <template v-if="errors.name_e">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.name_e" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3" v-if="isVisible('phone')">
-                                                        <div class="form-group">
-                                                            <label class="control-label">
-                                                                {{ getCompanyKey('general_customer_phone') }}
-                                                                <span v-if="isRequired('phone')" class="text-danger">*</span>
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                v-model="$v.edit.phone.$model"
-                                                                :class="{
+                                                                            />
+                                                                        </div>
+                                                                        <div v-if="!$v.edit.name_e.minLength" class="invalid-feedback">{{ $t('general.Itmustbeatleast') }} {{ $v.edit.name_e.$params.minLength.min }} {{ $t('general.letters') }}</div>
+                                                                        <div v-if="!$v.edit.name_e.maxLength" class="invalid-feedback">{{ $t('general.Itmustbeatmost') }}  {{ $v.edit.name_e.$params.maxLength.max }} {{ $t('general.letters') }}</div>
+                                                                        <template v-if="errors.name_e">
+                                                                            <ErrorMessage v-for="(errorMessage,index) in errors.name_e" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3" v-if="isVisible('phone')">
+                                                                    <div class="form-group">
+                                                                        <label class="control-label">
+                                                                            {{ getCompanyKey('general_customer_phone') }}
+                                                                            <span v-if="isRequired('phone')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <input
+                                                                            type="text"
+                                                                            class="form-control"
+                                                                            data-edit="9"
+                                                                            v-model="$v.edit.phone.$model"
+                                                                            :class="{
                                                                     'is-invalid':$v.edit.phone.$error || errors.phone,
                                                                     'is-valid':!$v.edit.phone.$invalid && !errors.phone
                                                                 }"
-                                                            />
-                                                            <template v-if="errors.phone">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.phone" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3" v-if="isVisible('email')">
-                                                        <div class="form-group">
-                                                            <label class="control-label">
-                                                                {{ getCompanyKey('general_customer_email') }}
-                                                                <span v-if="isRequired('email')" class="text-danger">*</span>
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                class="form-control"
-                                                                v-model="$v.edit.email.$model"
-                                                                :class="{
+                                                                        />
+                                                                        <template v-if="errors.phone">
+                                                                            <ErrorMessage v-for="(errorMessage,index) in errors.phone" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3" v-if="isVisible('email')">
+                                                                    <div class="form-group">
+                                                                        <label class="control-label">
+                                                                            {{ getCompanyKey('general_customer_email') }}
+                                                                            <span v-if="isRequired('email')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <input
+                                                                            type="text"
+                                                                            class="form-control"
+                                                                            v-model="$v.edit.email.$model"
+                                                                            :class="{
                                                 'is-invalid':$v.edit.email.$error || errors.email,
                                                 'is-valid':!$v.edit.email.$invalid && !errors.email
                                             }"
-                                                            />
-                                                            <template v-if="errors.email">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.email" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3" v-if="isVisible('contact_person')">
-                                                        <div class="form-group">
-                                                            <label class="control-label">
-                                                                {{ getCompanyKey('general_customer_contact_person') }}
-                                                                <span v-if="isRequired('contact_person')" class="text-danger">*</span>
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                v-model="$v.edit.contact_person.$model"
-                                                                :class="{
+                                                                        />
+                                                                        <template v-if="errors.email">
+                                                                            <ErrorMessage v-for="(errorMessage,index) in errors.email" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3" v-if="isVisible('contact_person')">
+                                                                    <div class="form-group">
+                                                                        <label class="control-label">
+                                                                            {{ getCompanyKey('general_customer_contact_person') }}
+                                                                            <span v-if="isRequired('contact_person')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <input
+                                                                            type="text"
+                                                                            class="form-control"
+                                                                            data-edit="9"
+                                                                            v-model="$v.edit.contact_person.$model"
+                                                                            :class="{
                                                 'is-invalid':$v.edit.contact_person.$error || errors.contact_person,
                                                 'is-valid':!$v.edit.contact_person.$invalid && !errors.contact_person
                                             }"
-                                                            />
-                                                            <template v-if="errors.contact_person">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.contact_person" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3" v-if="isVisible('rp_code')">
-                                                        <div class="form-group">
-                                                            <label  class="control-label">
-                                                                {{ getCompanyKey('general_customer_code') }}
-                                                                <span v-if="isRequired('rp_code')" class="text-danger">*</span>
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                v-model="$v.edit.rp_code.$model"
-                                                                :class="{
+                                                                        />
+                                                                        <template v-if="errors.contact_person">
+                                                                            <ErrorMessage v-for="(errorMessage,index) in errors.contact_person" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3" v-if="isVisible('rp_code')">
+                                                                    <div class="form-group">
+                                                                        <label  class="control-label">
+                                                                            {{ getCompanyKey('general_customer_code') }}
+                                                                            <span v-if="isRequired('rp_code')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <input
+                                                                            type="text"
+                                                                            class="form-control"
+                                                                            data-edit="9"
+                                                                            v-model="$v.edit.rp_code.$model"
+                                                                            :class="{
                                                                     'is-invalid':$v.edit.rp_code.$error || errors.rp_code,
                                                                     'is-valid':!$v.edit.rp_code.$invalid && !errors.rp_code
                                                                 }"
-                                                            />
-                                                            <template v-if="errors.rp_code">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.rp_code" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3" v-if="isVisible('national_id')">
-                                                        <div class="form-group">
-                                                            <label  class="control-label">
-                                                                {{ getCompanyKey('general_customer_national_id') }}
-                                                                <span v-if="isRequired('national_id')" class="text-danger">*</span>
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                step="0.1"
-                                                                v-model="$v.edit.national_id.$model"
-                                                                :class="{
+                                                                        />
+                                                                        <template v-if="errors.rp_code">
+                                                                            <ErrorMessage v-for="(errorMessage,index) in errors.rp_code" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3" v-if="isVisible('national_id')">
+                                                                    <div class="form-group">
+                                                                        <label  class="control-label">
+                                                                            {{ getCompanyKey('general_customer_national_id') }}
+                                                                            <span v-if="isRequired('national_id')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <input
+                                                                            type="number"
+                                                                            class="form-control"
+                                                                            data-edit="9"
+                                                                            step="0.1"
+                                                                            v-model="$v.edit.national_id.$model"
+                                                                            :class="{
                                                 'is-invalid':$v.edit.national_id.$error || errors.national_id,
                                                 'is-valid':!$v.edit.national_id.$invalid && !errors.national_id
                                             }"
-                                                            />
-                                                            <template v-if="errors.national_id">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.national_id" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3" v-if="isVisible('passport_no')">
-                                                        <div class="form-group">
-                                                            <label  class="control-label">
-                                                                {{ getCompanyKey('general_customer_passport_number') }}
-                                                                <span v-if="isRequired('passport_no')" class="text-danger">*</span>
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                step="0.1"
-                                                                v-model="$v.edit.passport_no.$model"
-                                                                :class="{
+                                                                        />
+                                                                        <template v-if="errors.national_id">
+                                                                            <ErrorMessage v-for="(errorMessage,index) in errors.national_id" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3" v-if="isVisible('passport_no')">
+                                                                    <div class="form-group">
+                                                                        <label  class="control-label">
+                                                                            {{ getCompanyKey('general_customer_passport_number') }}
+                                                                            <span v-if="isRequired('passport_no')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <input
+                                                                            type="number"
+                                                                            class="form-control"
+                                                                            data-edit="9"
+                                                                            step="0.1"
+                                                                            v-model="$v.edit.passport_no.$model"
+                                                                            :class="{
                                                                     'is-invalid':$v.edit.passport_no.$error || errors.passport_no,
                                                                     'is-valid':!$v.edit.passport_no.$invalid && !errors.passport_no
                                                                 }"
-                                                            />
-                                                            <template v-if="errors.passport_no">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.passport_no" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4" v-if="isVisible('contact_phone')">
-                                                        <div class="form-group">
-                                                            <label  class="control-label">
-                                                                {{ getCompanyKey('general_customer_contact_phones') }}
-                                                                <span v-if="isRequired('contact_phone')" class="text-danger">*</span>
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                step="0.1"
-                                                                v-model="$v.edit.contact_phone.$model"
-                                                                :class="{
+                                                                        />
+                                                                        <template v-if="errors.passport_no">
+                                                                            <ErrorMessage v-for="(errorMessage,index) in errors.passport_no" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4" v-if="isVisible('contact_phone')">
+                                                                    <div class="form-group">
+                                                                        <label  class="control-label">
+                                                                            {{ getCompanyKey('general_customer_contact_phones') }}
+                                                                            <span v-if="isRequired('contact_phone')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <input
+                                                                            type="number"
+                                                                            class="form-control"
+                                                                            data-edit="9"
+                                                                            step="0.1"
+                                                                            v-model="$v.edit.contact_phone.$model"
+                                                                            :class="{
                                                                     'is-invalid':$v.edit.contact_phone.$error || errors.contact_phone,
                                                                     'is-valid':!$v.edit.contact_phone.$invalid && !errors.contact_phone
                                                                 }"
-                                                            />
-                                                            <template v-if="errors.contact_phone">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.contact_phone" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3" v-if="isVisible('whatsapp')">
-                                                        <div class="form-group">
-                                                            <label class="control-label">
-                                                                {{ getCompanyKey('general_customer_whatsapp') }}
-                                                                <span v-if="isRequired('whatsapp')" class="text-danger">*</span>
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                v-model="$v.edit.whatsapp.$model"
-                                                                :class="{
+                                                                        />
+                                                                        <template v-if="errors.contact_phone">
+                                                                            <ErrorMessage v-for="(errorMessage,index) in errors.contact_phone" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3" v-if="isVisible('whatsapp')">
+                                                                    <div class="form-group">
+                                                                        <label class="control-label">
+                                                                            {{ getCompanyKey('general_customer_whatsapp') }}
+                                                                            <span v-if="isRequired('whatsapp')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <input
+                                                                            type="text"
+                                                                            class="form-control"
+                                                                            data-edit="9"
+                                                                            v-model="$v.edit.whatsapp.$model"
+                                                                            :class="{
                                                                     'is-invalid':$v.edit.whatsapp.$error || errors.whatsapp,
                                                                     'is-valid':!$v.edit.whatsapp.$invalid && !errors.whatsapp
                                                                 }"
-                                                            />
-                                                            <template v-if="errors.whatsapp">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.whatsapp" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3"  v-if="isVisible('nationality')">
-                                                        <div class="form-group">
-                                                            <label class="control-label">
-                                                                {{ getCompanyKey('general_customer_nationality') }}
-                                                                <span  v-if="isRequired('nationality')" class="text-danger">*</span>
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                class="form-control"
-                                                                data-edit="9"
-                                                                v-model="$v.edit.nationality.$model"
-                                                                :class="{
+                                                                        />
+                                                                        <template v-if="errors.whatsapp">
+                                                                            <ErrorMessage v-for="(errorMessage,index) in errors.whatsapp" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3"  v-if="isVisible('nationality')">
+                                                                    <div class="form-group">
+                                                                        <label class="control-label">
+                                                                            {{ getCompanyKey('general_customer_nationality') }}
+                                                                            <span  v-if="isRequired('nationality')" class="text-danger">*</span>
+                                                                        </label>
+                                                                        <input
+                                                                            type="text"
+                                                                            class="form-control"
+                                                                            data-edit="9"
+                                                                            v-model="$v.edit.nationality.$model"
+                                                                            :class="{
                                                                     'is-invalid':$v.edit.nationality.$error || errors.nationality,
                                                                     'is-valid':!$v.edit.nationality.$invalid && !errors.nationality
                                                                 }"
-                                                            />
-                                                            <template v-if="errors.nationality">
-                                                                <ErrorMessage v-for="(errorMessage,index) in errors.nationality" :key="index">{{ errorMessage }}</ErrorMessage>
-                                                            </template>
-                                                        </div>
-                                                    </div>
+                                                                        />
+                                                                        <template v-if="errors.nationality">
+                                                                            <ErrorMessage v-for="(errorMessage,index) in errors.nationality" :key="index">{{ errorMessage }}</ErrorMessage>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </b-tab>
+                                                        <b-tab
+                                                            :title="$t('general.ImageUploads')"
+                                                        >
+                                                        </b-tab>
+                                                        <b-tab
+                                                            :title="$t('general.ImageUploads')"
+                                                        >
+                                                        </b-tab>
+                                                    </b-tabs>
                                                 </div>
                                             </form>
                                         </b-modal>
@@ -2012,7 +2496,7 @@ export default {
         </div>
     </Layout>
 </template>
-<style scope>
+<style scoped>
 .dropdown-menu-custom-company.dropdown .dropdown-menu {
     padding: 5px 10px !important;
     overflow-y: scroll;

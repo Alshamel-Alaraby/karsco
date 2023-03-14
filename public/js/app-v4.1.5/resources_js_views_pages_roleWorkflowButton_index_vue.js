@@ -2977,7 +2977,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 _this15.isLoader = true;
                 _context7.next = 3;
-                return axios.get("".concat("https://alshamelalaraby.com/", "api/everything_about_the_company/").concat(_this15.company_id)).then(function (res) {
+                return axios.get("".concat("http://alshamel-administrator.com/", "api/everything_about_the_company/").concat(_this15.company_id)).then(function (res) {
                   var l = res.data.data;
                   _this15.buttons = l.buttons;
                   _this15.workflows = l.work_flow_trees;
@@ -3673,6 +3673,11 @@ var menuItems = [{
     label: 'menuitems.dashboard.list.avenue',
     name: "avenue",
     link: '/dashboard/avenue'
+  }, {
+    id: 8,
+    label: 'general.street',
+    name: "street",
+    link: '/dashboard/street'
   }]
 }, {
   id: 10001,
@@ -3788,11 +3793,7 @@ var menuItems = [{
     }, {
       id: 100021,
       name: 'contract unit',
-<<<<<<< HEAD:public/js/app-v4.1.4/resources_js_views_pages_roleWorkflowButton_index_vue.js
       label: 'general.invoice',
-=======
-      label: 'general.Invoice',
->>>>>>> b7efc7009968c4a85933b54bc00a732a6fa60ea2:public/js/app-v4.1.5/resources_js_views_pages_roleWorkflowButton_index_vue.js
       link: '/dashboard/realEstate/contractunit'
     }]
   }, {
@@ -3897,8 +3898,8 @@ var menuItems = [{
     subItems: [{
       id: 102275,
       name: 'building wallet',
-      label: 'general.tasks',
-      link: '/dashboard/boardRent/soctor'
+      label: 'general.sector',
+      link: '/dashboard/boardRent/sector'
     }]
   }]
 }, {

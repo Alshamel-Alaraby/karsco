@@ -671,7 +671,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-
     resetModal() {
       this.create = {
         name: "",

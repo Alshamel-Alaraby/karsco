@@ -54,7 +54,6 @@
                 type="text"
                 class="form-control"
                 data-create="1"
-                @keypress.enter="moveInput('input', 'create', 2)"
                 v-model="$v.create.name.$model"
                 :class="{
                   'is-invalid': $v.create.name.$error || errors.name,
@@ -90,7 +89,6 @@
                 type="text"
                 class="form-control"
                 data-create="2"
-                @keypress.enter="moveInput('input', 'create', 3)"
                 v-model="$v.create.name_e.$model"
                 :class="{
                   'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -117,7 +115,7 @@
               </template>
             </div>
           </div>
-             <div class="col-md-12" v-if="isVisible('is_active')">
+          <div class="col-md-12" v-if="isVisible('is_active')">
                     <div class="form-group">
                       <label class="mr-2">
                         {{ getCompanyKey("avenue_status") }}
@@ -175,7 +173,7 @@
             type="submit"
             class="mx-1"
             v-if="!isLoader"
-            @click.prevent="editSubmit()"
+            @click.prevent="editSubmit"
           >
             {{ $t("general.Edit") }}
           </b-button>
@@ -205,7 +203,6 @@
                 type="text"
                 class="form-control"
                 data-edit="1"
-                @keypress.enter="moveInput('input', 'edit', 2)"
                 v-model="$v.edit.name.$model"
                 :class="{
                   'is-invalid': $v.edit.name.$error || errors.name,
@@ -240,8 +237,6 @@
                 @keyup="englishValue(edit.name_e)"
                 type="text"
                 class="form-control"
-                data-edit="2"
-                @keypress.enter="moveInput('input', 'edit', 3)"
                 v-model="$v.edit.name_e.$model"
                 :class="{
                   'is-invalid': $v.edit.name_e.$error || errors.name_e,
@@ -327,7 +322,6 @@ import ErrorMessage from "../components/widgets/errorMessage";
 import loader from "../components/loader";
 import Multiselect from "vue-multiselect";
 import transMixinComp from "../helper/translation-comp-mixin";
-import { dynamicSortNumber, dynamicSortString } from "../helper/tableSort";
 import { formatDateOnly } from "../helper/startDate";
 import { arabicValue, englishValue } from "../helper/langTransform";
 
@@ -594,7 +588,7 @@ export default {
           })
           .then((res) => {
             this.is_disabled = true;
-            this.$emit("created");
+            this.$emit("created", res.data.data.id);
             setTimeout(() => {
               Swal.fire({
                 icon: "success",
@@ -624,16 +618,12 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     formatDate(value) {
       return formatDateOnly(value);
     },
     arabicValue(txt) {
       this.create.name = arabicValue(txt);
     },
-
     englishValue(txt) {
       this.create.name_e = englishValue(txt);
     },

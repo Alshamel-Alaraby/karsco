@@ -2720,6 +2720,11 @@ var menuItems = [{
     label: 'menuitems.dashboard.list.avenue',
     name: "avenue",
     link: '/dashboard/avenue'
+  }, {
+    id: 8,
+    label: 'general.street',
+    name: "street",
+    link: '/dashboard/street'
   }]
 }, {
   id: 10001,
@@ -2835,7 +2840,7 @@ var menuItems = [{
     }, {
       id: 100021,
       name: 'contract unit',
-      label: 'general.Invoice',
+      label: 'general.invoice',
       link: '/dashboard/realEstate/contractunit'
     }]
   }, {
@@ -2940,8 +2945,8 @@ var menuItems = [{
     subItems: [{
       id: 102275,
       name: 'building wallet',
-      label: 'general.tasks',
-      link: '/dashboard/boardRent/soctor'
+      label: 'general.sector',
+      link: '/dashboard/boardRent/sector'
     }]
   }]
 }, {
@@ -12425,7 +12430,7 @@ var render = function () {
                                     _vm._v(
                                       _vm._s(
                                         _vm.getCompanyKey(
-                                          "boardRealestate_sellMethod_name_ar"
+                                          "boardRent_sellMethod_name_ar"
                                         )
                                       ) +
                                         "\n                                    "
@@ -12451,7 +12456,7 @@ var render = function () {
                                       "\n                                        " +
                                         _vm._s(
                                           _vm.getCompanyKey(
-                                            "boardRealestate_sellMethod_name_en"
+                                            "boardRent_sellMethod_name_en"
                                           )
                                         ) +
                                         "\n                                    "
@@ -12716,7 +12721,7 @@ var render = function () {
                                       _vm._v(
                                         _vm._s(
                                           _vm.getCompanyKey(
-                                            "boardRealestate_sellMethod_name_ar"
+                                            "boardRent_sellMethod_name_ar"
                                           )
                                         ) +
                                           "\n                                        "
@@ -12741,7 +12746,7 @@ var render = function () {
                                         "\n                                            " +
                                           _vm._s(
                                             _vm.getCompanyKey(
-                                              "boardRealestate_sellMethod_name_en"
+                                              "boardRent_sellMethod_name_en"
                                             )
                                           ) +
                                           "\n                                        "
@@ -12898,7 +12903,7 @@ var render = function () {
                     attrs: {
                       id: "create",
                       title: _vm.getCompanyKey(
-                        "boardRealestate_sellMethod_create_form"
+                        "boardRent_sellMethod_create_form"
                       ),
                       "title-class": "font-18",
                       "body-class": "p-4 ",
@@ -13171,7 +13176,7 @@ var render = function () {
                                     "\n                                            " +
                                       _vm._s(
                                         _vm.getCompanyKey(
-                                          "boardRealestate_sellMethod_name_en"
+                                          "boardRent_sellMethod_name_en"
                                         )
                                       ) +
                                       "\n                                            "
@@ -13402,7 +13407,7 @@ var render = function () {
                                         _vm._v(
                                           _vm._s(
                                             _vm.getCompanyKey(
-                                              "boardRealestate_sellMethod_name_ar"
+                                              "boardRent_sellMethod_name_ar"
                                             )
                                           )
                                         ),
@@ -13449,7 +13454,7 @@ var render = function () {
                                         _vm._v(
                                           _vm._s(
                                             _vm.getCompanyKey(
-                                              "boardRealestate_sellMethod_name_en"
+                                              "boardRent_sellMethod_name_en"
                                             )
                                           )
                                         ),
@@ -13771,7 +13776,7 @@ var render = function () {
                                                 attrs: {
                                                   id: "modal-edit-" + data.id,
                                                   title: _vm.getCompanyKey(
-                                                    "boardRealestate_sellMethod_edit_form"
+                                                    "boardRent_sellMethod_edit_form"
                                                   ),
                                                   "title-class": "font-18",
                                                   "body-class": "p-4",
@@ -13939,7 +13944,7 @@ var render = function () {
                                                                     "\n                                                            " +
                                                                       _vm._s(
                                                                         _vm.getCompanyKey(
-                                                                          "boardRealestate_sellMethod_name_ar"
+                                                                          "boardRent_sellMethod_name_ar"
                                                                         )
                                                                       ) +
                                                                       "\n                                                            "
@@ -14189,7 +14194,7 @@ var render = function () {
                                                                     "\n                                                            " +
                                                                       _vm._s(
                                                                         _vm.getCompanyKey(
-                                                                          "boardRealestate_sellMethod_name_en"
+                                                                          "boardRent_sellMethod_name_en"
                                                                         )
                                                                       ) +
                                                                       "\n                                                            "

@@ -8695,6 +8695,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       per_page: 6,
       type: "",
       search: "",
+      expanded: [],
       favourite: false,
       debounce: {},
       archivesPagination: {},
@@ -8830,9 +8831,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   methods: {
     setChildNodes: function setChildNodes(result) {
+      var _this4 = this;
       _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-archive-files/getKeys?doc_type_id=".concat(result.node.doc_type_id, "\n      &arch_department_id=").concat(result.node.arch_department_id, "&key_name_e=").concat(result.node.name_e)).then(function (res) {
         result.node.children = res.data;
         result.expanded.push(result.node);
+        _this4.expanded = result.expanded;
       });
     },
     getFieldData: function getFieldData() {
@@ -8857,51 +8860,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     getArchiveFiles: function getArchiveFiles(docId) {
-      var _this4 = this;
+      var _this5 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _this4.arch_doc_type_id = docId;
-                if (_this4.currentNode.archive_file) {
+                _this5.arch_doc_type_id = docId;
+                if (_this5.currentNode.archive_file) {
                   _context2.next = 3;
                   break;
                 }
                 return _context2.abrupt("return");
               case 3:
                 _context2.next = 5;
-                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-archive-files/valueMedia?value=".concat(_typeof(_this4.currentNode.name_e) === 'object' ? _this4.currentNode.name_e.name_e : _this4.currentNode.name_e, "&department_id=").concat(_this4.currentNode.archive_file.arch_department_id, "\n          &parent_arch_doc_type_id=").concat(_this4.currentNode.parent_doc_id, "\n          &arch_doc_type_id=").concat(_this4.arch_doc_type_id ? _this4.arch_doc_type_id : "", "\n          &page=").concat(_this4.current_page, "&per_page=").concat(_this4.per_page)).then(function (res) {
-                  var l = res.data;
-                  _this4.archiveFiles = l.data;
-                  _this4.archivesPagination = l.pagination;
-                  _this4.current_page = l.pagination.current_page;
-                })["catch"](function (err) {
-                  sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
-                    icon: "error",
-                    title: "".concat(_this4.$t("general.Error")),
-                    text: "".concat(_this4.$t("general.Thereisanerrorinthesystem"))
-                  });
-                })["finally"](function () {
-                  _this4.isLoader = false;
-                });
-              case 5:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2);
-      }))();
-    },
-    getArchiveFilesByDepartmentDocument: function getArchiveFilesByDepartmentDocument(departmentId, parentDocumentId) {
-      var _this5 = this;
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                _context3.next = 2;
-                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("arch-archive-files/files_Department_Doc_Type?arch_department_id=".concat(departmentId, "&arch_doc_type_id=").concat(parentDocumentId ? parentDocumentId : "", "&page=").concat(_this5.current_page, "&per_page=").concat(_this5.per_page)).then(function (res) {
+                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-archive-files/valueMedia?value=".concat(_typeof(_this5.currentNode.name_e) === 'object' ? _this5.currentNode.name_e.name_e : _this5.currentNode.name_e, "&department_id=").concat(_this5.currentNode.archive_file.arch_department_id, "\n          &parent_arch_doc_type_id=").concat(_this5.currentNode.parent_doc_id, "\n          &arch_doc_type_id=").concat(_this5.arch_doc_type_id ? _this5.arch_doc_type_id : "", "\n          &page=").concat(_this5.current_page, "&per_page=").concat(_this5.per_page)).then(function (res) {
                   var l = res.data;
                   _this5.archiveFiles = l.data;
                   _this5.archivesPagination = l.pagination;
@@ -8915,6 +8888,36 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 })["finally"](function () {
                   _this5.isLoader = false;
                 });
+              case 5:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }))();
+    },
+    getArchiveFilesByDepartmentDocument: function getArchiveFilesByDepartmentDocument(departmentId, parentDocumentId) {
+      var _this6 = this;
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("arch-archive-files/files_Department_Doc_Type?arch_department_id=".concat(departmentId, "&arch_doc_type_id=").concat(parentDocumentId ? parentDocumentId : "", "&page=").concat(_this6.current_page, "&per_page=").concat(_this6.per_page)).then(function (res) {
+                  var l = res.data;
+                  _this6.archiveFiles = l.data;
+                  _this6.archivesPagination = l.pagination;
+                  _this6.current_page = l.pagination.current_page;
+                })["catch"](function (err) {
+                  sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
+                    icon: "error",
+                    title: "".concat(_this6.$t("general.Error")),
+                    text: "".concat(_this6.$t("general.Thereisanerrorinthesystem"))
+                  });
+                })["finally"](function () {
+                  _this6.isLoader = false;
+                });
               case 2:
               case "end":
                 return _context3.stop();
@@ -8924,16 +8927,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     getDocumentFields: function getDocumentFields(node) {
-      var _this6 = this;
+      var _this7 = this;
       _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-doc-type-field/id-doctype-field/".concat(node.id)).then(function (res) {
         node.doc_type_field = res.data.data;
-        _this6.lockups = [];
+        _this7.lockups = [];
         node.doc_type_field.sort(function (a, b) {
           return parseInt(a.field_order) > parseInt(b.field_order) ? 1 : -1;
         });
-        _this6.nodeFields = _toConsumableArray(node.doc_type_field).map(function (field) {
+        _this7.nodeFields = _toConsumableArray(node.doc_type_field).map(function (field) {
           if (field.doc_field_id.data_type.name_e == "Lookup (table)") {
-            _this6.getLookup(field.doc_field_id.lookup_table, field.doc_field_id.lookup_table_column, field.doc_field_id.name_e);
+            _this7.getLookup(field.doc_field_id.lookup_table, field.doc_field_id.lookup_table_column, field.doc_field_id.name_e);
           }
           // if (field.doc_field_id.data_type.name_e == "ENUM (droplist)") {
           //    this.getProperties();
@@ -8942,7 +8945,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             value: ""
           });
         });
-        _this6.getProperties();
+        _this7.getProperties();
       });
     },
     getCurrentTreeProps: function getCurrentTreeProps(treePropertyId) {
@@ -8974,7 +8977,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.properties = props;
     },
     updateCurrentPropertyTreeList: function updateCurrentPropertyTreeList() {
-      var _this7 = this;
+      var _this8 = this;
       _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("tree-properties/child-nodes/".concat(this.treePropId)).then(function (res) {
         var l = res.data;
         l.unshift({
@@ -8983,16 +8986,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           name_e: "Add property"
         });
         var currProp = null;
-        var treePropId = _this7.treePropId;
-        _this7.properties.forEach(function (prop) {
+        var treePropId = _this8.treePropId;
+        _this8.properties.forEach(function (prop) {
           if (prop.tree_property_id == treePropId) {
             currProp = prop;
             return;
           }
         });
         currProp.list = l;
-        _this7.dropListPopup = false;
-        _this7.treePropId = null;
+        _this8.dropListPopup = false;
+        _this8.treePropId = null;
       });
     },
     print: function print() {
@@ -9023,7 +9026,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       })[0];
     },
     getFields: function getFields(id) {
-      var _this8 = this;
+      var _this9 = this;
       this.from = 0;
       this.to = 0;
       this.toDate = new Date();
@@ -9035,21 +9038,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
       this.isLoader = true;
       _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("arch-archive-files/docType-child-archiv-files?doc_type_id=".concat(id)).then(function (res) {
-        _this8.fields = res.data;
-        if (_this8.fields.length) {
-          _this8.searchFieldId = _this8.fields[0].name_e;
-          _this8.currentField = _this8.fields.filter(function (field) {
-            return field.name_e == _this8.searchFieldId;
+        _this9.fields = res.data;
+        if (_this9.fields.length) {
+          _this9.searchFieldId = _this9.fields[0].name_e;
+          _this9.currentField = _this9.fields.filter(function (field) {
+            return field.name_e == _this9.searchFieldId;
           })[0];
         }
-        _this8.isLoader = false;
+        _this9.isLoader = false;
       })["catch"](function (err) {
         sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
           icon: "error",
-          title: "".concat(_this8.$t("general.Error")),
-          text: "".concat(_this8.$t("general.Thereisanerrorinthesystem"))
+          title: "".concat(_this9.$t("general.Error")),
+          text: "".concat(_this9.$t("general.Thereisanerrorinthesystem"))
         });
-        _this8.isLoader = false;
+        _this9.isLoader = false;
       })["finally"](function () {});
     },
     showFileModal: function showFileModal(file) {
@@ -9063,7 +9066,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       console.log("dbl clicked");
     },
     getLookup: function getLookup(table, column, field_name) {
-      var _this9 = this;
+      var _this10 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
@@ -9073,18 +9076,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/document-field/column-data/".concat(table, "/").concat(column)).then(function (res) {
                   var l = res.data;
                   l.data.unshift({
-                    id: _this9.$i18n.locale == "ar" ? "اضف" : "Add",
+                    id: _this10.$i18n.locale == "ar" ? "اضف" : "Add",
                     name: "اضف",
                     name_e: "Add"
                   });
                   var result = null;
-                  if (_this9.lockupTableObject) {
-                    result = _this9.lockups.find(function (e) {
-                      return _this9.lockupTableObject.lookup_table == e.table;
+                  if (_this10.lockupTableObject) {
+                    result = _this10.lockups.find(function (e) {
+                      return _this10.lockupTableObject.lookup_table == e.table;
                     });
                     result.field_data = l.data;
                   } else {
-                    _this9.lockups.push({
+                    _this10.lockups.push({
                       field_name: field_name,
                       column: column,
                       table: table,
@@ -9094,11 +9097,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 })["catch"](function (err) {
                   sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                     icon: "error",
-                    title: "".concat(_this9.$t("general.Error")),
-                    text: "".concat(_this9.$t("general.Thereisanerrorinthesystem"))
+                    title: "".concat(_this10.$t("general.Error")),
+                    text: "".concat(_this10.$t("general.Thereisanerrorinthesystem"))
                   });
                 })["finally"](function () {
-                  _this9.isLoader = false;
+                  _this10.isLoader = false;
                 });
               case 2:
               case "end":
@@ -9178,13 +9181,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     getTree: function getTree() {
-      var _this10 = this;
+      var _this11 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _this10.isLoader = true;
+                _this11.isLoader = true;
                 _context5.next = 3;
                 return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-department/parent_department").then(function (res) {
                   var root = res.data.data;
@@ -9199,15 +9202,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       });
                     }
                   });
-                  _this10.root = root;
+                  _this11.root = root;
                 })["catch"](function (err) {
                   sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                     icon: "error",
-                    title: "".concat(_this10.$t("general.Error")),
-                    text: "".concat(_this10.$t("general.Thereisanerrorinthesystem"))
+                    title: "".concat(_this11.$t("general.Error")),
+                    text: "".concat(_this11.$t("general.Thereisanerrorinthesystem"))
                   });
                 })["finally"](function () {
-                  _this10.isLoader = false;
+                  _this11.isLoader = false;
                 });
               case 3:
               case "end":
@@ -9218,7 +9221,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     getPdf: function getPdf(id) {
-      var _this11 = this;
+      var _this12 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
@@ -9236,8 +9239,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 })["catch"](function (err) {
                   sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                     icon: "error",
-                    title: "".concat(_this11.$t("general.Error")),
-                    text: "".concat(_this11.$t("general.Thereisanerrorinthesystem"))
+                    title: "".concat(_this12.$t("general.Error")),
+                    text: "".concat(_this12.$t("general.Thereisanerrorinthesystem"))
                   });
                 });
               case 4:
@@ -9253,7 +9256,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      */
     getData: function getData() {
       var _arguments = arguments,
-        _this12 = this;
+        _this13 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var page;
         return _regeneratorRuntime().wrap(function _callee7$(_context7) {
@@ -9261,45 +9264,45 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context7.prev = _context7.next) {
               case 0:
                 page = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : 1;
-                _this12.searchFinished = false;
-                _this12.isLoader = true;
-                if (_this12.from && !_this12.to) {
-                  _this12.to = _this12.from;
+                _this13.searchFinished = false;
+                _this13.isLoader = true;
+                if (_this13.from && !_this13.to) {
+                  _this13.to = _this13.from;
                 }
-                if (_this12.fromDate && !_this12.toDate) {
-                  _this12.toDate = _this12.fromDate;
+                if (_this13.fromDate && !_this13.toDate) {
+                  _this13.toDate = _this13.fromDate;
                 }
-                if (_this12.to && !_this12.from) {
-                  _this12.from = _this12.to;
+                if (_this13.to && !_this13.from) {
+                  _this13.from = _this13.to;
                 }
-                if (_this12.toDate && !_this12.fromDate) {
-                  _this12.fromDate = _this12.toDate;
+                if (_this13.toDate && !_this13.fromDate) {
+                  _this13.fromDate = _this13.toDate;
                 }
                 _context7.next = 9;
-                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-archive-files?page=".concat(page, "&per_page=").concat(_this12.per_page, "&search=").concat(_this12.search, "&favourite=").concat(_this12.favourite), {
-                  params: _this12.currentField ? {
+                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-archive-files?page=".concat(page, "&per_page=").concat(_this13.per_page, "&search=").concat(_this13.search, "&favourite=").concat(_this13.favourite), {
+                  params: _this13.currentField ? {
                     field: {
-                      from: _this12.currentField.data_type == "INTEGER" ? _this12.from : _this12.fromDate,
-                      to: _this12.currentField.data_type == "INTEGER" ? _this12.to : _this12.toDate,
-                      text: _this12.search,
-                      range: ["INTEGER", "DATE"].includes(_this12.currentField.data_type),
-                      data_type: _this12.currentField.data_type
+                      from: _this13.currentField.data_type == "INTEGER" ? _this13.from : _this13.fromDate,
+                      to: _this13.currentField.data_type == "INTEGER" ? _this13.to : _this13.toDate,
+                      text: _this13.search,
+                      range: ["INTEGER", "DATE"].includes(_this13.currentField.data_type),
+                      data_type: _this13.currentField.data_type
                     }
                   } : {}
                 }).then(function (res) {
                   var l = res.data;
-                  _this12.archiveFiles = l.data;
-                  _this12.archivesPagination = l.pagination;
-                  _this12.current_page = l.pagination.current_page;
-                  _this12.searchFinished = true;
+                  _this13.archiveFiles = l.data;
+                  _this13.archivesPagination = l.pagination;
+                  _this13.current_page = l.pagination.current_page;
+                  _this13.searchFinished = true;
                 })["catch"](function (err) {
                   sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                     icon: "error",
-                    title: "".concat(_this12.$t("general.Error")),
-                    text: "".concat(_this12.$t("general.Thereisanerrorinthesystem"))
+                    title: "".concat(_this13.$t("general.Error")),
+                    text: "".concat(_this13.$t("general.Thereisanerrorinthesystem"))
                   });
                 })["finally"](function () {
-                  _this12.isLoader = false;
+                  _this13.isLoader = false;
                 });
               case 9:
               case "end":
@@ -9310,7 +9313,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     getDataCurrentPage: function getDataCurrentPage() {
-      var _this13 = this;
+      var _this14 = this;
       if (this.from && !this.to) {
         this.to = this.from;
       }
@@ -9337,42 +9340,42 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           } : {}
         }).then(function (res) {
           var l = res.data;
-          _this13.archiveFiles = l.data;
-          _this13.archivesPagination = l.pagination;
-          _this13.current_page = l.pagination.current_page;
+          _this14.archiveFiles = l.data;
+          _this14.archivesPagination = l.pagination;
+          _this14.current_page = l.pagination.current_page;
         })["catch"](function (err) {
           sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
             icon: "error",
-            title: "".concat(_this13.$t("general.Error")),
-            text: "".concat(_this13.$t("general.Thereisanerrorinthesystem"))
+            title: "".concat(_this14.$t("general.Error")),
+            text: "".concat(_this14.$t("general.Thereisanerrorinthesystem"))
           });
         })["finally"](function () {
-          _this13.isLoader = false;
+          _this14.isLoader = false;
         });
       }
     },
     getSecondLevelNodes: function getSecondLevelNodes() {
-      var _this14 = this;
+      var _this15 = this;
       this.isLoader = true;
       _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-doc-type/nodes-level-two").then(function (res) {
-        _this14.secondLevelNodes = res.data.data;
-        _this14.searchDocumentTypeId = _this14.secondLevelNodes.length ? _this14.secondLevelNodes[0].id : null;
-        _this14.getFields(_this14.searchDocumentTypeId);
+        _this15.secondLevelNodes = res.data.data;
+        _this15.searchDocumentTypeId = _this15.secondLevelNodes.length ? _this15.secondLevelNodes[0].id : null;
+        _this15.getFields(_this15.searchDocumentTypeId);
       })["catch"](function (err) {
         sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
           icon: "error",
-          title: "".concat(_this14.$t("general.Error")),
-          text: "".concat(_this14.$t("general.Thereisanerrorinthesystem"))
+          title: "".concat(_this15.$t("general.Error")),
+          text: "".concat(_this15.$t("general.Thereisanerrorinthesystem"))
         });
       })["finally"](function () {
-        _this14.isLoader = false;
+        _this15.isLoader = false;
       });
     },
     /**
      *  delete screen button
      */
     deleteScreenButton: function deleteScreenButton(id, index) {
-      var _this15 = this;
+      var _this16 = this;
       if (Array.isArray(id)) {
         sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
           title: "".concat(this.$t("general.Areyousure")),
@@ -9386,16 +9389,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           buttonsStyling: false
         }).then(function (result) {
           if (result.value) {
-            _this15.isLoader = true;
+            _this16.isLoader = true;
             _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].post("/arch-archive-files/bulk-delete", {
               ids: id
             }).then(function (res) {
-              _this15.checkAll = [];
-              _this15.getData();
+              _this16.checkAll = [];
+              _this16.getData();
               sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                 icon: "success",
-                title: "".concat(_this15.$t("general.Deleted")),
-                text: "".concat(_this15.$t("general.Yourrowhasbeendeleted")),
+                title: "".concat(_this16.$t("general.Deleted")),
+                text: "".concat(_this16.$t("general.Yourrowhasbeendeleted")),
                 showConfirmButton: false,
                 timer: 1500
               });
@@ -9403,19 +9406,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               if (err.response.status == 400) {
                 sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                   icon: "error",
-                  title: "".concat(_this15.$t("general.Error")),
-                  text: "".concat(_this15.$t("general.CantDeleteRelation"))
+                  title: "".concat(_this16.$t("general.Error")),
+                  text: "".concat(_this16.$t("general.CantDeleteRelation"))
                 });
-                _this15.getData();
+                _this16.getData();
               } else {
                 sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                   icon: "error",
-                  title: "".concat(_this15.$t("general.Error")),
-                  text: "".concat(_this15.$t("general.Thereisanerrorinthesystem"))
+                  title: "".concat(_this16.$t("general.Error")),
+                  text: "".concat(_this16.$t("general.Thereisanerrorinthesystem"))
                 });
               }
             })["finally"](function () {
-              _this15.isLoader = false;
+              _this16.isLoader = false;
             });
           }
         });
@@ -9432,14 +9435,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           buttonsStyling: false
         }).then(function (result) {
           if (result.value) {
-            _this15.isLoader = true;
+            _this16.isLoader = true;
             _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"]["delete"]("/arch-archive-files/".concat(id)).then(function (res) {
-              _this15.checkAll = [];
-              _this15.getData();
+              _this16.checkAll = [];
+              _this16.getData();
               sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                 icon: "success",
-                title: "".concat(_this15.$t("general.Deleted")),
-                text: "".concat(_this15.$t("general.Yourrowhasbeendeleted")),
+                title: "".concat(_this16.$t("general.Deleted")),
+                text: "".concat(_this16.$t("general.Yourrowhasbeendeleted")),
                 showConfirmButton: false,
                 timer: 1500
               });
@@ -9447,18 +9450,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               if (err.response.status == 400) {
                 sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                   icon: "error",
-                  title: "".concat(_this15.$t("general.Error")),
-                  text: "".concat(_this15.$t("general.CantDeleteRelation"))
+                  title: "".concat(_this16.$t("general.Error")),
+                  text: "".concat(_this16.$t("general.CantDeleteRelation"))
                 });
               } else {
                 sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                   icon: "error",
-                  title: "".concat(_this15.$t("general.Error")),
-                  text: "".concat(_this15.$t("general.Thereisanerrorinthesystem"))
+                  title: "".concat(_this16.$t("general.Error")),
+                  text: "".concat(_this16.$t("general.Thereisanerrorinthesystem"))
                 });
               }
             })["finally"](function () {
-              _this15.isLoader = false;
+              _this16.isLoader = false;
             });
           }
         });
@@ -9468,23 +9471,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *  reset Modal (create)
      */
     resetModalHidden: function resetModalHidden() {
-      var _this16 = this;
+      var _this17 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
         return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                if (!(_this16.images.length > 0)) {
+                if (!(_this17.images.length > 0)) {
                   _context8.next = 3;
                   break;
                 }
                 _context8.next = 3;
-                return _this16.getPdf(_this16.archive_id);
+                return _this17.getPdf(_this17.archive_id);
               case 3:
                 _context8.next = 5;
-                return _this16.getArchiveFiles();
+                return _this17.getArchiveFiles();
               case 5:
-                _this16.create = {
+                _this17.create = {
                   job_file_number: null,
                   document_type_id: null,
                   status_id: null,
@@ -9493,14 +9496,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   custom_timestamp: null,
                   media: null
                 };
-                _this16.$nextTick(function () {
-                  _this16.$v.$reset();
+                _this17.$nextTick(function () {
+                  _this17.$v.$reset();
                 });
-                _this16.images = [];
-                _this16.errors = {};
-                _this16.archive_id = null;
-                _this16.lockupTableObject = null;
-                _this16.type = "";
+                _this17.images = [];
+                _this17.errors = {};
+                _this17.archive_id = null;
+                _this17.lockupTableObject = null;
+                _this17.type = "";
               case 12:
               case "end":
                 return _context8.stop();
@@ -9513,26 +9516,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *  hidden Modal (create)
      */
     resetModal: function resetModal() {
-      var _this17 = this;
+      var _this18 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
         return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
-                _this17.getProperties();
-                _this17.create = {
+                _this18.getProperties();
+                _this18.create = {
                   data_type_value: null,
                   data_type_id: null,
                   media: []
                 };
-                _this17.showPhoto = "/images/img-1.png";
-                _this17.is_disabled = false;
-                _this17.$nextTick(function () {
-                  _this17.$v.$reset();
+                _this18.showPhoto = "/images/img-1.png";
+                _this18.is_disabled = false;
+                _this18.$nextTick(function () {
+                  _this18.$v.$reset();
                 });
-                _this17.media = {};
-                _this17.images = [];
-                _this17.errors = {};
+                _this18.media = {};
+                _this18.images = [];
+                _this18.errors = {};
               case 8:
               case "end":
                 return _context9.stop();
@@ -9545,7 +9548,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *  create screen
      */
     resetForm: function resetForm() {
-      var _this18 = this;
+      var _this19 = this;
       this.lockupTableObject = null;
       this.create = {
         data_type_value: null,
@@ -9554,13 +9557,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       };
       this.is_disabled = false;
       this.$nextTick(function () {
-        _this18.$v.$reset();
+        _this19.$v.$reset();
       });
       this.media = {};
       this.images = [];
     },
     AddSubmit: function AddSubmit() {
-      var _this19 = this;
+      var _this20 = this;
       this.errors = {};
       this.is_disabled = false;
       var currentDocument = this.currentDocument;
@@ -9577,7 +9580,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.$v.nodeFields.$touch();
       var check = false;
       this.nodeFields.forEach(function (field, index) {
-        if (field.is_required == 1 && _this19.$v.nodeFields.$each[index].value.$error) {
+        if (field.is_required == 1 && _this20.$v.nodeFields.$each[index].value.$error) {
           return check = true;
         }
       });
@@ -9591,59 +9594,65 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         data_type_value: dataTypeValue
       }).then(function (res) {
         //Update tree
-        if (_this19.currentNode && _this19.currentNode.key && _this19.currentNode.key.length) {
+        if (_this20.currentNode && _this20.currentNode.key && _this20.currentNode.key.length) {
+          console.log("here1");
           var archFileKeyValue = res.data.data.data_type_value.filter(function (field) {
-            return field.name_e == _this19.currentNode.key[0].name_e;
+            return field.name_e == _this20.currentNode.key[0].name_e;
           });
           archFileKeyValue = archFileKeyValue.length > 0 ? archFileKeyValue[0] : null;
           if (archFileKeyValue) {
-            var _check = _this19.currentNode.key[0].children.filter(function (element) {
+            console.log("here2");
+            var _check = _this20.currentNode.key[0].children.filter(function (element) {
               return archFileKeyValue.value == element.name_e;
             });
             if (_check.length == 0) {
-              _this19.currentNode.key[0].children.push({
+              _this20.currentNode.key[0].children.push({
                 name: archFileKeyValue.value,
                 name_e: archFileKeyValue.value,
                 archive_file: res.data.data,
-                parent_doc_type_children: _this19.currentNode.sub_docs,
+                parent_doc_type_children: _this20.currentNode.sub_docs,
                 parent_doc_id: res.data.data.parent_doc_id
               });
+              var index = _this20.expanded.findIndex(_this20.currentNode.key[0]);
+              _this20.expanded.splice(2, 1);
+              _this20.expanded.push(_this20.currentNode.key[0]);
             }
           }
         }
+
         //Update tree
-        _this19.archive_id = res.data.data.id;
-        _this19.is_disabled = true;
+        _this20.archive_id = res.data.data.id;
+        _this20.is_disabled = true;
         setTimeout(function () {
           sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
             icon: "success",
-            text: "".concat(_this19.$t("general.Addedsuccessfully")),
+            text: "".concat(_this20.$t("general.Addedsuccessfully")),
             showConfirmButton: false,
             timer: 1500
           });
         }, 500);
       })["catch"](function (err) {
         if (err.response.data) {
-          _this19.errors = err.response.data.errors;
+          _this20.errors = err.response.data.errors;
         } else {
           sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
             icon: "error",
-            title: "".concat(_this19.$t("general.Error")),
-            text: "".concat(_this19.$t("general.Thereisanerrorinthesystem"))
+            title: "".concat(_this20.$t("general.Error")),
+            text: "".concat(_this20.$t("general.Thereisanerrorinthesystem"))
           });
         }
       })["finally"](function () {
-        _this19.isLoader = false;
+        _this20.isLoader = false;
       });
     },
     /**
      *  edit screen
      */
     editSubmit: function editSubmit(id) {
-      var _this20 = this;
+      var _this21 = this;
       this.$v.edit.$touch();
       this.images.forEach(function (e) {
-        _this20.edit.old_media.push(e.id);
+        _this21.edit.old_media.push(e.id);
       });
       if (this.$v.edit.$invalid) {
         return;
@@ -9651,28 +9660,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.isLoader = true;
         this.errors = {};
         _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].post("/arch-archive-files/".concat(id), this.edit).then(function (res) {
-          _this20.$bvModal.hide("modal-edit-".concat(id));
-          _this20.getData();
+          _this21.$bvModal.hide("modal-edit-".concat(id));
+          _this21.getData();
           setTimeout(function () {
             sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
               icon: "success",
-              text: "".concat(_this20.$t("general.Editsuccessfully")),
+              text: "".concat(_this21.$t("general.Editsuccessfully")),
               showConfirmButton: false,
               timer: 1500
             });
           }, 500);
         })["catch"](function (err) {
           if (err.response.data) {
-            _this20.errors = err.response.data.errors;
+            _this21.errors = err.response.data.errors;
           } else {
             sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
               icon: "error",
-              title: "".concat(_this20.$t("general.Error")),
-              text: "".concat(_this20.$t("general.Thereisanerrorinthesystem"))
+              title: "".concat(_this21.$t("general.Error")),
+              text: "".concat(_this21.$t("general.Thereisanerrorinthesystem"))
             });
           }
         })["finally"](function () {
-          _this20.isLoader = false;
+          _this21.isLoader = false;
         });
       }
     },
@@ -9680,22 +9689,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *  get workflows
      */
     getDocumentTypes: function getDocumentTypes() {
-      var _this21 = this;
+      var _this22 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
         return _regeneratorRuntime().wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
-                _this21.isLoader = true;
+                _this22.isLoader = true;
                 _context10.next = 3;
                 return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/gen-arch-doc-type").then(function (res) {
-                  _this21.isLoader = false;
-                  _this21.documentTypes = res.data.data;
+                  _this22.isLoader = false;
+                  _this22.documentTypes = res.data.data;
                 })["catch"](function (err) {
                   sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                     icon: "error",
-                    title: "".concat(_this21.$t("general.Error")),
-                    text: "".concat(_this21.$t("general.Thereisanerrorinthesystem"))
+                    title: "".concat(_this22.$t("general.Error")),
+                    text: "".concat(_this22.$t("general.Thereisanerrorinthesystem"))
                   });
                 });
               case 3:
@@ -9707,22 +9716,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     getStatuses: function getStatuses() {
-      var _this22 = this;
+      var _this23 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
         return _regeneratorRuntime().wrap(function _callee11$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
-                _this22.isLoader = true;
+                _this23.isLoader = true;
                 _context11.next = 3;
                 return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-doc-status").then(function (res) {
-                  _this22.isLoader = false;
-                  _this22.documentStatuses = res.data.data;
+                  _this23.isLoader = false;
+                  _this23.documentStatuses = res.data.data;
                 })["catch"](function (err) {
                   sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                     icon: "error",
-                    title: "".concat(_this22.$t("general.Error")),
-                    text: "".concat(_this22.$t("general.Thereisanerrorinthesystem"))
+                    title: "".concat(_this23.$t("general.Error")),
+                    text: "".concat(_this23.$t("general.Thereisanerrorinthesystem"))
                   });
                 });
               case 3:
@@ -9737,7 +9746,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *   show Modal (edit)
      */
     resetModalEdit: function resetModalEdit(id) {
-      var _this23 = this;
+      var _this24 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
         var _archive$media;
         var archive;
@@ -9745,28 +9754,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
-                archive = _this23.archiveFiles.find(function (e) {
+                archive = _this24.archiveFiles.find(function (e) {
                   return id == e.id;
                 });
                 _context12.next = 3;
-                return _this23.getDocumentTypes();
+                return _this24.getDocumentTypes();
               case 3:
                 _context12.next = 5;
-                return _this23.getStatuses();
+                return _this24.getStatuses();
               case 5:
-                _this23.edit.job_file_number = archive.job_file_number;
-                _this23.edit.document_type_id = archive.document_type_id;
-                _this23.edit.status_id = archive.status_id;
-                _this23.edit.description = archive.description;
-                _this23.edit.custom_timestamp = new Date(archive.custom_timestamp);
-                _this23.edit.timestamp = (0,_helper_startDate__WEBPACK_IMPORTED_MODULE_8__.formatDateTime)(archive.timestamp);
-                _this23.images = (_archive$media = archive.media) !== null && _archive$media !== void 0 ? _archive$media : [];
-                if (_this23.images && _this23.images.length > 0) {
-                  _this23.showPhoto = _this23.images[_this23.images.length - 1].webp;
+                _this24.edit.job_file_number = archive.job_file_number;
+                _this24.edit.document_type_id = archive.document_type_id;
+                _this24.edit.status_id = archive.status_id;
+                _this24.edit.description = archive.description;
+                _this24.edit.custom_timestamp = new Date(archive.custom_timestamp);
+                _this24.edit.timestamp = (0,_helper_startDate__WEBPACK_IMPORTED_MODULE_8__.formatDateTime)(archive.timestamp);
+                _this24.images = (_archive$media = archive.media) !== null && _archive$media !== void 0 ? _archive$media : [];
+                if (_this24.images && _this24.images.length > 0) {
+                  _this24.showPhoto = _this24.images[_this24.images.length - 1].webp;
                 } else {
-                  _this23.showPhoto = "/images/img-1.png";
+                  _this24.showPhoto = "/images/img-1.png";
                 }
-                _this23.errors = {};
+                _this24.errors = {};
               case 14:
               case "end":
                 return _context12.stop();
@@ -9809,21 +9818,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return formatDateOnly(value);
     },
     log: function log(id) {
-      var _this24 = this;
+      var _this25 = this;
       if (this.mouseEnter != id) {
         this.Tooltip = "";
         this.mouseEnter = id;
         _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-archive-files/logs/".concat(id)).then(function (res) {
           var l = res.data.data;
           l.forEach(function (e) {
-            _this24.Tooltip += "Created By: ".concat(e.causer_type, "; Event: ").concat(e.event, "; Description: ").concat(e.description, " ;Created At: ").concat(_this24.formatDate(e.created_at), " \n");
+            _this25.Tooltip += "Created By: ".concat(e.causer_type, "; Event: ").concat(e.event, "; Description: ").concat(e.description, " ;Created At: ").concat(_this25.formatDate(e.created_at), " \n");
           });
           $("#tooltip-".concat(id)).tooltip();
         })["catch"](function (err) {
           sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
             icon: "error",
-            title: "".concat(_this24.$t("general.Error")),
-            text: "".concat(_this24.$t("general.Thereisanerrorinthesystem"))
+            title: "".concat(_this25.$t("general.Error")),
+            text: "".concat(_this25.$t("general.Thereisanerrorinthesystem"))
           });
         });
       }
@@ -9843,7 +9852,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.addImage(file);
     },
     addImage: function addImage(file) {
-      var _this25 = this;
+      var _this26 = this;
       this.media = file; //upload
       if (file) {
         this.idDelete = null;
@@ -9857,47 +9866,47 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           formDate.append("media[0]", this.media);
           _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].post("/media", formDate).then(function (res) {
             var old_media = [];
-            _this25.images.forEach(function (e) {
+            _this26.images.forEach(function (e) {
               return old_media.push(e.id);
             });
             var new_media = [];
             res.data.data.forEach(function (e) {
               return new_media.push(e.id);
             });
-            _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].put("/arch-archive-files/".concat(_this25.archive_id), {
+            _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].put("/arch-archive-files/".concat(_this26.archive_id), {
               old_media: old_media,
               media: new_media
             }).then(function (res) {
               var _res$data$data$media;
-              _this25.images = (_res$data$data$media = res.data.data.media) !== null && _res$data$data$media !== void 0 ? _res$data$data$media : [];
-              if (_this25.images && _this25.images.length > 0) {
-                _this25.showPhoto = _this25.images[_this25.images.length - 1].webp;
+              _this26.images = (_res$data$data$media = res.data.data.media) !== null && _res$data$data$media !== void 0 ? _res$data$data$media : [];
+              if (_this26.images && _this26.images.length > 0) {
+                _this26.showPhoto = _this26.images[_this26.images.length - 1].webp;
               } else {
-                _this25.showPhoto = "/images/img-1.png";
+                _this26.showPhoto = "/images/img-1.png";
               }
               // this.getData();
-              if (_this25.type == "application/pdf") {
-                _this25.$bvModal.hide("create");
+              if (_this26.type == "application/pdf") {
+                _this26.$bvModal.hide("create");
               }
             })["catch"](function (err) {
               sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                 icon: "error",
-                title: "".concat(_this25.$t("general.Error")),
-                text: "".concat(_this25.$t("general.Thereisanerrorinthesystem"))
+                title: "".concat(_this26.$t("general.Error")),
+                text: "".concat(_this26.$t("general.Thereisanerrorinthesystem"))
               });
             });
           })["catch"](function (err) {
             if (err.response.data) {
-              _this25.errors = err.response.data.errors;
+              _this26.errors = err.response.data.errors;
             } else {
               sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                 icon: "error",
-                title: "".concat(_this25.$t("general.Error")),
-                text: "".concat(_this25.$t("general.Thereisanerrorinthesystem"))
+                title: "".concat(_this26.$t("general.Error")),
+                text: "".concat(_this26.$t("general.Thereisanerrorinthesystem"))
               });
             }
           })["finally"](function () {
-            _this25.isLoader = false;
+            _this26.isLoader = false;
           });
         } else {
           sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
@@ -9911,50 +9920,50 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             buttonsStyling: false
           }).then(function (result) {
             if (result.value) {
-              _this25.isLoader = true;
+              _this26.isLoader = true;
               var _formDate = new FormData();
-              _formDate.append("media[0]", _this25.media);
+              _formDate.append("media[0]", _this26.media);
               _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].post("/media", _formDate).then(function (res) {
                 var old_media = [];
-                _this25.images.forEach(function (e) {
+                _this26.images.forEach(function (e) {
                   return old_media.push(e.id);
                 });
-                old_media.splice(old_media.indexOf(_this25.idDelete), 1);
+                old_media.splice(old_media.indexOf(_this26.idDelete), 1);
                 var new_media = [];
                 res.data.data.forEach(function (e) {
                   return new_media.push(e.id);
                 });
-                _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].put("/arch-archive-files/".concat(_this25.country_id), {
+                _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].put("/arch-archive-files/".concat(_this26.country_id), {
                   old_media: old_media,
                   media: new_media
                 }).then(function (res) {
                   var _res$data$data$media2;
-                  _this25.images = (_res$data$data$media2 = res.data.data.media) !== null && _res$data$data$media2 !== void 0 ? _res$data$data$media2 : [];
-                  if (_this25.images && _this25.images.length > 0) {
-                    _this25.showPhoto = _this25.images[_this25.images.length - 1].webp;
+                  _this26.images = (_res$data$data$media2 = res.data.data.media) !== null && _res$data$data$media2 !== void 0 ? _res$data$data$media2 : [];
+                  if (_this26.images && _this26.images.length > 0) {
+                    _this26.showPhoto = _this26.images[_this26.images.length - 1].webp;
                   } else {
-                    _this25.showPhoto = "/images/img-1.png";
+                    _this26.showPhoto = "/images/img-1.png";
                   }
-                  _this25.getData();
+                  _this26.getData();
                 })["catch"](function (err) {
                   sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                     icon: "error",
-                    title: "".concat(_this25.$t("general.Error")),
-                    text: "".concat(_this25.$t("general.Thereisanerrorinthesystem"))
+                    title: "".concat(_this26.$t("general.Error")),
+                    text: "".concat(_this26.$t("general.Thereisanerrorinthesystem"))
                   });
                 });
               })["catch"](function (err) {
                 if (err.response.data) {
-                  _this25.errors = err.response.data.errors;
+                  _this26.errors = err.response.data.errors;
                 } else {
                   sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                     icon: "error",
-                    title: "".concat(_this25.$t("general.Error")),
-                    text: "".concat(_this25.$t("general.Thereisanerrorinthesystem"))
+                    title: "".concat(_this26.$t("general.Error")),
+                    text: "".concat(_this26.$t("general.Thereisanerrorinthesystem"))
                   });
                 }
               })["finally"](function () {
-                _this25.isLoader = false;
+                _this26.isLoader = false;
               });
             }
           });
@@ -9962,7 +9971,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     deleteImageCreate: function deleteImageCreate(id, index) {
-      var _this26 = this;
+      var _this27 = this;
       var old_media = [];
       this.images.forEach(function (e) {
         if (e.id != id) {
@@ -9973,17 +9982,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         old_media: old_media
       }).then(function (res) {
         var _res$data$data$media3;
-        _this26.images = (_res$data$data$media3 = res.data.data.media) !== null && _res$data$data$media3 !== void 0 ? _res$data$data$media3 : [];
-        if (_this26.images && _this26.images.length > 0) {
-          _this26.showPhoto = _this26.images[_this26.images.length - 1].webp;
+        _this27.images = (_res$data$data$media3 = res.data.data.media) !== null && _res$data$data$media3 !== void 0 ? _res$data$data$media3 : [];
+        if (_this27.images && _this27.images.length > 0) {
+          _this27.showPhoto = _this27.images[_this27.images.length - 1].webp;
         } else {
-          _this26.showPhoto = "/images/img-1.png";
+          _this27.showPhoto = "/images/img-1.png";
         }
       })["catch"](function (err) {
         sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
           icon: "error",
-          title: "".concat(_this26.$t("general.Error")),
-          text: "".concat(_this26.$t("general.Thereisanerrorinthesystem"))
+          title: "".concat(_this27.$t("general.Error")),
+          text: "".concat(_this27.$t("general.Thereisanerrorinthesystem"))
         });
       });
     },
@@ -9997,23 +10006,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.$refs.html2Pdf.generatePdf();
     },
     deleteFileComponent: function deleteFileComponent(id) {
-      var _this27 = this;
+      var _this28 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13() {
         var file;
         return _regeneratorRuntime().wrap(function _callee13$(_context13) {
           while (1) {
             switch (_context13.prev = _context13.next) {
               case 0:
-                file = _this27.archiveFiles.find(function (e) {
+                file = _this28.archiveFiles.find(function (e) {
                   return e.id = id;
                 });
-                _this27.$store.commit("archiving/objectActiveEmity");
-                _this27.$store.commit("archiving/archiveFileUpdate", file);
+                _this28.$store.commit("archiving/objectActiveEmity");
+                _this28.$store.commit("archiving/archiveFileUpdate", file);
                 _context13.next = 5;
-                return _this27.getTree();
+                return _this28.getTree();
               case 5:
                 _context13.next = 7;
-                return _this27.getData();
+                return _this28.getData();
               case 7:
               case "end":
                 return _context13.stop();
@@ -10023,15 +10032,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     showFavorite: function showFavorite() {
-      var _this28 = this;
+      var _this29 = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee14() {
         return _regeneratorRuntime().wrap(function _callee14$(_context14) {
           while (1) {
             switch (_context14.prev = _context14.next) {
               case 0:
-                _this28.favourite = !_this28.favourite;
+                _this29.favourite = !_this29.favourite;
                 _context14.next = 3;
-                return _this28.getData();
+                return _this29.getData();
               case 3:
               case "end":
                 return _context14.stop();

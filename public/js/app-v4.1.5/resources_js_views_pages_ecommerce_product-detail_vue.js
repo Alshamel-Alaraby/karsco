@@ -2152,6 +2152,11 @@ var menuItems = [{
     label: 'menuitems.dashboard.list.avenue',
     name: "avenue",
     link: '/dashboard/avenue'
+  }, {
+    id: 8,
+    label: 'general.street',
+    name: "street",
+    link: '/dashboard/street'
   }]
 }, {
   id: 10001,
@@ -2267,11 +2272,7 @@ var menuItems = [{
     }, {
       id: 100021,
       name: 'contract unit',
-<<<<<<< HEAD:public/js/app-v4.1.4/resources_js_views_pages_ecommerce_product-detail_vue.js
       label: 'general.invoice',
-=======
-      label: 'general.Invoice',
->>>>>>> b7efc7009968c4a85933b54bc00a732a6fa60ea2:public/js/app-v4.1.5/resources_js_views_pages_ecommerce_product-detail_vue.js
       link: '/dashboard/realEstate/contractunit'
     }]
   }, {
@@ -2376,8 +2377,8 @@ var menuItems = [{
     subItems: [{
       id: 102275,
       name: 'building wallet',
-      label: 'general.tasks',
-      link: '/dashboard/boardRent/soctor'
+      label: 'general.sector',
+      link: '/dashboard/boardRent/sector'
     }]
   }]
 }, {

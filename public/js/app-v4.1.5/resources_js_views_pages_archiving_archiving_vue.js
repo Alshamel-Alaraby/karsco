@@ -8673,27 +8673,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     VueHtml2pdf: vue_html2pdf__WEBPACK_IMPORTED_MODULE_16__["default"],
     General: _components_create_general__WEBPACK_IMPORTED_MODULE_15__["default"]
   },
-  beforeRouteEnter: function beforeRouteEnter(to, from, next) {
-    next(function (vm) {
-      if (vm.$store.state.auth.work_flow_trees.includes("archiving-e")) {
-        sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
-          icon: "error",
-          title: "".concat(vm.$t("general.Error")),
-          text: "".concat(vm.$t("general.ModuleExpired"))
-        });
-        return vm.$router.push({
-          name: "home"
-        });
-      }
-      if (vm.$store.state.auth.work_flow_trees.includes("archiving screen") || vm.$store.state.auth.work_flow_trees.includes("archiving") || vm.$store.state.auth.user.type == "super_admin") {
-        return true;
-      } else {
-        return vm.$router.push({
-          name: "home"
-        });
-      }
-    });
-  },
+  // beforeRouteEnter(to, from, next) {
+  //   next((vm) => {
+  //     if (vm.$store.state.auth.work_flow_trees.includes("archiving-e")) {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: `${vm.$t("general.Error")}`,
+  //         text: `${vm.$t("general.ModuleExpired")}`,
+  //       });
+  //       return vm.$router.push({ name: "home" });
+  //     }
+  //     if (
+  //       vm.$store.state.auth.work_flow_trees.includes("archiving screen") ||
+  //       vm.$store.state.auth.work_flow_trees.includes("archiving") ||
+  //       vm.$store.state.auth.user.type == "super_admin"
+  //     ) {
+  //       return true;
+  //     } else {
+  //       return vm.$router.push({ name: "home" });
+  //     }
+  //   });
+  // },
   data: function data() {
     return {
       printLoading: true,
@@ -8730,6 +8730,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       fileImages: [],
       secondLevelNodes: [],
       fields: [],
+      searchFinished: false,
       properties: [],
       treePropId: null,
       arch_doc_type_id: null,
@@ -8793,7 +8794,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * watch per_page
      */
     per_page: function per_page(after, befour) {
-      this.getData();
+      // this.getData();
     },
     /**
      * watch search
@@ -8802,7 +8803,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this = this;
       clearTimeout(this.debounce);
       this.debounce = setTimeout(function () {
-        _this.getData();
+        _this.getFieldData();
         _this.isSearch = !_this.isSearch;
       }, 400);
     },
@@ -8842,17 +8843,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   methods: {
+    getFieldData: function getFieldData() {
+      this.getPaginatedArchFiles(1);
+      // this.currentNode = null;
+    },
     getPaginatedArchFiles: function getPaginatedArchFiles(page) {
       this.current_page = page ? page : this.current_page;
-      if (this.currentNode.parent_doc_type_children) {
-        //If node selected is key value
-        this.getArchiveFiles();
-      } else if (this.currentNode.arch_documents) {
-        //If node selected department
-        this.getArchiveFilesByDepartmentDocument(this.currentNode.id, null);
-      } else if (this.currentNode.key) {
-        //If node selected parent document
-        this.getArchiveFilesByDepartmentDocument(this.currentNode.arch_department_id, this.currentNode.id);
+      if (!this.currentNode) {
+        this.getData(page);
+        return;
+      } else {
+        if (!this.search) {
+          if (this.currentNode.parent_doc_type_children) {
+            //If node selected is key value
+            this.getArchiveFiles();
+          } else if (this.currentNode.arch_documents) {
+            //If node selected department
+            this.getArchiveFilesByDepartmentDocument(this.currentNode.id, null);
+          } else if (this.currentNode.key) {
+            //If node selected parent document
+            this.getArchiveFilesByDepartmentDocument(this.currentNode.arch_department_id, this.currentNode.id);
+          }
+        } else {
+          this.getData(page);
+        }
       }
     },
     getArchiveFiles: function getArchiveFiles(docId) {
@@ -8900,7 +8914,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("arch-archive-files/files_Department_Doc_Type?arch_department_id=".concat(departmentId, "&arch_doc_type_id=").concat(parentDocumentId ? parentDocumentId : "", "&page=").concat(_this5.current_page, "&per_page=").concat(_this5.per_page)).then(function (res) {
+                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("arch-archive-files/files_Department_Doc_Type?arch_department_id=".concat(departmentId, "&arch_doc_type_id=").concat(parentDocumentId ? parentDocumentId : "", "&page=").concat(_this5.current_page, "&per_page=").concat(_this5.per_page, "&doc_type_id=").concat(parentDocumentId ? parentDocumentId : "", "&search=").concat(_this5.search)).then(function (res) {
                   var l = res.data;
                   _this5.archiveFiles = l.data;
                   _this5.archivesPagination = l.pagination;
@@ -9008,13 +9022,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     getCurrentField: function getCurrentField(id) {
+      this.searchFinished = false;
       this.from = 0;
       this.to = 0;
       this.toDate = new Date();
       this.fromDate = new Date();
       this.search = "";
       this.currentField = this.fields.filter(function (field) {
-        return field.id == id;
+        return field.name_e == id;
       })[0];
     },
     getFields: function getFields(id) {
@@ -9029,12 +9044,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return;
       }
       this.isLoader = true;
-      _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-doc-type/".concat(id)).then(function (res) {
-        _this8.fields = res.data.data.doc_type_field;
+      _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("arch-archive-files/docType-child-archiv-files?doc_type_id=".concat(id)).then(function (res) {
+        _this8.fields = res.data;
         if (_this8.fields.length) {
-          _this8.searchFieldId = _this8.fields[0].id;
+          _this8.searchFieldId = _this8.fields[0].name_e;
           _this8.currentField = _this8.fields.filter(function (field) {
-            return field.id == _this8.searchFieldId;
+            return field.name_e == _this8.searchFieldId;
           })[0];
         }
         _this8.isLoader = false;
@@ -9150,6 +9165,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     nodeWasClicked: function nodeWasClicked(result) {
       this.currentNode = result;
+      this.searchFinished = false;
       this.child_doc_types = this.currentNode && this.currentNode.parent_doc_type_children && this.currentNode.parent_doc_type_children.length ? [{
         id: 0,
         name: "الكل",
@@ -9157,6 +9173,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }].concat(_toConsumableArray(this.currentNode.parent_doc_type_children)) : [];
       this.arch_doc_type_id = null;
       this.getPaginatedArchFiles(1);
+      this.searchFields = false;
       this.isActiveFile = !this.isActiveFile;
       this.$store.commit("archiving/archiveFileEmity");
       this.$store.commit("archiving/objectActiveEmity");
@@ -9179,7 +9196,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 _this10.isLoader = true;
                 _context5.next = 3;
-                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-department/tree").then(function (res) {
+                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-department/parent_department").then(function (res) {
                   var root = res.data.data;
                   root.forEach(function (node) {
                     if (node.children) {
@@ -9254,6 +9271,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context7.prev = _context7.next) {
               case 0:
                 page = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : 1;
+                _this12.searchFinished = false;
                 _this12.isLoader = true;
                 if (_this12.from && !_this12.to) {
                   _this12.to = _this12.from;
@@ -9267,15 +9285,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 if (_this12.toDate && !_this12.fromDate) {
                   _this12.fromDate = _this12.toDate;
                 }
-                _context7.next = 8;
-                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-archive-files?page=".concat(page, "&per_page=").concat(_this12.per_page, "&search=").concat(_this12.search, "&arch_doc_type_id=").concat(_this12.currentNode ? _this12.currentNode.id : "", "&favourite=").concat(_this12.favourite), {
+                _context7.next = 9;
+                return _api_adminAxios__WEBPACK_IMPORTED_MODULE_2__["default"].get("/arch-archive-files?page=".concat(page, "&per_page=").concat(_this12.per_page, "&search=").concat(_this12.search, "&favourite=").concat(_this12.favourite), {
                   params: _this12.currentField ? {
                     field: {
-                      from: _this12.currentField.doc_field_id.data_type.name_e == "INTEGER" ? _this12.from : _this12.fromDate,
-                      to: _this12.currentField.doc_field_id.data_type.name_e == "INTEGER" ? _this12.to : _this12.toDate,
+                      from: _this12.currentField.data_type == "INTEGER" ? _this12.from : _this12.fromDate,
+                      to: _this12.currentField.data_type == "INTEGER" ? _this12.to : _this12.toDate,
                       text: _this12.search,
-                      range: ["INTEGER", "DATE"].includes(_this12.currentField.doc_field_id.data_type.name_e),
-                      data_type: _this12.currentField.doc_field_id.data_type.name_e
+                      range: ["INTEGER", "DATE"].includes(_this12.currentField.data_type),
+                      data_type: _this12.currentField.data_type
                     }
                   } : {}
                 }).then(function (res) {
@@ -9283,6 +9301,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this12.archiveFiles = l.data;
                   _this12.archivesPagination = l.pagination;
                   _this12.current_page = l.pagination.current_page;
+                  _this12.searchFinished = true;
                 })["catch"](function (err) {
                   sweetalert2__WEBPACK_IMPORTED_MODULE_3___default().fire({
                     icon: "error",
@@ -9292,7 +9311,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 })["finally"](function () {
                   _this12.isLoader = false;
                 });
-              case 8:
+              case 9:
               case "end":
                 return _context7.stop();
             }
@@ -9475,7 +9494,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _context8.next = 5;
                 return _this16.getArchiveFiles();
               case 5:
-                // await this.getData();
                 _this16.create = {
                   job_file_number: null,
                   document_type_id: null,
@@ -10672,6 +10690,11 @@ var menuItems = [{
     label: 'menuitems.dashboard.list.avenue',
     name: "avenue",
     link: '/dashboard/avenue'
+  }, {
+    id: 8,
+    label: 'general.street',
+    name: "street",
+    link: '/dashboard/street'
   }]
 }, {
   id: 10001,
@@ -10787,7 +10810,7 @@ var menuItems = [{
     }, {
       id: 100021,
       name: 'contract unit',
-      label: 'general.Invoice',
+      label: 'general.invoice',
       link: '/dashboard/realEstate/contractunit'
     }]
   }, {
@@ -10892,8 +10915,8 @@ var menuItems = [{
     subItems: [{
       id: 102275,
       name: 'building wallet',
-      label: 'general.tasks',
-      link: '/dashboard/boardRent/soctor'
+      label: 'general.sector',
+      link: '/dashboard/boardRent/sector'
     }]
   }]
 }, {
@@ -37004,29 +37027,32 @@ var render = function () {
                           ),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "col-md-12" }, [
-                          _c("div", { staticClass: "form-group" }, [
-                            _c("label", { staticClass: "control-label" }, [
-                              _vm._v(" Link "),
-                            ]),
-                            _vm._v(" "),
-                            _c("input", {
-                              staticClass: "form-control",
-                              attrs: {
-                                type: "text",
-                                disabled: "",
-                                "data-create": "9",
-                              },
-                              domProps: {
-                                value:
-                                  _vm.$store.state.archiving.objectActive.media[
-                                    _vm.$store.state.archiving.objectActive
-                                      .media.length - 1
-                                  ].url,
-                              },
-                            }),
-                          ]),
-                        ]),
+                        _vm.$store.state.archiving.objectActive.media
+                          ? _c("div", { staticClass: "col-md-12" }, [
+                              _c("div", { staticClass: "form-group" }, [
+                                _c("label", { staticClass: "control-label" }, [
+                                  _vm._v(" Link "),
+                                ]),
+                                _vm._v(" "),
+                                _c("input", {
+                                  staticClass: "form-control",
+                                  attrs: {
+                                    type: "text",
+                                    disabled: "",
+                                    "data-create": "9",
+                                  },
+                                  domProps: {
+                                    value:
+                                      _vm.$store.state.archiving.objectActive
+                                        .media[
+                                        _vm.$store.state.archiving.objectActive
+                                          .media.length - 1
+                                      ].url,
+                                  },
+                                }),
+                              ]),
+                            ])
+                          : _vm._e(),
                       ]),
                     ]
                   ),
@@ -47199,9 +47225,9 @@ var render = function () {
                                 return _c(
                                   "b-form-checkbox",
                                   {
-                                    key: field.id,
+                                    key: field.name_e,
                                     staticClass: "mb-1",
-                                    attrs: { value: field.id },
+                                    attrs: { value: field.name_e },
                                     on: { change: _vm.getCurrentField },
                                     model: {
                                       value: _vm.searchFieldId,
@@ -47216,8 +47242,8 @@ var render = function () {
                                       "\n                      " +
                                         _vm._s(
                                           _vm.$i18n.locale == "ar"
-                                            ? field.doc_field_id.name
-                                            : field.doc_field_id.name_e
+                                            ? field.name
+                                            : field.name_e
                                         ) +
                                         "\n                    "
                                     ),
@@ -47231,8 +47257,7 @@ var render = function () {
                         ),
                         _vm._v(" "),
                         _vm.currentField &&
-                        _vm.currentField.doc_field_id.data_type.name_e ==
-                          "INTEGER"
+                        _vm.currentField.data_type == "INTEGER"
                           ? [
                               _c(
                                 "div",
@@ -47267,7 +47292,7 @@ var render = function () {
                                         domProps: { value: _vm.from },
                                         on: {
                                           keyup: function ($event) {
-                                            return _vm.getData()
+                                            return _vm.getFieldData()
                                           },
                                           input: function ($event) {
                                             if ($event.target.composing) {
@@ -47307,7 +47332,7 @@ var render = function () {
                                         domProps: { value: _vm.to },
                                         on: {
                                           keyup: function ($event) {
-                                            return _vm.getData()
+                                            return _vm.getFieldData()
                                           },
                                           input: function ($event) {
                                             if ($event.target.composing) {
@@ -47326,8 +47351,7 @@ var render = function () {
                               ),
                             ]
                           : _vm.currentField &&
-                            _vm.currentField.doc_field_id.data_type.name_e ==
-                              "DATE"
+                            _vm.currentField.data_type == "DATE"
                           ? [
                               _c(
                                 "div",
@@ -47346,7 +47370,7 @@ var render = function () {
                                           attrs: { type: "date", confirm: "" },
                                           on: {
                                             change: function ($event) {
-                                              return _vm.getData()
+                                              return _vm.getFieldData()
                                             },
                                           },
                                           model: {
@@ -47369,7 +47393,7 @@ var render = function () {
                                           attrs: { type: "date", confirm: "" },
                                           on: {
                                             change: function ($event) {
-                                              return _vm.getData()
+                                              return _vm.getFieldData()
                                             },
                                           },
                                           model: {
@@ -47433,12 +47457,18 @@ var render = function () {
                                     },
                                     domProps: { value: _vm.search },
                                     on: {
-                                      input: function ($event) {
-                                        if ($event.target.composing) {
-                                          return
-                                        }
-                                        _vm.search = $event.target.value.trim()
-                                      },
+                                      input: [
+                                        function ($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.search =
+                                            $event.target.value.trim()
+                                        },
+                                        function ($event) {
+                                          _vm.searchFinished = false
+                                        },
+                                      ],
                                       blur: function ($event) {
                                         return _vm.$forceUpdate()
                                       },
@@ -49589,16 +49619,35 @@ var render = function () {
                     "div",
                     { staticClass: "col-lg-5" },
                     [
-                      _c("Files", {
-                        attrs: {
-                          archiveFiles: _vm.archiveFiles,
-                          isActiveFile: _vm.isActiveFile,
-                          isSearch: _vm.isSearch,
-                        },
-                        on: { onDoubleClicked: _vm.showFileModal },
-                      }),
+                      _vm.archiveFiles.length
+                        ? [
+                            _c("Files", {
+                              attrs: {
+                                archiveFiles: _vm.archiveFiles,
+                                isActiveFile: _vm.isActiveFile,
+                                isSearch: _vm.isSearch,
+                              },
+                              on: { onDoubleClicked: _vm.showFileModal },
+                            }),
+                          ]
+                        : _vm.searchFinished
+                        ? _c("div", { staticClass: "text-center" }, [
+                            _vm._v(
+                              "\n                  " +
+                                _vm._s(
+                                  _vm.$t("general.NO_FILES_FOUND", {
+                                    value:
+                                      _vm.from || _vm.to
+                                        ? _vm.from + " - " + _vm.to
+                                        : _vm.search,
+                                  })
+                                ) +
+                                "\n                "
+                            ),
+                          ])
+                        : _vm._e(),
                     ],
-                    1
+                    2
                   ),
                   _vm._v(" "),
                   _vm.$store.state.archiving.archiveFile.length > 0

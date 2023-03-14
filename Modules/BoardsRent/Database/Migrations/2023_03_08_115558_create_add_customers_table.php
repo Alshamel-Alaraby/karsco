@@ -25,7 +25,6 @@ return new class extends Migration
             $table->unsignedInteger('customer_source_id')->nullable();
             $table->unsignedInteger('sector_id')->nullable();
             $table->unsignedInteger('avenue_id')->nullable();
-
         });
 
     }

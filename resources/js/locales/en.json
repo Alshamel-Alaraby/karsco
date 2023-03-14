@@ -969,6 +969,11 @@
         "order": "Orders",
         "invoice": "Invoices",
         "tasks": "Tasks",
-        "systemSetup": "System Setup"
+        "systemSetup": "System Setup",
+        "sector": "Sector",
+        "sectorsTable": "Sectors Table",
+        "street": "Street",
+        "streetsTable": "Streets Table",
+        "customerBranch": "customer Branch"
     }
 }

@@ -67,11 +67,11 @@ export default [
         component: () => import('../../views/pages/boardRent/tasks'),
     },
     {
-        path: '/dashboard/boardRent/soctor',
+        path: '/dashboard/boardRent/sector',
         name: 'boardRent tasks',
         meta: {
             middleware: [auth,checkAuth]
         },
-        component: () => import('../../views/pages/boardRent/soctor'),
+        component: () => import('../../views/pages/boardRent/sector'),
     },
 ];

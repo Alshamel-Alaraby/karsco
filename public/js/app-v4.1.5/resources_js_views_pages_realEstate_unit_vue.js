@@ -7602,6 +7602,11 @@ var menuItems = [{
     label: 'menuitems.dashboard.list.avenue',
     name: "avenue",
     link: '/dashboard/avenue'
+  }, {
+    id: 8,
+    label: 'general.street',
+    name: "street",
+    link: '/dashboard/street'
   }]
 }, {
   id: 10001,
@@ -7717,11 +7722,7 @@ var menuItems = [{
     }, {
       id: 100021,
       name: 'contract unit',
-<<<<<<< HEAD:public/js/app-v4.1.4/resources_js_views_pages_realEstate_unit_vue.js
       label: 'general.invoice',
-=======
-      label: 'general.Invoice',
->>>>>>> b7efc7009968c4a85933b54bc00a732a6fa60ea2:public/js/app-v4.1.5/resources_js_views_pages_realEstate_unit_vue.js
       link: '/dashboard/realEstate/contractunit'
     }]
   }, {
@@ -7826,8 +7827,8 @@ var menuItems = [{
     subItems: [{
       id: 102275,
       name: 'building wallet',
-      label: 'general.tasks',
-      link: '/dashboard/boardRent/soctor'
+      label: 'general.sector',
+      link: '/dashboard/boardRent/sector'
     }]
   }]
 }, {
@@ -9570,7 +9571,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.dropdown-menu-custom-company.dropdown .dropdown-menu[data-v-b4e311a2] {\n    padding: 5px 10px !important;\n    overflow-y: scroll;\n    height: 300px;\n}\n.nav-bordered[data-v-b4e311a2] {\n    border: unset !important;\n}\n.nav[data-v-b4e311a2] {\n    background-color: #dff0fe;\n}\n.tab-content[data-v-b4e311a2] {\n    padding: 70px 60px 40px;\n    min-height: 300px;\n    background-color: #f5f5f5;\n    position: relative;\n}\n.nav-tabs .nav-link[data-v-b4e311a2] {\n    border: 1px solid #b7b7b7 !important;\n    background-color: #d7e5f2;\n    border-bottom: 0 !important;\n    margin-bottom: 1px;\n}\n.nav-tabs .nav-link.active[data-v-b4e311a2],\n.nav-tabs .nav-item.show .nav-link[data-v-b4e311a2] {\n    color: #000;\n    background-color: hsl(0deg 0% 96%);\n    border-bottom: 0 !important;\n}\n.img-thumbnail[data-v-b4e311a2] {\n    max-height: 400px !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.dropdown-menu-custom-company.dropdown .dropdown-menu[data-v-b4e311a2] {\r\n    padding: 5px 10px !important;\r\n    overflow-y: scroll;\r\n    height: 300px;\n}\n.nav-bordered[data-v-b4e311a2] {\r\n    border: unset !important;\n}\n.nav[data-v-b4e311a2] {\r\n    background-color: #dff0fe;\n}\n.tab-content[data-v-b4e311a2] {\r\n    padding: 70px 60px 40px;\r\n    min-height: 300px;\r\n    background-color: #f5f5f5;\r\n    position: relative;\n}\n.nav-tabs .nav-link[data-v-b4e311a2] {\r\n    border: 1px solid #b7b7b7 !important;\r\n    background-color: #d7e5f2;\r\n    border-bottom: 0 !important;\r\n    margin-bottom: 1px;\n}\n.nav-tabs .nav-link.active[data-v-b4e311a2],\r\n.nav-tabs .nav-item.show .nav-link[data-v-b4e311a2] {\r\n    color: #000;\r\n    background-color: hsl(0deg 0% 96%);\r\n    border-bottom: 0 !important;\n}\n.img-thumbnail[data-v-b4e311a2] {\r\n    max-height: 400px !important;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

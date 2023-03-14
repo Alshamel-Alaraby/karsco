@@ -23,6 +23,7 @@ import { arabicValue, englishValue } from "../../../helper/langTransform";
 import GovernorateTab from "../../../components/tabGovernorate.vue";
 import CityTab from "../../../components/tabCity.vue";
 import AvenueTab from "../../../components/tabAvenue.vue";
+import StreetTab from "../../../components/tabStreet";
 /**
  * Advanced Table component
  */
@@ -43,6 +44,7 @@ export default {
     ErrorMessage,
     loader,
     AvenueTab,
+    StreetTab
   },
   // beforeRouteEnter(to, from, next) {
   //   next((vm) => {
@@ -118,7 +120,11 @@ export default {
       country_id: null,
       governorate_id: null,
       city_id: null,
+      street_id: null,
       saveImageName: [],
+      streets:[],
+      avenue_id: null,
+      streetEdit: {},
       current_page: 1,
       showPhoto: "./images/img-1.png",
       setting: {
@@ -497,6 +503,15 @@ export default {
         is_active: data.is_active,
       };
     },
+    onStreetEditClicked(data){
+        this.$bvModal.show(`tab-street-edit`);
+        this.streetEdit = {
+            id: data.id,
+            name: data.name,
+            name_e: data.name_e,
+            is_active: data.is_active,
+        };
+    },
     deleteGovernorate(id) {
       Swal.fire({
         title: `${this.$t("general.Areyousure")}`,
@@ -547,6 +562,57 @@ export default {
         }
       });
     },
+    deleteStreet(id){
+
+        Swal.fire({
+            title: `${this.$t("general.Areyousure")}`,
+            text: `${this.$t("general.Youwontbeabletoreverthis")}`,
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: `${this.$t("general.Yesdeleteit")}`,
+            cancelButtonText: `${this.$t("general.Nocancel")}`,
+            confirmButtonClass: "btn btn-success mt-2",
+            cancelButtonClass: "btn btn-danger ml-2 mt-2",
+            buttonsStyling: false,
+        }).then((result) => {
+            if (result.value) {
+                this.isLoader = true;
+
+                adminApi
+                    .delete(`/streets/${id}`)
+                    .then((res) => {
+                        this.checkAll = [];
+                        this.getData();
+                        Swal.fire({
+                            icon: "success",
+                            title: `${this.$t("general.Deleted")}`,
+                            text: `${this.$t("general.Yourrowhasbeendeleted")}`,
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                    })
+                    .catch((err) => {
+                        if (err.response.status == 400) {
+                            Swal.fire({
+                                icon: "error",
+                                title: `${this.$t("general.Error")}`,
+                                text: `${this.$t("general.CantDeleteRelation")}`,
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: `${this.$t("general.Error")}`,
+                                text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                            });
+                        }
+                    })
+                    .finally(() => {
+                        this.isLoader = false;
+                    });
+            }
+        });
+
+    },
     async getGovernorates(id) {
       this.governorate_id = id ? id : null;
       await adminApi
@@ -562,8 +628,8 @@ export default {
           });
         });
     },
-
-    async getAvenues() {
+    async getAvenues(id) {
+      this.avenue_id = id ? id : null;
       await adminApi
         .get(`/avenues?columns[0]=city_id&search=${this.city_id}`)
         .then((res) => {
@@ -577,6 +643,20 @@ export default {
           });
         });
     },
+    async getStreet() {
+          await adminApi
+              .get(`/streets?columns[0]=avenue_id&search=${this.avenue_id}`)
+              .then((res) => {
+                  this.streets = res.data.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              });
+      },
     async getCities(id) {
       this.city_id = id ? id : null;
       await adminApi
@@ -866,9 +946,11 @@ export default {
       this.country_id = null;
       this.governorate_id = null;
       this.city_id = null;
+      this.avenue_id = null;
       this.governorates = [];
       this.cities = [];
       this.avenues = [];
+      this.streets = [];
       this.media = {};
       this.images = [];
       this.errors = {};
@@ -894,6 +976,7 @@ export default {
       this.country_id = null;
       this.governorate_id = null;
       this.city_id = null;
+      this.avenue_id = null;
       this.media = {};
       this.images = [];
       this.errors = {};
@@ -1052,9 +1135,11 @@ export default {
       this.governorates = [];
       this.cities = [];
       this.avenues = [];
+      this.streets = [];
       this.country_id = null;
       this.governorate_id = null;
       this.city_id = null;
+      this.avenue_id = null;
       this.images = [];
     },
     /**
@@ -1291,7 +1376,9 @@ export default {
     <CityTab :edit="cityEdit" :defaultsKeys="defaultsKeys" :companyKeys="companyKeys" :country_id="country_id"
       :governorate_id="governorate_id" @created="getCities($event)" @updated="getCities" />
     <AvenueTab :edit="avenueEdit" :defaultsKeys="defaultsKeys" :companyKeys="companyKeys" :country_id="country_id"
-      :governorate_id="governorate_id" :city_id="city_id" @created="getAvenues" @updated="getAvenues" />
+      :governorate_id="governorate_id" :city_id="city_id" @created="getAvenues($event)" @updated="getAvenues" />
+    <StreetTab :defaultsKeys="defaultsKeys" :companyKeys="companyKeys" :editStreet="streetEdit"
+               :avenue_id="avenue_id" @created="getStreet" @updated="getStreet" />
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -2059,6 +2146,80 @@ export default {
                       </div>
                       <!-- end .table-responsive-->
                     </b-tab>
+                    <b-tab :disabled="!avenue_id" :title="$t('general.street')">
+                          <div class="col-md-6 mb-4 p-0 position-relative">
+                              <b-button v-b-modal.tab-street-create variant="primary" class="btn-sm mx-1 font-weight-bold">
+                                  {{ $t("general.Create") }}
+                                  <i class="fas fa-plus"></i>
+                              </b-button>
+                          </div>
+                          <!-- start .table-responsive-->
+                          <div class="table-responsive mb-3 custom-table-theme position-relative">
+                              <!--       start loader       -->
+                              <loader size="large" v-if="isLoader" />
+                              <!--       end loader       -->
+
+                              <table class="table table-borderless table-hover table-centered m-0">
+                                  <thead>
+                                  <tr>
+                                      <th>
+                                          <div class="d-flex justify-content-center">
+                                              <span>{{ $t("general.Name") }}</span>
+                                          </div>
+                                      </th>
+                                      <th>
+                                          <div class="d-flex justify-content-center">
+                                              <span>{{ $t("general.Name_en") }}</span>
+                                          </div>
+                                      </th>
+                                      <th>{{ $t("general.Action") }}</th>
+                                  </tr>
+                                  </thead>
+                                  <tbody v-if="streets.length > 0">
+                                  <tr v-for="(data, index) in streets" :key="data.id" class="body-tr-custom">
+                                      <td>
+                                          {{ data.name }}
+                                      </td>
+                                      <td>
+                                          {{ data.name_e }}
+                                      </td>
+
+                                      <td>
+                                          <div class="btn-group">
+                                              <button type="button" class="btn btn-sm dropdown-toggle dropdown-coustom"
+                                                      data-toggle="dropdown" aria-expanded="false">
+                                                  {{ $t("general.commands") }}
+                                                  <i class="fas fa-angle-down"></i>
+                                              </button>
+                                              <div class="dropdown-menu dropdown-menu-custom">
+                                                  <a class="dropdown-item" href="#" @click="onStreetEditClicked(data)">
+                                                      <div class="d-flex justify-content-between align-items-center text-black">
+                                                          <span>{{ $t("general.edit") }}</span>
+                                                          <i class="mdi mdi-square-edit-outline text-info"></i>
+                                                      </div>
+                                                  </a>
+                                                  <a class="dropdown-item text-black" href="#" @click.prevent="deleteStreet(data.id)">
+                                                      <div class="d-flex justify-content-between align-items-center text-black">
+                                                          <span>{{ $t("general.delete") }}</span>
+                                                          <i class="fas fa-times text-danger"></i>
+                                                      </div>
+                                                  </a>
+                                              </div>
+                                          </div>
+                                      </td>
+                                  </tr>
+                                  </tbody>
+                                  <tbody v-else>
+                                  <tr>
+                                      <th class="text-center" colspan="15">
+                                          {{ $t("general.notDataFound") }}
+                                      </th>
+                                  </tr>
+                                  </tbody>
+                              </table>
+                          </div>
+                          <!-- end .table-responsive-->
+                      </b-tab>
                   </b-tabs>
                 </div>
               </form>
@@ -2818,12 +2979,24 @@ export default {
                               <!-- end .table-responsive-->
                             </b-tab>
                             <b-tab :disabled="!city_id" :title="$t('general.avenue')">
-                              <div class="col-md-6 mb-4 p-0 position-relative">
+                              <div class="d-flex mb-4" style="height: 36px; position: relative; top: 24px">
                                 <b-button v-b-modal.tab-avenue-create variant="primary"
                                   class="btn-sm mx-1 font-weight-bold">
                                   {{ $t("general.Create") }}
                                   <i class="fas fa-plus"></i>
                                 </b-button>
+                                <div class="col-md-6">
+                                      <div class="form-group">
+                                          <multiselect @input="getStreet(null)" v-model="avenue_id"
+                                                       :options="avenues.map((type) => type.id)" :custom-label="
+                                        (opt) =>
+                                          $i18n.locale
+                                            ? avenues.find((x) => x.id == opt).name
+                                            : avenues.find((x) => x.id == opt).name_e
+                                      ">
+                                          </multiselect>
+                                      </div>
+                                  </div>
                               </div>
                               <!-- start .table-responsive-->
                               <div class="table-responsive mb-3 custom-table-theme position-relative">
@@ -2893,6 +3066,82 @@ export default {
                               </div>
                               <!-- end .table-responsive-->
                             </b-tab>
+                            <b-tab :disabled="!avenue_id" :title="$t('general.street')">
+                                  <div class="col-md-6 mb-4 p-0 position-relative">
+                                      <b-button v-b-modal.tab-street-create variant="primary"
+                                                class="btn-sm mx-1 font-weight-bold">
+                                          {{ $t("general.Create") }}
+                                          <i class="fas fa-plus"></i>
+                                      </b-button>
+                                  </div>
+                                  <!-- start .table-responsive-->
+                                  <div class="table-responsive mb-3 custom-table-theme position-relative">
+                                      <!--       start loader       -->
+                                      <loader size="large" v-if="isLoader" />
+                                      <!--       end loader       -->
+
+                                      <table class="table table-borderless table-hover table-centered m-0">
+                                          <thead>
+                                          <tr>
+                                              <th>
+                                                  <div class="d-flex justify-content-center">
+                                                      <span>{{ $t("general.Name") }}</span>
+                                                  </div>
+                                              </th>
+                                              <th>
+                                                  <div class="d-flex justify-content-center">
+                                                      <span>{{ $t("general.Name_en") }}</span>
+                                                  </div>
+                                              </th>
+                                              <th>{{ $t("general.Action") }}</th>
+                                          </tr>
+                                          </thead>
+                                          <tbody v-if="streets.length > 0">
+                                          <tr v-for="(data, index) in streets" :key="data.id" class="body-tr-custom">
+                                              <td>
+                                                  {{ data.name }}
+                                              </td>
+                                              <td>
+                                                  {{ data.name_e }}
+                                              </td>
+
+                                              <td>
+                                                  <div class="btn-group">
+                                                      <button type="button" class="btn btn-sm dropdown-toggle dropdown-coustom"
+                                                              data-toggle="dropdown" aria-expanded="false">
+                                                          {{ $t("general.commands") }}
+                                                          <i class="fas fa-angle-down"></i>
+                                                      </button>
+                                                      <div class="dropdown-menu dropdown-menu-custom">
+                                                          <a class="dropdown-item" href="#" @click="onStreetEditClicked(data)">
+                                                              <div class="d-flex justify-content-between align-items-center text-black">
+                                                                  <span>{{ $t("general.edit") }}</span>
+                                                                  <i class="mdi mdi-square-edit-outline text-info"></i>
+                                                              </div>
+                                                          </a>
+                                                          <a class="dropdown-item text-black" href="#"
+                                                             @click.prevent="deleteStreet(data.id)">
+                                                              <div class="d-flex justify-content-between align-items-center text-black">
+                                                                  <span>{{ $t("general.delete") }}</span>
+                                                                  <i class="fas fa-times text-danger"></i>
+                                                              </div>
+                                                          </a>
+                                                      </div>
+                                                  </div>
+                                              </td>
+                                          </tr>
+                                          </tbody>
+                                          <tbody v-else>
+                                          <tr>
+                                              <th class="text-center" colspan="15">
+                                                  {{ $t("general.notDataFound") }}
+                                              </th>
+                                          </tr>
+                                          </tbody>
+                                      </table>
+                                  </div>
+                                  <!-- end .table-responsive-->
+                              </b-tab>
                           </b-tabs>
                         </div>
                       </b-modal>
@@ -2925,47 +3174,48 @@ export default {
 </template>
 
 <style>
-.modal-dialog .card {
-  margin: 0 !important;
-}
+    .modal-dialog .card {
+      margin: 0 !important;
+    }
 
-.country.modal-body {
-  padding: 0 !important;
-}
+    .country.modal-body {
+      padding: 0 !important;
+    }
 
-.modal-dialog .card-body {
-  padding: 1.5rem 1.5rem 0 1.5rem !important;
-}
+    .modal-dialog .card-body {
+      padding: 1.5rem 1.5rem 0 1.5rem !important;
+    }
 
-.nav-bordered {
-  border: unset !important;
-}
+    .nav-bordered {
+      border: unset !important;
+    }
 
-.nav {
-  background-color: #dff0fe;
-}
+    .nav {
+      background-color: #dff0fe;
+    }
 
-.tab-content {
-  padding: 70px 60px 40px;
-  min-height: 300px;
-  background-color: #f5f5f5;
-  position: relative;
-}
+    .tab-content {
+      padding: 70px 60px 40px;
+      min-height: 300px;
+      background-color: #f5f5f5;
+      position: relative;
+    }
 
-.nav-tabs .nav-link {
-  border: 1px solid #b7b7b7 !important;
-  background-color: #d7e5f2;
-  border-bottom: 0 !important;
-  margin-bottom: 1px;
-}
+    .nav-tabs .nav-link {
+      border: 1px solid #b7b7b7 !important;
+      background-color: #d7e5f2;
+      border-bottom: 0 !important;
+      margin-bottom: 1px;
+    }
 
-.nav-tabs .nav-link.active,
-.nav-tabs .nav-item.show .nav-link {
-  color: #000;
-  background-color: hsl(0deg 0% 96%);
-  border-bottom: 0 !important;
-}
+    .nav-tabs .nav-link.active,
+    .nav-tabs .nav-item.show .nav-link {
+      color: #000;
+      background-color: hsl(0deg 0% 96%);
+      border-bottom: 0 !important;
+    }
 
-.img-thumbnail {
-  max-height: 400px !important;
-}</style>
+    .img-thumbnail {
+      max-height: 400px !important;
+    }
+</style>

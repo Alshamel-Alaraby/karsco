@@ -77,6 +77,7 @@ export default {
       per_page: 6,
       type: "",
       search: "",
+      expanded: [],
       favourite: false,
       debounce: {},
       archivesPagination: {},
@@ -196,31 +197,38 @@ export default {
         .then((res) => {
           result.node.children = res.data;
           result.expanded.push(result.node);
+          this.expanded = result.expanded;
         });
     },
     getFieldData() {
       this.getPaginatedArchFiles(1);
-      this.currentNode = null;
+      // this.currentNode = null;
     },
     getPaginatedArchFiles(page) {
       this.current_page = page ? page : this.current_page;
       if (!this.currentNode) {
         this.getData(page);
         return;
+      }else {
+          if(!this.search){
+              if (this.currentNode.parent_doc_type_children) {
+                  //If node selected is key value
+                  this.getArchiveFiles();
+              } else if (this.currentNode.arch_documents) {
+                  //If node selected department
+                  this.getArchiveFilesByDepartmentDocument(this.currentNode.id, null);
+              } else if (this.currentNode.key) {
+                  //If node selected parent document
+                  this.getArchiveFilesByDepartmentDocument(
+                      this.currentNode.arch_department_id,
+                      this.currentNode.id
+                  );
+              }
+          }else {
+              this.getData(page);
+          }
       }
-      if (this.currentNode.parent_doc_type_children) {
-        //If node selected is key value
-        this.getArchiveFiles();
-      } else if (this.currentNode.arch_documents) {
-        //If node selected department
-        this.getArchiveFilesByDepartmentDocument(this.currentNode.id, null);
-      } else if (this.currentNode.key) {
-        //If node selected parent document
-        this.getArchiveFilesByDepartmentDocument(
-          this.currentNode.arch_department_id,
-          this.currentNode.id
-        );
-      }
+
     },
     async getArchiveFiles(docId) {
       this.arch_doc_type_id = docId;
@@ -256,7 +264,7 @@ export default {
       await adminApi
         .get(
           `arch-archive-files/files_Department_Doc_Type?arch_department_id=${departmentId}&arch_doc_type_id=${parentDocumentId ? parentDocumentId : ""
-          }&page=${this.current_page}&per_page=${this.per_page}`
+          }&page=${this.current_page}&per_page=${this.per_page}&doc_type_id=${parentDocumentId ? parentDocumentId : ""}&search=${this.search}`
         )
         .then((res) => {
           let l = res.data;
@@ -699,7 +707,6 @@ export default {
           });
       }
     },
-
     getSecondLevelNodes() {
       this.isLoader = true;
       adminApi
@@ -939,9 +946,13 @@ export default {
                   parent_doc_type_children: this.currentNode.sub_docs,
                   parent_doc_id: res.data.data.parent_doc_id,
                 });
+                let index = this.expanded.findIndex(this.currentNode.key[0]);
+                this.expanded.splice(2, 1);
+                this.expanded.push(this.currentNode.key[0]);
               }
             }
           }
+
           //Update tree
           this.archive_id = res.data.data.id;
           this.is_disabled = true;
@@ -1031,7 +1042,6 @@ export default {
           });
         });
     },
-
     async getStatuses() {
       this.isLoader = true;
       await adminApi
@@ -1085,7 +1095,6 @@ export default {
       };
       this.images = [];
     },
-
     /**
      *  start  dynamicSortString
      */
@@ -1523,9 +1532,9 @@ export default {
               <div class="col-xs-10 col-md-9 col-lg-3 d-flex align-items-center justify-content-end">
                 <div>
                   <!-- <b-button class="mx-1 custom-btn-background">
-                                                          {{ $t("general.filter") }}
-                                                          <i class="fas fa-filter"></i>
-                                                        </b-button> -->
+                                                                              {{ $t("general.filter") }}
+                                                                              <i class="fas fa-filter"></i>
+                                                                            </b-button> -->
                   <!-- start Pagination -->
                   <div class="d-inline-flex align-items-center pagination-custom">
                     <div class="d-inline-block" style="font-size: 15px">

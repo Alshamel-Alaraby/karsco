@@ -34,6 +34,7 @@ import archiving from "./routeChild/archiving";
 import recievablePayable from "./routeChild/recievablePayable";
 import customer from "./routeChild/customer";
 import boardRent from "./routeChild/boardRent";
+import street from "./routeChild/street";
 
 
 export default [
@@ -71,6 +72,7 @@ export default [
     ...customer,
     ...document,
     ...boardRent,
+    ...street,
     {
         path: '/dashboard/notifications',
         name: 'notifications',

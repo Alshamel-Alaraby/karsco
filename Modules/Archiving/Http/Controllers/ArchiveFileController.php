@@ -45,7 +45,7 @@ class ArchiveFileController extends Controller
                 $q->whereIn("arch_doc_type_id", $arch_doc_type_id);
             }
 
-            if ($request->favourite == "true") {
+                if ($request->favourite == "true") {
                 $q->whereHas("favourites", function ($q) use ($request) {
                     $favourite = null;
                     $user_id = $request->header('user_id');
@@ -298,20 +298,30 @@ class ArchiveFileController extends Controller
         return responseJson(200, 'success', ArchiveFileResource::collection($model['data']), $model['paginate'] ? getPaginates($model['data']) : null);
     }
 
-
     public function files_Department_Doc_Type(Request $request)
     {
         $model = $this->model->where(function ($q) use ($request) {
             $q->when($request->arch_department_id, function ($q) use ($request) {
                 $q->where('arch_department_id', $request->arch_department_id);
             });
-        })->where(function ($q) use ($request) {
-            $q->when($request->arch_doc_type_id, function ($q) use ($request) {
-                $q->whereHas('docType', function ($q) use ($request) {
-                    $q->where('parent_id', $request->arch_doc_type_id);
+        });
+        if(!$request->search){
+            $model->where(function ($q) use ($request) {
+                $q->when($request->arch_doc_type_id, function ($q) use ($request) {
+                    $q->whereHas('docType', function ($q) use ($request) {
+                        $q->where('parent_id', $request->arch_doc_type_id);
+                    });
                 });
             });
-        });
+        }
+        if($request->search){
+            $model->where(function ($q) use ($request) {
+                $q->when($request->doc_type_id, function ($q) use ($request) {
+                    $q->where('arch_doc_type_id', $request->doc_type_id);
+                });
+            });
+        }
+
         //
         if ($request->per_page) {
             $model = ['data' => $model->paginate($request->per_page), 'paginate' => true];

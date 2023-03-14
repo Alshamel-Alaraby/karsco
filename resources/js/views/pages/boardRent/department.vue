@@ -567,10 +567,10 @@ export default {
                     class="btn-block setting-search"
                   >
                     <b-form-checkbox  v-model="filterSetting" value="name" class="mb-1">
-                      {{ getCompanyKey("department_name_ar") }}
+                      {{ getCompanyKey("boardRent_department_name_ar") }}
                     </b-form-checkbox>
                     <b-form-checkbox  v-model="filterSetting" value="name_e" class="mb-1">
-                      {{ getCompanyKey("department_name_en") }}
+                      {{ getCompanyKey("boardRent_department_name_en") }}
                     </b-form-checkbox>
                   </b-dropdown>
                   <!-- Basic dropdown -->
@@ -665,10 +665,10 @@ export default {
                       class="dropdown-custom-ali"
                     >
                       <b-form-checkbox  v-model="setting.name" class="mb-1"
-                        >{{ getCompanyKey("department_name_ar") }}
+                        >{{ getCompanyKey("boardRent_department_name_ar") }}
                       </b-form-checkbox>
                       <b-form-checkbox  v-model="setting.name_e" class="mb-1">
-                        {{ getCompanyKey("department_name_en") }}
+                        {{ getCompanyKey("boardRent_department_name_en") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
                         <a href="javascript:void(0)" class="btn btn-primary btn-sm"
@@ -725,7 +725,7 @@ export default {
             <!--  create   -->
             <b-modal
               id="create"
-              :title="getCompanyKey('department_create_form')"
+              :title="getCompanyKey('boardRent_department_create_form')"
               title-class="font-18"
               body-class="p-4 "
               :hide-footer="true"
@@ -773,7 +773,7 @@ export default {
                   <div class="col-md-12" >
                     <div class="form-group">
                       <label for="field-1" class="control-label">
-                        {{ getCompanyKey("department_name_ar") }}
+                        {{ getCompanyKey("boardRent_department_name_ar") }}
                         <span  class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
@@ -813,7 +813,7 @@ export default {
                   <div class="col-md-12" >
                     <div class="form-group">
                       <label for="field-2" class="control-label">
-                        {{ getCompanyKey("department_name_en") }}
+                        {{ getCompanyKey("boardRent_department_name_en") }}
                         <span  class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
@@ -877,7 +877,7 @@ export default {
                     </th>
                     <th v-if="setting.name">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("department_name_ar") }}</span>
+                        <span>{{ getCompanyKey("boardRent_department_name_ar") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -892,7 +892,7 @@ export default {
                     </th>
                     <th v-if="setting.name_e">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("department_name_en") }}</span>
+                        <span>{{ getCompanyKey("boardRent_department_name_en") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -978,7 +978,7 @@ export default {
                       <!--  edit   -->
                       <b-modal
                         :id="`modal-edit-${data.id}`"
-                        :title="getCompanyKey('department_edit_form')"
+                        :title="getCompanyKey('boardRent_department_edit_form')"
                         title-class="font-18"
                         body-class="p-4"
                         :ref="`edit-${data.id}`"
@@ -1016,7 +1016,7 @@ export default {
                             <div class="col-md-12">
                               <div class="form-group">
                                 <label for="field-u-1" class="control-label">
-                                  {{ getCompanyKey("department_name_ar") }}
+                                  {{ getCompanyKey("boardRent_department_name_ar") }}
                                   <span class="text-danger">*</span>
                                 </label>
                                 <div dir="rtl">
@@ -1060,7 +1060,7 @@ export default {
                             <div class="col-md-12">
                             <div class="form-group">
                                 <label for="field-u-2" class="control-label">
-                                  {{ getCompanyKey("department_name_en") }}
+                                  {{ getCompanyKey("boardRent_department_name_en") }}
                                   <span class="text-danger">*</span>
                                 </label>
                                 <div dir="ltr">

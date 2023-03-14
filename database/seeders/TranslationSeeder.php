@@ -7070,10 +7070,68 @@ class TranslationSeeder extends Seeder
 
             ],
         ]);
-        //departments
+        //Street
         Translation::insert([
             [
-                "key" => "department_create_form",
+                "key" => "street_create_form",
+                "default_en" => "Add new street",
+                "default_ar" => "اضف شارع جديد",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "street"
+            ],
+            [
+                "key" => "street_edit_form",
+                "default_en" => "Edit street form",
+                "default_ar" => "تعديل نموذج شارع",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "street"
+            ],
+            [
+                "key" => "street_name_ar",
+                "default_en" => "street name (arabic)",
+                "default_ar" => "اسم شارع (عربي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "street"
+            ],
+            [
+                "key" => "street_name_en",
+                "default_en" => "street name (english)",
+                "default_ar" => "اسم شارع (انجليزي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "street"
+            ],
+            [
+                "key" => "street_status",
+                "default_en" => "street status",
+                "default_ar" => "حاله ",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "street"
+            ],
+            [
+                "key" => "street_avenue",
+                "default_en" => "avenue",
+                "default_ar" => "المنطقه",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "street",
+            ],
+        ]);
+        //   start  boardRealestate    //
+        //boardRealestate departments
+        Translation::insert([
+            [
+                "key" => "boardRent_department_create_form",
                 "default_en" => "Add new department",
                 "default_ar" => "اضف قسم جديدة",
                 "new_ar" => "",
@@ -7082,7 +7140,7 @@ class TranslationSeeder extends Seeder
                 "screen" => "units"
             ],
             [
-                "key" => "department_edit_form",
+                "key" => "boardRent_department_edit_form",
                 "default_en" => "Edit department form",
                 "default_ar" => "نموذج تعديل القسم",
                 "new_ar" => "",
@@ -7092,7 +7150,7 @@ class TranslationSeeder extends Seeder
 
             ],
             [
-                "key" => "department_name_ar",
+                "key" => "boardRent_department_name_ar",
                 "default_en" => "department name (arabic)",
                 "default_ar" => "اسم القسم (عربي)",
                 "new_ar" => "",
@@ -7102,7 +7160,7 @@ class TranslationSeeder extends Seeder
 
             ],
             [
-                "key" => "department_name_en",
+                "key" => "boardRent_department_name_en",
                 "default_en" => "department name (english)",
                 "default_ar" => "اسم قسم (انجليزي)",
                 "new_ar" => "",
@@ -7112,10 +7170,10 @@ class TranslationSeeder extends Seeder
 
             ],
         ]);
-        //boardRealestate
+        //boardRealestate sell method
         Translation::insert([
             [
-                "key" => "boardRealestate_sellMethod_create_form",
+                "key" => "boardRent_sellMethod_create_form",
                 "default_en" => "Add new sell Method",
                 "default_ar" => "اضف طريقه بيع جديدة",
                 "new_ar" => "",
@@ -7124,7 +7182,7 @@ class TranslationSeeder extends Seeder
                 "screen" => "units"
             ],
             [
-                "key" => "boardRealestate_sellMethod_edit_form",
+                "key" => "boardRent_sellMethod_edit_form",
                 "default_en" => "Edit Sell Method form",
                 "default_ar" => "تعديل طريقه البيع ",
                 "new_ar" => "",
@@ -7134,7 +7192,7 @@ class TranslationSeeder extends Seeder
 
             ],
             [
-                "key" => "boardRealestate_sellMethod_name_ar",
+                "key" => "boardRent_sellMethod_name_ar",
                 "default_en" => "Sell Method name (arabic)",
                 "default_ar" => "اسم طريقه البيع (عربي)",
                 "new_ar" => "",
@@ -7144,7 +7202,7 @@ class TranslationSeeder extends Seeder
 
             ],
             [
-                "key" => "boardRealestate_sellMethod_name_en",
+                "key" => "boardRent_sellMethod_name_en",
                 "default_en" => "Sell Method name (english)",
                 "default_ar" => "اسم طريقه اليع (انجليزي)",
                 "new_ar" => "",
@@ -7153,26 +7211,50 @@ class TranslationSeeder extends Seeder
                 "screen" => "units"
 
             ],
+        ]);
+        //boardRealestate sector
+        Translation::insert([
             [
-                "key" => "boardRealestate_sellMethod_commission_ratio",
-                "default_en" => "Commission Ratio",
-                "default_ar" => "نسبة العمولة",
+                "key" => "boardRent_sector_create_form",
+                "default_en" => "Add new sector",
+                "default_ar" => "اضف قطاع جديد",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
-                "screen" => "units"
+                "screen" => "employees"
             ],
             [
-                "key" => "boardRealestate_sellMethod_target_ratio",
-                "default_en" => "target ratio",
-                "default_ar" => "النسبة المستهدفة",
+                "key" => "boardRent_sector_edit_form",
+                "default_en" => "Edit sector form",
+                "default_ar" => "تعديل نموذج قطاع",
                 "new_ar" => "",
                 "new_en" => "",
                 "company_id" => 0,
-                "screen" => "units"
+                "screen" => "employees"
 
             ],
+            [
+                "key" => "boardRent_sector_name_ar",
+                "default_en" => "Sector name (arabic)",
+                "default_ar" => "اسم القطاع (عربي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "employees"
+
+            ],
+            [
+                "key" => "boardRent_sector_name_en",
+                "default_en" => "Sector name (english)",
+                "default_ar" => "اسم القطاع (انجليزي)",
+                "new_ar" => "",
+                "new_en" => "",
+                "company_id" => 0,
+                "screen" => "employees"
+
+            ]
         ]);
+        //   end  boardRealestate    //
     }
 
 }

@@ -8502,6 +8502,11 @@ var menuItems = [{
     label: 'menuitems.dashboard.list.avenue',
     name: "avenue",
     link: '/dashboard/avenue'
+  }, {
+    id: 8,
+    label: 'general.street',
+    name: "street",
+    link: '/dashboard/street'
   }]
 }, {
   id: 10001,
@@ -8617,11 +8622,7 @@ var menuItems = [{
     }, {
       id: 100021,
       name: 'contract unit',
-<<<<<<< HEAD:public/js/app-v4.1.4/resources_js_views_pages_realEstate_contractunit_vue.js
       label: 'general.invoice',
-=======
-      label: 'general.Invoice',
->>>>>>> b7efc7009968c4a85933b54bc00a732a6fa60ea2:public/js/app-v4.1.5/resources_js_views_pages_realEstate_contractunit_vue.js
       link: '/dashboard/realEstate/contractunit'
     }]
   }, {
@@ -8726,8 +8727,8 @@ var menuItems = [{
     subItems: [{
       id: 102275,
       name: 'building wallet',
-      label: 'general.tasks',
-      link: '/dashboard/boardRent/soctor'
+      label: 'general.sector',
+      link: '/dashboard/boardRent/sector'
     }]
   }]
 }, {
@@ -10374,15 +10375,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-<<<<<<< HEAD
-<<<<<<< HEAD:public/js/app-v4.1.4/resources_js_views_pages_realEstate_contractunit_vue.js
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.loader[data-v-155ec09e] {\n    width: 100%;\n    height: 100%;\n    background-color: #fff;\n    opacity: .6;\n    z-index: 100;\n}\n.loader-large[data-v-155ec09e] {\n    width: 4rem;\n    height: 4rem\n}\n.loader-small[data-v-155ec09e] {\n    width: 1rem;\n    height: 1rem\n}\n.loader-middle[data-v-155ec09e] {\n    width: 2.25rem;\n    height: 2.25rem\n}\n", ""]);
-=======
-___CSS_LOADER_EXPORT___.push([module.id, "\n.color {\n    color: #6c757d !important;\n}\n", ""]);
->>>>>>> b7efc7009968c4a85933b54bc00a732a6fa60ea2:public/js/app-v4.1.5/resources_js_views_pages_realEstate_contractunit_vue.js
-=======
-___CSS_LOADER_EXPORT___.push([module.id, "\n.color {\r\n    color: #6c757d !important;\n}\r\n", ""]);
->>>>>>> 4a623a22647776ef00038a56e4d1f3bb62689048
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
