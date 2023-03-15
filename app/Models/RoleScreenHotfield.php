@@ -11,7 +11,7 @@ use Spatie\Activitylog\LogOptions;
 
 class RoleScreenHotfield extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait, CompanyScopeTrait;
+    use HasFactory, SoftDeletes, LogTrait   ;
 
     protected $table = 'general_role_screen_hotfields';
 

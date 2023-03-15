@@ -22,7 +22,7 @@ class ArchiveFile extends Model implements HasMedia
 
     public function docType()
     {
-        return $this->belongsTo(DocType::class);
+        return $this->belongsTo(DocType::class ,'arch_doc_type_id');
     }
     public function department(){
         return $this->belongsTo(Department::class);
@@ -36,7 +36,7 @@ class ArchiveFile extends Model implements HasMedia
     protected function dataTypeValue(): Attribute
     {
         return Attribute::make(
-            set:fn($value) => json_encode($value),
+            set:fn($value) => json_encode($value,JSON_UNESCAPED_UNICODE),
             get:fn($value) => json_decode($value)
         );
     }

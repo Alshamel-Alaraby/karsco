@@ -12,7 +12,7 @@ use Spatie\MediaLibrary\HasMedia;
 
 class BankAccount extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes, LogTrait, MediaTrait, CompanyScopeTrait;
+    use HasFactory, SoftDeletes, LogTrait, MediaTrait   ;
     protected $table = 'general_bank_accounts';
 
     protected $fillable = [

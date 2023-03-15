@@ -19,9 +19,9 @@ class CreateGeneralSerialsTable extends Migration
             $table->string('perfix')->nullable();
             $table->string('suffix')->nullable();
             $table->string('restart_period')->default(0)->comment ('Daily, monthly, yearly, open');
-            $table->unsignedBigInteger('company_id');
-            $table->unsignedBigInteger('branch_id');
-            $table->unsignedBigInteger('store_id');
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->unsignedBigInteger('branch_id')->nullable();
+            $table->unsignedBigInteger('store_id')->nullable();
             $table->string('is_default')->default(0)->comment ('1=Yes, 0=No');
             $table->timestamps();
         });

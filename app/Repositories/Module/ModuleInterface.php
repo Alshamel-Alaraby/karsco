@@ -15,6 +15,10 @@ interface ModuleInterface
 
     public function delete($id);
 
+    public function moduleDisable($request);
+
+
+
     // public function addModuleToCompany($module_id, $company_id);
 
     // public function removeModuleFromCompany($module_id, $company_id);

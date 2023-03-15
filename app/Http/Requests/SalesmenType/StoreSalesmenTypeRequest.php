@@ -24,9 +24,9 @@ class StoreSalesmenTypeRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255',
-            'name_e' => 'required|string|max:255',
-            "is_employee" => "required|in:0,1",
+            'name' => 'nullable|string|max:255',
+            'name_e' => 'nullable|string|max:255',
+            "is_employee" => "nullable|in:0,1",
         ];
     }
 

@@ -8,8 +8,6 @@ use Modules\RecievablePayable\Repositories\RpDocumentPlanRepository;
 use Modules\RecievablePayable\Repositories\RpDocumentPlanRepositoryInterface;
 use Modules\RecievablePayable\Repositories\RpInstallmentCondationRepository;
 use Modules\RecievablePayable\Repositories\RpInstallmentCondationRepositoryInterface;
-use Modules\RecievablePayable\Repositories\RpInstallmentPaymentPlanDetailRepository;
-use Modules\RecievablePayable\Repositories\RpInstallmentPaymentPlanDetailRepositoryInterface;
 use Modules\RecievablePayable\Repositories\RpInstallmentPaymentPlanRepository;
 use Modules\RecievablePayable\Repositories\RpInstallmentPaymentPlanRepositoryInterface;
 use Modules\RecievablePayable\Repositories\RpInstallmentPaymentTypeRepository;
@@ -18,6 +16,8 @@ use Modules\RecievablePayable\Repositories\RpInstallmentStatusRepository;
 use Modules\RecievablePayable\Repositories\RpInstallmentStatusRepositoryInterface;
 use Modules\RecievablePayable\Repositories\RpMainContactGroupRepository;
 use Modules\RecievablePayable\Repositories\RpMainContactGroupRepositoryInterface;
+use Modules\RecievablePayable\Repositories\RpOpeningBalanceInterface;
+use Modules\RecievablePayable\Repositories\RpOpeningBalanceRepository;
 use Modules\RecievablePayable\Repositories\RpPaymentPlanInstallmentRepository;
 use Modules\RecievablePayable\Repositories\RpPaymentPlanInstallmentRepositoryInterface;
 use Modules\RecievablePayable\Repositories\RpScreenSubContactGroupRepository;
@@ -49,7 +49,6 @@ class RecievablePayableServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
 
-        $this->app->bind (RpInstallmentPaymentPlanDetailRepositoryInterface::class,RpInstallmentPaymentPlanDetailRepository::class);
         $this->app->bind (RpInstallmentPaymentTypeRepositoryInterface::class,RpInstallmentPaymentTypeRepository::class);
         $this->app->bind (RpInstallmentStatusRepositoryInterface::class,RpInstallmentStatusRepository::class);
         $this->app->bind (RpPaymentPlanInstallmentRepositoryInterface::class,RpPaymentPlanInstallmentRepository::class);
@@ -59,6 +58,7 @@ class RecievablePayableServiceProvider extends ServiceProvider
         $this->app->bind (RpScreenSubContactGroupRepositoryInterface::class,RpScreenSubContactGroupRepository::class);
         $this->app->bind (RpDocumentPlanRepositoryInterface::class,RpDocumentPlanRepository::class);
         $this->app->bind (RpInstallmentCondationRepositoryInterface::class,RpInstallmentCondationRepository::class);
+        $this->app->bind (RpOpeningBalanceInterface::class,RpOpeningBalanceRepository::class);
     }
 
     /**

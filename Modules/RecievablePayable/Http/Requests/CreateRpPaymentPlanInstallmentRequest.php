@@ -2,12 +2,12 @@
 
 namespace Modules\RecievablePayable\Http\Requests;
 
-use App\Traits\ValidationTrait;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRpPaymentPlanInstallmentRequest extends FormRequest
 {
-    use ValidationTrait;
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -16,20 +16,21 @@ class CreateRpPaymentPlanInstallmentRequest extends FormRequest
     public function rules()
     {
         return [
-            'installment_payment_plan_id' => 'required',
-            'installment_payment_plan_detail_ln_no' => 'required',
-            'v_date' => 'required',
-            'due_date' => 'required',
-            'total_amount' => 'required',
-            'paid_amount' => 'required',
-            'installment_status_id' => 'required',
-            'doc_type' => 'required',
-            'screen_id' => 'required',
-            'module_id' => 'required',
-            'ref_id' => 'required',
-            'rp_code' => 'required',
-            'note_a' => 'nullable|string',
-            'note_e' => 'nullable|string',
+            "payment_plan_installments"  => "required|array",
+            'payment_plan_installments.*.installment_payment_plan_id' => 'required',
+            'payment_plan_installments.*.installment_payment_type_id' => 'required',
+            'payment_plan_installments.*.v_date' => 'required',
+            'payment_plan_installments.*.due_date' => 'required',
+            'payment_plan_installments.*.total_amount' => 'required',
+            'payment_plan_installments.*.paid_amount' => 'required',
+            'payment_plan_installments.*.installment_status_id' => 'required',
+            'payment_plan_installments.*.doc_type_id' => 'required',
+            'payment_plan_installments.*.ref_id' => 'required',
+            'payment_plan_installments.*.rp_code' => 'required',
+            'payment_plan_installments.*.is_fixed' => [],
+            'payment_plan_installments.*.day_month' => [],
+            'payment_plan_installments.*.note_a' => 'nullable|string',
+            'payment_plan_installments.*.note_e' => 'nullable|string',
         ];
     }
 

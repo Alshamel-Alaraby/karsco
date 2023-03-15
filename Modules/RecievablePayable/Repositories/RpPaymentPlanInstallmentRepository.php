@@ -5,6 +5,7 @@ namespace Modules\RecievablePayable\Repositories;
 use App\Models\UserSettingScreen;
 use Illuminate\Support\Facades\DB;
 use Modules\RealEstate\Entities\PropertyType;
+use Modules\RecievablePayable\Entities\RpInstallmentPaymentPlan;
 use Modules\RecievablePayable\Entities\RpInstallmentPaymentPlanDetail;
 use Modules\RecievablePayable\Entities\RpPaymentPlanInstallment;
 
@@ -12,11 +13,13 @@ class RpPaymentPlanInstallmentRepository implements RpPaymentPlanInstallmentRepo
 {
 
     private $model;
+    private $modelplan;
     private $setting;
 
-    public function __construct(RpPaymentPlanInstallment $model, UserSettingScreen $setting)
+    public function __construct(RpPaymentPlanInstallment $model, UserSettingScreen $setting ,RpInstallmentPaymentPlan $modelplan)
     {
         $this->model = $model;
+        $this->modelplan = $modelplan;
         $this->setting = $setting;
     }
 
@@ -37,32 +40,41 @@ class RpPaymentPlanInstallmentRepository implements RpPaymentPlanInstallmentRepo
     {
         return $this->model->find($id);
     }
+    public function findPlan($id)
+    {
+        return $this->modelplan->find($id);
+    }
+
 
     public function create($request)
     {
         DB::transaction(function () use ($request) {
-            $model = $this->model->create($request->all());
-            cacheForget("RpPaymentPlanInstallment");
+            foreach ($request->payment_plan_installments as $data):
+            $model = $this->model->create($data);
+            endforeach;
         });
     }
 
     public function update($request, $id)
     {
         DB::transaction(function () use ($id, $request) {
-            $model = $this->model->find($id);
-            $model->update($request->all());
-
-            $this->forget($id);
-
+            $model = $this->modelplan->find($id);
+            foreach ($model->payment_plan_installments as $data ):
+                $data->delete();
+            endforeach;
+            foreach ($request->payment_plan_installments as $data):
+                $model = $this->model->create($data);
+            endforeach;
         });
 
     }
 
     public function delete($id)
     {
-        $model = $this->find($id);
-        $this->forget($id);
-        $model->delete();
+        $model  = $this->modelplan->find($id);
+        foreach ($model->payment_plan_installments as $data ):
+            $data->delete();
+        endforeach;
     }
 
 

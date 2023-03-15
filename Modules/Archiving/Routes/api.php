@@ -27,12 +27,13 @@ use Modules\Archiving\Http\Controllers\DocumentFieldController;
 //     return $request->user();
 // });
 
+
+
 Route::group(['prefix' => 'document-field'], function () {
     Route::controller(DocumentFieldController::class)->group(function () {
         Route::get("tables", 'getTables');
         Route::get("columns/{table}", 'getColumns');
         Route::get("column-data/{table}/{column}", 'getColumnData');
-
         Route::get('/', 'all')->name('document.index');
         Route::get('/{id}', 'find');
         Route::post('/', 'create')->name('document.create');
@@ -58,6 +59,7 @@ Route::group(['prefix' => 'archive-closed-reference'], function () {
 Route::group(['prefix' => 'arch-department'], function () {
     Route::controller(DepartmentController::class)->group(function () {
         Route::get('/', 'all')->name('archDepartment.index');
+        Route::get('parent_department', 'parentDepartment')->name('parent_department.index');
         Route::get('/tree', 'tree');
         Route::get('/only-has-key', 'onlyHasKey');
         Route::get('/{id}', 'find');
@@ -85,6 +87,7 @@ Route::group(['prefix' => 'arch-doc-type'], function () {
     Route::controller(DocTypeController::class)->group(function () {
         Route::get("/tree", 'tree')->name('arch-doc-type.tree');
         Route::get("/nodes-level-two", 'nodesLevelTwo');
+        Route::get("/docTypeChildArchiveFiles", 'docTypeChildArchiveFiles');
         Route::get('/', 'all')->name('arch-doc-type.index');
         Route::post('add-status-to-document', 'addStatusToDocumentType');
         Route::delete('remove-status-from-document/{doc_type_id}/{status_id}', 'removeStatusFromDocumentType');
@@ -102,6 +105,7 @@ Route::group(['prefix' => 'arch-doc-type-field'], function () {
     Route::controller(DocTypeFieldController::class)->group(function () {
         Route::get('/', 'all')->name('arch-doc-type-field.index');
         Route::get('/{id}', 'find');
+        Route::get('id-doctype-field/{id}', 'idDocTypeField');
         Route::post('/', 'create')->name('arch-doc-type-field.create');
         Route::put('/{id}', 'update')->name('arch-doc-type-field.update');
         Route::delete('/{id}', 'delete')->name('arch-doc-type-field.destroy');
@@ -154,6 +158,10 @@ Route::group(['prefix' => 'arch-doc-type-department'], function () {
 Route::group(['prefix' => 'arch-archive-files'], function () {
     Route::controller(ArchiveFileController::class)->group(function () {
         Route::get('valueMedia', 'valueMedia');
+        Route::get('getKeys', 'getKeys');
+        Route::get('files-Doc-Type/{id}', 'filesDocType');
+        Route::get("/docType-child-archiv-files", 'docTypeChildArchiveFiles');
+        Route::get('files_Department_Doc_Type', 'files_Department_Doc_Type');
         Route::get("/value/{value}", "searchValue");
         Route::get("pdf/{id}", "pdf");
         Route::put("toggle-favourite", "toggleFavourite");
@@ -165,7 +173,6 @@ Route::group(['prefix' => 'arch-archive-files'], function () {
         Route::delete('/{id}', 'delete')->name(' archive.files.destroy');
         Route::get('logs/{id}', 'logs');
         Route::post('bulk-delete', 'bulkDelete');
-        Route::post('file-noartify', 'sendArchvingNotification');
     });
 });
 

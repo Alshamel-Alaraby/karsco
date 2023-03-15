@@ -23,6 +23,8 @@ use App\Repositories\Currency\CurrencyRepository;
 use App\Repositories\Currency\CurrencyRepositoryInterface;
 use App\Repositories\CustomTable\CustomTableInterface;
 use App\Repositories\CustomTable\CustomTableRepository;
+use App\Repositories\Document\DocumentInterface;
+use App\Repositories\Document\DocumentIRepository;
 use App\Repositories\Employee\EmployeeInterface;
 use App\Repositories\Employee\EmployeeRepository;
 use App\Repositories\ExternalSalesmen\ExternalSalesmenInterface;
@@ -70,6 +72,7 @@ use App\Repositories\User\UserRepositoryInterface;
 use App\Repositories\WorkflowHotfield\WorkflowHotfieldRepository;
 use App\Repositories\WorkflowHotfield\WorkflowHotfieldRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -126,6 +129,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ScreenTreePropertyRepositoryInterface::class, ScreenTreePropertyRepository::class);
         $this->app->bind(GeneralCustomerRepositoryInterface::class, GeneralCustomerRepository::class);
         $this->app->bind(CustomTableInterface::class, CustomTableRepository::class);
+        $this->app->bind(DocumentInterface::class, DocumentIRepository::class);
     }
 
     /**
@@ -133,8 +137,9 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
+
     public function boot()
     {
-        //
+        Schema::defaultStringLength(191);
     }
 }

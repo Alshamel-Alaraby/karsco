@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import {required, minLength, maxLength, integer} from "vuelidate/lib/validators";
+import {required, minLength, maxLength, integer, decimal, minValue} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -12,7 +12,7 @@ import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
 
 import { arabicValue, englishValue } from "../../../helper/langTransform";
-
+import owner from "../../../components/create/realEstate/owner";
 /**
  * Advanced Table component
  */
@@ -46,10 +46,12 @@ export default {
         PageHeader,
         Switches,
         ErrorMessage,
-        loader
+        loader,
+        owner
     },
     data() {
         return {
+            tab: '',
             per_page: 50,
             search: '',
             debounce: {},
@@ -66,7 +68,20 @@ export default {
                 name: '',
                 name_e: '',
             },
+            createOwner: {
+                wallet_owners: [
+                    {
+                        owner_id: null,
+                        percentage: 0,
+                    }
+                ]
+            },
+            editOwner: {
+                wallet_owners: []
+            },
+            wallet_id: null,
             errors: {},
+            owners: [],
             dropDownSenders: [],
             is_disabled: false,
             isCheckAll: false,
@@ -80,6 +95,7 @@ export default {
             Tooltip: '',
             mouseEnter: null,
             printLoading: true,
+            is_persentage: true,
             printObj: {
                 id: "printWallet",
             }
@@ -94,6 +110,26 @@ export default {
             name: {required, minLength: minLength(3), maxLength: maxLength(100)},
             name_e: {required, minLength: minLength(3), maxLength: maxLength(100)},
         },
+        createOwner: {
+            wallet_id: { required },
+            wallet_owners: {
+                required,
+                $each: {
+                    owner_id: {required},
+                    percentage: {required, decimal, minValue: minValue(0.01)},
+                }
+            }
+        },
+        editOwner: {
+            wallet_id: { required },
+            wallet_owners: {
+                required,
+                $each: {
+                    owner_id: {required},
+                    percentage: {required, decimal, minValue: minValue(0.01)},
+                }
+            }
+        }
     },
     watch: {
         /**
@@ -126,49 +162,86 @@ export default {
             }
         }
     },
-    // updated(){
-
-    //     $(function(){
-    //         $(".englishInput").keypress(function(event){
-    //             var ew = event.which;
-    //             if(ew == 32)
-    //                 return true;
-    //             if(48 <= ew && ew <= 57)
-    //                 return true;
-    //             if(65 <= ew && ew <= 90)
-    //                 return true;
-    //             if(97 <= ew && ew <= 122)
-    //                 return true;
-    //             return false;
-    //         });
-    //         $(".arabicInput").keypress(function(event){
-    //             var ew = event.which;
-    //             if(ew == 32)
-    //                 return true;
-    //             if(48 <= ew && ew <= 57)
-    //                 return true;
-    //             if(65 <= ew && ew <= 90)
-    //                 return false;
-    //             if(97 <= ew && ew <= 122)
-    //                 return false;
-    //             return true;
-    //         });
-    //     });
-    // },
     mounted() {
         this.getData();
     },
     methods: {
-                arabicValue(txt) {
-      this.create.name = arabicValue(txt);
-      this.edit.name = arabicValue(txt);
-    },
+        addNewField(){
+                this.createOwner.wallet_owners.push({
+                    owner_id: null,
+                    percentage: 0,
+                });
+            },
+        removeNewField(index){
+                if(this.createOwner.wallet_owners.length > 1){
+                    this.createOwner.wallet_owners.splice(index,1);
+                    let totel = this.createOwner.wallet_owners.reduce((accumulator, curValue) => parseFloat(accumulator) + parseFloat(curValue.percentage), 0);
+                    this.is_persentage = totel == 100  ? true: false;
+                }
+            },
+        addNewFieldEdit(){
+                this.edit.editOwner.push({
+                    owner_id: null,
+                    percentage: 0,
+                });
+            },
+        removeNewFieldEdit(index){
+                if(this.editOwner.wallet_owners.length > 1){
+                    this.editOwner.wallet_owners.splice(index,1);
+                    let totel = this.editOwner.wallet_owners.reduce((accumulator, curValue) => parseFloat(accumulator) + parseFloat(curValue.percentage), 0);
+                    this.is_persentage = totel == 100 ? true: false;
+                }
+            },
+        arabicValue(txt) {
+          this.create.name = arabicValue(txt);
+          this.edit.name = arabicValue(txt);
+        },
+        englishValue(txt) {
+          this.create.name_e = englishValue(txt);
+          this.edit.name_e = englishValue(txt);
+        },
+        async getOwner() {
+                this.isLoader = true;
 
-    englishValue(txt) {
-      this.create.name_e = englishValue(txt);
-      this.edit.name_e = englishValue(txt);
-    },
-
+                await adminApi
+                    .get(`/real-estate/owners`)
+                    .then((res) => {
+                        let l = res.data.data;
+                        l.unshift({ id: 0, name: "اضف مالك  ", name_e: "Add Owner" });
+                        this.owners = l;
+                    })
+                    .catch((err) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: `${this.$t("general.Error")}`,
+                            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                        });
+                    })
+                    .finally(() => {
+                        this.isLoader = false;
+                    });
+            },
+        showOwnerModal(index) {
+            if (this.createOwner.wallet_owners[index].owner_id == 0) {
+                this.$bvModal.show("owner-create");
+                this.createOwner.wallet_owners[index].owner_id = null;
+            }
+        },
+        showOwnerEditModal(index) {
+            if (this.editOwner.wallet_owners[index].owner_id == 0) {
+                this.$bvModal.show("owner-create");
+                this.editOwner.wallet_owners[index].owner_id = null;
+            }
+        },
+        changeNumber(add){
+            if(add == 'add'){
+                let totel = this.createOwner.wallet_owners.reduce((accumulator, curValue) => parseFloat(accumulator) + parseFloat(curValue.percentage), 0);
+                this.is_persentage = totel == 100  ? true: false;
+            }else {
+                let totel = this.editOwner.wallet_owners.reduce((accumulator, curValue) => parseFloat(accumulator) + parseFloat(curValue.percentage), 0);
+                this.is_persentage = totel == 100 ? true: false;
+            }
+        },
         /**
          *  start get Data module && pagination
          */
@@ -341,6 +414,7 @@ export default {
             this.$nextTick(() => {
                 this.$v.$reset()
             });
+            this.is_persentage = true;
             this.errors = {};
             this.$bvModal.hide(`create`);
         },
@@ -364,6 +438,7 @@ export default {
             });
             this.is_disabled = false;
             this.errors = {};
+            this.is_persentage = true;
         },
         AddSubmit() {
 
@@ -453,6 +528,7 @@ export default {
          */
         resetModalEdit(id) {
             let module = this.wallets.find(e => id == e.id);
+            this.is_persentage = true;
             this.edit.name = module.name;
             this.edit.name_e = module.name_e;
             this.errors = {};
@@ -466,6 +542,7 @@ export default {
                 name: '',
                 name_e: '',
             };
+            this.is_persentage = true;
         },
 
         /**
@@ -539,6 +616,7 @@ export default {
 
 <template>
     <Layout>
+        <owner :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getOwner" />
         <PageHeader/>
         <div class="row">
             <div class="col-12">
@@ -705,6 +783,7 @@ export default {
                             :title="getCompanyKey('wallet_create_form')"
                             title-class="font-18"
                             body-class="p-4 "
+                            :size="tab == 'owner'? 'lg' : ''"
                             :hide-footer="true"
                             @show="resetModal"
                             @hidden="resetModalHidden"
@@ -712,109 +791,127 @@ export default {
                             <form>
                                 <div class="mb-3 d-flex justify-content-end">
 
-                                    <b-button
-                                        variant="success"
-                                        :disabled="!is_disabled"
-                                        @click.prevent="resetForm"
-                                        type="button" :class="['font-weight-bold px-2',is_disabled?'mx-2': '']"
-                                    >
-                                        {{ $t('general.AddNewRecord') }}
-                                    </b-button>
-                                    <template v-if="!is_disabled">
                                         <b-button
                                             variant="success"
-                                            type="button" class="mx-1"
-                                            v-if="!isLoader"
-                                            @click.prevent="AddSubmit"
+                                            :disabled="!is_disabled"
+                                            @click.prevent="resetForm"
+                                            type="button" :class="['font-weight-bold px-2',is_disabled?'mx-2': '']"
                                         >
-                                            {{ $t('general.Add') }}
+                                            {{ $t('general.AddNewRecord') }}
                                         </b-button>
+                                        <template v-if="!is_disabled">
+                                            <b-button
+                                                variant="success"
+                                                type="button" class="mx-1"
+                                                v-if="!isLoader"
+                                                @click.prevent="AddSubmit"
+                                            >
+                                                {{ $t('general.Add') }}
+                                            </b-button>
 
-                                        <b-button variant="success" class="mx-1" disabled v-else>
-                                            <b-spinner small></b-spinner>
-                                            <span class="sr-only">{{ $t('login.Loading') }}...</span>
+                                            <b-button variant="success" class="mx-1" disabled v-else>
+                                                <b-spinner small></b-spinner>
+                                                <span class="sr-only">{{ $t('login.Loading') }}...</span>
+                                            </b-button>
+                                        </template>
+                                        <!-- Emulate built in modal footer ok and cancel button actions -->
+
+                                        <b-button variant="danger" type="button" @click.prevent="resetModalHidden">
+                                            {{ $t('general.Cancel') }}
                                         </b-button>
-                                    </template>
-                                    <!-- Emulate built in modal footer ok and cancel button actions -->
+                                    </div>
+                                <b-tabs nav-class="nav-tabs nav-bordered">
+                                    <b-tab :title="$t('general.DataEntry')" @click="tab = ''" active>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="field-1" class="control-label">
+                                                        {{ getCompanyKey('wallet_name_ar') }}
+                                                        <span class="text-danger">*</span>
+                                                    </label>
+                                                    <div dir="rtl">
+                                                        <input
+                                                            @keyup="arabicValue(create.name)"
+                                                            type="text"
+                                                            class="form-control"
+                                                            data-create="1"
+                                                            @keypress.enter="moveInput('input','create',2)"
+                                                            v-model="$v.create.name.$model"
+                                                            :class="{
+                                            'is-invalid':$v.create.name.$error || errors.name,
+                                            'is-valid':!$v.create.name.$invalid && !errors.name
+                                        }"
+                                                            id="field-1"
+                                                        />
+                                                    </div>
+                                                    <div v-if="!$v.create.name.minLength" class="invalid-feedback">
+                                                        {{ $t('general.Itmustbeatleast') }}
+                                                        {{ $v.create.name.$params.minLength.min }} {{ $t('general.letters') }}
+                                                    </div>
+                                                    <div v-if="!$v.create.name.maxLength" class="invalid-feedback">
+                                                        {{ $t('general.Itmustbeatmost') }}
+                                                        {{ $v.create.name.$params.maxLength.max }} {{ $t('general.letters') }}
+                                                    </div>
+                                                    <template v-if="errors.name">
+                                                        <ErrorMessage v-for="(errorMessage,index) in errors.name" :key="index">
+                                                            {{ errorMessage }}
+                                                        </ErrorMessage>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 ">
+                                                <div class="form-group">
+                                                    <label for="field-2" class="control-label">
+                                                        {{ getCompanyKey('wallet_name_en') }}
+                                                        <span class="text-danger">*</span>
+                                                    </label>
+                                                    <div>
+                                                        <input
+                                                            @keyup="englishValue(create.name_e)"
+                                                            type="text"
+                                                            class="form-control"
+                                                            data-create="2"
+                                                            @keypress.enter="moveInput('select','create',3)"
+                                                            v-model="$v.create.name_e.$model"
+                                                            :class="{
+                                            'is-invalid':$v.create.name_e.$error || errors.name_e,
+                                            'is-valid':!$v.create.name_e.$invalid && !errors.name_e
+                                        }"
+                                                            id="field-2"
+                                                        />
+                                                    </div>
+                                                    <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
+                                                        {{ $t('general.Itmustbeatleast') }}
+                                                        {{ $v.create.name_e.$params.minLength.min }} {{ $t('general.letters') }}
+                                                    </div>
+                                                    <div v-if="!$v.create.name_e.maxLength" class="invalid-feedback">
+                                                        {{ $t('general.Itmustbeatmost') }}
+                                                        {{ $v.create.name_e.$params.maxLength.max }} {{ $t('general.letters') }}
+                                                    </div>
+                                                    <template v-if="errors.name_e">
+                                                        <ErrorMessage v-for="(errorMessage,index) in errors.name_e"
+                                                                      :key="index">{{ errorMessage }}
+                                                        </ErrorMessage>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </b-tab>
+                                    <b-tab
+                                        :disabled="wallet_id"
+                                        :title="$t('general.owner')"
+                                        @click="tab = 'owner'"
+                                    >
 
-                                    <b-button variant="danger" type="button" @click.prevent="resetModalHidden">
-                                        {{ $t('general.Cancel') }}
-                                    </b-button>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="field-1" class="control-label">
-                                                {{ getCompanyKey('wallet_name_ar') }}
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <div dir="rtl">
-                                                <input
-                                                @keyup="arabicValue(create.name)"
-                                                    type="text"
-                                                    class="form-control"
-                                                    data-create="1"
-                                                    @keypress.enter="moveInput('input','create',2)"
-                                                    v-model="$v.create.name.$model"
-                                                    :class="{
-                                                'is-invalid':$v.create.name.$error || errors.name,
-                                                'is-valid':!$v.create.name.$invalid && !errors.name
-                                            }"
-                                                    id="field-1"
-                                                />
-                                            </div>
-                                            <div v-if="!$v.create.name.minLength" class="invalid-feedback">
-                                                {{ $t('general.Itmustbeatleast') }}
-                                                {{ $v.create.name.$params.minLength.min }} {{ $t('general.letters') }}
-                                            </div>
-                                            <div v-if="!$v.create.name.maxLength" class="invalid-feedback">
-                                                {{ $t('general.Itmustbeatmost') }}
-                                                {{ $v.create.name.$params.maxLength.max }} {{ $t('general.letters') }}
-                                            </div>
-                                            <template v-if="errors.name">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.name" :key="index">
-                                                    {{ errorMessage }}
-                                                </ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12 ">
-                                        <div class="form-group">
-                                            <label for="field-2" class="control-label">
-                                                {{ getCompanyKey('wallet_name_en') }}
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <div>
-                                                <input
-                                                @keyup="englishValue(create.name_e)"
-                                                    type="text"
-                                                    class="form-control"
-                                                    data-create="2"
-                                                    @keypress.enter="moveInput('select','create',3)"
-                                                    v-model="$v.create.name_e.$model"
-                                                    :class="{
-                                                'is-invalid':$v.create.name_e.$error || errors.name_e,
-                                                'is-valid':!$v.create.name_e.$invalid && !errors.name_e
-                                            }"
-                                                    id="field-2"
-                                                />
-                                            </div>
-                                            <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
-                                                {{ $t('general.Itmustbeatleast') }}
-                                                {{ $v.create.name_e.$params.minLength.min }} {{ $t('general.letters') }}
-                                            </div>
-                                            <div v-if="!$v.create.name_e.maxLength" class="invalid-feedback">
-                                                {{ $t('general.Itmustbeatmost') }}
-                                                {{ $v.create.name_e.$params.maxLength.max }} {{ $t('general.letters') }}
-                                            </div>
-                                            <template v-if="errors.name_e">
-                                                <ErrorMessage v-for="(errorMessage,index) in errors.name_e"
-                                                              :key="index">{{ errorMessage }}
-                                                </ErrorMessage>
-                                            </template>
-                                        </div>
-                                    </div>
-                                </div>
+                                    </b-tab>
+                                    <b-tab
+                                        :disabled="wallet_id"
+                                        :title="$t('general.Building')"
+                                        @click="tab = ''"
+                                    >
+
+                                    </b-tab>
+                                </b-tabs>
                             </form>
                         </b-modal>
                         <!--  /create   -->
@@ -1096,5 +1193,7 @@ export default {
     </Layout>
 </template>
 
+<style scoped>
 
+</style>
 

@@ -17,8 +17,8 @@ class CreateGeneralBranchesTable extends Migration
         Schema::create('general_branches', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('company_id')->nullable();
-            $table->string('name');
-            $table->string('name_e');
+            $table->string('name')->nullable();
+            $table->string('name_e')->nullable();
             $table->string('is_active')->default('inactive');
             $table->softDeletes();
             $table->timestamps();

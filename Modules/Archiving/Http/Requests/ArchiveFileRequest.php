@@ -2,12 +2,12 @@
 
 namespace Modules\Archiving\Http\Requests;
 
-use App\Traits\ValidationTrait;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class ArchiveFileRequest extends FormRequest
 {
-    use ValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      *

@@ -19,13 +19,6 @@ export const menuItems = [
         link: '/dashboard/branch'
     },
     {
-        id: 1222,
-        label: 'general.customTable',
-        icon: 'fas fa-code-branch',
-        name: 'custom table',
-        link: '/dashboard/custom-table'
-    },
-    {
         id: 10008,
         label: 'menuitems.store.text',
         name: 'store',
@@ -47,13 +40,13 @@ export const menuItems = [
         isMenuCollapsed: false,
         subItems: [
             {
-                id:225,
+                id: 225,
                 label: 'general.ScreenProperties',
                 name: 'screen properties',
                 link: '/dashboard/screen-properties'
             },
             {
-                id:226,
+                id: 226,
                 label: 'general.TreeProperty',
                 name: 'tree property',
                 link: '/dashboard/tree-properties'
@@ -101,19 +94,19 @@ export const menuItems = [
         isMenuCollapsed: false,
         subItems: [
             {
-                id:112201,
+                id: 112201,
                 label: 'general.paymentTypes',
                 name: 'payment types',
                 link: '/dashboard/paymentTypes'
             },
             {
-                id:222,
+                id: 222,
                 label: 'menuitems.Banks.text',
                 name: 'banks',
                 link: '/dashboard/banks'
             },
             {
-                id:112202,
+                id: 112202,
                 label: 'general.bankAccounts',
                 name: 'bank accounts',
                 link: '/dashboard/bankAccount'
@@ -151,6 +144,12 @@ export const menuItems = [
                 label: 'menuitems.dashboard.list.avenue',
                 name: "avenue",
                 link: '/dashboard/avenue'
+            },
+            {
+                id: 8,
+                label: 'general.street',
+                name: "street",
+                link: '/dashboard/street'
             },
         ]
     },
@@ -208,71 +207,222 @@ export const menuItems = [
         isMenuCollapsed: false,
         subItems: [
             {
-                id: 100001,
-                name: 'realEstate unit status',
-                label: 'general.unitstatus',
-                link: '/dashboard/realEstate/unitstatus'
+                id: 100211,
+                icon: "fas fa-hotel",
+                name: 'real estate',
+                label: 'general.lookup',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 100001,
+                        name: 'realEstate unit status',
+                        label: 'general.unitstatus',
+                        link: '/dashboard/realEstate/unitstatus'
+                    },
+                    {
+                        id: 1022323,
+                        name: 'wallets',
+                        label: 'general.wallet',
+                        link: '/dashboard/realEstate/wallet'
+                    },
+                    {
+                        id: 1000201,
+                        name: 'owners',
+                        label: 'general.owner',
+                        link: '/dashboard/realEstate/owner'
+                    },
+                    {
+                        id: 1042323,
+                        name: 'wallet owner',
+                        label: 'general.walletOwner',
+                        link: '/dashboard/realEstate/wallet-owner'
+                    },
+                ]
             },
             {
-                id: 100111,
-                name: 'contract',
-                label: 'general.contract',
-                link: '/dashboard/realEstate/contract'
+                id: 134211,
+                icon: "fas fa-hotel",
+                name: 'real estate',
+                label: 'general.master_file',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 102371,
+                        name: 'building wallet',
+                        label: 'general.building_wallet',
+                        link: '/dashboard/realEstate/building-wallet'
+                    },
+                    {
+                        id: 10048103,
+                        name: 'building',
+                        label: 'general.building',
+                        link: '/dashboard/realEstate/building'
+                    },
+                    {
+                        id: 1042323,
+                        name: 'realEstate units',
+                        label: 'units.units',
+                        link: '/dashboard/realEstate/unit'
+                    }
+                ]
             },
             {
-                id: 100021,
-                name: 'contract unit',
-                label: 'general.contractunit',
-                link: '/dashboard/realEstate/contractunit'
+                id: 134211,
+                icon: "fas fa-hotel",
+                name: 'real estate',
+                label: 'general.transaction',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 1042323,
+                        name: 'reservation',
+                        label: 'general.reservation',
+                        link: '/dashboard/realEstate/reservation'
+                    },
+                    {
+                        id: 100111,
+                        name: 'contract',
+                        label: 'general.contract',
+                        link: '/dashboard/realEstate/contract'
+                    },
+                    {
+                        id: 100021,
+                        name: 'contract unit',
+                        label: 'general.invoice',
+                        link: '/dashboard/realEstate/contractunit'
+                    }
+                ]
             },
             {
-                id: 1000201,
-                name: 'owners',
-                label: 'general.owner',
-                link: '/dashboard/realEstate/owner'
+                id: 333201,
+                icon: "fas fa-hotel",
+                name: 'real estate',
+                label: 'general.reports',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 333200,
+                        name: 'real estate',
+                        label: 'general.Finance report',
+                        link: '/'
+                    },
+                    {
+                        id: 333201,
+                        name: 'real estate',
+                        label: 'general.Admin report',
+                        link: '/'
+                    },
+                ]
             },
             {
-                id: 10048103,
-                name: 'building',
-                label: 'general.building',
-                link: '/dashboard/realEstate/building'
+                id: 1021111,
+                icon: "fas fa-hotel",
+                name: 'real estate',
+                label: 'general.tools',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 100222,
+                        label: 'general.customTable',
+                        icon: 'fas fa-tasks',
+                        name: 'custom table',
+                        link: '/dashboard/custom-table'
+                    },
+                    {
+                        id: 2011311,
+                        name: 'real estate',
+                        label: 'general.backup',
+                        link: '/'
+                    },
+                ]
+            },
+        ]
+    },
+    {
+        id: 1002168,
+        label: "general.boardRent",
+        icon: "fas fa-hotel",
+        name: 'real estate',
+        isMenuCollapsed: false,
+        subItems: [
+            {
+                id: 10211,
+                name: 'real estate',
+                label: 'general.master_file',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 100024,
+                        name: 'board-realEstate unit status',
+                        label: 'general.sellMethod',
+                        link: '/dashboard/boardRent/sell-method'
+                    },
+                    {
+                        id: 100023,
+                        name: 'board-realEstate unit status',
+                        label: 'general.department',
+                        link: '/dashboard/boardRent/department'
+                    },
+                    {
+                        id: 100021,
+                        name: 'board-realEstate unit status',
+                        label: 'general.panel',
+                        link: '/dashboard/boardRent/panel'
+                    },
+                    {
+                        id: 100022,
+                        name: 'board-realEstate unit status',
+                        label: 'general.package',
+                        link: '/dashboard/boardRent/package'
+                    },
+                ]
             },
             {
-                id: 1022343,
-                name: 'customer',
-                label: 'general.customer',
-                link: '/dashboard/realEstate/customer'
+                id: 14211,
+                name: 'real estate',
+                label: 'general.transaction',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 102375,
+                        name: 'building wallet',
+                        label: 'general.tasks',
+                        link: '/dashboard/boardRent/tasks'
+                    },
+                    {
+                        id: 102373,
+                        name: 'building wallet',
+                        label: 'general.quotation',
+                        link: '/dashboard/boardRent/quotation'
+                    },
+                    {
+                        id: 102372,
+                        name: 'building wallet',
+                        label: 'general.order',
+                        link: '/dashboard/boardRent/order'
+                    },
+                    {
+                        id: 102374,
+                        name: 'building wallet',
+                        label: 'general.invoice',
+                        link: '/dashboard/boardRent/invoice'
+                    }
+                ]
             },
             {
-                id: 1022323,
-                name: 'wallets',
-                label: 'general.wallet',
-                link: '/dashboard/realEstate/wallet'
-            },
-            {
-                id: 1042323,
-                name: 'wallet owner',
-                label: 'general.walletOwner',
-                link: '/dashboard/realEstate/wallet-owner'
-            },
-            {
-                id: 1042323,
-                name: 'realEstate units',
-                label: 'units.units',
-                link: '/dashboard/realEstate/unit'
-            },
-            {
-                id: 1042323,
-                name: 'reservation',
-                label: 'general.reservation',
-                link: '/dashboard/realEstate/reservation'
-            },
-            {
-                id: 102371,
-                name: 'building wallet',
-                label: 'general.building_wallet',
-                link: '/dashboard/realEstate/building-wallet'
-            },
+                id: 14211,
+                name: 'real estate',
+                label: 'general.systemSetup',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 102275,
+                        name: 'building wallet',
+                        label: 'general.sector',
+                        link: '/dashboard/boardRent/sector'
+                    },
+                ]
+            }
         ]
     },
     {
@@ -346,66 +496,191 @@ export const menuItems = [
         isMenuCollapsed: false,
         subItems: [
             {
-                id: 387181,
-                name: 'installment status',
-                label: 'general.installmentStatus',
-                link: '/dashboard/installment-status'
+                id: 103311,
+                icon: "fas fa-hotel",
+                name: 'receivable payable',
+                label: 'general.lookup',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 387181,
+                        name: 'installment status',
+                        label: 'general.installmentStatus',
+                        link: '/dashboard/installment-status'
+                    },
+                    {
+                        id: 3874261,
+                        name: 'installment payment type',
+                        label: 'general.installmentPaymentType',
+                        link: '/dashboard/installment-payment-type',
+                    },
+                    // {
+                    //     id: 387192,
+                    //     name: 'main contact groups',
+                    //     label: 'general.MainContactGroups',
+                    //     link: '/dashboard/MainContactGroups'
+                    // },
+                    // {
+                    //     id: 387192,
+                    //     name: 'subContactGroup',
+                    //     label: 'general.subcontactgroup',
+                    //     link: '/dashboard/sub-contact-group'
+                    // },
+                ]
             },
             {
-                id: 3874261,
-                name: 'installment payment type',
-                label: 'general.installmentPaymentType',
-                link: '/dashboard/installment-payment-type',
+                id: 103311,
+                icon: "fas fa-hotel",
+                name: 'receivable payable',
+                label: 'general.master_file',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 3243193,
+                        name: 'installment payment plan',
+                        label: 'general.installmentPaymentPlan',
+                        link: '/dashboard/installment-payment-plan'
+                    },
+                    // {
+                    //     id: 387193,
+                    //     name: 'installment payment plan detail',
+                    //     label: 'general.InstallmentPaymentPlanDetail',
+                    //     link: '/dashboard/InstallmentPaymentPlanDetail'
+                    // },
+                    {
+                        id: 1222,
+                        label: 'general.DocumentPlan',
+                        icon: 'fas fa-code-branch',
+                        name: 'installment document plan',
+                        link: '/dashboard/installment-document-plan'
+                    },
+                    // {
+                    //     id: 1222,
+                    //     label: 'general.ScreenSubcontactGroup',
+                    //     name: 'screen subcontact group',
+                    //     link: '/dashboard/screen-subcontact-group'
+                    // },
+                    {
+                        id: 387171,
+                        name: 'installment condition',
+                        label: 'general.installmentCondition',
+                        link: '/dashboard/installment-condition'
+                    },
+
+                    {
+                        id: 1222,
+                        label: 'general.payemntPlanInstallment',
+                        icon: 'fas fa-code-branch',
+                        name: 'payment plan installment',
+                        link: '/dashboard/payment-plan-installments'
+                    },
+                ]
             },
             {
-                id: 387192,
-                name: 'main contact groups',
-                label: 'general.MainContactGroups',
-                link: '/dashboard/MainContactGroups'
+                id: 123311,
+                icon: "fas fa-hotel",
+                name: 'receivable payable',
+                label: 'general.transaction',
+                isMenuCollapsed: false,
+                subItems:[
+                    {
+                        id: 2241,
+                        label: 'general.openinig balance',
+                        icon: 'fas fa-hot-tub',
+                        name: 'receivable payable',
+                        link: '/dashboard/receivablePayable/transaction/openingBalance'
+                    },
+                    {
+                        id: 2234,
+                        label: 'general.invoice',
+                        icon: 'fas fa-hot-tub',
+                        name: 'receivable payable',
+                        link: '/'
+                    },
+                    {
+                        id: 22034,
+                        label: 'general.contract',
+                        icon: 'fas fa-hot-tub',
+                        name: 'receivable payable',
+                        link: '/'
+                    },
+                    {
+                        id: 11034,
+                        label: 'general.reciept vourcher',
+                        icon: 'fas fa-hot-tub',
+                        name: 'receivable payable',
+                        link: '/'
+                    },
+                    {
+                        id: 13334,
+                        label: 'general.credit note',
+                        icon: 'fas fa-hot-tub',
+                        name: 'receivable payable',
+                        link: '/'
+                    },
+                    {
+                        id: 13334,
+                        label: 'general.debit note',
+                        icon: 'fas fa-hot-tub',
+                        name: 'receivable payable',
+                        link: '/'
+                    },
+                    {
+                        id: 13334,
+                        label: 'general.issue vourcher',
+                        icon: 'fas fa-hot-tub',
+                        name: 'receivable payable',
+                        link: '/'
+                    },
+                ]
             },
             {
-                id: 387192,
-                name: 'subContactGroup',
-                label: 'general.subcontactgroup',
-                link: '/dashboard/sub-contact-group'
+                id: 1021111,
+                icon: "fas fa-hotel",
+                name: 'receivable payable',
+                label: 'general.reports',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 1003321,
+                        name: 'receivable payable',
+                        label: 'general.Finance report',
+                        link: '/'
+                    },
+                    {
+                        id: 222311,
+                        name: 'receivable payable',
+                        label: 'general.Admin report',
+                        link: '/'
+                    },
+                ]
             },
             {
-                id: 387193,
-                name: 'installment payment plan detail',
-                label: 'general.InstallmentPaymentPlanDetail',
-                link: '/dashboard/InstallmentPaymentPlanDetail'
-            },
-            {
-                id: 3243193,
-                name: 'installment payment plan',
-                label: 'general.installmentPaymentPlan',
-                link: '/dashboard/installment-payment-plan'
-            },
-            {
-                id: 1222,
-                label: 'general.payemntPlanInstallment',
-                icon: 'fas fa-code-branch',
-                name: 'payment plan installment',
-                link: '/dashboard/payment-plan-installments'
-            },
-            {
-                id: 1222,
-                label: 'general.DocumentPlan',
-                icon: 'fas fa-code-branch',
-                name: 'installment document plan',
-                link: '/dashboard/installment-document-plan'
-            },
-            {
-                id: 1222,
-                label: 'general.ScreenSubcontactGroup',
-                icon: 'fas fa-code-branch',
-                name: 'screen subcontact group',
-                link: '/dashboard/screen-subcontact-group'
+                id: 1021111,
+                icon: "fas fa-hotel",
+                name: 'real estate',
+                label: 'general.tools',
+                isMenuCollapsed: false,
+                subItems: [
+                    {
+                        id: 1222,
+                        label: 'general.customTable',
+                        icon: 'fas fa-tasks',
+                        name: 'custom table',
+                        link: '/dashboard/custom-table'
+                    },
+                    {
+                        id: 222311,
+                        name: 'receivable payable',
+                        label: 'general.backup',
+                        link: '/'
+                    },
+                ]
             },
         ]
     },
     {
-        id:224,
+        id: 224,
         label: 'general.Workflowhotfields',
         icon: 'fas fa-hot-tub',
         name: 'Workflow hot fields',
@@ -415,8 +690,15 @@ export const menuItems = [
         id: 223,
         name: 'users',
         label: 'general.Users',
-        icon: 'fas fa-network-wired',
+        icon: 'fas fa-user',
         link: '/dashboard/users'
+    },
+    {
+        id: 2224,
+        name: 'general customer',
+        label: 'general.customer',
+        icon: 'fas fa-user-friends',
+        link: '/dashboard/customer'
     },
     {
         id: 5,
@@ -429,7 +711,7 @@ export const menuItems = [
         id: 6,
         name: 'employees',
         label: 'menuitems.employee.text',
-        icon: 'fas fa-user-friends',
+        icon: 'fas fa-briefcase',
         link: '/dashboard/employee'
     },
     {
@@ -447,14 +729,19 @@ export const menuItems = [
         link: '/dashboard/units'
     },
     {
+        id: 100006,
+        name: 'document',
+        label: 'general.document',
+        icon: 'fas fa-file-alt',
+        link: '/dashboard/document'
+    },
+    {
         id: 10005,
         name: 'color',
         label: 'menuitems.colors.text',
         icon: 'fas fa-palette',
         link: '/dashboard/colors'
     },
-
-
 
     // {
     //     id: 1115,

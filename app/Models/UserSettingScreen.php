@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-use App\Traits\CompanyScopeTrait;
-use App\Traits\ConnTrait;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+   use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class UserSettingScreen extends Model
 {
-    use HasFactory, CompanyScopeTrait;
+    use HasFactory;
 
     protected $guarded = [];
     protected $table = "general_user_setting_screens";

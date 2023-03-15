@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('general_salesmen', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
-            $table->string('name_e', 100);
-            $table->foreignId('salesman_type_id')->constrained('general_salesmen_types')->references("id");
+            $table->string('name', 100)->nullable();
+            $table->string('name_e', 100)->nullable();
+            $table->foreignId('salesman_type_id')->constrained('general_salesmen_types')->references("id")->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

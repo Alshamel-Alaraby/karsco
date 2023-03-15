@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Traits\CompanyScopeTrait;
-use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +9,7 @@ use Spatie\Activitylog\LogOptions;
 
 class ScreenTreeProperty extends Model
 {
-    use HasFactory, LogTrait, CompanyScopeTrait;
+    use HasFactory, LogTrait;
 
     protected $table = 'general_screen_tree_properties';
 

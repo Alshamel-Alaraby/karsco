@@ -16,8 +16,8 @@ return new class extends Migration
     {
         Schema::create('general_data_types', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('name_e');
+            $table->string('name')->nullable();
+            $table->string('name_e')->nullable();
             $table->string('placeholder')->nullable();
             $table->string('placeholder_e')->nullable();
             $table->string('length')->nullable();

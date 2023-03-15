@@ -67,4 +67,9 @@ class DocTypeFieldRepository implements DocTypeFieldInterface
             cacheForget($key);
         }
     }
+    public function idDocTypeField($id)
+    {
+        $model = $this->model->where('doc_type_id',$id)->get();
+        return $model;
+    }
 }

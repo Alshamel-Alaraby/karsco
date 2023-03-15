@@ -16,8 +16,8 @@ return new class extends Migration
     {
         Schema::create('general_workflows_hotfields', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('workflow_id');
-            $table->unsignedInteger('hotfield_id');
+            $table->unsignedInteger('workflow_id')->nullable();
+            $table->unsignedInteger('hotfield_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

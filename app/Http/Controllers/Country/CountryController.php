@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Country;
 
-use App\Http\Requests\Country\StoreCountryRequest;
-use App\Http\Requests\Country\UpdateCountryRequest;
+use App\Http\Requests\CountryRequest;
 use App\Http\Resources\Country\CountryResource;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 
 class CountryController extends Controller
 {
@@ -51,14 +51,14 @@ class CountryController extends Controller
         return responseJson(200, 'success', CountryResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
-    public function create(StoreCountryRequest $request)
+    public function create(CountryRequest $request)
     {
         $model = $this->modelInterface->create($request);
         $model->refresh();
         return responseJson(200, 'success', new CountryResource($model));
     }
 
-    public function update(UpdateCountryRequest $request, $id)
+    public function update(CountryRequest $request, $id)
     {
         $model = $this->modelInterface->find($id);
         if (!$model) {
@@ -112,4 +112,7 @@ class CountryController extends Controller
         return responseJson(200, __('Done'));
     }
 
+    public function getCountrySeeder(){
+        return DB::table("country_seeder")->get();
+    }
 }

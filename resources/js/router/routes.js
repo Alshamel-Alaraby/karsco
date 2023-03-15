@@ -13,6 +13,7 @@ import externalSalesmen from  "./routeChild/externalSalesmen";
 import rolesType from "./routeChild/rolesType";
 import roles from "./routeChild/roles";
 import units from "./routeChild/units";
+import document from "./routeChild/document";
 import banks from "./routeChild/banks";
 import colors from "./routeChild/colors";
 import salesmenTypes from "./routeChild/salesmenTypes";
@@ -31,6 +32,9 @@ import propertyTrees from  "./routeChild/property-tree";
 import realEstate from  "./routeChild/realEstate";
 import archiving from "./routeChild/archiving";
 import recievablePayable from "./routeChild/recievablePayable";
+import customer from "./routeChild/customer";
+import boardRent from "./routeChild/boardRent";
+import street from "./routeChild/street";
 
 
 export default [
@@ -65,6 +69,10 @@ export default [
     ...realEstate,
     ...archiving,
     ...recievablePayable,
+    ...customer,
+    ...document,
+    ...boardRent,
+    ...street,
     {
         path: '/dashboard/notifications',
         name: 'notifications',

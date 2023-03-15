@@ -10,15 +10,9 @@ import loader from "../../../components/loader";
 import { dynamicSortString } from "../../../helper/tableSort";
 import { formatDateOnly, formatDateTime } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
-import DatePicker from "vue2-datepicker";
 import Multiselect from "vue-multiselect";
 import InstallmentPaymentType from "../../../components/create/receivablePayment/installmentPaymentType.vue";
-
-// require styles
-import "quill/dist/quill.core.css";
-import "quill/dist/quill.snow.css";
-import "quill/dist/quill.bubble.css";
-import { arabicValue, englishValue } from "../../../helper/langTransform";
+import {arabicValue, englishValue} from "../../../helper/langTransform";
 /**
  * Advanced Table component
  */
@@ -34,7 +28,6 @@ export default {
     Switches,
     ErrorMessage,
     loader,
-    DatePicker,
     Multiselect,
     InstallmentPaymentType,
   },
@@ -68,80 +61,15 @@ export default {
       },
       per_page: 50,
       search: "",
-      editorOption: {
-        // Some Quill options...
-        theme: "snow",
-        modules: {
-          toolbar: [
-            [
-              {
-                font: [],
-              },
-              {
-                size: [],
-              },
-            ],
-            ["bold", "italic", "underline", "strike"],
-            [
-              {
-                color: [],
-              },
-              {
-                background: [],
-              },
-            ],
-            [
-              {
-                script: "super",
-              },
-              {
-                script: "sub",
-              },
-            ],
-            [
-              {
-                header: [false, 1, 2, 3, 4, 5, 6],
-              },
-              "blockquote",
-              "code-block",
-            ],
-            [
-              {
-                list: "ordered",
-              },
-              {
-                list: "bullet",
-              },
-              {
-                indent: "-1",
-              },
-              {
-                indent: "+1",
-              },
-            ],
-            [
-              "direction",
-              {
-                align: [],
-              },
-            ],
-            ["link", "image", "video"],
-            ["clean"],
-          ],
-        },
-      },
       debounce: {},
       installmentStatusPagination: {},
       installmentStatus: [],
       isLoader: false,
-      paymentTypes: [],
       create: {
         name: "",
         name_e: "",
         description: "",
         description_e: "",
-        start_date: "",
-        installment_payment_type_id: null,
         is_default: 1,
         is_active: "active",
       },
@@ -150,13 +78,10 @@ export default {
         name_e: "",
         description: "",
         description_e: "",
-        start_date: "",
-        installment_payment_type_id: null,
         is_default: 1,
         is_active: "active",
       },
       errors: {},
-      custom_date_start: new Date(),
       dropDownSenders: [],
       is_disabled: false,
       isCheckAll: false,
@@ -167,10 +92,8 @@ export default {
         name_e: true,
         is_default: true,
         description: true,
-        start_date: true,
         description_e: true,
         is_active: true,
-        installment_payment_type_id: true,
       },
       filterSetting: ["name", "name_e"],
       Tooltip: "",
@@ -185,8 +108,6 @@ export default {
       description_e: { maxLength: maxLength(1000) },
       is_default: { required },
       is_active: { required },
-      start_date: { required },
-      installment_payment_type_id: { required },
     },
     edit: {
       name: { required, minLength: minLength(3), maxLength: maxLength(100) },
@@ -195,8 +116,6 @@ export default {
       description_e: { maxLength: maxLength(1000) },
       is_default: { required },
       is_active: { required },
-      start_date: { required },
-      installment_payment_type_id: { required },
     },
   },
   watch: {
@@ -254,43 +173,6 @@ export default {
     this.getData();
   },
   methods: {
-    showInstallPaymentTypeModal() {
-      if (this.create.installment_payment_type_id == 0) {
-        this.$bvModal.show("installment_payment_type_create");
-        this.create.installment_payment_type_id = null;
-      }
-    },
-    showInstallPaymentTypeModalEdit() {
-      if (this.edit.installment_payment_type_id == 0) {
-        this.$bvModal.show("installment_payment_type_create");
-        this.edit.installment_payment_type_id = null;
-      }
-    },
-
-    async getInstallPaymentTypes() {
-      this.isLoader = true;
-      await adminApi
-        .get(`recievable-payable/rp_installment_payment_types`)
-        .then((res) => {
-          let l = res.data.data;
-          l.unshift({
-            id: 0,
-            name: "اضف نوع دفع جديد",
-            name_e: "Add installment payment type",
-          });
-          this.paymentTypes = l;
-        })
-        .catch((err) => {
-          Swal.fire({
-            icon: "error",
-            title: `${this.$t("general.Error")}`,
-            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
-          });
-        })
-        .finally(() => {
-          this.isLoader = false;
-        });
-    },
     /**
      *  start get Data module && pagination
      */
@@ -474,33 +356,28 @@ export default {
         name_e: "",
         description: "",
         description_e: "",
-        start_date: formatDateTime(this.custom_date_start),
-        installment_payment_type_id: null,
         is_default: 1,
         is_active: "active",
       };
       this.$nextTick(() => {
         this.$v.$reset();
       });
+      this.is_disabled = false;
       this.errors = {};
       this.$bvModal.hide(`create`);
     },
     /**
      *  hidden Modal (create)
      */
-    async resetModal() {
+     resetModal() {
       this.create = {
         name: "",
         name_e: "",
         description: "",
         description_e: "",
-        start_date: formatDateTime(this.custom_date_start),
-        installment_payment_type_id: null,
         is_default: 1,
         is_active: "active",
       };
-      await this.getInstallPaymentTypes();
-      this.custom_date_start = new Date();
       this.$nextTick(() => {
         this.$v.$reset();
       });
@@ -515,12 +392,9 @@ export default {
         name_e: "",
         description: "",
         description_e: "",
-        start_date: formatDateTime(this.custom_date_start),
-        installment_payment_type_id: null,
         is_default: 1,
         is_active: "active",
       };
-      this.custom_date_start = new Date();
       this.$nextTick(() => {
         this.$v.$reset();
       });
@@ -628,16 +502,12 @@ export default {
     /**
      *   show Modal (edit)
      */
-    async resetModalEdit(id) {
-      await this.getInstallPaymentTypes();
+     resetModalEdit(id) {
       let module = this.installmentStatus.find((e) => id == e.id);
       this.edit.name = module.name;
       this.edit.name_e = module.name_e;
       this.edit.description = module.description;
       this.edit.description_e = module.description_e;
-      this.custom_date_start = new Date(module.start_date);
-      this.edit.start_date = formatDateTime(module.start_date);
-      this.edit.installment_payment_type_id = module.installment_payment_type_id;
       this.edit.is_default = module.is_default;
       this.edit.is_active = module.is_active == 1 ? "active" : "inactive";
       this.errors = {};
@@ -652,8 +522,6 @@ export default {
         name_e: "",
         description: "",
         description_e: "",
-        start_date: "",
-        installment_payment_type_id: null,
         is_default: 1,
         is_active: "active",
       };
@@ -679,18 +547,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    start_date(e) {
-      if (e) {
-        this.create.start_date = formatDateTime(e);
-        this.edit.start_date = formatDateTime(e);
-      } else {
-        this.create.start_date = null;
-        this.edit.start_date = null;
-      }
-    },
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     formatDate(value) {
       return formatDateOnly(value);
     },
@@ -745,6 +601,14 @@ export default {
       this.create.name_e = englishValue(txt);
       this.edit.name_e = englishValue(txt);
     },
+    arabicValueDescription(txt){
+         this.create.description = arabicValue(txt);
+         this.edit.description = arabicValue(txt);
+    },
+    englishValueDescription(txt){
+         this.create.description_e = englishValue(txt);
+         this.edit.description_e = englishValue(txt);
+    },
   },
 };
 </script>
@@ -752,11 +616,6 @@ export default {
 <template>
   <Layout>
     <PageHeader />
-    <InstallmentPaymentType
-      :companyKeys="companyKeys"
-      :defaultsKeys="defaultsKeys"
-      @created="getInstallPaymentTypes"
-    />
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -894,17 +753,6 @@ export default {
                         {{ getCompanyKey("installment_payment_description_en") }}
                       </b-form-checkbox>
 
-                      <b-form-checkbox v-model="setting.start_date" class="mb-1">
-                        {{ getCompanyKey("installment_payment_start_date") }}
-                      </b-form-checkbox>
-
-                      <b-form-checkbox
-                        v-model="setting.installment_payment_type_id"
-                        class="mb-1"
-                      >
-                        {{ getCompanyKey("installment_payment_type") }}
-                      </b-form-checkbox>
-
                       <div class="d-flex justify-content-end">
                         <a href="javascript:void(0)" class="btn btn-primary btn-sm"
                           >Apply</a
@@ -1015,44 +863,6 @@ export default {
                 </div>
                 <div class="row">
                   <div class="col-md-6">
-                    <div class="form-group position-relative">
-                      <label class="control-label">
-                        {{ getCompanyKey("installment_payment_type") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <multiselect
-                        @input="showInstallPaymentTypeModal"
-                        v-model="create.installment_payment_type_id"
-                        :options="paymentTypes.map((type) => type.id)"
-                        :custom-label="
-                          (opt) =>
-                            $i18n.locale == 'ar'
-                              ? paymentTypes.find((x) => x.id == opt).name
-                              : paymentTypes.find((x) => x.id == opt).name_e
-                        "
-                      >
-                      </multiselect>
-                      <div
-                        v-if="
-                          $v.create.installment_payment_type_id.$error ||
-                          errors.installment_payment_type_id
-                        "
-                        class="text-danger"
-                      >
-                        {{ $t("general.fieldIsRequired") }}
-                      </div>
-                      <template v-if="errors.installment_payment_type_id">
-                        <ErrorMessage
-                          v-for="(
-                            errorMessage, index
-                          ) in errors.installment_payment_type_id"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
                     <div class="form-group">
                       <label for="field-1" class="control-label">
                         {{ getCompanyKey("installment_payment_name_ar") }}
@@ -1133,31 +943,6 @@ export default {
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label class="control-label">
-                        {{ getCompanyKey("installment_payment_start_date") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <date-picker
-                        v-model="custom_date_start"
-                        type="datetime"
-                        :default-value="custom_date_start"
-                        @change="start_date"
-                        confirm
-                      ></date-picker>
-                      <div v-if="!$v.create.start_date.required" class="invalid-feedback">
-                        {{ $t("general.fieldIsRequired") }}
-                      </div>
-                      <template v-if="errors.start_date">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.start_date"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
                       <label class="mr-2">
                         {{ getCompanyKey("is_default") }}
                         <span class="text-danger">*</span>
@@ -1230,45 +1015,37 @@ export default {
                     </div>
                   </div>
                   <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="mr-2">
-                        {{ getCompanyKey("installment_payment_description_ar") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <quill-editor
-                        v-model="$v.create.description.$model"
-                        style="min-height: 150px; background-color: #fff"
-                        :options="editorOption"
-                      />
-                      <template v-if="errors.description">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.description"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
+                        <div class="form-group">
+                            <label class="mr-2" for="inlineFormCustomSelectPref">
+                                {{ getCompanyKey("installment_payment_description_ar") }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            <textarea @input="arabicValueDescription(create.description)" v-model="$v.create.description.$model" class="form-control" :maxlength="1000" rows="5"></textarea>
+                            <template v-if="errors.description">
+                                <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.description"
+                                    :key="index"
+                                >{{ errorMessage }}</ErrorMessage
+                                >
+                            </template>
+                        </div>
                     </div>
-                  </div>
                   <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="mr-2">
-                        {{ getCompanyKey("installment_payment_description_en") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <quill-editor
-                        v-model="$v.create.description_e.$model"
-                        style="min-height: 150px; background-color: #fff"
-                        :options="editorOption"
-                      />
-                      <template v-if="errors.description_e">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.description_e"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
+                        <div class="form-group">
+                            <label class="mr-2">
+                                {{ getCompanyKey("installment_payment_description_en") }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            <textarea  @input="englishValueDescription(create.description_e)" v-model="$v.create.description_e.$model" class="form-control" :maxlength="1000" rows="5"></textarea>
+                            <template v-if="errors.description_e">
+                                <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.description_e"
+                                    :key="index"
+                                >{{ errorMessage }}</ErrorMessage
+                                >
+                            </template>
+                        </div>
                     </div>
-                  </div>
                 </div>
               </form>
             </b-modal>
@@ -1351,16 +1128,6 @@ export default {
                         }}</span>
                       </div>
                     </th>
-                    <th v-if="setting.start_date">
-                      <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("installment_payment_start_date") }}</span>
-                      </div>
-                    </th>
-                    <th v-if="setting.installment_payment_type_id">
-                      <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("installment_payment_type") }}</span>
-                      </div>
-                    </th>
                     <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
@@ -1427,18 +1194,6 @@ export default {
                     </td>
                     <td v-if="setting.description_e">
                       <h5 class="m-0 font-weight-normal">{{ data.description_e }}</h5>
-                    </td>
-                    <td v-if="setting.start_date">
-                      <h5 class="m-0 font-weight-normal">{{ data.start_date }}</h5>
-                    </td>
-                    <td v-if="setting.installment_payment_type_id">
-                      <h5 class="m-0 font-weight-normal">
-                        {{
-                          $i18n.locale == "ar"
-                            ? data.installment_payment_type.name
-                            : data.installment_payment_type.name_e
-                        }}
-                      </h5>
                     </td>
                     <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
@@ -1518,44 +1273,6 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-6">
-                              <div class="form-group position-relative">
-                                <label class="control-label">
-                                  {{ getCompanyKey("installment_payment_type") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <multiselect
-                                  @input="showInstallPaymentTypeModalEdit"
-                                  v-model="edit.installment_payment_type_id"
-                                  :options="paymentTypes.map((type) => type.id)"
-                                  :custom-label="
-                                    (opt) =>
-                                      $i18n.locale == 'ar'
-                                        ? paymentTypes.find((x) => x.id == opt).name
-                                        : paymentTypes.find((x) => x.id == opt).name_e
-                                  "
-                                >
-                                </multiselect>
-                                <div
-                                  v-if="
-                                    $v.edit.installment_payment_type_id.$error ||
-                                    errors.installment_payment_type_id
-                                  "
-                                  class="text-danger"
-                                >
-                                  {{ $t("general.fieldIsRequired") }}
-                                </div>
-                                <template v-if="errors.installment_payment_type_id">
-                                  <ErrorMessage
-                                    v-for="(
-                                      errorMessage, index
-                                    ) in errors.installment_payment_type_id"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
                             <div class="col-md-6">
                               <div class="form-group">
                                 <label for="field-u-1" class="control-label">
@@ -1654,34 +1371,6 @@ export default {
                             </div>
                             <div class="col-md-6">
                               <div class="form-group">
-                                <label class="control-label">
-                                  {{ getCompanyKey("installment_payment_start_date") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <date-picker
-                                  v-model="custom_date_start"
-                                  type="datetime"
-                                  @change="start_date"
-                                  :default-value="custom_date_start"
-                                  confirm
-                                ></date-picker>
-                                <div
-                                  v-if="!$v.edit.start_date.required"
-                                  class="invalid-feedback"
-                                >
-                                  {{ $t("general.fieldIsRequired") }}
-                                </div>
-                                <template v-if="errors.start_date">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.start_date"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-md-6">
-                              <div class="form-group">
                                 <label class="mr-2">
                                   {{ getCompanyKey("is_default") }}
                                   <span class="text-danger">*</span>
@@ -1757,49 +1446,37 @@ export default {
                               </div>
                             </div>
                             <div class="col-md-6">
-                              <div class="form-group">
-                                <label class="mr-2">
-                                  {{
-                                    getCompanyKey("installment_payment_description_ar")
-                                  }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <quill-editor
-                                  v-model="$v.edit.description.$model"
-                                  style="min-height: 150px; background-color: #fff"
-                                  :options="editorOption"
-                                />
-                                <template v-if="errors.description">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.description"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
+                                  <div class="form-group">
+                                      <label class="mr-2">
+                                          {{ getCompanyKey("installment_payment_description_ar") }}
+                                          <span class="text-danger">*</span>
+                                      </label>
+                                      <textarea @input="arabicValueDescription(edit.description)" v-model="$v.edit.description.$model" class="form-control" :maxlength="1000" rows="5"></textarea>
+                                      <template v-if="errors.description">
+                                          <ErrorMessage
+                                              v-for="(errorMessage, index) in errors.description"
+                                              :key="index"
+                                          >{{ errorMessage }}</ErrorMessage
+                                          >
+                                      </template>
+                                  </div>
                               </div>
-                            </div>
                             <div class="col-md-6">
-                              <div class="form-group">
-                                <label class="mr-2">
-                                  {{
-                                    getCompanyKey("installment_payment_description_en")
-                                  }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <quill-editor
-                                  v-model="$v.edit.description_e.$model"
-                                  style="min-height: 150px; background-color: #fff"
-                                  :options="editorOption"
-                                />
-                                <template v-if="errors.description_e">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.description_e"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
+                                  <div class="form-group">
+                                      <label class="mr-2">
+                                          {{ getCompanyKey("installment_payment_description_en") }}
+                                          <span class="text-danger">*</span>
+                                      </label>
+                                      <textarea  @input="englishValueDescription(edit.description_e)" v-model="$v.edit.description_e.$model" class="form-control" :maxlength="1000" rows="5"></textarea>
+                                      <template v-if="errors.description_e">
+                                          <ErrorMessage
+                                              v-for="(errorMessage, index) in errors.description_e"
+                                              :key="index"
+                                          >{{ errorMessage }}</ErrorMessage
+                                          >
+                                      </template>
+                                  </div>
                               </div>
-                            </div>
                           </div>
                         </form>
                       </b-modal>

@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength, integer } from "vuelidate/lib/validators";
+import {required, minLength, maxLength, integer, requiredIf} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -23,26 +23,26 @@ export default {
     meta: [{ name: "description", content: "Country" }],
   },
   mixins: [translation],
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      if (vm.$store.state.auth.work_flow_trees.includes("area-e")) {
-        Swal.fire({
-          icon: "error",
-          title: `${vm.$t("general.Error")}`,
-          text: `${vm.$t("general.ModuleExpired")}`,
-        });
-        return vm.$router.push({ name: "home" });
-      } else if (
-        (vm.showScreen( "area","governorate") &&
-          vm.$store.state.auth.work_flow_trees.includes("area")) ||
-        vm.$store.state.auth.user.type == "super_admin"
-      ) {
-        return true;
-      } else {
-        return vm.$router.push({ name: "home" });
-      }
-    });
-  },
+  // beforeRouteEnter(to, from, next) {
+  //   next((vm) => {
+  //     if (vm.$store.state.auth.work_flow_trees.includes("area-e")) {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: `${vm.$t("general.Error")}`,
+  //         text: `${vm.$t("general.ModuleExpired")}`,
+  //       });
+  //       return vm.$router.push({ name: "home" });
+  //     } else if (
+  //       (vm.showScreen( "area","governorate") &&
+  //         vm.$store.state.auth.work_flow_trees.includes("area")) ||
+  //       vm.$store.state.auth.user.type == "super_admin"
+  //     ) {
+  //       return true;
+  //     } else {
+  //       return vm.$router.push({ name: "home" });
+  //     }
+  //   });
+  // },
   components: {
     Layout,
     PageHeader,
@@ -110,6 +110,7 @@ export default {
         is_default: true,
         is_active: true,
       },
+      fields: [],
       company_id: null,
       errors: {},
       dropDownSenders: [],
@@ -129,28 +130,52 @@ export default {
   },
   validations: {
     create: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100) },
+      name: { required: requiredIf(function (model) {
+              return this.isRequired("name");
+          }), minLength: minLength(2), maxLength: maxLength(100) },
       name_e: {
-        required,
+          required: requiredIf(function (model) {
+              return this.isRequired("name_e");
+          }),
         minLength: minLength(2),
         maxLength: maxLength(100),
       },
-      phone_key: { required, integer, minLength: minLength(1), maxLength: maxLength(10) },
-      is_default: { required, integer },
-      country_id: { required },
-      is_active: { required },
+      phone_key: { required: requiredIf(function (model) {
+              return this.isRequired("phone_key");
+          }), integer, minLength: minLength(1), maxLength: maxLength(10) },
+      is_default: { required: requiredIf(function (model) {
+              return this.isRequired("is_default");
+          }), integer },
+      country_id: { required: requiredIf(function (model) {
+              return this.isRequired("country_id");
+          }) },
+      is_active: { required: requiredIf(function (model) {
+              return this.isRequired("is_active");
+          }) },
     },
     edit: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      name_e: {
-        required,
-        minLength: minLength(2),
-        maxLength: maxLength(100),
-      },
-      phone_key: { required, integer, minLength: minLength(1), maxLength: maxLength(10) },
-      is_default: { required, integer },
-      country_id: { required },
-      is_active: { required },
+        name: { required: requiredIf(function (model) {
+                return this.isRequired("name");
+            }), minLength: minLength(2), maxLength: maxLength(100) },
+        name_e: {
+            required: requiredIf(function (model) {
+                return this.isRequired("name_e");
+            }),
+            minLength: minLength(2),
+            maxLength: maxLength(100),
+        },
+        phone_key: { required: requiredIf(function (model) {
+                return this.isRequired("phone_key");
+            }), integer, minLength: minLength(1), maxLength: maxLength(10) },
+        is_default: { required: requiredIf(function (model) {
+                return this.isRequired("is_default");
+            }), integer },
+        country_id: { required: requiredIf(function (model) {
+                return this.isRequired("country_id");
+            }) },
+        is_active: { required: requiredIf(function (model) {
+                return this.isRequired("is_active");
+            }) },
     },
   },
   watch: {
@@ -186,10 +211,40 @@ export default {
   },
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
+    this.getCustomTableFields();
     this.getData();
   },
   methods: {
-        arabicValue(txt) {
+    getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_governorates`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+    isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+    isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
+    arabicValue(txt) {
       this.create.name = arabicValue(txt);
       this.edit.name = arabicValue(txt);
     },
@@ -197,7 +252,6 @@ export default {
       this.create.name_e = englishValue(txt);
       this.edit.name_e = englishValue(txt);
     },
-
     showScreen(module, screen) {
       let filterRes = this.$store.state.auth.allWorkFlow.filter(
         (workflow) => workflow.name_e == module
@@ -439,7 +493,7 @@ export default {
       this.$nextTick(() => {
         this.$v.$reset();
       });
-      this.getCategory();
+      if(this.isVisible('country_id')) this.getCategory();
       this.countries = [];
       this.errors = {};
     },
@@ -545,8 +599,8 @@ export default {
       this.edit.name = governorate.name;
       this.edit.name_e = governorate.name_e;
       this.edit.is_active = governorate.is_active;
-      await this.getCategory();
-      this.edit.country_id = governorate.country.id;
+      if(this.isVisible('country_id')) await this.getCategory();
+      if(governorate.country)this.edit.country_id = governorate.country.id;
       this.edit.phone_key = governorate.phone_key;
       this.errors = {};
     },
@@ -585,9 +639,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     async getCategory() {
       this.isLoader = true;
 
@@ -675,19 +726,21 @@ export default {
                     ref="dropdown"
                     class="btn-block setting-search"
                   >
-                    <b-form-checkbox v-model="filterSetting" value="name" class="mb-1"
+                    <b-form-checkbox v-if="isVisible('name')" v-model="filterSetting" value="name" class="mb-1"
                       >{{ getCompanyKey("governorate_name_ar") }}
                     </b-form-checkbox>
-                    <b-form-checkbox v-model="filterSetting" value="name_e" class="mb-1"
+                    <b-form-checkbox v-if="isVisible('name_e')" v-model="filterSetting" value="name_e" class="mb-1"
                       >{{ getCompanyKey("governorate_name_en") }}
                     </b-form-checkbox>
                     <b-form-checkbox
+                      v-if="isVisible('country_id')"
                       v-model="filterSetting"
                       :value="$i18n.locale == 'ar' ? 'country.name' : 'country.name_e'"
                       class="mb-1"
                       >{{ getCompanyKey("country") }}
                     </b-form-checkbox>
                     <b-form-checkbox
+                      v-if="isVisible('phone_key')"
                       v-model="filterSetting"
                       value="phone_key"
                       class="mb-1"
@@ -785,22 +838,22 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.name" class="mb-1"
+                      <b-form-checkbox v-if="isVisible('name')" v-model="setting.name" class="mb-1"
                         >{{ getCompanyKey("governorate_name_ar") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.name_e" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('name_e')" v-model="setting.name_e" class="mb-1">
                         {{ getCompanyKey("governorate_name_en") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.phone_key" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('phone_key')" v-model="setting.phone_key" class="mb-1">
                         {{ getCompanyKey("governorate_phone_key") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.country_id" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('country_id')" v-model="setting.country_id" class="mb-1">
                         {{ getCompanyKey("governorate_country") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.is_default" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('is_default')" v-model="setting.is_default" class="mb-1">
                         {{ getCompanyKey("governorate_default") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.is_active" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('is_active')" v-model="setting.is_active" class="mb-1">
                         {{ getCompanyKey("governorate_status") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
@@ -903,11 +956,11 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('country_id')">
                     <div class="form-group position-relative">
                       <label class="control-label">
                         {{ getCompanyKey("country") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('country_id')" class="text-danger">*</span>
                       </label>
                       <multiselect
                         @input="showCountryModal"
@@ -931,17 +984,16 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('phone_key')">
                     <div class="form-group">
                       <label for="field-5" class="control-label">
                         {{ getCompanyKey("governorate_phone_key") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('phone_key')" class="text-danger">*</span>
                       </label>
                       <input
                         type="number"
                         class="form-control"
                         data-create="4"
-                        @keypress.enter="moveInput('select', 'create', 5)"
                         v-model="$v.create.phone_key.$model"
                         :class="{
                           'is-invalid': $v.create.phone_key.$error || errors.phone_key,
@@ -968,19 +1020,17 @@ export default {
                       </template>
                     </div>
                   </div>
-
-                  <div class="col-md-6 direction" dir="rtl">
+                  <div  class="col-md-6 direction" v-if="isVisible('name')" dir="rtl">
                     <div class="form-group">
                       <label for="field-1" class="control-label">
                         {{ getCompanyKey("governorate_name_ar") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name')" class="text-danger">*</span>
                       </label>
                       <input
                       @keyup="arabicValue(create.name)"
                         type="text"
                         class="form-control"
                         data-create="1"
-                        @keypress.enter="moveInput('input', 'create', 2)"
                         v-model="$v.create.name.$model"
                         :class="{
                           'is-invalid': $v.create.name.$error || errors.name,
@@ -1007,18 +1057,16 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6 direction-ltr" dir="ltr">
+                  <div class="col-md-6 direction-ltr" v-if="isVisible('name_e')" dir="ltr">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
                         {{ getCompanyKey("governorate_name_en") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name_e')" class="text-danger">*</span>
                       </label>
                       <input
                       @keyup="englishValue(create.name_e)"
                         type="text"
                         class="form-control"
-                        data-create="2"
-                        @keypress.enter="moveInput('input', 'create', 4)"
                         v-model="$v.create.name_e.$model"
                         :class="{
                           'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -1045,16 +1093,15 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('is_default')">
                     <div class="form-group">
                       <label class="mr-2" for="field-11">
                         {{ getCompanyKey("governorate_default") }}
+                        <span v-if="isRequired('is_default')" class="text-danger">*</span>
                       </label>
                       <select
                         class="custom-select mr-sm-2"
                         id="field-11"
-                        data-create="5"
-                        @keypress.enter.prevent="moveInput('select', 'create', 6)"
                         v-model="$v.create.is_default.$model"
                         :class="{
                           'is-invalid': $v.create.is_default.$error || errors.is_default,
@@ -1063,8 +1110,8 @@ export default {
                         }"
                       >
                         <option value="" selected>{{ $t("general.Choose") }}...</option>
-                        <option value="1">{{ $t("general.Active") }}</option>
-                        <option value="0">{{ $t("general.Inactive") }}</option>
+                        <option value="1">{{ $t("general.Yes") }}</option>
+                        <option value="0">{{ $t("general.No") }}</option>
                       </select>
                       <template v-if="errors.is_default">
                         <ErrorMessage
@@ -1075,36 +1122,46 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="mr-2" for="inlineFormCustomSelectPref">
-                        {{ getCompanyKey("governorate_status") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <select
-                        class="custom-select mr-sm-2"
-                        id="inlineFormCustomSelectPref"
-                        data-create="6"
-                        @keypress.enter.prevent="moveInput('input', 'create', 1)"
-                        v-model="$v.create.is_active.$model"
-                        :class="{
-                          'is-invalid': $v.create.is_active.$error || errors.is_active,
-                          'is-valid': !$v.create.is_active.$invalid && !errors.is_active,
-                        }"
-                      >
-                        <option value="" selected>{{ $t("general.Choose") }}...</option>
-                        <option value="active">{{ $t("general.Active") }}</option>
-                        <option value="inactive">{{ $t("general.Inactive") }}</option>
-                      </select>
-                      <template v-if="errors.is_active">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.is_active"
-                          :key="index"
-                          >{{ errorMessage }}
-                        </ErrorMessage>
-                      </template>
-                    </div>
-                  </div>
+                <div class="col-md-12" v-if="isVisible('is_active')">
+                              <div class="form-group">
+                                <label class="mr-2">
+                                  {{ getCompanyKey("governorate_status") }}
+                                  <span v-if="isRequired('is_active')" class="text-danger"
+                                    >*</span
+                                  >
+                                </label>
+                                <b-form-group
+                                  :class="{
+                                    'is-invalid':
+                                      $v.create.is_active.$error || errors.is_active,
+                                    'is-valid':
+                                      !$v.create.is_active.$invalid && !errors.is_active,
+                                  }"
+                                >
+                                  <b-form-radio
+                                    class="d-inline-block"
+                                    v-model="$v.create.is_active.$model"
+                                    name="some-radios"
+                                    value="active"
+                                    >{{ $t("general.Active") }}</b-form-radio
+                                  >
+                                  <b-form-radio
+                                    class="d-inline-block m-1"
+                                    v-model="$v.create.is_active.$model"
+                                    name="some-radios"
+                                    value="inactive"
+                                    >{{ $t("general.Inactive") }}</b-form-radio
+                                  >
+                                </b-form-group>
+                                <template v-if="errors.is_active">
+                                  <ErrorMessage
+                                    v-for="(errorMessage, index) in errors.is_active"
+                                    :key="index"
+                                    >{{ errorMessage }}
+                                  </ErrorMessage>
+                                </template>
+                              </div>
+                            </div>
                 </div>
               </form>
             </b-modal>
@@ -1130,7 +1187,7 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.name">
+                    <th v-if="setting.name && isVisible('name')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("governorate_name_ar") }}</span>
                         <div class="arrow-sort">
@@ -1145,7 +1202,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.name_e">
+                    <th v-if="setting.name_e && isVisible('name_e')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("governorate_name_en") }}</span>
                         <div class="arrow-sort">
@@ -1160,22 +1217,22 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.phone_key">
+                    <th v-if="setting.phone_key && isVisible('phone_key')">
                       <div class="d-flex justify-content-center">
                         {{ getCompanyKey("governorate_phone_key") }}
                       </div>
                     </th>
-                    <th v-if="setting.country_id">
+                    <th v-if="setting.country_id && isVisible('country_id')">
                       <div class="d-flex justify-content-center">
                         {{ getCompanyKey("country") }}
                       </div>
                     </th>
-                    <th v-if="setting.is_default">
+                    <th v-if="setting.is_default && isVisible('is_default')">
                       <div class="d-flex justify-content-center">
                         {{ getCompanyKey("governorate_default") }}
                       </div>
                     </th>
-                    <th v-if="setting.is_active">
+                    <th v-if="setting.is_active && isVisible('is_active')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("governorate_status") }}</span>
                         <div class="arrow-sort">
@@ -1215,17 +1272,17 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.name">
+                    <td v-if="setting.name && isVisible('name')">
                       <h5 class="m-0 font-weight-normal">{{ data.name }}</h5>
                     </td>
-                    <td v-if="setting.name_e">
+                    <td v-if="setting.name_e && isVisible('name_e')">
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
-                    <td v-if="setting.phone_key">{{ data.phone_key }}</td>
-                    <td v-if="setting.country_id">
-                      {{ $i18n.locale == "ar" ? data.country.name : data.country.name_e }}
+                    <td v-if="setting.phone_key && isVisible('phone_key')">{{ data.phone_key }}</td>
+                    <td v-if="setting.country_id && isVisible('country_id')">
+                      {{data.country ? $i18n.locale == "ar" ? data.country.name : data.country.name_e : ''}}
                     </td>
-                    <td v-if="setting.is_default">
+                    <td v-if="setting.is_default && isVisible('is_default')">
                       <span
                         :class="[
                           data.is_default == 'active' ? 'text-success' : 'text-danger',
@@ -1239,7 +1296,7 @@ export default {
                         }}
                       </span>
                     </td>
-                    <td v-if="setting.is_active">
+                    <td v-if="setting.is_active && isVisible('is_active')">
                       <span
                         :class="[
                           data.is_active == 'active' ? 'text-success' : 'text-danger',
@@ -1331,11 +1388,11 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('country_id')">
                               <div class="form-group">
                                 <label class="control-label">
                                   {{ getCompanyKey("country") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('country_id')" class="text-danger">*</span>
                                 </label>
                                 <multiselect
                                   @input="showCountryModalEdit"
@@ -1361,17 +1418,15 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('phone_key')">
                               <div class="form-group">
                                 <label for="edit-4" class="control-label">
                                   {{ getCompanyKey("governorate_phone_key") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('phone_key')" class="text-danger">*</span>
                                 </label>
                                 <input
                                   type="number"
                                   class="form-control"
-                                  data-edit="6"
-                                  @keypress.enter="moveInput('input', 'edit', 7)"
                                   v-model="$v.edit.phone_key.$model"
                                   :class="{
                                     'is-invalid':
@@ -1406,11 +1461,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6 direction" dir="rtl">
+                            <div class="col-md-6 direction" v-if="isVisible('name')"  dir="rtl">
                               <div class="form-group">
                                 <label for="edit-1" class="control-label">
                                   {{ getCompanyKey("governorate_name_ar") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('name')"  class="text-danger">*</span>
                                 </label>
                                 <input
                                 @keyup="arabicValue(edit.name)"
@@ -1418,7 +1473,6 @@ export default {
                                   type="text"
                                   class="form-control"
                                   data-edit="1"
-                                  @keypress.enter="moveInput('input', 'edit', 2)"
                                   v-model="$v.edit.name.$model"
                                   :class="{
                                     'is-invalid': $v.edit.name.$error || errors.name,
@@ -1451,19 +1505,17 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6 direction-ltr" dir="ltr">
+                            <div class="col-md-6 direction-ltr" v-if="isVisible('name_e')" dir="ltr">
                               <div class="form-group">
                                 <label for="edit-2" class="control-label">
                                   {{ getCompanyKey("governorate_name_en") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('name_e')" class="text-danger">*</span>
                                 </label>
                                 <input
                                 @keyup="englishValue(edit.name_e)"
 
                                   type="text"
                                   class="form-control"
-                                  data-edit="2"
-                                  @keypress.enter="moveInput('input', 'edit', 4)"
                                   v-model="$v.edit.name_e.$model"
                                   :class="{
                                     'is-invalid': $v.edit.name_e.$error || errors.name_e,
@@ -1497,17 +1549,16 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('is_default')">
                               <div class="form-group">
                                 <label class="mr-2" for="edit-11">
                                   {{ getCompanyKey("governorate_default") }}
+                                  <span v-if="isRequired('is_default')" class="text-danger">*</span>
                                 </label>
                                 <select
                                   class="custom-select mr-sm-2"
                                   id="edit-11"
-                                  data-edit="8"
-                                  @keypress.enter.prevent="moveInput('select', 'edit', 9)"
-                                  v-model="$v.create.is_default.$model"
+                                  v-model="$v.edit.is_default.$model"
                                   :class="{
                                     'is-invalid':
                                       $v.edit.is_default.$error || errors.is_default,
@@ -1518,8 +1569,8 @@ export default {
                                   <option value="" selected>
                                     {{ $t("general.Choose") }}...
                                   </option>
-                                  <option value="1">{{ $t("general.Active") }}</option>
-                                  <option value="0">{{ $t("general.Inactive") }}</option>
+                                  <option value="1">{{ $t("general.Yes") }}</option>
+                                  <option value="0">{{ $t("general.No") }}</option>
                                 </select>
                                 <template v-if="errors.is_default">
                                   <ErrorMessage
@@ -1530,17 +1581,15 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                          <div class="col-md-12" v-if="isVisible('is_active')">
                               <div class="form-group">
                                 <label class="mr-2">
                                   {{ getCompanyKey("governorate_status") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('is_active')" class="text-danger"
+                                    >*</span
+                                  >
                                 </label>
-                                <select
-                                  class="custom-select mr-sm-2"
-                                  data-edit="9"
-                                  @keypress.enter.prevent="moveInput('input', 'edit', 1)"
-                                  v-model="$v.edit.is_active.$model"
+                                <b-form-group
                                   :class="{
                                     'is-invalid':
                                       $v.edit.is_active.$error || errors.is_active,
@@ -1548,16 +1597,21 @@ export default {
                                       !$v.edit.is_active.$invalid && !errors.is_active,
                                   }"
                                 >
-                                  <option value="" selected>
-                                    {{ $t("general.Choose") }}...
-                                  </option>
-                                  <option value="active">
-                                    {{ $t("general.Active") }}
-                                  </option>
-                                  <option value="inactive">
-                                    {{ $t("general.Inactive") }}
-                                  </option>
-                                </select>
+                                  <b-form-radio
+                                    class="d-inline-block"
+                                    v-model="$v.edit.is_active.$model"
+                                    name="some-radios"
+                                    value="active"
+                                    >{{ $t("general.Active") }}</b-form-radio
+                                  >
+                                  <b-form-radio
+                                    class="d-inline-block m-1"
+                                    v-model="$v.edit.is_active.$model"
+                                    name="some-radios"
+                                    value="inactive"
+                                    >{{ $t("general.Inactive") }}</b-form-radio
+                                  >
+                                </b-form-group>
                                 <template v-if="errors.is_active">
                                   <ErrorMessage
                                     v-for="(errorMessage, index) in errors.is_active"

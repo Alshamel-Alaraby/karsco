@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('general_colors', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('name_e')->unique();
+            $table->string('name')->unique()->nullable();
+            $table->string('name_e')->unique()->nullable();
             $table->string('is_active')->default('active');
             $table->softDeletes();
             $table->timestamps();

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Currency;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Currency\CreateCurrencyRequest;
+use App\Http\Requests\CurrencyRequest;
 use App\Http\Resources\Currency\CurrencyResource;
 use App\Repositories\Currency\CurrencyRepositoryInterface;
 use Illuminate\Http\Request;
@@ -37,7 +37,7 @@ class CurrencyController extends Controller
         //     $data = $this->repository->getAll($request);
         //     cachePut('currencies', $data);
         // }
-        
+
         $data = $this->repository->getAll($request);
         return responseJson(200, 'success', ($this->resource)::collection($data['data']), $data['paginate'] ? getPaginates($data['data']) : null);
     }
@@ -47,7 +47,7 @@ class CurrencyController extends Controller
      * @param Request $request
      * @return \response
      */
-    public function store(CreateCurrencyRequest $request)
+    public function store(CurrencyRequest $request)
     {
         $model = $this->repository->create($request->validated());
         return responseJson(200, __('done'), new $this->resource($model));
@@ -83,7 +83,7 @@ class CurrencyController extends Controller
      * @param int $id
      * @return \response
      */
-    public function update(Request $request, $id)
+    public function update(CurrencyRequest $request, $id)
     {
         $model = $this->repository->find($id);
 

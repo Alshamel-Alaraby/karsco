@@ -23,8 +23,8 @@ class UpdateUnitRequest extends FormRequest
      */public function rules()
     {
         return [
-            'name' => 'string|max:255',
-            'name_e' => 'string|max:255',
+            'name' => 'nullable|max:255',
+            'name_e' => 'nullable|max:255',
             'is_active' => 'nullable|in:active,inactive',
         ];
     }

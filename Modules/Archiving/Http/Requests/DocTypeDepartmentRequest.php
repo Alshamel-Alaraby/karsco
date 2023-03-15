@@ -29,16 +29,6 @@ class DocTypeDepartmentRequest extends FormRequest
         ];
     }
 
-    public function messages()
-    {
-        return [
-            "arch_doc_type_id.required" => __("message.field is required"),
-            "arch_doc_type_id.integer" => __("message.field must be integer"),
-            "arch_doc_type_id.exists" => __("message.field must be exists"),
-            "arch_department_id.required" => __("message.field is required"),
-            "arch_department_id.integer" => __("message.field must be integer"),
-            "arch_department_id.exists" => __("message.field must be exists"),
-        ];
-    }
+
 
 }

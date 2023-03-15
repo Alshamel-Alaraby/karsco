@@ -4,12 +4,12 @@ import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
 import {
-  required,
-  minLength,
-  maxLength,
-  integer,
-  alpha,
-  email,
+    required,
+    minLength,
+    maxLength,
+    integer,
+    alpha,
+    email, requiredIf,
 } from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
@@ -61,6 +61,7 @@ export default {
   },
   data() {
     return {
+      fields: [],
       per_page: 50,
       search: "",
       Tooltip: "",
@@ -127,34 +128,54 @@ export default {
   },
   validations: {
     create: {
-      bank_id: { required, integer },
+      bank_id: { required: requiredIf(function (model) {
+              return this.isRequired("bank_id");
+          }), integer },
       account_number: {
-        required,
-        integer,
-        minLength: minLength(2),
-        maxLength: maxLength(100),
-      },
-      phone: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      address: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      email: { required, email },
-      emp_id: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      rp_code: { required, minLength: minLength(2), maxLength: maxLength(100) },
+          required: requiredIf(function (model) {
+              return this.isRequired("account_number");
+          }), integer, minLength: minLength(2), maxLength: maxLength(100),},
+      phone: { required: requiredIf(function (model) {
+              return this.isRequired("phone");
+          }), minLength: minLength(2), maxLength: maxLength(100) },
+      address: { required: requiredIf(function (model) {
+              return this.isRequired("address");
+          }), minLength: minLength(2), maxLength: maxLength(100) },
+      email: { required: requiredIf(function (model) {
+              return this.isRequired("email");
+          }), email },
+      emp_id: { required: requiredIf(function (model) {
+              return this.isRequired("emp_id");
+          }), minLength: minLength(2), maxLength: maxLength(100) },
+      rp_code: { required: requiredIf(function (model) {
+              return this.isRequired("rp_code");
+          }), minLength: minLength(2), maxLength: maxLength(100) },
       media: {},
     },
     edit: {
-      bank_id: { required, integer },
-      account_number: {
-        required,
-        integer,
-        minLength: minLength(2),
-        maxLength: maxLength(100),
-      },
-      phone: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      address: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      email: { required, email },
-      emp_id: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      rp_code: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      media: {},
+        bank_id: { required: requiredIf(function (model) {
+                return this.isRequired("bank_id");
+            }), integer },
+        account_number: {
+            required: requiredIf(function (model) {
+                return this.isRequired("account_number");
+            }), integer, minLength: minLength(2), maxLength: maxLength(100),},
+        phone: { required: requiredIf(function (model) {
+                return this.isRequired("phone");
+            }), minLength: minLength(2), maxLength: maxLength(100) },
+        address: { required: requiredIf(function (model) {
+                return this.isRequired("address");
+            }), minLength: minLength(2), maxLength: maxLength(100) },
+        email: { required: requiredIf(function (model) {
+                return this.isRequired("email");
+            }), email },
+        emp_id: { required: requiredIf(function (model) {
+                return this.isRequired("emp_id");
+            }), minLength: minLength(2), maxLength: maxLength(100) },
+        rp_code: { required: requiredIf(function (model) {
+                return this.isRequired("rp_code");
+            }), minLength: minLength(2), maxLength: maxLength(100) },
+        media: {},
     },
   },
   watch: {
@@ -190,29 +211,39 @@ export default {
   },
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
+    this.getCustomTableFields();
     this.getData();
   },
-  updated() {
-    $(function () {
-      $(".englishInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return true;
-        if (65 <= ew && ew <= 90) return true;
-        if (97 <= ew && ew <= 122) return true;
-        return false;
-      });
-      $(".arabicInput").keypress(function (event) {
-        var ew = event.which;
-        if (ew == 32) return true;
-        if (48 <= ew && ew <= 57) return false;
-        if (65 <= ew && ew <= 90) return false;
-        if (97 <= ew && ew <= 122) return false;
-        return true;
-      });
-    });
-  },
   methods: {
+    getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_bank_accounts`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+    isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+    isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
     showScreen(module, screen) {
       let filterRes = this.$store.state.auth.allWorkFlow.filter(
         (workflow) => workflow.name_e == module
@@ -434,7 +465,7 @@ export default {
      *  hidden Modal (create)
      */
     async resetModal() {
-      await this.getBank();
+      if(this.isVisible('bank_id')) await this.getBank();
       this.create = {
         bank_id: null,
         account_number: "",
@@ -457,7 +488,7 @@ export default {
      *  create countrie
      */
     async resetForm() {
-      await this.getBank();
+      if(this.isVisible('bank_id')) await this.getBank();
       this.create = {
         bank_id: null,
         account_number: "",
@@ -593,10 +624,10 @@ export default {
      *   show Modal (edit)
      */
     async resetModalEdit(id) {
-      await this.getBank();
+      if(this.isVisible('bank_id')) await this.getBank();
       let bankAccount = this.bankAccounts.find((e) => id == e.id);
       this.bankAccount_id = id;
-      this.edit.bank_id = bankAccount.bank_id;
+      this.edit.bank_id = bankAccount.bank_id ?? null;
       this.edit.account_number = bankAccount.account_number;
       this.edit.phone = bankAccount.phone;
       this.edit.address = bankAccount.address;
@@ -649,9 +680,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     /**
      *  start Image ceate
      */
@@ -879,6 +907,7 @@ export default {
                     class="btn-block setting-search"
                   >
                     <b-form-checkbox
+                      v-if="isVisible('bank_id')"
                       v-model="filterSetting"
                       :value="$i18n.locale == 'ar' ? 'bank.name' : 'bank.name_e'"
                       class="mb-1"
@@ -887,24 +916,25 @@ export default {
                     </b-form-checkbox>
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('bank_id')"
                       value="account_number"
                       class="mb-1"
                     >
                       {{ getCompanyKey("bank_account_number") }}
                     </b-form-checkbox>
-                    <b-form-checkbox v-model="filterSetting" value="phone" class="mb-1">
+                    <b-form-checkbox v-if="isVisible('phone')"  v-model="filterSetting" value="phone" class="mb-1">
                       {{ getCompanyKey("bank_account_phone") }}
                     </b-form-checkbox>
-                    <b-form-checkbox v-model="filterSetting" value="address" class="mb-1">
+                    <b-form-checkbox v-if="isVisible('address')"  v-model="filterSetting" value="address" class="mb-1">
                       {{ getCompanyKey("bank_account_address") }}
                     </b-form-checkbox>
-                    <b-form-checkbox v-model="filterSetting" value="email" class="mb-1">
+                    <b-form-checkbox v-if="isVisible('email')"  v-model="filterSetting" value="email" class="mb-1">
                       {{ getCompanyKey("bank_account_email") }}
                     </b-form-checkbox>
-                    <b-form-checkbox v-model="filterSetting" value="emp_id" class="mb-1">
+                    <b-form-checkbox v-if="isVisible('emp_id')" v-model="filterSetting" value="emp_id" class="mb-1">
                       {{ getCompanyKey("employee") }}
                     </b-form-checkbox>
-                    <b-form-checkbox v-model="filterSetting" value="rp_code" class="mb-1"
+                    <b-form-checkbox v-if="isVisible('rp_code')" v-model="filterSetting" value="rp_code" class="mb-1"
                       >{{ getCompanyKey("bank_account_rpcode") }}
                     </b-form-checkbox>
                   </b-dropdown>
@@ -999,25 +1029,25 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.bank_id" class="mb-1"
+                      <b-form-checkbox v-if="isVisible('bank_id')" v-model="setting.bank_id" class="mb-1"
                         >{{ getCompanyKey("bank") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.account_number" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('account_number')" v-model="setting.account_number" class="mb-1">
                         {{ getCompanyKey("bank_account_number") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.phone" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('phone')" v-model="setting.phone" class="mb-1">
                         {{ getCompanyKey("bank_account_phone") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.address" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('address')" v-model="setting.address" class="mb-1">
                         {{ getCompanyKey("bank_account_address") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.email" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('email')" v-model="setting.email" class="mb-1">
                         {{ getCompanyKey("bank_account_email") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.emp_id" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('emp_id')" v-model="setting.emp_id" class="mb-1">
                         {{ getCompanyKey("employee") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.rp_code" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('rp_code')" v-model="setting.rp_code" class="mb-1">
                         {{ getCompanyKey("bank_account_rpcode") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
@@ -1130,11 +1160,11 @@ export default {
                     <b-tab :title="$t('general.DataEntry')" active>
                       <div class="row">
                         <div class="row">
-                          <div class="col-md-6">
+                          <div class="col-md-6" v-if="isVisible('bank_id')">
                             <div class="form-group position-relative">
                               <label class="control-label">
                                 {{ getCompanyKey("bank") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('bank_id')" class="text-danger">*</span>
                               </label>
                               <multiselect
                                 @input="showBankModal"
@@ -1160,12 +1190,12 @@ export default {
                               </template>
                             </div>
                           </div>
-                          <div class="col-md-6"></div>
-                          <div class="col-md-6">
+                          <div class="col-md-6" v-if="isVisible('bank_id')"></div>
+                          <div class="col-md-6" v-if="isVisible('account_number')" >
                             <div class="form-group">
                               <label for="field-1" class="control-label">
                                 {{ getCompanyKey("bank_account_number") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('account_number')" class="text-danger">*</span>
                               </label>
                               <input
                                 type="number"
@@ -1209,11 +1239,11 @@ export default {
                               </template>
                             </div>
                           </div>
-                          <div class="col-md-6">
+                          <div class="col-md-6" v-if="isVisible('phone')">
                             <div class="form-group">
                               <label for="field-3" class="control-label">
                                 {{ getCompanyKey("bank_account_phone") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('phone')" class="text-danger">*</span>
                               </label>
 
                               <input
@@ -1254,11 +1284,11 @@ export default {
                               </template>
                             </div>
                           </div>
-                          <div class="col-md-6">
+                          <div class="col-md-6" v-if="isVisible('address')">
                             <div class="form-group">
                               <label for="field-2" class="control-label">
                                 {{ getCompanyKey("bank_account_address") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('address')" class="text-danger">*</span>
                               </label>
                               <div dir="ltr">
                                 <input
@@ -1301,11 +1331,11 @@ export default {
                               </template>
                             </div>
                           </div>
-                          <div class="col-md-6">
+                          <div class="col-md-6" v-if="isVisible('email')">
                             <div class="form-group">
                               <label for="field-4" class="control-label">
                                 {{ getCompanyKey("bank_account_email") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('email')" class="text-danger">*</span>
                               </label>
                               <input
                                 type="text"
@@ -1331,11 +1361,11 @@ export default {
                               </template>
                             </div>
                           </div>
-                          <div class="col-md-6">
+                          <div class="col-md-6" v-if="isVisible('emp_id')">
                             <div class="form-group">
                               <label for="field-3" class="control-label">
                                 {{ getCompanyKey("employee") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('emp_id')" class="text-danger">*</span>
                               </label>
 
                               <input
@@ -1376,13 +1406,12 @@ export default {
                               </template>
                             </div>
                           </div>
-                          <div class="col-md-6">
+                          <div class="col-md-6"  v-if="isVisible('rp_code')">
                             <div class="form-group">
                               <label for="field-3" class="control-label">
                                 {{ getCompanyKey("bank_account_rpcode") }}
-                                <span class="text-danger">*</span>
+                                <span  v-if="isRequired('rp_code')" class="text-danger">*</span>
                               </label>
-
                               <input
                                 type="text"
                                 class="form-control"
@@ -1568,7 +1597,7 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.bank_id">
+                    <th v-if="setting.bank_id && isVisible('bank_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("bank") }}</span>
                         <div class="arrow-sort">
@@ -1583,7 +1612,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.account_number">
+                    <th v-if="setting.account_number && isVisible('account_number')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("bank_account_number") }}</span>
                         <div class="arrow-sort">
@@ -1602,7 +1631,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.phone">
+                    <th v-if="setting.phone && isVisible('phone')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("bank_account_phone") }}</span>
                         <div class="arrow-sort">
@@ -1617,7 +1646,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.address">
+                    <th v-if="setting.address && isVisible('address')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("bank_account_address") }}</span>
                         <div class="arrow-sort">
@@ -1632,7 +1661,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.email">
+                    <th v-if="setting.email && isVisible('email')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("bank_account_email") }}</span>
                         <div class="arrow-sort">
@@ -1647,8 +1676,7 @@ export default {
                         </div>
                       </div>
                     </th>
-
-                    <th v-if="setting.emp_id">
+                    <th v-if="setting.emp_id && isVisible('emp_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("employee") }}</span>
                         <div class="arrow-sort">
@@ -1663,8 +1691,7 @@ export default {
                         </div>
                       </div>
                     </th>
-
-                    <th v-if="setting.rp_code">
+                    <th v-if="setting.rp_code && isVisible('rp_code')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("bank_account_rpcode") }}</span>
                         <div class="arrow-sort">
@@ -1704,23 +1731,23 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.bank_id">
+                    <td v-if="setting.bank_id && isVisible('bank_id')">
                       <h5 class="m-0 font-weight-normal">
-                        {{ $i18n.locale == "ar" ? data.bank.name : data.bank.name_e }}
+                        {{ data.bank ? $i18n.locale == "ar" ? data.bank.name : data.bank.name_e : ' - '}}
                       </h5>
                     </td>
-                    <td v-if="setting.account_number">
+                    <td v-if="setting.account_number && isVisible('account_number')">
                       <h5 class="m-0 font-weight-normal">{{ data.account_number }}</h5>
                     </td>
-                    <td v-if="setting.phone">
+                    <td v-if="setting.phone && isVisible('phone')">
                       <h5 class="m-0 font-weight-normal">{{ data.phone }}</h5>
                     </td>
-                    <td v-if="setting.address">
+                    <td v-if="setting.address && isVisible('address')">
                       <h5 class="m-0 font-weight-normal">{{ data.address }}</h5>
                     </td>
-                    <td v-if="setting.email">{{ data.email }}</td>
-                    <td v-if="setting.emp_id">{{ data.emp_id }}</td>
-                    <td v-if="setting.rp_code">{{ data.rp_code }}</td>
+                    <td v-if="setting.email && isVisible('email')">{{ data.email }}</td>
+                    <td v-if="setting.emp_id && isVisible('emp_id')">{{ data.emp_id }}</td>
+                    <td v-if="setting.rp_code && isVisible('rp_code')">{{ data.rp_code }}</td>
                     <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
@@ -1804,11 +1831,11 @@ export default {
                           <b-tabs nav-class="nav-tabs nav-bordered">
                             <b-tab :title="$t('general.DataEntry')" active>
                               <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-6" v-if="isVisible('bank_id')">
                                   <div class="form-group position-relative">
                                     <label class="control-label">
                                       {{ getCompanyKey("bank") }}
-                                      <span class="text-danger">*</span>
+                                      <span v-if="isRequired('bank_id')" class="text-danger">*</span>
                                     </label>
                                     <multiselect
                                       @input="showBankModalEdit"
@@ -1834,18 +1861,17 @@ export default {
                                     </template>
                                   </div>
                                 </div>
-                                <div class="col-md-6"></div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" v-if="isVisible('bank_id')"></div>
+                                <div class="col-md-6" v-if="isVisible('account_number')">
                                   <div class="form-group">
                                     <label for="field-1" class="control-label">
                                       {{ getCompanyKey("bank_account_number") }}
-                                      <span class="text-danger">*</span>
+                                      <span v-if="isRequired('account_number')" class="text-danger">*</span>
                                     </label>
                                     <input
                                       type="number"
                                       class="form-control"
                                       data-edit="1"
-                                      @keypress.enter="moveInput('input', 'edit', 2)"
                                       v-model="$v.edit.account_number.$model"
                                       :class="{
                                         'is-invalid':
@@ -1884,18 +1910,17 @@ export default {
                                     </template>
                                   </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" v-if="isVisible('phone')">
                                   <div class="form-group">
                                     <label for="field-3" class="control-label">
                                       {{ getCompanyKey("bank_account_phone") }}
-                                      <span class="text-danger">*</span>
+                                      <span v-if="isRequired('phone')" class="text-danger">*</span>
                                     </label>
 
                                     <input
                                       type="text"
                                       class="form-control"
                                       data-edit="3"
-                                      @keypress.enter="moveInput('input', 'edit', 4)"
                                       v-model="$v.edit.phone.$model"
                                       :class="{
                                         'is-invalid':
@@ -1930,18 +1955,17 @@ export default {
                                     </template>
                                   </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" v-if="isVisible('address')">
                                   <div class="form-group">
                                     <label for="field-2" class="control-label">
                                       {{ getCompanyKey("bank_account_address") }}
-                                      <span class="text-danger">*</span>
+                                      <span v-if="isRequired('address')" class="text-danger">*</span>
                                     </label>
                                     <div dir="ltr">
                                       <input
                                         type="text"
                                         class="form-control"
                                         data-edit="2"
-                                        @keypress.enter="moveInput('input', 'edit', 3)"
                                         v-model="$v.edit.address.$model"
                                         :class="{
                                           'is-invalid':
@@ -1976,11 +2000,11 @@ export default {
                                     </template>
                                   </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" v-if="isVisible('email')">
                                   <div class="form-group">
                                     <label for="field-4" class="control-label">
                                       {{ getCompanyKey("bank_account_email") }}
-                                      <span class="text-danger">*</span>
+                                      <span v-if="isRequired('email')" class="text-danger">*</span>
                                     </label>
                                     <input
                                       type="text"
@@ -2010,11 +2034,11 @@ export default {
                                     </template>
                                   </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" v-if="isVisible('emp_id')">
                                   <div class="form-group">
                                     <label for="field-3" class="control-label">
                                       {{ getCompanyKey("employee") }}
-                                      <span class="text-danger">*</span>
+                                      <span v-if="isRequired('emp_id')" class="text-danger">*</span>
                                     </label>
 
                                     <input
@@ -2056,11 +2080,11 @@ export default {
                                     </template>
                                   </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" v-if="isVisible('rp_code')">
                                   <div class="form-group">
                                     <label for="field-3" class="control-label">
                                       {{ getCompanyKey("bank_account_rpcode") }}
-                                      <span class="text-danger">*</span>
+                                      <span v-if="isRequired('rp_code')" class="text-danger">*</span>
                                     </label>
 
                                     <input

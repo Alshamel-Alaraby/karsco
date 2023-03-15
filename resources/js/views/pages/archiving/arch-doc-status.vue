@@ -73,7 +73,7 @@ export default {
       dataTablePagination: {},
       storedData: [],
       parent: [],
-      enabled3: false,
+      enabled3: true,
       isLoader: false,
       create: {
         name: "",
@@ -503,11 +503,10 @@ export default {
             <div class="row justify-content-between align-items-center mb-2">
               <h4 class="header-title">{{ $t("ArchDocStatus.ArchDocStatusTable") }}</h4>
               <div class="col-xs-10 col-md-9 col-lg-7" style="font-weight: 500">
-                <!-- Start search button -->
                 <div class="d-inline-block" style="width: 22.2%">
                   <!-- Basic dropdown -->
                   <b-dropdown
-                    variant="mary"
+                    variant="primary"
                     :text="$t('general.searchSetting')"
                     ref="dropdown"
                     class="btn-block setting-search"
@@ -519,13 +518,12 @@ export default {
                       v-model="filterSetting"
                       value="name_e"
                       class="mb-1"
-                      >{{ $t("general.Name_en") }}</b-form-checkbox
+                      >{{$t("general.Name_en")}}</b-form-checkbox
                     >
                   </b-dropdown>
                   <!-- Basic dropdown -->
                 </div>
-                <!-- End search button -->
-                <!-- Start Search TB -->
+
                 <div class="d-inline-block position-relative" style="width: 77%">
                   <span
                     :class="[
@@ -543,7 +541,6 @@ export default {
                     :placeholder="`${$t('general.Search')}...`"
                   />
                 </div>
-                <!-- End Search TB -->
               </div>
             </div>
 

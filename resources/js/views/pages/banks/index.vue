@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength, integer } from "vuelidate/lib/validators";
+import {required, minLength, maxLength, integer, requiredIf} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import Country from "../../../components/country";
@@ -54,6 +54,7 @@ export default {
   },
   data() {
     return {
+      fields: [],
       per_page: 50,
       search: "",
       debounce: {},
@@ -102,16 +103,32 @@ export default {
   },
   validations: {
     create: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      name_e: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      swift_code: { required },
-      country_id: { required },
+      name: { required: requiredIf(function (model) {
+              return this.isRequired("name");
+          }) , minLength: minLength(2), maxLength: maxLength(100) },
+      name_e: { required: requiredIf(function (model) {
+              return this.isRequired("name_e");
+          }) , minLength: minLength(2), maxLength: maxLength(100) },
+      swift_code: { required: requiredIf(function (model) {
+              return this.isRequired("swift_code");
+          })  },
+      country_id: { required: requiredIf(function (model) {
+          return this.isRequired("country_id");
+      })  },
     },
     edit: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      name_e: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      swift_code: { required },
-      country_id: { required },
+        name: { required: requiredIf(function (model) {
+                return this.isRequired("name");
+            }) , minLength: minLength(2), maxLength: maxLength(100) },
+        name_e: { required: requiredIf(function (model) {
+                return this.isRequired("name_e");
+            }) , minLength: minLength(2), maxLength: maxLength(100) },
+        swift_code: { required: requiredIf(function (model) {
+                return this.isRequired("swift_code");
+            })  },
+        country_id: { required: requiredIf(function (model) {
+                return this.isRequired("country_id");
+            })  },
     },
   },
   watch: {
@@ -147,29 +164,39 @@ export default {
   },
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
+    this.getCustomTableFields();
     this.getData();
   },
-  updated() {
-    // $(function () {
-    //   $(".englishInput").keypress(function (event) {
-    //     var ew = event.which;
-    //     if (ew == 32) return true;
-    //     if (48 <= ew && ew <= 57) return true;
-    //     if (65 <= ew && ew <= 90) return true;
-    //     if (97 <= ew && ew <= 122) return true;
-    //     return false;
-    //   });
-    //   $(".arabicInput").keypress(function (event) {
-    //     var ew = event.which;
-    //     if (ew == 32) return true;
-    //     if (48 <= ew && ew <= 57) return true;
-    //     if (65 <= ew && ew <= 90) return false;
-    //     if (97 <= ew && ew <= 122) return false;
-    //     return true;
-    //   });
-    // });
-  },
   methods: {
+      getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_banks`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+      isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+      isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
     showScreen(module, screen) {
       let filterRes = this.$store.state.auth.allWorkFlow.filter(
         (workflow) => workflow.name_e == module
@@ -400,7 +427,7 @@ export default {
         country_id: null,
         swift_code: "",
       };
-      this.getCountries();
+      if(this.isVisible('country_id')) this.getCountries();
       this.$nextTick(() => {
         this.$v.$reset();
       });
@@ -504,11 +531,11 @@ export default {
      *   show Modal (edit)
      */
     async resetModalEdit(id) {
-      await this.getCountries();
+      if(this.isVisible('country_id')) await this.getCountries();
       let bank = this.banks.find((e) => id == e.id);
       this.edit.name = bank.name;
       this.edit.name_e = bank.name_e;
-      this.edit.country_id = bank.country_id;
+      this.edit.country_id = bank.country_id ?? null;
       this.edit.swift_code = bank.swift_code;
       this.errors = {};
     },
@@ -548,9 +575,7 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
+
     async getCountries() {
       this.isLoader = true;
       await adminApi
@@ -650,14 +675,15 @@ export default {
                     ref="dropdown"
                     class="btn-block setting-search"
                   >
-                    <b-form-checkbox v-model="filterSetting" value="name" class="mb-1"
+                    <b-form-checkbox v-if="isVisible('name')" v-model="filterSetting" value="name" class="mb-1"
                       >{{ getCompanyKey("bank_name_ar") }}
                     </b-form-checkbox>
-                    <b-form-checkbox v-model="filterSetting" value="name_e" class="mb-1"
+                    <b-form-checkbox v-if="isVisible('name_e')" v-model="filterSetting" value="name_e" class="mb-1"
                       >{{ getCompanyKey("bank_name_en") }}
                     </b-form-checkbox>
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('country_id')"
                       :value="$i18n.locale == 'ar' ? 'country.name' : 'country.name_e'"
                       class="mb-1"
                       >{{ getCompanyKey("bank_name_en") }}
@@ -760,16 +786,16 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.name" class="mb-1"
+                      <b-form-checkbox v-if="isVisible('name')" v-model="setting.name" class="mb-1"
                         >{{ getCompanyKey("bank_name_ar") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.name_e" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('name_e')" v-model="setting.name_e" class="mb-1">
                         {{ getCompanyKey("bank_name_en") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.country_id" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('country_id')" v-model="setting.country_id" class="mb-1">
                         {{ getCompanyKey("country") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.swift_code" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('swift_code')" v-model="setting.swift_code" class="mb-1">
                         {{ getCompanyKey("bank_swiftcode") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
@@ -870,11 +896,11 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('country_id')">
                     <div class="form-group position-relative">
                       <label class="control-label">
                         {{ getCompanyKey("country") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('country_id')" class="text-danger">*</span>
                       </label>
                       <multiselect
                         @input="showCountryModal"
@@ -903,24 +929,21 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('swift_code')">
                     <div class="form-group">
                       <label for="field-15" class="control-label">
                         {{ getCompanyKey("bank_swiftcode") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('swift_code')" class="text-danger">*</span>
                       </label>
                       <input
                         type="text"
                         class="form-control"
-                        data-create="1"
-                        @keypress.enter="moveInput('input', 'create', 2)"
                         v-model="$v.create.swift_code.$model"
                         :class="{
                           'is-invalid': $v.create.swift_code.$error || errors.swift_code,
                           'is-valid':
                             !$v.create.swift_code.$invalid && !errors.swift_code,
                         }"
-                        id="field-15"
                       />
                       <template v-if="errors.swift_code">
                         <ErrorMessage
@@ -931,18 +954,16 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('name')" >
                     <div class="form-group">
                       <label for="field-1" class="control-label">
                         {{ getCompanyKey("bank_name_ar") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name')"  class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
                         <input
                           type="text"
                           class="form-control arabicInput"
-                          data-create="1"
-                          @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
                           :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
@@ -972,18 +993,16 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('name_e')">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
                         {{ getCompanyKey("bank_name_en") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name_e')" class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
                         <input
                           type="text"
                           class="form-control englishInput"
-                          data-create="2"
-                          @keypress.enter="moveInput('input', 'create', 3)"
                           v-model="$v.create.name_e.$model"
                           :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -1037,7 +1056,7 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.name">
+                    <th v-if="setting.name && isVisible('name')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("bank_name_ar") }}</span>
                         <div class="arrow-sort">
@@ -1052,7 +1071,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.name_e">
+                    <th v-if="setting.name_e && isVisible('name_e')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("bank_name_en") }}</span>
                         <div class="arrow-sort">
@@ -1067,7 +1086,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.country_id">
+                    <th v-if="setting.country_id && isVisible('country_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("country") }}</span>
                         <div class="arrow-sort">
@@ -1090,7 +1109,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.swift_code">
+                    <th v-if="setting.swift_code && isVisible('swift_code')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("bank_swiftcode") }}</span>
                         <div class="arrow-sort">
@@ -1130,20 +1149,20 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.name">
+                    <td v-if="setting.name && isVisible('name')">
                       <h5 class="m-0 font-weight-normal">{{ data.name }}</h5>
                     </td>
-                    <td v-if="setting.name_e">
+                    <td v-if="setting.name_e && isVisible('name_e')">
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
-                    <td v-if="setting.country_id">
+                    <td v-if="setting.country_id && isVisible('country_id')">
                       <h5 class="m-0 font-weight-normal">
                         {{
-                          $i18n.locale == "ar" ? data.country.name : data.country.name_e
+                           data.country ? $i18n.locale == "ar" ? data.country.name : data.country.name_e : ' - '
                         }}
                       </h5>
                     </td>
-                    <td v-if="setting.swift_code">
+                    <td v-if="setting.swift_code && isVisible('swift_code')">
                       <h5 class="m-0 font-weight-normal">{{ data.swift_code }}</h5>
                     </td>
                     <td v-if="enabled3" class="do-not-print">
@@ -1225,11 +1244,11 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('country_id')">
                               <div class="form-group position-relative">
                                 <label class="control-label">
                                   {{ getCompanyKey("country") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('country_id')" class="text-danger">*</span>
                                 </label>
                                 <multiselect
                                   @input="showCountryModalEdit"
@@ -1258,17 +1277,16 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('swift_code')">
                               <div class="form-group">
                                 <label for="field-15" class="control-label">
                                   {{ getCompanyKey("bank_swiftcode") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('swift_code')" class="text-danger">*</span>
                                 </label>
                                 <input
                                   type="text"
                                   class="form-control"
                                   data-create="1"
-                                  @keypress.enter="moveInput('input', 'create', 2)"
                                   v-model="$v.edit.swift_code.$model"
                                   :class="{
                                     'is-invalid':
@@ -1287,18 +1305,16 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('name')">
                               <div class="form-group">
                                 <label for="field-u-1" class="control-label">
                                   {{ getCompanyKey("bank_name_ar") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('name')" class="text-danger">*</span>
                                 </label>
                                 <div dir="rtl">
                                   <input
                                     type="text"
                                     class="form-control arabicInput"
-                                    data-create="1"
-                                    @keypress.enter="moveInput('input', 'create', 2)"
                                     v-model="$v.edit.name.$model"
                                     :class="{
                                       'is-invalid': $v.edit.name.$error || errors.name,
@@ -1334,11 +1350,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('name_e')">
                               <div class="form-group">
                                 <label for="field-u-2" class="control-label">
                                   {{ getCompanyKey("bank_name_en") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('name_e')" class="text-danger">*</span>
                                 </label>
                                 <div dir="ltr">
                                   <input

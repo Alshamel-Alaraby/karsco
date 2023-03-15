@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Traits\CompanyScopeTrait;
-use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Avenue extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait, CompanyScopeTrait;
+    use HasFactory, SoftDeletes, LogTrait;
     protected $table = 'general_avenues';
 
     protected $fillable = [
@@ -21,7 +19,7 @@ class Avenue extends Model
         'country_id',
         'governorate_id',
         'city_id',
-        "company_id"
+        "company_id",
     ];
 
     protected $casts = [
@@ -43,6 +41,17 @@ class Avenue extends Model
         return $this->belongsTo(City::class);
     }
 
+    public function customerBranches()
+    {
+        return $this->hasMany(\App\Models\CustomerBranch::class);
+    }
+    public function streets()
+    {
+        return $this->hasMany(Street::class);
+    }
+
+
+    
 
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {

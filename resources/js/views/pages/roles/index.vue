@@ -3,7 +3,13 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength, integer } from "vuelidate/lib/validators";
+import {
+  required,
+  minLength,
+  maxLength,
+  integer,
+  requiredIf,
+} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -12,7 +18,7 @@ import { dynamicSortString } from "../../../helper/tableSort";
 import Multiselect from "vue-multiselect";
 import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
-import {arabicValue,englishValue} from "../../../helper/langTransform";
+import { arabicValue, englishValue } from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -32,9 +38,9 @@ export default {
     loader,
     Multiselect,
   },
-    beforeRouteEnter(to, from, next) {
-        next((vm) => {
-          if (vm.$store.state.auth.work_flow_trees.includes("role-e")) {
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      if (vm.$store.state.auth.work_flow_trees.includes("role-e")) {
         Swal.fire({
           icon: "error",
           title: `${vm.$t("general.Error")}`,
@@ -42,15 +48,17 @@ export default {
         });
         return vm.$router.push({ name: "home" });
       }
-            if (    ( vm.showScreen( "role","roles") &&
-        vm.$store.state.auth.work_flow_trees.includes("role"))
-  || vm.$store.state.auth.user.type == 'super_admin') {
-                return true;
-            } else {
-                return vm.$router.push({ name: "home" });
-            }
-        });
-    },
+      if (
+        (vm.showScreen("role", "roles") &&
+          vm.$store.state.auth.work_flow_trees.includes("role")) ||
+        vm.$store.state.auth.user.type == "super_admin"
+      ) {
+        return true;
+      } else {
+        return vm.$router.push({ name: "home" });
+      }
+    });
+  },
   data() {
     return {
       per_page: 50,
@@ -60,6 +68,7 @@ export default {
       roles: [],
       parents: [],
       isLoader: false,
+      fields: [],
       create: {
         name: "",
         name_e: "",
@@ -88,24 +97,56 @@ export default {
       ],
       Tooltip: "",
       mouseEnter: null,
-      company_id:null,
-        enabled3: true,
-        printLoading: true,
-        printObj: {
-            id: "printCustom",
-        },
+      company_id: null,
+      enabled3: true,
+      printLoading: true,
+      printObj: {
+        id: "printCustom",
+      },
     };
   },
   validations: {
     create: {
-      name: { required, minLength: minLength(3), maxLength: maxLength(100) },
-      name_e: { required, minLength: minLength(3), maxLength: maxLength(100) },
-      roletype_id: { required },
+      name: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name");
+        }),
+        minLength: minLength(3),
+        maxLength: maxLength(100),
+      },
+      name_e: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name_e");
+        }),
+        minLength: minLength(3),
+        maxLength: maxLength(100),
+      },
+      roletype_id: {
+        required: requiredIf(function (model) {
+          return this.isRequired("roletype_id");
+        }),
+      },
     },
     edit: {
-      name: { required, minLength: minLength(3), maxLength: maxLength(100) },
-      name_e: { required, minLength: minLength(3), maxLength: maxLength(100) },
-      roletype_id: { required },
+      name: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name");
+        }),
+        minLength: minLength(3),
+        maxLength: maxLength(100),
+      },
+      name_e: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name_e");
+        }),
+        minLength: minLength(3),
+        maxLength: maxLength(100),
+      },
+      roletype_id: {
+        required: requiredIf(function (model) {
+          return this.isRequired("roletype_id");
+        }),
+      },
     },
   },
   watch: {
@@ -141,6 +182,7 @@ export default {
   },
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
+    this.getCustomTableFields();
     this.getData();
   },
   // updated() {
@@ -164,7 +206,36 @@ export default {
   //   });
   // },
   methods: {
-                        arabicValue(txt) {
+    getCustomTableFields() {
+      adminApi
+        .get(`/customTable/table-columns/general_roles`)
+        .then((res) => {
+          this.fields = res.data;
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: `${this.$t("general.Error")}`,
+            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+          });
+        })
+        .finally(() => {
+          this.isLoader = false;
+        });
+    },
+    isVisible(fieldName) {
+      let res = this.fields.filter((field) => {
+        return field.column_name == fieldName;
+      });
+      return res.length > 0 && res[0].is_visible == 1 ? true : false;
+    },
+    isRequired(fieldName) {
+      let res = this.fields.filter((field) => {
+        return field.column_name == fieldName;
+      });
+      return res.length > 0 && res[0].is_required == 1 ? true : false;
+    },
+    arabicValue(txt) {
       this.create.name = arabicValue(txt);
       this.edit.name = arabicValue(txt);
     },
@@ -172,7 +243,6 @@ export default {
       this.create.name_e = englishValue(txt);
       this.edit.name_e = englishValue(txt);
     },
-
 
     showScreen(module, screen) {
       let filterRes = this.$store.state.auth.allWorkFlow.filter(
@@ -223,7 +293,6 @@ export default {
         for (let i = 0; i < this.filterSetting.length; ++i) {
           filter += `columns[${i}]=${this.filterSetting[i]}&`;
         }
-
         adminApi
           .get(
             `/roles?page=${page}&per_page=${this.per_page}&search=${this.search}&${filter}`
@@ -371,7 +440,7 @@ export default {
      */
 
     async resetModal() {
-      await this.getRoleType();
+      if(this.isVisible('roletype_id')) await this.getRoleType();
       this.create = { name: "", name_e: "", roletype_id: null };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -382,7 +451,7 @@ export default {
      *  create module
      */
     async resetForm() {
-      await this.getRoleType();
+      if(this.isVisible('roletype_id'))await this.getRoleType();
       this.create = { name: "", name_e: "", roletype_id: null };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -406,7 +475,7 @@ export default {
         this.isLoader = true;
         this.errors = {};
         adminApi
-          .post(`/roles`,{...this.create,company_id:this.company_id})
+          .post(`/roles`, { ...this.create, company_id: this.company_id })
           .then((res) => {
             this.is_disabled = true;
             this.getData();
@@ -487,11 +556,11 @@ export default {
      *   show Modal (edit)
      */
     async resetModalEdit(id) {
-      await this.getRoleType();
+      if(this.isVisible('roletype_id'))await this.getRoleType();
       let module = this.roles.find((e) => id == e.id);
       this.edit.name = module.name;
       this.edit.name_e = module.name_e;
-      this.edit.roletype_id = module.roletype_id;
+      this.edit.roletype_id = module.roletype_id ?? null;
       this.errors = {};
     },
     /**
@@ -525,9 +594,7 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
+
     async getRoleType() {
       this.isLoader = true;
 
@@ -591,18 +658,21 @@ export default {
       }
     },
     ExportExcel(type, fn, dl) {
-          this.enabled3 = false;
-          setTimeout(() => {
-              let elt = this.$refs.exportable_table;
-              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
-              if (dl) {
-                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
-              } else {
-                  XLSX.writeFile(wb, fn || (('Role' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
-              }
-              this.enabled3 = true;
-          }, 100);
-      }
+      this.enabled3 = false;
+      setTimeout(() => {
+        let elt = this.$refs.exportable_table;
+        let wb = XLSX.utils.table_to_book(elt, { sheet: "Sheet JS" });
+        if (dl) {
+          XLSX.write(wb, { bookType: type, bookSST: true, type: "base64" });
+        } else {
+          XLSX.writeFile(
+            wb,
+            fn || ("Role" + "." || "SheetJSTableExport.") + (type || "xlsx")
+          );
+        }
+        this.enabled3 = true;
+      }, 100);
+    },
   },
 };
 </script>
@@ -610,7 +680,11 @@ export default {
 <template>
   <Layout>
     <PageHeader />
-    <RoleType :companyKeys="companyKeys" :defaultsKeys="defaultsKeys" @created="getRoleType" />
+    <RoleType
+      :companyKeys="companyKeys"
+      :defaultsKeys="defaultsKeys"
+      @created="getRoleType"
+    />
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -627,18 +701,29 @@ export default {
                     ref="dropdown"
                     class="btn-block setting-search"
                   >
-                    <b-form-checkbox v-model="filterSetting" value="name" class="mb-1">
-                      {{ getCompanyKey('role_name_ar') }}
-                    </b-form-checkbox>
-                    <b-form-checkbox v-model="filterSetting" value="name_e" class="mb-1">
-                      {{ getCompanyKey('role_name_en') }}
+                    <b-form-checkbox
+                      v-if="isVisible('name')"
+                      v-model="filterSetting"
+                      value="name"
+                      class="mb-1"
+                    >
+                      {{ getCompanyKey("role_name_ar") }}
                     </b-form-checkbox>
                     <b-form-checkbox
+                      v-if="isVisible('name_e')"
+                      v-model="filterSetting"
+                      value="name_e"
+                      class="mb-1"
+                    >
+                      {{ getCompanyKey("role_name_en") }}
+                    </b-form-checkbox>
+                    <b-form-checkbox
+                      v-if="isVisible('roletype_id')"
                       v-model="filterSetting"
                       :value="$i18n.locale == 'ar' ? 'roleType.name' : 'roleType.name_e'"
                       class="mb-1"
                     >
-                      {{ getCompanyKey('role_type') }}
+                      {{ getCompanyKey("role_type") }}
                     </b-form-checkbox>
                   </b-dropdown>
                   <!-- Basic dropdown -->
@@ -732,14 +817,22 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.name" class="mb-1"
-                        >{{ getCompanyKey('role_name_ar') }}
+                      <b-form-checkbox
+                        v-model="setting.name && isVisible('name')"
+                        class="mb-1"
+                        >{{ getCompanyKey("role_name_ar") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.name_e" class="mb-1">
-                        {{ getCompanyKey('role_name_en') }}
+                      <b-form-checkbox
+                        v-model="setting.name_e && isVisible('name_e')"
+                        class="mb-1"
+                      >
+                        {{ getCompanyKey("role_name_en") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.roletype_id" class="mb-1">
-                        {{ getCompanyKey('role_type') }}
+                      <b-form-checkbox
+                        v-model="setting.roletype_id && isVisible('roletype_id')"
+                        class="mb-1"
+                      >
+                        {{ getCompanyKey("role_type") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
                         <a href="javascript:void(0)" class="btn btn-primary btn-sm"
@@ -841,14 +934,18 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-12">
+                  <div v-if="isVisible('roletype_id')" class="col-md-12">
                     <div class="form-group">
-                      <label class="my-1 mr-2">{{ getCompanyKey('role_type') }}</label>
+                      <label class="my-1">{{ getCompanyKey("role_type") }}</label>
+                      <span v-if="isRequired('roletype_id')" class="text-danger">*</span>
                       <multiselect
                         @input="showRoleTypeModal"
-                        v-model="create.roletype_id"
+                        v-model="$v.create.roletype_id.$model"
                         :options="role_types.map((type) => type.id)"
                         :custom-label="(opt) => role_types.find((x) => x.id == opt).name"
+                        :class="{
+                          'is-invalid': $v.create.roletype_id.$error,
+                        }"
                       >
                       </multiselect>
                       <template v-if="errors.roletype_id">
@@ -860,19 +957,17 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div v-if="isVisible('name')" class="col-md-12">
                     <div class="form-group">
                       <label for="field-1" class="control-label">
-                        {{ getCompanyKey('role_name_ar') }}
-                        <span class="text-danger">*</span>
+                        {{ getCompanyKey("role_name_ar") }}
+                        <span v-if="isRequired('name')" class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
                         <input
-                        @keyup="arabicValue(create.name)"
+                          @keyup="arabicValue(create.name)"
                           type="text"
                           class="form-control"
-                          data-create="1"
-                          @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
                           :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
@@ -901,19 +996,17 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div v-if="isVisible('name_e')" class="col-md-12">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
-                        {{ getCompanyKey('role_name_en') }}
-                        <span class="text-danger">*</span>
+                        {{ getCompanyKey("role_name_en") }}
+                        <span v-if="isRequired('name_e')" class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
                         <input
-                        @keyup="englishValue(create.name_e)"
+                          @keyup="englishValue(create.name_e)"
                           type="text"
                           class="form-control"
-                          data-create="2"
-                          @keypress.enter="moveInput('select', 'create', 3)"
                           v-model="$v.create.name_e.$model"
                           :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -955,11 +1048,14 @@ export default {
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
 
-              <table class="table table-borderless table-hover table-centered m-0" ref="exportable_table"
-                     id="printCustom">
+              <table
+                class="table table-borderless table-hover table-centered m-0"
+                ref="exportable_table"
+                id="printCustom"
+              >
                 <thead>
                   <tr>
-                    <th scope="col" style="width: 0"  v-if="enabled3" class="do-not-print">
+                    <th scope="col" style="width: 0" v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control">
                         <input
                           class="form-check-input"
@@ -969,9 +1065,9 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.name">
+                    <th v-if="setting.name && isVisible('name')">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('role_name_ar') }}</span>
+                        <span>{{ getCompanyKey("role_name_ar") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -984,9 +1080,9 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.name_e">
+                    <th v-if="setting.name_e && isVisible('name_e')">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey('role_name_en') }}</span>
+                        <span>{{ getCompanyKey("role_name_en") }}</span>
                         <div class="arrow-sort">
                           <i
                             class="fas fa-arrow-up"
@@ -999,11 +1095,15 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.roletype_id">{{ getCompanyKey('role_type') }}</th>
-                    <th  v-if="enabled3" class="do-not-print">
+                    <th v-if="setting.roletype_id && isVisible('roletype_id')">
+                      {{ getCompanyKey("role_type") }}
+                    </th>
+                    <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </th>
                   </tr>
                 </thead>
                 <tbody v-if="roles.length > 0">
@@ -1014,7 +1114,7 @@ export default {
                     :key="data.id"
                     class="body-tr-custom"
                   >
-                    <td  v-if="enabled3" class="do-not-print">
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="form-check custom-control" style="min-height: 1.9em">
                         <input
                           style="width: 17px; height: 17px"
@@ -1025,22 +1125,21 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.name">
+                    <td v-if="setting.name && isVisible('name')">
                       <h5 class="m-0 font-weight-normal">{{ data.name }}</h5>
                     </td>
-                    <td v-if="setting.name_e">
+                    <td v-if="setting.name_e && isVisible('name_e')">
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
-
-                    <td v-if="setting.roletype_id">
+                    <td v-if="setting.roletype_id && isVisible('roletype_id')">
                       <h5 class="m-0 font-weight-normal">
                         {{
-                          $i18n.locale == "ar" ? data.roletype.name : data.roletype.name_e
+                          data.roletype ? $i18n.locale == "ar" ? data.roletype.name : data.roletype.name_e : ' - '
                         }}
                       </h5>
                     </td>
 
-                    <td  v-if="enabled3" class="do-not-print">
+                    <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
                           type="button"
@@ -1117,18 +1216,26 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-12">
+                            <div v-if="isVisible('roletype_id')" class="col-md-12">
                               <div class="form-group">
-                                <label class="my-1 mr-2">
-                                  {{ getCompanyKey('role_type') }}
+                                <label class="my-1">
+                                  {{ getCompanyKey("role_type") }}
+                                  <span
+                                    v-if="isRequired('roletype_id')"
+                                    class="text-danger"
+                                    >*</span
+                                  >
                                 </label>
                                 <multiselect
                                   @input="showRoleTypeModalEdit"
-                                  v-model="edit.roletype_id"
+                                  v-model="$v.edit.roletype_id.$model"
                                   :options="role_types.map((type) => type.id)"
                                   :custom-label="
                                     (opt) => role_types.find((x) => x.id == opt).name
                                   "
+                                  :class="{
+                                    'is-invalid': $v.edit.roletype_id.$error,
+                                  }"
                                 >
                                 </multiselect>
                                 <template v-if="errors.roletype_id">
@@ -1140,15 +1247,17 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div v-if="isVisible('name')" class="col-md-12">
                               <div class="form-group">
                                 <label for="field-u-1" class="control-label">
-                                  {{ getCompanyKey('role_name_ar') }}
-                                  <span class="text-danger">*</span>
+                                  {{ getCompanyKey("role_name_ar") }}
+                                  <span v-if="isRequired('name')" class="text-danger"
+                                    >*</span
+                                  >
                                 </label>
                                 <div dir="rtl">
                                   <input
-                                  @keyup="arabicValue(edit.name)"
+                                    @keyup="arabicValue(edit.name)"
                                     type="text"
                                     class="form-control"
                                     v-model="$v.edit.name.$model"
@@ -1184,15 +1293,17 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div v-if="isVisible('name_e')" class="col-md-12">
                               <div class="form-group">
                                 <label for="field-u-2" class="control-label">
-                                  {{ getCompanyKey('role_name_en') }}
-                                  <span class="text-danger">*</span>
+                                  {{ getCompanyKey("role_name_en") }}
+                                  <span v-if="isRequired('name_e')" class="text-danger"
+                                    >*</span
+                                  >
                                 </label>
                                 <div dir="ltr">
                                   <input
-                                  @keyup="englishValue(edit.name_e)"
+                                    @keyup="englishValue(edit.name_e)"
                                     type="text"
                                     class="form-control"
                                     v-model="$v.edit.name_e.$model"
@@ -1235,7 +1346,7 @@ export default {
                       </b-modal>
                       <!--  /edit   -->
                     </td>
-                    <td  v-if="enabled3" class="do-not-print">
+                    <td v-if="enabled3" class="do-not-print">
                       <button
                         @mousemove="log(data.id)"
                         @mouseover="log(data.id)"
@@ -1266,6 +1377,3 @@ export default {
     </div>
   </Layout>
 </template>
-
-
-

@@ -4,11 +4,11 @@ import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
 import {
-  required,
-  minLength,
-  maxLength,
-  integer,
-  numeric,
+    required,
+    minLength,
+    maxLength,
+    integer,
+    numeric, decimal, minValue, between,
 } from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
@@ -17,7 +17,7 @@ import wallet from "../../../components/create/realEstate/wallet";
 import loader from "../../../components/loader";
 import Role from "../../../components/create/role.vue";
 import Multiselect from "vue-multiselect";
-import { formatDateOnly } from "../../../helper/startDate";
+import {formatDateOnly, formatDateTime} from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
 
 /**
@@ -71,14 +71,17 @@ export default {
       enabled3: true,
       isLoader: false,
       create: {
-        wallet_id: null,
-        owner_id: null,
-        percentage: null,
+            wallet_id: null,
+            wallet_owners: [
+                    {
+                        owner_id: null,
+                        percentage: 0,
+                    }
+                ]
       },
       edit: {
         wallet_id: null,
-        owner_id: null,
-        percentage: null,
+          wallet_owners: []
       },
       errors: {},
       isCheckAll: false,
@@ -86,16 +89,15 @@ export default {
       wallets: [],
       owners: [],
       current_page: 1,
+      is_persentage: true,
       setting: {
         wallet_id: true,
         owner_id: true,
-        percentage: true,
       },
       is_disabled: false,
       filterSetting: [
         this.$i18n.locale == "ar" ? "owner.name" : "owner.name_e",
         this.$i18n.locale == "ar" ? "wallet.name" : "wallet.name_e",
-        "percentage",
       ],
       printLoading: true,
       printObj: {
@@ -106,13 +108,23 @@ export default {
   validations: {
     create: {
       wallet_id: { required },
-      owner_id: { required },
-      percentage: { required, numeric },
+      wallet_owners: {
+          required,
+          $each: {
+              owner_id: {required},
+              percentage: {required, decimal, minValue: minValue(0.01)},
+          }
+      }
     },
     edit: {
         wallet_id: { required },
-        owner_id: { required },
-        percentage: { required, numeric },
+        wallet_owners: {
+            required,
+            $each: {
+                owner_id: {required},
+                percentage: {required, decimal, minValue: minValue(0.01)},
+            }
+        }
     }
   },
   watch: {
@@ -150,6 +162,32 @@ export default {
     await this.getData();
   },
   methods: {
+    addNewField(){
+          this.create.wallet_owners.push({
+              owner_id: null,
+              percentage: 0,
+          });
+      },
+    removeNewField(index){
+          if(this.create.wallet_owners.length > 1){
+              this.create.wallet_owners.splice(index,1);
+               let totel = this.create.wallet_owners.reduce((accumulator, curValue) => parseFloat(accumulator) + parseFloat(curValue.percentage), 0);
+              this.is_persentage = totel == 100  ? true: false;
+          }
+      },
+    addNewFieldEdit(){
+          this.edit.wallet_owners.push({
+              owner_id: null,
+              percentage: 0,
+          });
+      },
+    removeNewFieldEdit(index){
+          if(this.edit.wallet_owners.length > 1){
+              this.edit.wallet_owners.splice(index,1);
+              let totel = this.edit.wallet_owners.reduce((accumulator, curValue) => parseFloat(accumulator) + parseFloat(curValue.percentage), 0);
+              this.is_persentage = totel == 100 ? true: false;
+          }
+      },
     /**
      *  start get Data module && pagination
      */
@@ -328,14 +366,20 @@ export default {
      */
     resetModalHidden() {
       this.create = {
-        wallet_id: null,
-        owner_id: null,
-        percentage: null,
+          wallet_id: null,
+          wallet_owners: [
+              {
+                  owner_id: null,
+                  percentage: 0,
+              }
+          ]
       };
       this.$nextTick(() => {
         this.$v.$reset();
       });
+      this.is_disabled = false;
       this.errors = {};
+      this.is_persentage = true;
       this.$bvModal.hide(`create`);
     },
     /**
@@ -346,9 +390,13 @@ export default {
       await this.getWallet();
       await this.getOwner();
       this.create = {
-        wallet_id: null,
-        owner_id: null,
-        percentage: null,
+          wallet_id: null,
+          wallet_owners: [
+              {
+                  owner_id: null,
+                  percentage: 0,
+              }
+          ]
       };
       this.$nextTick(() => {
         this.$v.$reset();
@@ -358,31 +406,38 @@ export default {
     /**
      *  create module
      */
-    async resetForm() {
-      await this.getWallet();
-      await this.getOwner();
+    resetForm() {
       this.create = {
-        wallet_id: null,
-        owner_id: null,
-        percentage: null,
+          wallet_id: null,
+          wallet_owners: [
+              {
+                  owner_id: null,
+                  percentage: 0,
+              }
+          ]
       };
       this.$nextTick(() => {
         this.$v.$reset();
       });
       this.is_disabled = false;
+      this.is_persentage = true;
       this.errors = {};
     },
 
     AddSubmit() {
       this.$v.create.$touch();
 
-      if (this.$v.create.$invalid) {
+      let totel = this.create.wallet_owners.reduce((accumulator, curValue) => parseFloat(accumulator) + parseFloat(curValue.percentage), 0);
+      this.is_persentage = totel == 100;
+
+      if (this.$v.create.$invalid && !this.is_persentage) {
         return;
       } else {
         this.isLoader = true;
+        this.create.wallet_owners.map(e => e.wallet_id = this.create.wallet_id);
         this.errors = {};
         adminApi
-          .post(`/real-estate/wallet-owner`, this.create)
+          .post(`/real-estate/wallet-owner`, {'wallet-owner':this.create.wallet_owners})
           .then((res) => {
             this.is_disabled = true;
             this.getData();
@@ -417,14 +472,16 @@ export default {
     editSubmit(id) {
       this.$v.edit.$touch();
 
-      if (this.$v.edit.$invalid) {
+      let totel = this.edit.wallet_owners.reduce((accumulator, curValue) => parseFloat(accumulator) + parseFloat(curValue.percentage), 0);
+      this.is_persentage = totel == 100;
+      if (this.$v.edit.$invalid && !this.is_persentage) {
         return;
       } else {
         this.isLoader = true;
         this.errors = {};
-
+        this.edit.wallet_owners.map(e => e.wallet_id = this.edit.wallet_id);
         adminApi
-          .put(`/real-estate/wallet-owner/${id}`, this.edit)
+          .put(`/real-estate/wallet-owner/${id}`, {'wallet-owner':this.edit.wallet_owners})
           .then((res) => {
             this.$bvModal.hide(`modal-edit-${id}`);
             this.getData();
@@ -461,19 +518,23 @@ export default {
       await this.getOwner();
       let module = this.walletOwners.find((e) => id == e.id);
       this.edit.wallet_id = module.wallet.id;
-      this.edit.owner_id = module.owner.id;
-      this.edit.percentage = module.percentage;
+      module.wallet.owners.forEach((e) => {
+            this.edit.wallet_owners.push({
+                owner_id: e.id,
+                percentage: e.walletOwner[0].percentage
+            });
+      });
       this.errors = {};
     },
     resetModalHiddenEdit(id) {
       this.edit = {
-        wallet_id: null,
-        owner_id: null,
-        percentage: null,
+          wallet_id: null,
+          wallet_owners: []
       };
       this.$nextTick(() => {
         this.$v.$reset();
       });
+      this.is_persentage = true;
       this.is_disabled = false;
       this.errors = {};
     },
@@ -494,9 +555,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     async getWallet() {
       this.isLoader = true;
 
@@ -593,18 +651,32 @@ export default {
               this.enabled3 = true;
           }, 100);
       },
-    showOwnerModal() {
-          if (this.create.owner_id == 0) {
+    showOwnerModal(index) {
+          if (this.create.wallet_owners[index].owner_id == 0) {
               this.$bvModal.show("owner-create");
-              this.create.owner_id = null;
+              this.create.wallet_owners[index].owner_id = null;
           }
       },
-    showOwnerEditModal() {
-          if (this.edit.owner_id == 0) {
+    showOwnerEditModal(index) {
+          if (this.edit.wallet_owners[index].owner_id == 0) {
               this.$bvModal.show("owner-create");
-              this.edit.owner_id = null;
+              this.edit.wallet_owners[index].owner_id = null;
           }
       },
+    changeNumber(add){
+        if(add == 'add'){
+            let totel = this.create.wallet_owners.reduce((accumulator, curValue) => parseFloat(accumulator) + parseFloat(curValue.percentage), 0);
+            this.is_persentage = totel == 100  ? true: false;
+        }else {
+            let totel = this.edit.wallet_owners.reduce((accumulator, curValue) => parseFloat(accumulator) + parseFloat(curValue.percentage), 0);
+            this.is_persentage = totel == 100 ? true: false;
+        }
+    },
+    allOnwers(items){
+        let data = '';
+        items.forEach(e => data += `${this.$i18n.locale == 'ar' ? e.name : e.name_e} - `);
+        return data;
+    }
   },
 };
 </script>
@@ -643,13 +715,6 @@ export default {
                       class="mb-1"
                     >
                       {{ getCompanyKey("wallet") }}
-                    </b-form-checkbox>
-                    <b-form-checkbox
-                      v-model="filterSetting"
-                      value="percentage"
-                      class="mb-1"
-                    >
-                      {{ getCompanyKey("wallet_owner_percentage") }}
                     </b-form-checkbox>
                   </b-dropdown>
                   <!-- Basic dropdown -->
@@ -694,11 +759,11 @@ export default {
                     <button v-print="'#printWalletOwner'" class="custom-btn-dowonload">
                         <i class="fe-printer"></i>
                     </button>
-                  <button
-                    class="custom-btn-dowonload"
-                    @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
-                    v-if="checkAll.length == 1"
-                  >
+                    <button
+                      class="custom-btn-dowonload"
+                      @click="$bvModal.show(`modal-edit-${checkAll[0]}`)"
+                      v-if="checkAll.length == 1"
+                    >
                     <i class="mdi mdi-square-edit-outline"></i>
                   </button>
                   <!-- start mult delete  -->
@@ -748,9 +813,6 @@ export default {
                       </b-form-checkbox>
                       <b-form-checkbox v-model="setting.wallet_id" class="mb-1">
                         {{ getCompanyKey("wallet") }}
-                      </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.percentage" class="mb-1">
-                        {{ getCompanyKey("wallet_owner_percentage") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
                         <a href="javascript:void(0)" class="btn btn-primary btn-sm"
@@ -812,12 +874,13 @@ export default {
               :title="getCompanyKey('wallet_owner_create_form')"
               title-class="font-18"
               body-class="p-4 "
+              size="lg"
               :hide-footer="true"
               @show="resetModal"
               @hidden="resetModalHidden"
             >
               <form>
-                <div class="mb-3 d-flex justify-content-end">
+                <div class="d-flex justify-content-end">
                   <b-button
                     variant="success"
                     :disabled="!is_disabled"
@@ -854,7 +917,7 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-12">
+                    <div class="col-md-6">
                     <div class="form-group">
                       <label class="my-1 mr-2">{{ getCompanyKey("wallet")  }}</label>
                       <multiselect
@@ -881,61 +944,84 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
-                    <div class="form-group">
-                      <label class="my-1 mr-2">{{ getCompanyKey("owner") }}</label>
-                      <multiselect
-                        @input="showOwnerModal"
-                        v-model="$v.create.owner_id.$model"
-                        :options="owners.map((type) => type.id)"
-                        :custom-label="
-                          (opt) =>
-                            $i18n.locale == 'ar'
-                              ? owners.find((x) => x.id == opt).name
-                              : owners.find((x) => x.id == opt).name_e
-                        "
-                      >
-                      </multiselect>
-                      <div v-if="$v.create.owner_id.$error" class="text-danger">
-                        {{ $t("general.fieldIsRequired") }}
-                      </div>
-                      <template v-if="errors.owner_id">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.owner_id"
-                          :key="index"
-                          >{{ errorMessage }}</ErrorMessage
-                        >
-                      </template>
-                    </div>
-                  </div>
-                  <div class="col-md-12">
-                    <div class="form-group">
-                      <label class="control-label">
-                        {{ getCompanyKey("wallet_owner_percentage") }}
-                        <span class="text-danger">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        class="form-control"
-                        data-create="3"
-                        v-model="$v.create.percentage.$model"
-                        :class="{
-                          'is-invalid': $v.create.percentage.$error || errors.percentage,
-                          'is-valid':
-                            !$v.create.percentage.$invalid && !errors.percentage,
-                        }"
-                      />
-                      <template v-if="errors.percentage">
-                        <ErrorMessage
-                          v-for="(errorMessage, index) in errors.percentage"
-                          :key="index"
-                          >{{ errorMessage }}
-                        </ErrorMessage>
-                      </template>
-                    </div>
-                  </div>
                 </div>
+                <template  v-for="(item,index) in create.wallet_owners">
+                    <div class="row" :key="index">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>{{ getCompanyKey("owner") }}</label>
+                                <multiselect
+                                    @input="showOwnerModal(index)"
+                                    v-model="$v.create.wallet_owners.$each[index].owner_id.$model"
+                                    :options="owners.map((type) => type.id)"
+                                    :custom-label="
+                                  (opt) =>
+                                    $i18n.locale == 'ar'
+                                      ? owners.find((x) => x.id == opt).name
+                                      : owners.find((x) => x.id == opt).name_e
+                                "
+                                >
+                                </multiselect>
+                                <div v-if="$v.create.wallet_owners.$each[index].owner_id.$error" class="text-danger">
+                                    {{ $t("general.fieldIsRequired") }}
+                                </div>
+                                <template v-if="errors.owner_id">
+                                    <ErrorMessage
+                                        v-for="(errorMessage, index) in errors.owner_id"
+                                        :key="index"
+                                    >{{ errorMessage }}</ErrorMessage
+                                    >
+                                </template>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    {{ getCompanyKey("wallet_owner_percentage") }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    class="form-control"
+                                    data-create="3"
+                                    @input="changeNumber('add')"
+                                    v-model="$v.create.wallet_owners.$each[index].percentage.$model"
+                                    :class="{
+                                      'is-invalid': $v.create.wallet_owners.$each[index].percentage.$error || errors.percentage || !is_persentage ,
+                                      'is-valid':
+                                        !$v.create.wallet_owners.$each[index].percentage.$invalid && !errors.percentage && is_persentage,
+                                    }"
+                                />
+                                <template v-if="errors.percentage">
+                                    <ErrorMessage
+                                        v-for="(errorMessage, index) in errors.percentage"
+                                        :key="index"
+                                    >{{ errorMessage }}
+                                    </ErrorMessage>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="col-md-2 p-0 pt-3">
+                            <button
+                                v-if="(create.wallet_owners.length - 1) == index"
+                                type="button"
+                                @click.prevent="addNewField"
+                                class="custom-btn-dowonload"
+                            >
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button
+                                v-if="create.wallet_owners.length > 1"
+                                type="button"
+                                @click.prevent="removeNewField(index)"
+                                class="custom-btn-dowonload"
+                            >
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </template>
               </form>
             </b-modal>
             <!--  /create   -->
@@ -962,17 +1048,12 @@ export default {
                     </th>
                     <th v-if="setting.wallet_id">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("owner") }}</span>
+                        <span>{{ getCompanyKey("wallet") }}</span>
                       </div>
                     </th>
                     <th v-if="setting.owner_id">
                       <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("wallet") }}</span>
-                      </div>
-                    </th>
-                    <th v-if="setting.percentage">
-                      <div class="d-flex justify-content-center">
-                        <span>{{ getCompanyKey("wallet_owner_percentage") }}</span>
+                        <span>{{  getCompanyKey("owner") }}</span>
                       </div>
                     </th>
                     <th v-if="enabled3" class="do-not-print">
@@ -1006,14 +1087,7 @@ export default {
                       </h5>
                     </td>
                     <td v-if="setting.owner_id">
-                      <h5 class="m-0 font-weight-normal">
-                        {{ $i18n.locale == "ar" ? data.owner.name : data.owner.name_e }}
-                      </h5>
-                    </td>
-                    <td v-if="setting.percentage">
-                      <h5 class="m-0 font-weight-normal">
-                        {{ data.percentage }}
-                      </h5>
+                        {{ allOnwers(data.wallet.owners) }}
                     </td>
                     <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
@@ -1060,13 +1134,14 @@ export default {
                         :title="getCompanyKey('wallet_owner_edit_form')"
                         title-class="font-18"
                         body-class="p-4"
+                        size="lg"
                         :ref="`edit-${data.id}`"
                         :hide-footer="true"
                         @show="resetModalEdit(data.id)"
                         @hidden="resetModalHiddenEdit(data.id)"
                       >
                         <form>
-                          <div class="mb-3 d-flex justify-content-end">
+                          <div class="d-flex justify-content-end">
                             <!-- Emulate built in modal footer ok and cancel button actions -->
                             <b-button
                               variant="success"
@@ -1092,12 +1167,13 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                               <div class="form-group">
                                 <label class="my-1 mr-2">{{
                                       getCompanyKey("wallet")
                                 }}</label>
                                 <multiselect
+                                  :disabled="true"
                                   @input="showWalleModalEdit"
                                   v-model="$v.edit.wallet_id.$model"
                                   :options="wallets.map((type) => type.id)"
@@ -1124,67 +1200,83 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <label class="my-1 mr-2">{{
-                                        getCompanyKey("owner")
-                                }}</label>
-                                <multiselect
-                                  @input="showOwnerEditModal"
-                                  v-model="$v.edit.owner_id.$model"
-                                  :options="owners.map((type) => type.id)"
-                                  :custom-label="
-                                    (opt) =>
-                                      $i18n.locale == 'ar'
-                                        ? owners.find((x) => x.id == opt).name
-                                        : owners.find((x) => x.id == opt).name_e
-                                  "
-                                >
-                                </multiselect>
-                                <div
-                                  v-if="$v.create.wallet_id.$error"
-                                  class="text-danger"
-                                >
-                                  {{ $t("general.fieldIsRequired") }}
-                                </div>
-                                <template v-if="errors.owner_id">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.owner_id"
-                                    :key="index"
-                                    >{{ errorMessage }}</ErrorMessage
-                                  >
-                                </template>
-                              </div>
-                            </div>
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <label class="control-label">
-                                  {{ getCompanyKey("wallet_owner_percentage") }}
-                                  <span class="text-danger">*</span>
-                                </label>
-                                <input
-                                  type="number"
-                                  step="0.01"
-                                  class="form-control"
-                                  data-create="3"
-                                  v-model="$v.edit.percentage.$model"
-                                  :class="{
-                                    'is-invalid':
-                                      $v.edit.percentage.$error || errors.percentage,
-                                    'is-valid':
-                                      !$v.edit.percentage.$invalid && !errors.percentage,
-                                  }"
-                                />
-                                <template v-if="errors.percentage">
-                                  <ErrorMessage
-                                    v-for="(errorMessage, index) in errors.percentage"
-                                    :key="index"
-                                    >{{ errorMessage }}
-                                  </ErrorMessage>
-                                </template>
-                              </div>
-                            </div>
                           </div>
+                          <template  v-for="(item,index) in edit.wallet_owners">
+                                <div class="row" :key="index">
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label>{{ getCompanyKey("owner") }}</label>
+                                            <multiselect
+                                                @input="showOwnerModal(index)"
+                                                v-model="$v.edit.wallet_owners.$each[index].owner_id.$model"
+                                                :options="owners.map((type) => type.id)"
+                                                :custom-label="
+                                                      (opt) =>
+                                                        $i18n.locale == 'ar'
+                                                          ? owners.find((x) => x.id == opt).name
+                                                          : owners.find((x) => x.id == opt).name_e
+                                                    "
+                                            >
+                                            </multiselect>
+                                            <div v-if="$v.edit.wallet_owners.$each[index].owner_id.$error" class="text-danger">
+                                                {{ $t("general.fieldIsRequired") }}
+                                            </div>
+                                            <template v-if="errors.owner_id">
+                                                <ErrorMessage
+                                                    v-for="(errorMessage, index) in errors.owner_id"
+                                                    :key="index"
+                                                >{{ errorMessage }}</ErrorMessage
+                                                >
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label class="control-label">
+                                                {{ getCompanyKey("wallet_owner_percentage") }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                class="form-control"
+                                                @input="changeNumber('edit')"
+                                                v-model="$v.edit.wallet_owners.$each[index].percentage.$model"
+                                                :class="{
+                                                      'is-invalid': $v.edit.wallet_owners.$each[index].percentage.$error || errors.percentage || !is_persentage,
+                                                      'is-valid':
+                                                        !$v.edit.wallet_owners.$each[index].percentage.$invalid && !errors.percentage && is_persentage,
+                                                    }"
+                                            />
+                                            <template v-if="errors.percentage">
+                                                <ErrorMessage
+                                                    v-for="(errorMessage, index) in errors.percentage"
+                                                    :key="index"
+                                                >{{ errorMessage }}
+                                                </ErrorMessage>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 p-0 pt-3">
+                                        <button
+                                            v-if="(edit.wallet_owners.length - 1) == index"
+                                            type="button"
+                                            @click.prevent="addNewFieldEdit"
+                                            class="custom-btn-dowonload"
+                                        >
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                        <button
+                                            v-if="edit.wallet_owners.length > 1"
+                                            type="button"
+                                            @click.prevent="removeNewFieldEdit(index)"
+                                            class="custom-btn-dowonload"
+                                        >
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
                         </form>
                       </b-modal>
                       <!--  /edit   -->

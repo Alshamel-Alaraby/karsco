@@ -51,14 +51,6 @@ export default [
         component: () => import('../../views/pages/realEstate/building'),
     },
     {
-        path: '/dashboard/realEstate/customer',
-        name: 'realEstate-customer',
-        meta: {
-            middleware: [auth,checkAuth]
-        },
-        component: () => import('../../views/pages/realEstate/customer'),
-    },
-    {
         path: '/dashboard/realEstate/wallet',
         name: 'realEstate-wallet',
         meta: {

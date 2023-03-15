@@ -24,10 +24,10 @@ class StoreSalesmanRequest extends FormRequest
     public function rules()
     {
         return [
-            "name" => "required|string|max:100",
-            "name_e" => "required|string|max:100",
+            "name" => "nullable|string|max:100",
+            "name_e" => "nullable|string|max:100",
             // "salesman_type_id" => "required|exists:salesmen_types,id",
-            "salesman_type_id" => "required",
+            "salesman_type_id" => "nullable",
         ];
     }
 

@@ -25,6 +25,12 @@ class RlstWallet extends Model
         return $this->hasMany(\Modules\RealEstate\Entities\RlstWalletOwner::class, 'wallet_id');
     }
 
+    public function owners()
+    {
+        return $this->belongsToMany(\Modules\RealEstate\Entities\RlstOwner::class, 'rlst_wallet_owners','wallet_id','owner_id');
+
+    }
+
     public function buildingWallet()
     {
         return $this->hasMany(\Modules\RealEstate\Entities\RlstBuildingWallet::class, 'wallet_id');

@@ -15,13 +15,13 @@ class CreateGeneralCountriesTable extends Migration
     {
         Schema::create('general_countries', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('name_e')->unique();
-            $table->string("phone_key", 10)->unique();
-            $table->integer("national_id_length");
-            $table->string("long_name", 100);
-            $table->string("long_name_e", 100);
-            $table->string("short_code", 10);
+            $table->string('name')->unique()->nullable();
+            $table->string('name_e')->unique()->nullable();
+            $table->string("phone_key", 10)->unique()->nullable();
+            $table->integer("national_id_length")->nullable();
+            $table->string("long_name", 100)->nullable();
+            $table->string("long_name_e", 100)->nullable();
+            $table->string("short_code", 10)->nullable();
             $table->tinyInteger('is_default')->default(0);
             $table->string("is_active")->default('active');
             $table->softDeletes();

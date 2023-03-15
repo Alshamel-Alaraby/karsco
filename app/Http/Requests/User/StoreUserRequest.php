@@ -24,12 +24,12 @@ class StoreUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255',
-            'name_e' => 'required|string|max:255',
+            'name' => 'nullable|string|max:255',
+            'name_e' => 'nullable|string|max:255',
             'is_active' => 'nullable|in:active,inactive',
             // "media" => ["required", "exists:media,id", new \App\Rules\MediaRule()],
-            'email' => 'required|string|email|max:255|unique:general_users',
-            'password' => 'required|string|min:0',
+            'email' => 'nullable|string|email|max:255|unique:general_users',
+            'password' => 'nullable|string|min:0',
             'employee_id' => 'nullable|exists:general_employees,id',
         ];
     }

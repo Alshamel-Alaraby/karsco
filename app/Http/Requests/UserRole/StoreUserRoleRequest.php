@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests\UserRole;
 
-use App\Traits\ValidationTrait;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreUserRoleRequest extends FormRequest
 {
-    use ValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -26,11 +26,11 @@ class StoreUserRoleRequest extends FormRequest
     public function rules()
     {
         return [
-            "role" => "required|exists:general_roles,id",
-            "users" => "required|array",
-            "users.*" => "required|",
+            "role" => "nullable|exists:general_roles,id",
+            "users" => "nullable|array",
+            "users.*" => "nullable|",
             // "users.*" => "required|exists:general_users,id|unique:general_role_user,user_id",
-            "company_id"=>"required"
+            "company_id"=>"nullable"
         ];
     }
 

@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Schema;
 class CreateGeneralUsersTable extends Migration
 {
 
-
     /**
      * Run the migrations.
      *
@@ -19,12 +18,12 @@ class CreateGeneralUsersTable extends Migration
         // \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0');
         Schema::create('general_users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string("name_e");
-            $table->string('email')->unique();
+            $table->string('name')->nullable();
+            $table->string("name_e")->nullable();
+            $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string("is_active")->default('active');
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->bigInteger('employee_id')->nullable();
             $table->string('type')->nullable();
             $table->softDeletes();
@@ -33,7 +32,7 @@ class CreateGeneralUsersTable extends Migration
         });
     }
 
-    /**
+    /** 
      * Reverse the migrations.
      *
      * @return void

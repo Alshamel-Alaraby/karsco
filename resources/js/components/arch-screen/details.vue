@@ -147,7 +147,7 @@
                   </multiselect>
                 </div>
               </div>
-              <div class="col-md-12">
+              <div v-if="$store.state.archiving.objectActive.media" class="col-md-12">
                 <div class="form-group">
                   <label class="control-label"> Link </label>
                   <input
@@ -172,12 +172,12 @@
         <div class="details-nav">
           <div class="d-flex justify-content-between">
             <div class="col-8">
-              <a
-                class="btn-action-cutom"
-                v-if="
+              <span v-if="
                   $store.state.archiving.objectActive.media &&
                   $store.state.archiving.objectActive.media.length > 0
-                "
+                ">
+                <a
+                class="btn-action-cutom"
                 :href="
                   $store.state.archiving.objectActive.media[
                     $store.state.archiving.objectActive.media.length - 1
@@ -187,6 +187,7 @@
               >
                 <i class="fas fa-upload"></i>
               </a>
+              </span>
               <span class="btn-action-cutom" @click.prevent="$bvModal.show('show-email')">
                 <i class="fas fa-envelope-open"></i>
               </span>

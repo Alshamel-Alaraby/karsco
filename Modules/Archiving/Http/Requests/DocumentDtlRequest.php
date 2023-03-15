@@ -31,14 +31,6 @@ class DocumentDtlRequest extends FormRequest
         ];
     }
 
-    public function messages()
-    {
-        return [
-            'gen_arch_doc_type_id.required' => __("message.field is required"),
-            'arch_doc_field_id.required' => __("message.field is required"),
-            'field_value.required' => __("message.field is required"),
-        ];
 
-    }
 
 }

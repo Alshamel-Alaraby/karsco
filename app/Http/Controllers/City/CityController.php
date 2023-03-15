@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\City;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\City\CreateCityRequest;
-use App\Http\Requests\City\EditCityRequest;
+use App\Http\Requests\CityRequest;
 use App\Http\Resources\City\CityResource;
 use App\Repositories\City\CityRepositoryInterface;
 use App\Traits\CanDeleteTrait;
@@ -50,7 +49,7 @@ class CityController extends Controller
      * @param Request $request
      * @return \response
      */
-    public function store(CreateCityRequest $request)
+    public function store(CityRequest $request)
     {
 
         if (!DB::table('general_countries')->find($request->country_id)) {
@@ -59,8 +58,8 @@ class CityController extends Controller
         if (!DB::table('general_governorates')->find($request->governorate_id)) {
             return responseJson(404, __('governorates does\'t exist'));
         }
-        $this->repository->create($request->validated());
-        return responseJson(200, __('done'));
+        return $this->repository->create($request->validated());
+        // return responseJson(200, __('done'));
 
     }
 
@@ -93,7 +92,7 @@ class CityController extends Controller
      * @param int $id
      * @return \response
      */
-    public function update(EditCityRequest $request, $id)
+    public function update(CityRequest $request, $id)
     {
 
         $data = [];
@@ -110,20 +109,7 @@ class CityController extends Controller
             }
             $data['governorate_id'] = $request->governorate_id;
         }
-
-        if ($request->name) {
-            $data['name'] = $request->name;
-        }
-
-        if ($request->name_e) {
-            $data['name_e'] = $request->name_e;
-        }
-
-        if ($request->is_active) {
-            $data['is_active'] = $request->is_active;
-        }
-
-        $this->repository->update($data, $id);
+        $this->repository->update($request->validated(), $id);
         return responseJson(200, __('updated'));
 
     }

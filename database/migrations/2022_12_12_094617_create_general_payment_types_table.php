@@ -16,8 +16,8 @@ return new class extends Migration
     {
         Schema::create('general_payment_types', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('name_e')->unique();
+            $table->string('name')->unique()->nullable();
+            $table->string('name_e')->unique()->nullable();
             $table->tinyInteger('is_default')->default(1);
             $table->softDeletes();
             $table->timestamps();

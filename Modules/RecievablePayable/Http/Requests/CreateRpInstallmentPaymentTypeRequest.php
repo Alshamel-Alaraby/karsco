@@ -2,12 +2,12 @@
 
 namespace Modules\RecievablePayable\Http\Requests;
 
-use App\Traits\ValidationTrait;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRpInstallmentPaymentTypeRequest extends FormRequest
 {
-    use ValidationTrait;
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -18,14 +18,15 @@ class CreateRpInstallmentPaymentTypeRequest extends FormRequest
         return [
             'name' => 'required|string|max:255|unique:rp_installment_payment_types,name',
             'name_e' => 'required|string|max:255|unique:rp_installment_payment_types,name_e',
-            'auto_freq' => ['required','in:0,1'],
-            'is_partially' => ['required_if:auto_freq,==,1'],
-            'is_passed' => ['required_if:auto_freq,==,1'],
-            'is_passed_all' => ['required_if:auto_freq,==,1'],
+            'is_conditional' => [],
+            'installment_condation_id' => ['required_if:is_conditional,==,1'],
+            "installment_payment_type_freq" => '',
+            'is_partially' => [],
+            'is_passed' => [],
+            'is_passed_all' => [],
+            'is_passed_contract_plan' => [],
+            'auto_freq' => ['required_if:installment_payment_type_freq.*,>=,1' ],
             'freq_period' => [],
-            'day_month' => ['required_if:auto_freq,==,1'],
-            'is_conditional' => ['required_if:auto_freq,==,1'],
-            'installment_condation_id' => ['required_if:auto_freq,==,1'],
         ];
     }
 

@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests\PaymentType;
 
-use App\Traits\ValidationTrait;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdatePaymentTypeRequest extends FormRequest
 {
-    use ValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -26,8 +26,8 @@ class UpdatePaymentTypeRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:general_payment_types,name,' . $this->id,
-            'name_e' => 'required|string|max:255|unique:general_payment_types,name_e,' . $this->id,
+            'name' => 'nullable|string|max:255|unique:general_payment_types,name,' . $this->id,
+            'name_e' => 'nullable|string|max:255|unique:general_payment_types,name_e,' . $this->id,
             'is_default' => 'nullable|in:1,0',
         ];
     }

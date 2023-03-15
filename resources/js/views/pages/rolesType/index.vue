@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength, integer } from "vuelidate/lib/validators";
+import { required, minLength, maxLength, integer,requiredIf } from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -13,7 +13,7 @@ import { dynamicSortString } from "../../../helper/tableSort";
 import senderHoverHelper from "../../../helper/senderHoverHelper";
 import { formatDateOnly } from "../../../helper/startDate";
 import translation from "../../../helper/translation-mixin";
-import {arabicValue,englishValue} from "../../../helper/langTransform";
+import { arabicValue, englishValue } from "../../../helper/langTransform";
 
 /**
  * Advanced Table component
@@ -35,7 +35,7 @@ export default {
       }
 
       if (
-        (vm.showScreen("role","role Type") &&
+        (vm.showScreen("role", "role Type") &&
           vm.$store.state.auth.work_flow_trees.includes("role")) ||
         vm.$store.state.auth.user.type == "super_admin"
       ) {
@@ -60,6 +60,7 @@ export default {
       rolesTypePagination: {},
       rolesType: [],
       isLoader: false,
+      fields: [],
       create: {
         name: "",
         name_e: "",
@@ -83,21 +84,45 @@ export default {
       Tooltip: "",
       mouseEnter: null,
       company_id: null,
-        enabled3: true,
-        printLoading: true,
-        printObj: {
-            id: "printCustom",
-        },
+      enabled3: true,
+      printLoading: true,
+      printObj: {
+        id: "printCustom",
+      },
     };
   },
   validations: {
     create: {
-      name: { required, minLength: minLength(3), maxLength: maxLength(100) },
-      name_e: { required, minLength: minLength(3), maxLength: maxLength(100) },
+      name: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name");
+        }),
+        minLength: minLength(3),
+        maxLength: maxLength(100),
+      },
+      name_e: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name_e");
+        }),
+        minLength: minLength(3),
+        maxLength: maxLength(100),
+      },
     },
     edit: {
-      name: { required, minLength: minLength(3), maxLength: maxLength(100) },
-      name_e: { required, minLength: minLength(3), maxLength: maxLength(100) },
+      name: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name");
+        }),
+        minLength: minLength(3),
+        maxLength: maxLength(100),
+      },
+      name_e: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name_e");
+        }),
+        minLength: minLength(3),
+        maxLength: maxLength(100),
+      },
     },
   },
   watch: {
@@ -133,6 +158,7 @@ export default {
   },
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
+    this.getCustomTableFields();
     this.getData();
   },
   // updated() {
@@ -156,7 +182,36 @@ export default {
   //   });
   // },
   methods: {
-                    arabicValue(txt) {
+    getCustomTableFields() {
+      adminApi
+        .get(`/customTable/table-columns/general_role_types`)
+        .then((res) => {
+          this.fields = res.data;
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: `${this.$t("general.Error")}`,
+            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+          });
+        })
+        .finally(() => {
+          this.isLoader = false;
+        });
+    },
+    isVisible(fieldName) {
+      let res = this.fields.filter((field) => {
+        return field.column_name == fieldName;
+      });
+      return res.length > 0 && res[0].is_visible == 1 ? true : false;
+    },
+    isRequired(fieldName) {
+      let res = this.fields.filter((field) => {
+        return field.column_name == fieldName;
+      });
+      return res.length > 0 && res[0].is_required == 1 ? true : false;
+    },
+    arabicValue(txt) {
       this.create.name = arabicValue(txt);
       this.edit.name = arabicValue(txt);
     },
@@ -514,9 +569,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     formatDate(value) {
       return formatDateOnly(value);
     },
@@ -547,18 +599,21 @@ export default {
       }
     },
     ExportExcel(type, fn, dl) {
-          this.enabled3 = false;
-          setTimeout(() => {
-              let elt = this.$refs.exportable_table;
-              let wb = XLSX.utils.table_to_book(elt, {sheet: "Sheet JS"});
-              if (dl) {
-                  XLSX.write(wb, {bookType: type, bookSST: true, type: 'base64'});
-              } else {
-                  XLSX.writeFile(wb, fn || (('RoleType' + '.' || 'SheetJSTableExport.') + (type || 'xlsx')));
-              }
-              this.enabled3 = true;
-          }, 100);
-      }
+      this.enabled3 = false;
+      setTimeout(() => {
+        let elt = this.$refs.exportable_table;
+        let wb = XLSX.utils.table_to_book(elt, { sheet: "Sheet JS" });
+        if (dl) {
+          XLSX.write(wb, { bookType: type, bookSST: true, type: "base64" });
+        } else {
+          XLSX.writeFile(
+            wb,
+            fn || ("RoleType" + "." || "SheetJSTableExport.") + (type || "xlsx")
+          );
+        }
+        this.enabled3 = true;
+      }, 100);
+    },
   },
 };
 </script>
@@ -582,10 +637,20 @@ export default {
                     ref="dropdown"
                     class="btn-block setting-search"
                   >
-                    <b-form-checkbox v-model="filterSetting" value="name" class="mb-1">
+                    <b-form-checkbox
+                      v-if="isVisible('name')"
+                      v-model="filterSetting"
+                      value="name"
+                      class="mb-1"
+                    >
                       {{ getCompanyKey("role_type_name_ar") }}
                     </b-form-checkbox>
-                    <b-form-checkbox v-model="filterSetting" value="name_e" class="mb-1">
+                    <b-form-checkbox
+                      v-if="isVisible('name_e')"
+                      v-model="filterSetting"
+                      value="name_e"
+                      class="mb-1"
+                    >
                       {{ getCompanyKey("role_type_name_en") }}
                     </b-form-checkbox>
                   </b-dropdown>
@@ -680,10 +745,17 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.name" class="mb-1"
+                      <b-form-checkbox
+                        v-if="isVisible('name')"
+                        v-model="setting.name"
+                        class="mb-1"
                         >{{ getCompanyKey("role_type_name_ar") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.name_e" class="mb-1">
+                      <b-form-checkbox
+                        v-if="isVisible('name_e')"
+                        v-model="setting.name_e"
+                        class="mb-1"
+                      >
                         {{ getCompanyKey("role_type_name_en") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
@@ -787,19 +859,17 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-12">
+                  <div v-if="isVisible('name')" class="col-md-12">
                     <div class="form-group">
                       <label for="field-1" class="control-label">
                         {{ getCompanyKey("role_type_name_ar") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name')" class="text-danger">*</span>
                       </label>
                       <div dir="rtl">
                         <input
-                        @keyup="arabicValue(create.name)"
+                          @keyup="arabicValue(create.name)"
                           type="text"
                           class="form-control"
-                          data-create="1"
-                          @keypress.enter="moveInput('input', 'create', 2)"
                           v-model="$v.create.name.$model"
                           :class="{
                             'is-invalid': $v.create.name.$error || errors.name,
@@ -828,19 +898,17 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div v-if="isVisible('name_e')" class="col-md-12">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
                         {{ getCompanyKey("role_type_name_en") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('name_e')" class="text-danger">*</span>
                       </label>
                       <div dir="ltr">
                         <input
-                        @keyup="englishValue(create.name_e)"
+                          @keyup="englishValue(create.name_e)"
                           type="text"
                           class="form-control"
-                          data-create="2"
-                          @keypress.enter="moveInput('select', 'create', 3)"
                           v-model="$v.create.name_e.$model"
                           :class="{
                             'is-invalid': $v.create.name_e.$error || errors.name_e,
@@ -874,8 +942,11 @@ export default {
             <!--  /create   -->
 
             <!-- start .table-responsive-->
-            <div class="table-responsive mb-3 custom-table-theme position-relative"  ref="exportable_table"
-                 id="printCustom">
+            <div
+              class="table-responsive mb-3 custom-table-theme position-relative"
+              ref="exportable_table"
+              id="printCustom"
+            >
               <!--       start loader       -->
               <loader size="large" v-if="isLoader" />
               <!--       end loader       -->
@@ -893,7 +964,7 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.name">
+                    <th v-if="setting.name && isVisible('name')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("role_type_name_ar") }}</span>
                         <div class="arrow-sort">
@@ -908,7 +979,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.name_e">
+                    <th v-if="setting.name_e && isVisible('name_e')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("role_type_name_en") }}</span>
                         <div class="arrow-sort">
@@ -926,7 +997,9 @@ export default {
                     <th v-if="enabled3" class="do-not-print">
                       {{ $t("general.Action") }}
                     </th>
-                    <th v-if="enabled3" class="do-not-print"><i class="fas fa-ellipsis-v"></i></th>
+                    <th v-if="enabled3" class="do-not-print">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </th>
                   </tr>
                 </thead>
                 <tbody v-if="rolesType.length > 0">
@@ -948,13 +1021,12 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.name">
+                    <td v-if="setting.name && isVisible('name')">
                       <h5 class="m-0 font-weight-normal">{{ data.name }}</h5>
                     </td>
-                    <td v-if="setting.name_e">
+                    <td v-if="setting.name_e && isVisible('name_e')">
                       <h5 class="m-0 font-weight-normal">{{ data.name_e }}</h5>
                     </td>
-
                     <td v-if="enabled3" class="do-not-print">
                       <div class="btn-group">
                         <button
@@ -1032,15 +1104,17 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-12">
+                            <div v-if="isVisible('name')" class="col-md-12">
                               <div class="form-group">
                                 <label for="field-u-1" class="control-label">
                                   {{ getCompanyKey("role_type_name_ar") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('name')" class="text-danger"
+                                    >*</span
+                                  >
                                 </label>
                                 <div dir="rtl">
                                   <input
-                                  @keyup="arabicValue(edit.name)"
+                                    @keyup="arabicValue(edit.name)"
                                     type="text"
                                     class="form-control"
                                     v-model="$v.edit.name.$model"
@@ -1076,15 +1150,17 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div v-if="isVisible('name_e')" class="col-md-12">
                               <div class="form-group">
                                 <label for="field-u-2" class="control-label">
                                   {{ getCompanyKey("role_type_name_en") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('name_e')" class="text-danger"
+                                    >*</span
+                                  >
                                 </label>
                                 <div dir="ltr">
                                   <input
-                                  @keyup="englishValue(edit.name_e)"
+                                    @keyup="englishValue(edit.name_e)"
                                     type="text"
                                     class="form-control"
                                     v-model="$v.edit.name_e.$model"
@@ -1158,6 +1234,3 @@ export default {
     </div>
   </Layout>
 </template>
-
-
-

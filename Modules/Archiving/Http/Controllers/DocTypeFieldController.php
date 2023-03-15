@@ -117,4 +117,11 @@ class DocTypeFieldController extends Controller
         $logs = $model->activities()->orderBy('created_at', 'DESC')->get();
         return responseJson(200, 'success', \App\Http\Resources\Log\LogResource::collection($logs));
     }
+
+    public function idDocTypeField($id){
+
+        $model = $this->modelInterface->idDocTypeField($id);
+
+        return responseJson(200, 'success', DocTypeFieldResource::collection($model));
+    }
 }

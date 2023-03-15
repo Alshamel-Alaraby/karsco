@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('general_roles_workflows_buttons', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('role_id')->constrained('general_roles')->references("id");
-            $table->unsignedInteger('workflow_id');
-            $table->unsignedInteger('button_id');
+            $table->foreignId('role_id')->constrained('general_roles')->references("id")->nullable();
+            $table->unsignedInteger('workflow_id')->nullable();
+            $table->unsignedInteger('button_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

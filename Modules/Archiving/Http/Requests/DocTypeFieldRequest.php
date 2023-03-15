@@ -33,18 +33,5 @@ class DocTypeFieldRequest extends FormRequest
         ];
     }
 
-    public function messages()
-    {
-        return [
-            'gen_doc_type_id.required' => __("message.field is required"),
-            'doc_field_id.required' => __("message.field is required"),
-            'field_characters.required' => __("message.field is required"),
-            'field_characters.integer' => __("message.field must be integer"),
-            'field_order.required' => __("message.field is required"),
-            'field_order.integer' => __("message.field must be integer"),
-            'is_required.required' => __("message.field is required"),
-            'is_required.in' => __("message.field must be 1 or 0"),
-        ];
 
-    }
 }

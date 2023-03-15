@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('general_roles', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('name_e');
+            $table->string('name')->nullable();
+            $table->string('name_e')->nullable();
             $table->unsignedInteger('roletype_id')->nullable()->default(0);
             $table->timestamps();
         });

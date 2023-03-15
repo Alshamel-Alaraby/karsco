@@ -6,10 +6,12 @@ use App\Traits\BulkDeleteTrait;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\RecievablePayable\Entities\RpInstallmentPaymentPlan;
 use Modules\RecievablePayable\Http\Requests\CreateRpInstallmentPaymentPlanDetailRequest;
 use Modules\RecievablePayable\Http\Requests\EditRpInstallmentPaymentPlanDetailRequest;
 use Modules\RecievablePayable\Repositories\RpInstallmentPaymentPlanDetailRepositoryInterface;
 use Modules\RecievablePayable\Transformers\RpInstallmentPaymentPlanDetailResource;
+use Modules\RecievablePayable\Transformers\RpInstallmentPaymentPlanResource;
 
 class RpInstallmentPaymentPlanDetailController extends Controller
 {
@@ -18,6 +20,14 @@ class RpInstallmentPaymentPlanDetailController extends Controller
     public function __construct(RpInstallmentPaymentPlanDetailRepositoryInterface $modelInterface)
     {
         $this->modelInterface = $modelInterface;
+    }
+
+    public function allPlan(Request $request)
+    {
+
+      $models = $this->modelInterface->allPlan($request);
+
+        return responseJson(200, 'success', RpInstallmentPaymentPlanResource::collection($models['data']), $models['paginate'] ? getPaginates($models['data']) : null);
     }
 
     public function show($id)
@@ -51,13 +61,15 @@ class RpInstallmentPaymentPlanDetailController extends Controller
 
     public function store(CreateRpInstallmentPaymentPlanDetailRequest $request)
     {
+
         $model = $this->modelInterface->create($request);
         return responseJson(200, 'success');
     }
 
     public function update(EditRpInstallmentPaymentPlanDetailRequest $request, $id)
     {
-        $model = $this->modelInterface->find($id);
+
+        $model = $this->modelInterface->findPlan($id);
         if (!$model) {
             return responseJson(404, __('message.data not found'));
         }
@@ -94,7 +106,7 @@ class RpInstallmentPaymentPlanDetailController extends Controller
 
     public function destroy($id)
     {
-        $model = $this->modelInterface->find($id);
+        $model = $this->modelInterface->findPlan($id);
         if (!$model) {
             return responseJson(404, __('message.data not found'));
         }

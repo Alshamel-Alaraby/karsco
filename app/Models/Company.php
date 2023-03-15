@@ -32,6 +32,11 @@ class Company extends Model
         return $this->hasMany(GeneralCustomTable::class);
     }
 
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
+
     public function hasChildren()
     {
         return $this->stores()->count() > 0 ||

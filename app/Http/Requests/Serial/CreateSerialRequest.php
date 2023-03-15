@@ -17,11 +17,11 @@ class CreateSerialRequest extends FormRequest
     public function rules()
     {
         return [
-            'company_id'=>['required'],
-            'branch_id'=>['required'],
-            'store_id'=>['required'],
-            'restart_period'=>['required'],
-            'is_default'=>['required'],
+            'company_id'=>['nullable'],
+            'branch_id'=>['nullable'],
+            'store_id'=>['nullable'],
+            'restart_period'=>['nullable'],
+            'is_default'=>['nullable'],
             'start_no'=>['nullable'],
             'perfix'=>['nullable'],
             'suffix'=>['nullable'],

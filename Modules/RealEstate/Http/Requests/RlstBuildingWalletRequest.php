@@ -35,18 +35,5 @@ class RlstBuildingWalletRequest extends FormRequest
             'bu_ty' => 'required|in:1,2',
         ];
     }
-    public function messages()
-    {
-        return [
-            "wallet_id.required" => __("message.field is required"),
-            'wallet_id.integer' => __("message.field must be integer"),
-            'wallet_id.exists' => __("message.field must be exists in rlst_wallets table"),
-            "building_id.required" => __("message.field is required"),
-            'building_id.integer' => __("message.field must be integer"),
-            'building_id.exists' => __("message.field must be exists in rlst_buildings table"),
-            "bu_ty.required" => __("message.field is required"),
-            'bu_ty.in' => __("message.field must be in 0,1"),
 
-        ];
-    }
 }

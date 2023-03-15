@@ -12,6 +12,6 @@ class File extends Model implements HasMedia
 {
     protected $table="general_files";
     use HasFactory, MediaTrait;
-    use HasFactory, MediaTrait, CompanyScopeTrait;
+    use HasFactory, MediaTrait   ;
 
 }

@@ -23,19 +23,5 @@ class RlstInstallmentRequest extends FormRequest
         ];
     }
 
-    public function messages()
-    {
-        return [
-            "date.required" => __("message.field is required"),
-            "date.date" => __("message.field must be date"),
-            "pay_type.required" => __("message.field is required"),
-            "amount.required" => __("message.field is required"),
-            "amount.numeric" => __("message.field must be numeric"),
-            "currency_id.required" => __("message.field is required"),
-            "currency_id.integer" => __("message.field must be integer"),
-            "currency_id.exists" => __("message.field must be exists"),
-            "rest_amount.required" => __("message.field is required"),
-            "rest_amount.numeric" => __("message.field must be numeric"),
-        ];
-    }
+
 }

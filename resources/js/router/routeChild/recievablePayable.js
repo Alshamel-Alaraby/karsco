@@ -11,6 +11,14 @@ export default [
         component: () => import('../../views/pages/recievablePayable/installmentStatus'),
     },
     {
+        path: '/dashboard/installment-condition',
+        name: 'installmentCondition',
+        meta: {
+            middleware: [auth,checkAuth]
+        },
+        component: () => import('../../views/pages/recievablePayable/instalmentcondation'),
+    },
+    {
         path: '/dashboard/installment-payment-type',
         name: 'installmentPaymentType',
         meta: {
@@ -73,5 +81,16 @@ export default [
             middleware: [auth,checkAuth]
         },
         component: () => import('../../views/pages/recievablePayable/screenSubcontactgroup'),
+    },
+
+    //start transaction
+
+    {
+        path: '/dashboard/receivablePayable/transaction/openingBalance',
+        name: 'installment opening balance',
+        meta: {
+            middleware: [auth,checkAuth]
+        },
+        component: () => import('../../views/pages/recievablePayable/transaction/openingBalance'),
     },
 ];

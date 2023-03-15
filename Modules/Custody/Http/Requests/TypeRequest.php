@@ -2,12 +2,12 @@
 
 namespace Modules\Custody\Http\Requests;
 
-use App\Traits\ValidationTrait;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class TypeRequest extends FormRequest
 {
-    use ValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -25,7 +25,7 @@ class TypeRequest extends FormRequest
      */
     public function rules()
     {
-        
+
         return [
             'name' => "required|string|unique:cus_types,name,{$this->id},id",
             'name_e' => "required|string|unique:cus_types,name_e,{$this->id},id",

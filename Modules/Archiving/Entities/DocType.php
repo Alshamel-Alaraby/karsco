@@ -38,6 +38,8 @@ class DocType extends Model
         return $this->hasMany(ArchiveFile::class, "arch_doc_type_id");
     }
 
+
+
     public function getEmployees()
     {
         $e = $this->archiveFiles()->where('data_type_value', 'like', '');
@@ -54,19 +56,21 @@ class DocType extends Model
         $this->statuses()->count() > 0 ||
         $this->archiveFiles()->count() > 0;
     }
+
     public function departments()
     {
         return $this->belongsToMany(Department::class, 'arch_type_department', 'arch_doc_type_id', 'arch_department_id')
             ->whereNotNull("key_value");
     }
 
+    public function fields(){
+
+        return $this->belongsToMany(DocumentField::class,'arch_doc_type_fields','doc_type_id','doc_field_id');
+    }
+
     public function getKeyAttribute()
     {
-        $key = $this->departments()->first();
-        if ($key) {
-            return DocumentField::where("id", $key->key_value)->first();
-        } else {
-            return null;
-        }
+        return $this->fields()->first();
     }
+
 }

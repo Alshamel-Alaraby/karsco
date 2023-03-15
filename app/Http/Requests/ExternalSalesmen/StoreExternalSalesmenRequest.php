@@ -24,39 +24,15 @@ class StoreExternalSalesmenRequest extends FormRequest
     public function rules()
     {
         return [
-            "phone" => "max:20|required|unique:general_external_salesmen,phone",
-            "address" => "required|max:255",
-            "rp_code" => "required|unique:general_external_salesmen,rp_code",
-            "email" => "required|email|unique:general_external_salesmen,email",
-            "country_id" => "required|exists:general_countries,id",
-            'national_id' => "required|integer",
+            "phone" => "nullable|max:20|required|unique:general_external_salesmen,phone",
+            "address" => "nullable|max:255",
+            "rp_code" => "nullable|unique:general_external_salesmen,rp_code",
+            "email" => "nullable|email|unique:general_external_salesmen,email",
+            "country_id" => "nullable|exists:general_countries,id",
+            'national_id' => "nullable|integer",
             'is_active' => 'nullable|in:active,inactive',
         ];
     }
 
-    /**
-     * Get the error messages for the defined validation rules.
-     *
-     * @return array<string, string>
-     */
 
-    public function messages()
-    {
-        return [
-            'phone.required' => __('message.field is required'),
-            'phone.unique' => __('message.field must be unique'),
-            'address.required' => __('message.field is required'),
-            'rp_code.required' => __('message.field is required'),
-            'rp_code.unique' => __('message.field must be unique'),
-            'email.required' => __('message.field is required'),
-            'email.email' => __('message.field must be email'),
-            'email.unique' => __('message.field must be unique'),
-            'country_id.required' => __('message.field is required'),
-            'country_id.exists' => __('message.field must be exists'),
-            'national_id.required' => __('message.field is required'),
-            'national_id.integer' => __('message.field must be integer'),
-            'is_active.in' => __('message.field must be in active,inactive'),
-
-        ];
-    }
 }

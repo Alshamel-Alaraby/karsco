@@ -22,6 +22,7 @@ class RlstOwner extends Model
         'country_id',
         'city_id',
         'rb_code',
+        'phone_code',
         'nationality_id',
         'bank_account_id',
         'contact_person',

@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Traits\CompanyScopeTrait;
-use App\Traits\ConnTrait;
 use App\Traits\LogTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +11,7 @@ use Spatie\Activitylog\LogOptions;
 
 class Unit extends Model
 {
-    use HasFactory, SoftDeletes, LogTrait, CompanyScopeTrait;
+    use HasFactory, SoftDeletes, LogTrait   ;
 
     protected $table = 'general_units';
     protected $fillable = ['name', 'name_e', 'is_active','company_id'];

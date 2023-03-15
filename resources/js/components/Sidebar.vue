@@ -150,7 +150,7 @@ export default {
   },
   methods: {
     showScreen(module, screen) {
-      let filterRes = this.allWorkFlowTree.filter(
+      let filterRes = this.$store.state.auth.allWorkFlow.filter(
         (workflow) => workflow.name_e == module.name
       );
       let _module = filterRes.length ? filterRes[0] : null;
@@ -314,7 +314,7 @@ export default {
               v-if="
                 !item.isTitle &&
                 !item.isLayout &&
-                (workFlowTree.includes(item.name) ||
+                ($store.state.auth.work_flow_trees.includes(item.name) ||
                   $store.state.auth.user.type == 'super_admin')
               "
               :key="item.id"

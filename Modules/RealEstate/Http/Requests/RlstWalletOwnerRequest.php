@@ -14,23 +14,12 @@ class RlstWalletOwnerRequest extends FormRequest
     public function rules()
     {
         return [
-            'wallet_id' => 'required|integer|exists:rlst_wallets,id',
-            'owner_id' => 'required|integer|exists:rlst_owners,id',
-            'percentage' => 'required|numeric',
+            "wallet-owner" => 'required|array',
+            'wallet-owner.*.wallet_id'         => 'required|integer|exists:rlst_wallets,id',
+            'wallet-owner.*.owner_id'          => 'required|integer|exists:rlst_owners,id',
+            'wallet-owner.*.percentage'        => 'required|numeric',
         ];
     }
 
-    public function messages()
-    {
-        return [
-            "wallet_id.required" => __("message.field is required"),
-            "wallet_id.integer" => __("message.field must be integer"),
-            "wallet_id.exists" => __("message.field must be exists"),
-            "owner_id.required" => __("message.field is required"),
-            "owner_id.integer" => __("message.field must be integer"),
-            "owner_id.exists" => __("message.field must be exists"),
-            "percentage.required" => __("message.field is required"),
-            "percentage.numeric" => __("message.field must be numeric"),
-        ];
-    }
+
 }

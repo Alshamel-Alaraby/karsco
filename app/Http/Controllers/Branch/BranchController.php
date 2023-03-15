@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Branch;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Branch\CreateBranchRequest;
 use App\Http\Requests\Branch\EditBranchRequest;
+use App\Http\Requests\BranchRequest;
 use App\Http\Resources\Branch\BranchResource;
 use App\Repositories\Branch\BranchRepositoryInterface;
 use Illuminate\Http\Request;
@@ -38,7 +39,7 @@ class BranchController extends Controller
         return responseJson(200, 'success', ($this->resource)::collection($branches['data']), $branches['paginate'] ? getPaginates($branches['data']) : null);
     }
 
-    public function store(CreateBranchRequest $request)
+    public function store(BranchRequest $request)
     {
         cacheForget('branches');
         $this->repository->create($request->validated());
@@ -59,7 +60,7 @@ class BranchController extends Controller
 
     }
 
-    public function update(EditBranchRequest $request, $id)
+    public function update(BranchRequest $request, $id)
     {
         $data = [];
         $data['company_id'] = $request->company_id;

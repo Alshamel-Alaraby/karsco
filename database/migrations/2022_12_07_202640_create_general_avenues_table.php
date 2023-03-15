@@ -15,12 +15,12 @@ return new class extends Migration
     {
         Schema::create('general_avenues', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('name_e');
+            $table->string('name')->nullable();
+            $table->string('name_e')->nullable();
             $table->string('is_active')->default('active');
-            $table->unsignedBigInteger('country_id');
-            $table->unsignedBigInteger('governorate_id');
-            $table->unsignedBigInteger('city_id');
+            $table->unsignedBigInteger('country_id')->nullable();
+            $table->unsignedBigInteger('governorate_id')->nullable();
+            $table->unsignedBigInteger('city_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

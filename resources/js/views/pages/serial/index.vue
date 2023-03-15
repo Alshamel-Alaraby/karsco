@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength, integer } from "vuelidate/lib/validators";
+import {required, minLength, maxLength, integer, requiredIf} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -32,17 +32,17 @@ export default {
   },
   data() {
     return {
+      fields: [],
       per_page: 1,
       search: "",
       debounce: {},
-        enabled3: true,
+      enabled3: true,
       serialsPagination: {},
       serials: [],
       is_disabled: false,
       isLoader: false,
       Tooltip: "",
       mouseEnter: "",
-
       create: {
         start_no: null,
         perfix: "",
@@ -81,33 +81,61 @@ export default {
           this.$i18n.locale  == 'ar'?'branch.name':'branch.name_e',
           this.$i18n.locale  == 'ar'?'store.name':'store.name_e'
       ],
-        printLoading: true,
-        printObj: {
-            id: "printData",
-        }
+      printLoading: true,
+      printObj: {
+          id: "printData",
+      }
     };
   },
   validations: {
     create: {
-      start_no: { required, maxLength: maxLength(20) },
-      suffix: { required, maxLength: maxLength(200) },
-      perfix: { required, maxLength: maxLength(200) },
-      restart_period: { required, minLength: minLength(1), maxLength: maxLength(200) },
-      branch_id: { required },
-      store_id: { required },
-      is_default: { required },
+        start_no: { required: requiredIf(function (model) {
+                return this.isRequired("start_no");
+            }), maxLength: maxLength(20) },
+        suffix: { required: requiredIf(function (model) {
+                return this.isRequired("suffix");
+            }), maxLength: maxLength(200) },
+        perfix: { required: requiredIf(function (model) {
+                return this.isRequired("perfix");
+            }), maxLength: maxLength(200) },
+        restart_period: { required: requiredIf(function (model) {
+                return this.isRequired("restart_period");
+            }), minLength: minLength(1), maxLength: maxLength(200) },
+        branch_id: { required: requiredIf(function (model) {
+                return this.isRequired("branch_id");
+            }) },
+        store_id: { required: requiredIf(function (model) {
+                return this.isRequired("store_id");
+            }) },
+        is_default: { required: requiredIf(function (model) {
+                return this.isRequired("is_default");
+            }) },
     },
     edit: {
-      start_no: { required, maxLength: maxLength(20) },
-      suffix: { required, maxLength: maxLength(200) },
-      perfix: { required, maxLength: maxLength(200) },
-      restart_period: { required, minLength: minLength(1), maxLength: maxLength(200) },
-      branch_id: { required },
-      store_id: { required },
-      is_default: { required },
+      start_no: { required: requiredIf(function (model) {
+              return this.isRequired("start_no");
+          }), maxLength: maxLength(20) },
+      suffix: { required: requiredIf(function (model) {
+              return this.isRequired("suffix");
+          }), maxLength: maxLength(200) },
+      perfix: { required: requiredIf(function (model) {
+              return this.isRequired("perfix");
+          }), maxLength: maxLength(200) },
+      restart_period: { required: requiredIf(function (model) {
+              return this.isRequired("restart_period");
+          }), minLength: minLength(1), maxLength: maxLength(200) },
+      branch_id: { required: requiredIf(function (model) {
+              return this.isRequired("branch_id");
+          }) },
+      store_id: { required: requiredIf(function (model) {
+              return this.isRequired("store_id");
+          }) },
+      is_default: { required: requiredIf(function (model) {
+              return this.isRequired("is_default");
+          }) },
     },
   },
-    beforeRouteEnter(to, from, next) {
+  beforeRouteEnter(to, from, next) {
         next((vm) => {
             if (vm.$store.state.auth.work_flow_trees.includes('serial') || vm.$store.state.auth.user.type == 'super_admin') {
                 return true;
@@ -116,7 +144,7 @@ export default {
             }
         });
     },
-    watch: {
+  watch: {
     /**
      * watch per_page
      */
@@ -149,9 +177,39 @@ export default {
   },
   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
+    this.getCustomTableFields();
     this.getData();
   },
   methods: {
+      getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_serials`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+      isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+      isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
     formatDate(value) {
       return formatDateOnly(value);
     },
@@ -343,7 +401,7 @@ export default {
         store_id: null,
         is_default: 1,
       };
-      this.getBranch(this.company_id);
+      if(this.isVisible('branch_id')) this.getBranch(this.company_id);
       this.$nextTick(() => {
         this.$v.$reset();
       });
@@ -440,16 +498,16 @@ export default {
      *   show Modal (edit)
      */
     async resetModalEdit(id) {
-      await this.getBranch(this.company_id);
+      if(this.isVisible('branch_id')) await this.getBranch(this.company_id);
+      if(this.isVisible('store_id'))  await this.getStore(this.edit.branch_id);
       let serial = this.serials.find((e) => id == e.id);
       this.edit.start_no = serial.start_no;
       this.edit.perfix = serial.perfix;
       this.edit.suffix = serial.suffix;
       this.edit.restart_period = serial.restart_period;
-      this.edit.branch_id = serial.branch_id;
+      this.edit.branch_id = serial.branch_id ?? null;
       this.edit.is_default = parseInt(serial.is_default) ;
-      await this.getStore(this.edit.branch_id);
-      this.edit.store_id = serial.store_id;
+      this.edit.store_id = serial.store_id ?? null;
       this.errors = {};
     },
     /**
@@ -492,9 +550,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     async getBranch(id) {
       this.isLoader = true;
       await adminApi
@@ -581,6 +636,7 @@ export default {
                     class="btn-block setting-search"
                   >
                     <b-form-checkbox
+                      v-if="isVisible('perfix')"
                       v-model="filterSetting"
                       value="perfix"
                       class="mb-1"
@@ -588,20 +644,24 @@ export default {
                     >
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('suffix')"
                       value="suffix"
                       class="mb-1"
                       >{{ $t("general.Suffix") }}</b-form-checkbox>
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('start_no')"
                       value="start_no"
                       class="mb-1"
                       >{{ $t("general.StartNo") }}</b-form-checkbox>
                       <b-form-checkbox
+                          v-if="isVisible('branch_id')"
                           v-model="filterSetting"
                           :value="$i18n.locale  == 'ar'?'branch.name':'branch.name_e'"
                           class="mb-1"
                       >{{ $t("general.Branch") }}</b-form-checkbox>
                       <b-form-checkbox
+                          v-if="isVisible('store_id')"
                           v-model="filterSetting"
                           :value="$i18n.locale  == 'ar'?'store.name':'store.name_e'"
                           class="mb-1"
@@ -698,25 +758,25 @@ export default {
                       ref="dropdown"
                       class="dropdown-custom-ali"
                     >
-                      <b-form-checkbox v-model="setting.start_no" class="mb-1"
+                      <b-form-checkbox v-if="isVisible('start_no')" v-model="setting.start_no" class="mb-1"
                         >{{ $t("general.StartNo") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.perfix" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('perfix')" v-model="setting.perfix" class="mb-1">
                         {{ $t("general.Perfix") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.suffix" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('suffix')" v-model="setting.suffix" class="mb-1">
                         {{ $t("general.Suffix") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.restart_period" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('restart_period')" v-model="setting.restart_period" class="mb-1">
                         {{ $t("general.RestartPeriod") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.branch_id" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('branch_id')" v-model="setting.branch_id" class="mb-1">
                         {{ $t("general.Branch") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.store_id" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('store_id')" v-model="setting.store_id" class="mb-1">
                         {{ $t("general.Store") }}
                       </b-form-checkbox>
-                      <b-form-checkbox v-model="setting.is_default" class="mb-1">
+                      <b-form-checkbox v-if="isVisible('is_default')" v-model="setting.is_default" class="mb-1">
                         {{ $t("general.Default") }}
                       </b-form-checkbox>
                       <div class="d-flex justify-content-end">
@@ -817,11 +877,11 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('branch_id')">
                     <div class="form-group position-relative">
                       <label class="control-label">
                         {{ $t("general.Branch") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('branch_id')" class="text-danger">*</span>
                       </label>
                       <multiselect
                         v-model="create.branch_id"
@@ -850,11 +910,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('store_id')">
                     <div class="form-group position-relative">
                       <label class="control-label">
                         {{ $t("general.Store") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('store_id')" class="text-danger">*</span>
                       </label>
                       <multiselect
                         v-model="create.store_id"
@@ -882,17 +942,16 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('start_no')">
                     <div class="form-group">
                       <label for="field-15" class="control-label">
                         {{ $t("general.StartNo") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('start_no')" class="text-danger">*</span>
                       </label>
                       <input
                         type="number"
                         class="form-control"
                         data-create="1"
-                        @keypress.enter="moveInput('input', 'create', 2)"
                         v-model="$v.create.start_no.$model"
                         :class="{
                           'is-invalid': $v.create.start_no.$error || errors.start_no,
@@ -914,18 +973,17 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('suffix')">
                     <div class="form-group">
                       <label for="field-1" class="control-label">
                         {{ $t("general.Suffix") }}
 
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('suffix')" class="text-danger">*</span>
                       </label>
                       <input
                         type="text"
                         class="form-control"
                         data-create="2"
-                        @keypress.enter="moveInput('input', 'create', 3)"
                         v-model="$v.create.suffix.$model"
                         :class="{
                           'is-invalid': $v.create.suffix.$error || errors.suffix,
@@ -947,17 +1005,16 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('perfix')">
                     <div class="form-group">
                       <label for="field-2" class="control-label">
                         {{ $t("general.Perfix") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('perfix')" class="text-danger">*</span>
                       </label>
                       <input
                         type="text"
                         class="form-control"
                         data-create="3"
-                        @keypress.enter="moveInput('input', 'create', 4)"
                         v-model="$v.create.perfix.$model"
                         :class="{
                           'is-invalid': $v.create.perfix.$error || errors.perfix,
@@ -979,11 +1036,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('restart_period')">
                     <div class="form-group">
                       <label for="field-88" class="control-label">
                         {{ $t("general.RestartPeriod") }}
-                        <span class="text-danger">*</span>
+                        <span v-if="isRequired('restart_period')" class="text-danger">*</span>
                       </label>
                       <input
                         type="number"
@@ -991,7 +1048,6 @@ export default {
                         max="3"
                         class="form-control"
                         data-create="4"
-                        @keypress.enter="moveInput('select', 'create', 7)"
                         v-model="$v.create.restart_period.$model"
                         :class="{
                           'is-invalid':
@@ -1026,11 +1082,11 @@ export default {
                       </template>
                     </div>
                   </div>
-                    <div class="col-md-6">
+                  <div class="col-md-6" v-if="isVisible('is_default')">
                         <div class="form-group">
                             <label class="mr-2">
                                 {{ $t("general.Default") }}
-                                <span class="text-danger">*</span>
+                                <span v-if="isRequired('is_default')" class="text-danger">*</span>
                             </label>
                             <b-form-group :class="{
                                      'is-invalid': $v.create.is_default.$error || errors.is_default,
@@ -1086,7 +1142,7 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.start_no">
+                    <th v-if="setting.start_no && isVisible('start_no')">
                       <div class="d-flex justify-content-center">
                         <span>{{ $t("general.StartNo") }}</span>
                         <div class="arrow-sort">
@@ -1101,7 +1157,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.perfix">
+                    <th v-if="setting.perfix && isVisible('perfix')">
                       <div class="d-flex justify-content-center">
                         <span>{{ $t("general.Perfix") }}</span>
                         <div class="arrow-sort">
@@ -1116,7 +1172,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.suffix">
+                    <th v-if="setting.suffix && isVisible('suffix')">
                       <div class="d-flex justify-content-center">
                         <span>{{ $t("general.Suffix") }}</span>
                         <div class="arrow-sort">
@@ -1131,7 +1187,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.restart_period">
+                    <th v-if="setting.restart_period && isVisible('restart_period')">
                       <div class="d-flex justify-content-center">
                         <span>{{ $t("general.RestartPeriod") }}</span>
                         <div class="arrow-sort">
@@ -1146,7 +1202,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.branch_id">
+                    <th v-if="setting.branch_id && isVisible('branch_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ $t("general.Branch") }}</span>
                         <div class="arrow-sort">
@@ -1169,7 +1225,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.store_id">
+                    <th v-if="setting.store_id && isVisible('store_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ $t("general.Store") }}</span>
                         <div class="arrow-sort">
@@ -1192,7 +1248,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.is_default">
+                    <th v-if="setting.is_default && isVisible('is_default')">
                       <div class="d-flex justify-content-center">
                         <span>{{ $t("general.Default") }}</span>
                       </div>
@@ -1222,29 +1278,29 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.start_no">
+                    <td v-if="setting.start_no && isVisible('start_no')">
                       <h5 class="m-0 font-weight-normal">{{ data.start_no }}</h5>
                     </td>
-                    <td v-if="setting.perfix">
+                    <td v-if="setting.perfix && isVisible('perfix')">
                       <h5 class="m-0 font-weight-normal">{{ data.perfix }}</h5>
                     </td>
-                    <td v-if="setting.suffix">
+                    <td v-if="setting.suffix && isVisible('suffix')">
                       <h5 class="m-0 font-weight-normal">{{ data.suffix }}</h5>
                     </td>
-                    <td v-if="setting.restart_period">
+                    <td v-if="setting.restart_period && isVisible('restart_period')">
                       <h5 class="m-0 font-weight-normal">{{ data.restart_period }}</h5>
                     </td>
-                    <td v-if="setting.branch_id">
+                    <td v-if="setting.branch_id && isVisible('branch_id')">
                       <h5 class="m-0 font-weight-normal">
-                        {{ $i18n.locale == "ar" ? data.branch.name : data.branch.name_e }}
+                        {{data.branch ? $i18n.locale == "ar" ? data.branch.name : data.branch.name_e : ' - '}}
                       </h5>
                     </td>
-                    <td v-if="setting.store_id">
+                    <td v-if="setting.store_id && isVisible('store_id')">
                       <h5 class="m-0 font-weight-normal">
-                        {{ $i18n.locale == "ar" ? data.store.name : data.store.name_e }}
+                        {{data.store ? $i18n.locale == "ar" ? data.store.name : data.store.name_e : ' - '}}
                       </h5>
                     </td>
-                    <td v-if="setting.is_default">
+                    <td v-if="setting.is_default && isVisible('is_default')">
                       <span
                         :class="[
                           parseInt(data.is_default) == 1 ? 'text-success' : 'text-danger',
@@ -1337,11 +1393,11 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('branch_id')">
                               <div class="form-group position-relative">
                                 <label class="control-label">
                                   {{ $t("general.Branch") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('branch_id')" class="text-danger">*</span>
                                 </label>
                                 <multiselect
                                   @select="getStore"
@@ -1370,11 +1426,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('store_id')">
                               <div class="form-group position-relative">
                                 <label class="control-label">
                                   {{ $t("general.Store") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('store_id')" class="text-danger">*</span>
                                 </label>
                                 <multiselect
                                   v-model="edit.store_id"
@@ -1402,17 +1458,16 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('start_no')">
                               <div class="form-group">
                                 <label for="field-15" class="control-label">
                                   {{ $t("general.StartNo") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('start_no')" class="text-danger">*</span>
                                 </label>
                                 <input
                                   type="number"
                                   class="form-control"
                                   data-edit="1"
-                                  @keypress.enter="moveInput('input', 'edit', 2)"
                                   v-model="$v.edit.start_no.$model"
                                   :class="{
                                     'is-invalid':
@@ -1439,17 +1494,16 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('suffix')">
                               <div class="form-group">
                                 <label for="field-1" class="control-label">
                                   {{ $t("general.Suffix") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('suffix')" class="text-danger">*</span>
                                 </label>
                                 <input
                                   type="text"
                                   class="form-control"
                                   data-edit="2"
-                                  @keypress.enter="moveInput('input', 'edit', 3)"
                                   v-model="$v.edit.suffix.$model"
                                   :class="{
                                     'is-invalid': $v.edit.suffix.$error || errors.suffix,
@@ -1475,17 +1529,16 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6"  v-if="isVisible('perfix')">
                               <div class="form-group">
                                 <label for="field-2" class="control-label">
                                   {{ $t("general.Perfix") }}
-                                  <span class="text-danger">*</span>
+                                  <span  v-if="isRequired('perfix')" class="text-danger">*</span>
                                 </label>
                                 <input
                                   type="text"
                                   class="form-control"
                                   data-edit="3"
-                                  @keypress.enter="moveInput('input', 'edit', 4)"
                                   v-model="$v.edit.perfix.$model"
                                   :class="{
                                     'is-invalid': $v.edit.perfix.$error || errors.perfix,
@@ -1511,11 +1564,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('restart_period')">
                               <div class="form-group">
                                 <label for="edit-88" class="control-label">
                                   {{ $t("general.RestartPeriod") }}
-                                  <span class="text-danger">*</span>
+                                  <span v-if="isRequired('restart_period')" class="text-danger">*</span>
                                 </label>
                                 <input
                                   type="number"
@@ -1523,7 +1576,6 @@ export default {
                                   max="3"
                                   class="form-control"
                                   data-edit="4"
-                                  @keypress.enter="moveInput('select', 'edit', 7)"
                                   v-model="$v.edit.restart_period.$model"
                                   :class="{
                                     'is-invalid':
@@ -1560,11 +1612,11 @@ export default {
                                 </template>
                               </div>
                             </div>
-                              <div class="col-md-6">
+                            <div class="col-md-6" v-if="isVisible('is_default')">
                                   <div class="form-group">
                                       <label class="mr-2">
                                           {{ $t("general.Default") }}
-                                          <span class="text-danger">*</span>
+                                          <span v-if="isRequired('is_default')" class="text-danger">*</span>
                                       </label>
                                       <b-form-group :class="{
                                      'is-invalid': $v.edit.is_default.$error || errors.is_default,

@@ -30,6 +30,7 @@
 
 <script>
 import Swal from "sweetalert2";
+import adminApi from "../../../api/adminAxios";
 export default {
   name: "index",
   data() {
@@ -81,6 +82,35 @@ export default {
             "company",
             ...name,
           ]);
+            if(l.document_company_module.length > 0){
+                let documents = [];
+                l.document_company_module.forEach(e => {
+                    if(e.document_types.length > 0){
+                        e.document_types.forEach(w => {
+                            documents.push({
+                                name: w.name,
+                                name_e: w.name_e,
+                                is_admin: w.is_admin,
+                                is_default: 0,
+                                company_id: id
+                            });
+                        });
+                    }
+                });
+                if(documents.length > 0){
+                    documents.forEach(e => e.is_admin = 1);
+                    adminApi
+                        .post(`/document/from_admin`,{documents})
+                        .then((res) => {})
+                        .catch((err) => {
+                            Swal.fire({
+                                icon: "error",
+                                title: `${this.$t("general.Error")}`,
+                                text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                            });
+                        })
+                }
+            }
           this.$store.commit("auth/allWorkFlow", l.work_flow_trees);
           return this.$router.push({ name: "home" });
         })

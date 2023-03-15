@@ -6,6 +6,7 @@ interface DepartmentInterface
 {
 
     public function all($request);
+    public function parentDepartment($request);
 
     public function find($id);
 

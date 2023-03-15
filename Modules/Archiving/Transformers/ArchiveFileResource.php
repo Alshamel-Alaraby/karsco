@@ -4,6 +4,7 @@ namespace Modules\Archiving\Transformers;
 
 use App\Http\Resources\FileResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Archiving\Entities\DocType;
 
 class ArchiveFileResource extends JsonResource
 {
@@ -34,6 +35,7 @@ class ArchiveFileResource extends JsonResource
             'updated_at' => $this->updated_at,
             "media_count" => count((array) $this->files),
             "arch_department_id" => $this->arch_department_id,
+            "parent_doc_id"=>DocType::find($this->arch_doc_type_id)->parent_id
         ];
 
     }

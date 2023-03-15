@@ -42,7 +42,6 @@ export default {
       is_default: { required },
     },
   },
-
   updated() {
     // $(function () {
     //   $(".englishInput").keypress(function (event) {
@@ -138,19 +137,15 @@ export default {
           });
       }
     },
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     formatDate(value) {
       return formatDateOnly(value);
     },
-      arabicValue(txt){
+    arabicValue(txt){
           this.create.name = arabicValue(txt);
       },
-
-      englishValue(txt){
-          this.create.name_e = englishValue(txt);
-      }
+    englishValue(txt){
+       this.create.name_e = englishValue(txt);
+    }
   },
 };
 </script>
@@ -158,7 +153,7 @@ export default {
 <template>
   <!--  create   -->
     <b-modal
-        id="create"
+        id="installment-payment-create"
         :title="getCompanyKey('installment_status_create_form')"
         title-class="font-18"
         body-class="p-4 "
@@ -210,7 +205,7 @@ export default {
                                 type="text"
                                 class="form-control arabicInput"
                                 data-create="1"
-                                @keyup="arabicValueName(create.name)"
+                                @keyup="arabicValue(create.name)"
                                 v-model="$v.create.name.$model"
                                 :class="{
                                                         'is-invalid':$v.create.name.$error || errors.name,
@@ -245,7 +240,7 @@ export default {
                                 type="text"
                                 class="form-control englishInput"
                                 data-create="2"
-                                @keyup="englishValueName(create.name_e)"
+                                @keyup="englishValue(create.name_e)"
                                 v-model="$v.create.name_e.$model"
                                 :class="{
                                                 'is-invalid':$v.create.name_e.$error || errors.name_e,
@@ -271,15 +266,15 @@ export default {
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label class="mr-2" for="field-11">
+                        <label class="mr-2">
                             {{ getCompanyKey('installment_status_default') }}
                         </label>
                         <b-form-group
                             id="field-11"
                             :class="{
-                                                      'is-invalid': $v.create.is_default.$error || errors.is_default,
-                                                      'is-valid': !$v.create.is_default.$invalid && !errors.is_default,
-                                                    }"
+                              'is-invalid': $v.create.is_default.$error || errors.is_default,
+                              'is-valid': !$v.create.is_default.$invalid && !errors.is_default,
+                            }"
                         >
                             <b-form-radio
                                 class="d-inline-block"

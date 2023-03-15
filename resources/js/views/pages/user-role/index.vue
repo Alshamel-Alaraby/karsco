@@ -3,7 +3,7 @@ import Layout from "../../layouts/main";
 import PageHeader from "../../../components/Page-header";
 import adminApi from "../../../api/adminAxios";
 import outerAxios from "../../../api/outerAxios";
-import { required } from "vuelidate/lib/validators";
+import {required, requiredIf} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../../components/widgets/errorMessage";
 import loader from "../../../components/loader";
@@ -55,6 +55,7 @@ export default {
   },
   data() {
     return {
+        fields: [],
         enabled3: true,
         printLoading: true,
         printObj: {
@@ -93,12 +94,20 @@ export default {
   },
   validations: {
     create: {
-      role_id: { required },
-      user_id: { required },
+      role_id: { required: requiredIf(function (model) {
+              return this.isRequired("role_id");
+          }) },
+      user_id: { required: requiredIf(function (model) {
+              return this.isRequired("user_id");
+          }) },
     },
     edit: {
-      role_id: { required },
-      user_id: { required },
+        role_id: { required: requiredIf(function (model) {
+                return this.isRequired("role_id");
+            }) },
+        user_id: { required: requiredIf(function (model) {
+                return this.isRequired("user_id");
+            }) },
     },
   },
   watch: {
@@ -132,12 +141,41 @@ export default {
       }
     },
   },
-  async mounted() {
+   mounted() {
     this.company_id = this.$store.getters["auth/company_id"];
+    this.getCustomTableFields();
     this.getData();
-    console.log(this.$store.state.auth.allworkflow);
   },
   methods: {
+      getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_role_user`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+      isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+      isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
       ExportExcel(type, fn, dl) {
           this.enabled3 = false;
           setTimeout(() => {
@@ -381,8 +419,8 @@ export default {
      *  hidden Modal (create)
      */
     async resetModal() {
-      await this.getUsers();
-      await this.getRoles();
+      if(this.isVisible('user_id')) await this.getUsers();
+      if(this.isVisible('role_id'))await this.getRoles();
       this.create = { role_id: null, user_id: null };
       this.is_disabled = false;
       this.$nextTick(() => {
@@ -527,10 +565,10 @@ export default {
      */
     async resetModalEdit(id) {
       let userRole = this.userRoles.find((e) => id == e.id);
-      await this.getUsers();
-      await this.getRoles();
-      this.edit.role_id = userRole.role_id;
-      this.edit.user_id = userRole.user_id;
+      if(this.isVisible('user_id'))await this.getUsers();
+      if(this.isVisible('role_id'))await this.getRoles();
+      this.edit.role_id = userRole.role_id ?? null;
+      this.edit.user_id = userRole.user_id ?? null;
       this.errors = {};
     },
     /**
@@ -613,12 +651,14 @@ export default {
                   >
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('role_id')"
                       value="role_id"
                       class="mb-1"
                       >{{ getCompanyKey("role") }}</b-form-checkbox
                     >
                     <b-form-checkbox
                       v-model="filterSetting"
+                      v-if="isVisible('user_id')"
                       value="user_id"
                       class="mb-1"
                       >{{ getCompanyKey("user") }}</b-form-checkbox
@@ -710,10 +750,10 @@ export default {
                     ref="dropdown"
                     class="dropdown-custom-ali"
                   >
-                    <b-form-checkbox v-model="setting.role_id" class="mb-1"
+                    <b-form-checkbox v-if="isVisible('role_id')" v-model="setting.role_id" class="mb-1"
                       >{{ getCompanyKey("role") }}
                     </b-form-checkbox>
-                    <b-form-checkbox v-model="setting.user_id" class="mb-1"
+                    <b-form-checkbox v-if="isVisible('user_id')" v-model="setting.user_id" class="mb-1"
                       >{{ getCompanyKey("user") }}
                     </b-form-checkbox>
                     <div class="d-flex justify-content-end">
@@ -814,9 +854,12 @@ export default {
                   </b-button>
                 </div>
                 <div class="row">
-                  <div class="col-md-12 position-relative">
+                  <div class="col-md-12 position-relative" v-if="isVisible('role_id')">
                     <div class="form-group">
-                      <label class="my-1 mr-2">{{ getCompanyKey("role") }}</label>
+                      <label class="my-1 mr-2">
+                          {{ getCompanyKey("role") }}
+                          <span v-if="isRequired('role_id')" class="text-danger">*</span>
+                      </label>
                       <multiselect
                         @input="showRoleModal"
                         v-model="create.role_id"
@@ -845,9 +888,12 @@ export default {
                       </template>
                     </div>
                   </div>
-                  <div class="col-md-12 position-relative">
+                  <div class="col-md-12 position-relative" v-if="isVisible('user_id')">
                     <div class="form-group">
-                      <label class="my-1 mr-2">{{ getCompanyKey("user") }}</label>
+                      <label class="my-1 mr-2">
+                          {{ getCompanyKey("user") }}
+                          <span v-if="isRequired('user_id')" class="text-danger">*</span>
+                      </label>
                       <multiselect
                         @input="showUserModal"
                         :multiple="true"
@@ -901,7 +947,7 @@ export default {
                         />
                       </div>
                     </th>
-                    <th v-if="setting.role_id">
+                    <th v-if="setting.role_id && isVisible('role_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("role") }}</span>
                         <div class="arrow-sort">
@@ -924,7 +970,7 @@ export default {
                         </div>
                       </div>
                     </th>
-                    <th v-if="setting.user_id">
+                    <th v-if="setting.user_id && isVisible('user_id')">
                       <div class="d-flex justify-content-center">
                         <span>{{ getCompanyKey("user") }}</span>
                         <div class="arrow-sort">
@@ -972,14 +1018,14 @@ export default {
                         />
                       </div>
                     </td>
-                    <td v-if="setting.role_id">
+                    <td v-if="setting.role_id && isVisible('role_id')">
                       <h5 class="m-0 font-weight-normal">
-                        {{ $i18n.locale == "ar" ? data.role.name : data.role.name_e }}
+                        {{data.role ? $i18n.locale == "ar" ? data.role.name : data.role.name_e : ' - '}}
                       </h5>
                     </td>
-                    <td v-if="setting.user_id">
+                    <td v-if="setting.user_id && isVisible('user_id')">
                       <h5 class="m-0 font-weight-normal">
-                        {{ $i18n.locale == "ar" ? data.user.name : data.user.name_e }}
+                        {{data.user ? $i18n.locale == "ar" ? data.user.name : data.user.name_e  : ' - '}}
                       </h5>
                     </td>
                     <td v-if="enabled3" class="do-not-print">
@@ -1059,11 +1105,13 @@ export default {
                             </b-button>
                           </div>
                           <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-12" v-if="isVisible('role_id')">
                               <div class="form-group">
                                 <label class="my-1 mr-2">{{
                                   getCompanyKey("role")
-                                }}</label>
+                                }}
+                                    <span v-if="isRequired('role_id')" class="text-danger">*</span>
+                                </label>
                                 <multiselect
                                   @input="showRoleModalEdit"
                                   v-model="edit.role_id"
@@ -1096,11 +1144,13 @@ export default {
                                 </template>
                               </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-12" v-if="isVisible('user_id')">
                               <div class="form-group">
                                 <label class="my-1 mr-2">{{
                                   getCompanyKey("user")
-                                }}</label>
+                                }}
+                                    <span v-if="isRequired('user_id')" class="text-danger">*</span>
+                                </label>
                                 <multiselect
                                   v-model="edit.user_id"
                                   @input="showUserModalEdit"

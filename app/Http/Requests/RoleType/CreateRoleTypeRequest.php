@@ -17,9 +17,9 @@ class CreateRoleTypeRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'=>['required'],
-            'name_e'=>['required'],
-            "company_id"=>"required"
+            'name'=>['nullable'],
+            'name_e'=>['nullable'],
+            "company_id"=>"nullable"
         ];
     }
 

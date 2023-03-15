@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests\Store;
 
-use App\Traits\ValidationTrait;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreStoreRequest extends FormRequest
 {
-    use ValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -26,10 +26,10 @@ class StoreStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255',
-            'name_e' => 'required|string|max:255',
-            'company_id' => 'required|integer',
-            'branch_id' => 'required|integer',
+            'name' => 'nullable|string|max:255',
+            'name_e' => 'nullable|string|max:255',
+            'company_id' => 'nullable|integer',
+            'branch_id' => 'nullable|integer',
             'is_active' => 'nullable|in:active,inactive',
         ];
     }

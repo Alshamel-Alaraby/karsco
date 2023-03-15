@@ -37,20 +37,16 @@
             <span class="sr-only">{{ $t("login.Loading") }}...</span>
           </b-button>
         </template>
-        <b-button
-          @click.prevent="$bvModal.hide(`governate-create`)"
-          variant="danger"
-          type="button"
-        >
+        <b-button @click.prevent="resetModalHidden" variant="danger" type="button">
           {{ $t("general.Cancel") }}
         </b-button>
       </div>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6" v-if="isVisible('country_id')">
           <div class="form-group position-relative">
             <label class="control-label">
               {{ getCompanyKey("country") }}
-              <span class="text-danger">*</span>
+              <span v-if="isRequired('country_id')" class="text-danger">*</span>
             </label>
             <multiselect
               v-model="create.country_id"
@@ -68,22 +64,21 @@
               <ErrorMessage
                 v-for="(errorMessage, index) in errors.country_id"
                 :key="index"
-                >{{ errorMessage }}</ErrorMessage
-              >
+                >{{ errorMessage }}
+              </ErrorMessage>
             </template>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6" v-if="isVisible('phone_key')">
           <div class="form-group">
             <label for="field-5" class="control-label">
               {{ getCompanyKey("governorate_phone_key") }}
-              <span class="text-danger">*</span>
+              <span v-if="isRequired('phone_key')" class="text-danger">*</span>
             </label>
             <input
               type="number"
               class="form-control"
               data-create="4"
-              @keypress.enter="moveInput('select', 'create', 5)"
               v-model="$v.create.phone_key.$model"
               :class="{
                 'is-invalid': $v.create.phone_key.$error || errors.phone_key,
@@ -102,32 +97,28 @@
               {{ $t("general.letters") }}
             </div>
             <template v-if="errors.phone_key">
-              <ErrorMessage
-                v-for="(errorMessage, index) in errors.phone_key"
-                :key="index"
-                >{{ errorMessage }}</ErrorMessage
-              >
+              <ErrorMessage v-for="(errorMessage, index) in errors.phone_key" :key="index"
+                >{{ errorMessage }}
+              </ErrorMessage>
             </template>
           </div>
         </div>
-
-        <div class="col-md-6 direction" dir="rtl">
+        <div class="col-md-6 direction" v-if="isVisible('name')" dir="rtl">
           <div class="form-group">
             <label for="field-1" class="control-label">
               {{ getCompanyKey("governorate_name_ar") }}
-              <span class="text-danger">*</span>
+              <span v-if="isRequired('name')" class="text-danger">*</span>
             </label>
             <input
+              @keyup="arabicValue(create.name)"
               type="text"
-              class="form-control arabicInput"
+              class="form-control"
               data-create="1"
-              @keypress.enter="moveInput('input', 'create', 2)"
               v-model="$v.create.name.$model"
               :class="{
                 'is-invalid': $v.create.name.$error || errors.name,
                 'is-valid': !$v.create.name.$invalid && !errors.name,
               }"
-              @keyup="arabicValue(create.name)"
               id="field-1"
             />
             <div v-if="!$v.create.name.minLength" class="invalid-feedback">
@@ -141,29 +132,28 @@
               {{ $t("general.letters") }}
             </div>
             <template v-if="errors.name">
-              <ErrorMessage v-for="(errorMessage, index) in errors.name" :key="index">{{
-                errorMessage
-              }}</ErrorMessage>
+              <ErrorMessage v-for="(errorMessage, index) in errors.name" :key="index"
+                >{{ errorMessage }}
+              </ErrorMessage>
             </template>
           </div>
         </div>
-        <div class="col-md-6 direction-ltr" dir="ltr">
+        <div class="col-md-6 direction-ltr" v-if="isVisible('name_e')" dir="ltr">
           <div class="form-group">
             <label for="field-2" class="control-label">
               {{ getCompanyKey("governorate_name_en") }}
-              <span class="text-danger">*</span>
+              <span v-if="isRequired('name_e')" class="text-danger">*</span>
             </label>
             <input
+              @keyup="englishValue(create.name_e)"
               type="text"
-              class="form-control englishInput"
+              class="form-control"
               data-create="2"
-              @keypress.enter="moveInput('input', 'create', 4)"
               v-model="$v.create.name_e.$model"
               :class="{
                 'is-invalid': $v.create.name_e.$error || errors.name_e,
                 'is-valid': !$v.create.name_e.$invalid && !errors.name_e,
               }"
-              @keyup="englishValue(create.name_e)"
               id="field-2"
             />
             <div v-if="!$v.create.name_e.minLength" class="invalid-feedback">
@@ -177,22 +167,22 @@
               {{ $t("general.letters") }}
             </div>
             <template v-if="errors.name_e">
-              <ErrorMessage v-for="(errorMessage, index) in errors.name_e" :key="index">{{
-                errorMessage
-              }}</ErrorMessage>
+              <ErrorMessage v-for="(errorMessage, index) in errors.name_e" :key="index"
+                >{{ errorMessage }}
+              </ErrorMessage>
             </template>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6" v-if="isVisible('is_default')">
           <div class="form-group">
             <label class="mr-2" for="field-11">
               {{ getCompanyKey("governorate_default") }}
+              <span v-if="isRequired('is_default')" class="text-danger">*</span>
             </label>
             <select
               class="custom-select mr-sm-2"
               id="field-11"
               data-create="5"
-              @keypress.enter.prevent="moveInput('select', 'create', 6)"
               v-model="$v.create.is_default.$model"
               :class="{
                 'is-invalid': $v.create.is_default.$error || errors.is_default,
@@ -200,45 +190,49 @@
               }"
             >
               <option value="" selected>{{ $t("general.Choose") }}...</option>
-              <option value="1">{{ $t("general.Active") }}</option>
-              <option value="0">{{ $t("general.Inactive") }}</option>
+              <option value="1">{{ $t("general.Yes") }}</option>
+              <option value="0">{{ $t("general.No") }}</option>
             </select>
             <template v-if="errors.is_default">
               <ErrorMessage
                 v-for="(errorMessage, index) in errors.is_default"
                 :key="index"
-                >{{ errorMessage }}</ErrorMessage
-              >
+                >{{ errorMessage }}
+              </ErrorMessage>
             </template>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-12" v-if="isVisible('is_active')">
           <div class="form-group">
-            <label class="mr-2" for="inlineFormCustomSelectPref">
+            <label class="mr-2">
               {{ getCompanyKey("governorate_status") }}
-              <span class="text-danger">*</span>
+              <span v-if="isRequired('is_active')" class="text-danger">*</span>
             </label>
-            <select
-              class="custom-select mr-sm-2"
-              id="inlineFormCustomSelectPref"
-              data-create="6"
-              @keypress.enter.prevent="moveInput('input', 'create', 1)"
-              v-model="$v.create.is_active.$model"
+            <b-form-group
               :class="{
                 'is-invalid': $v.create.is_active.$error || errors.is_active,
                 'is-valid': !$v.create.is_active.$invalid && !errors.is_active,
               }"
             >
-              <option value="" selected>{{ $t("general.Choose") }}...</option>
-              <option value="active">{{ $t("general.Active") }}</option>
-              <option value="inactive">{{ $t("general.Inactive") }}</option>
-            </select>
-            <template v-if="errors.is_active">
-              <ErrorMessage
-                v-for="(errorMessage, index) in errors.is_active"
-                :key="index"
-                >{{ errorMessage }}</ErrorMessage
+              <b-form-radio
+                class="d-inline-block"
+                v-model="$v.create.is_active.$model"
+                name="some-radios"
+                value="active"
+                >{{ $t("general.Active") }}</b-form-radio
               >
+              <b-form-radio
+                class="d-inline-block m-1"
+                v-model="$v.create.is_active.$model"
+                name="some-radios"
+                value="inactive"
+                >{{ $t("general.Inactive") }}</b-form-radio
+              >
+            </b-form-group>
+            <template v-if="errors.is_active">
+              <ErrorMessage v-for="(errorMessage, index) in errors.is_active" :key="index"
+                >{{ errorMessage }}
+              </ErrorMessage>
             </template>
           </div>
         </div>
@@ -250,14 +244,21 @@
 
 <script>
 import adminApi from "../api/adminAxios";
-import { required, minLength, maxLength, integer, alpha } from "vuelidate/lib/validators";
+import {
+  required,
+  minLength,
+  maxLength,
+  integer,
+  alpha,
+  requiredIf,
+} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import Switches from "vue-switches";
 import ErrorMessage from "../components/widgets/errorMessage";
 import loader from "../components/loader";
 import Multiselect from "vue-multiselect";
 import transMixinComp from "../helper/translation-comp-mixin";
-import {arabicValue, englishValue} from "../helper/langTransform";
+import { arabicValue, englishValue } from "../helper/langTransform";
 
 export default {
   components: {
@@ -271,17 +272,17 @@ export default {
     id: {
       default: "governate-create",
     },
-    companyKeys:{
-      default:[]
+    companyKeys: {
+      default: [],
     },
-    defaultsKeys:{
-      default:[]
+    defaultsKeys: {
+      default: [],
     },
   },
   mounted() {
+    this.getCustomTableFields();
     this.company_id = this.$store.getters["auth/company_id"];
   },
-
   updated() {
     // $(function () {
     //   $(".englishInput").keypress(function (event) {
@@ -304,21 +305,49 @@ export default {
   },
   validations: {
     create: {
-      name: { required, minLength: minLength(2), maxLength: maxLength(100) },
-      name_e: {
-        required,
+      name: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name");
+        }),
         minLength: minLength(2),
         maxLength: maxLength(100),
       },
-      phone_key: { required, integer, minLength: minLength(1), maxLength: maxLength(10) },
-      is_default: { required, integer },
-      country_id: { required },
-      is_active: { required },
+      name_e: {
+        required: requiredIf(function (model) {
+          return this.isRequired("name_e");
+        }),
+        minLength: minLength(2),
+        maxLength: maxLength(100),
+      },
+      phone_key: {
+        required: requiredIf(function (model) {
+          return this.isRequired("phone_key");
+        }),
+        integer,
+        minLength: minLength(1),
+        maxLength: maxLength(10),
+      },
+      is_default: {
+        required: requiredIf(function (model) {
+          return this.isRequired("is_default");
+        }),
+        integer,
+      },
+      country_id: {
+        required: requiredIf(function (model) {
+          return this.isRequired("country_id");
+        }),
+      },
+      is_active: {
+        required: requiredIf(function (model) {
+          return this.isRequired("is_active");
+        }),
+      },
     },
   },
-
   data() {
     return {
+      fields: [],
       isLoader: false,
       is_disabled: false,
       create: {
@@ -342,6 +371,35 @@ export default {
     };
   },
   methods: {
+    getCustomTableFields() {
+      adminApi
+        .get(`/customTable/table-columns/general_governorates`)
+        .then((res) => {
+          this.fields = res.data;
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: `${this.$t("general.Error")}`,
+            text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+          });
+        })
+        .finally(() => {
+          this.isLoader = false;
+        });
+    },
+    isVisible(fieldName) {
+      let res = this.fields.filter((field) => {
+        return field.column_name == fieldName;
+      });
+      return res.length > 0 && res[0].is_visible == 1 ? true : false;
+    },
+    isRequired(fieldName) {
+      let res = this.fields.filter((field) => {
+        return field.column_name == fieldName;
+      });
+      return res.length > 0 && res[0].is_required == 1 ? true : false;
+    },
     resetForm() {
       this.create = {
         name: "",
@@ -359,9 +417,6 @@ export default {
     /**
      *  end  ckeckRow
      */
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
     async getCategory() {
       this.isLoader = true;
 
@@ -411,6 +466,7 @@ export default {
         is_default: 0,
         is_active: "active",
       };
+      this.$bvModal.hide(this.id);
     },
     AddSubmit() {
       if (this.create.name || this.create.name_e) {
@@ -455,13 +511,12 @@ export default {
           });
       }
     },
-    arabicValue(txt){
+    arabicValue(txt) {
       this.create.name = arabicValue(txt);
     },
-
-    englishValue(txt){
+    englishValue(txt) {
       this.create.name_e = englishValue(txt);
-    }
+    },
   },
 };
 </script>

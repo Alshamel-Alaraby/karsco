@@ -2,13 +2,13 @@
 
 namespace Modules\RecievablePayable\Http\Requests;
 
-use App\Traits\ValidationTrait;
+
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class EditRpInstallmentPaymentPlanRequest extends FormRequest
 {
-    use ValidationTrait;
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -23,6 +23,7 @@ class EditRpInstallmentPaymentPlanRequest extends FormRequest
             'is_active' => [],
             'description' => [],
             'description_e' => [],
+
         ];
     }
 

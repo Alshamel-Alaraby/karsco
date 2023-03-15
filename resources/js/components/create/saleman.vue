@@ -1,7 +1,7 @@
 <script>
 import adminApi from "../../api/adminAxios";
 import Switches from "vue-switches";
-import { required, minLength, maxLength, integer } from "vuelidate/lib/validators";
+import {required, minLength, maxLength, integer, requiredIf} from "vuelidate/lib/validators";
 import Swal from "sweetalert2";
 import ErrorMessage from "../../components/widgets/errorMessage";
 import loader from "../../components/loader";
@@ -34,20 +34,27 @@ export default {
       },
       errors: {},
       salesmenTypes: [],
+        fields: [],
     };
   },
   validations: {
-    create: {
-      name: { required, minLength: minLength(3), maxLength: maxLength(100) },
-      name_e: { required, minLength: minLength(3), maxLength: maxLength(100) },
-      salesman_type_id: { required },
-    },
+      create: {
+          name: { required: requiredIf(function (model) {
+                  return this.isRequired("name");
+              }), minLength: minLength(3), maxLength: maxLength(100) },
+          name_e: { required: requiredIf(function (model) {
+                  return this.isRequired("name_e");
+              }), minLength: minLength(3), maxLength: maxLength(100) },
+          salesman_type_id: { required: requiredIf(function (model) {
+                  return this.isRequired("salesman_type_id");
+              }) },
+      },
   },
   mounted(){
+    this.getCustomTableFields();
     this.company_id=this.$store.getters["auth/company_id"];
   },
    props: ["companyKeys", "defaultsKeys"],
-
   updated() {
     // $(function () {
     //   $(".englishInput").keypress(function (event) {
@@ -69,9 +76,35 @@ export default {
     // });
   },
   methods: {
-    moveInput(tag, c, index) {
-      document.querySelector(`${tag}[data-${c}='${index}']`).focus();
-    },
+      getCustomTableFields() {
+          adminApi
+              .get(`/customTable/table-columns/general_salesmen`)
+              .then((res) => {
+                  this.fields = res.data;
+              })
+              .catch((err) => {
+                  Swal.fire({
+                      icon: "error",
+                      title: `${this.$t("general.Error")}`,
+                      text: `${this.$t("general.Thereisanerrorinthesystem")}`,
+                  });
+              })
+              .finally(() => {
+                  this.isLoader = false;
+              });
+      },
+      isVisible(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_visible == 1 ? true : false;
+      },
+      isRequired(fieldName) {
+          let res = this.fields.filter((field) => {
+              return field.column_name == fieldName;
+          });
+          return res.length > 0 && res[0].is_required == 1 ? true : false;
+      },
     resetModalHidden() {
       this.create = {
         name: "",
@@ -190,7 +223,6 @@ export default {
       arabicValue(txt){
           this.create.name = arabicValue(txt);
       },
-
       englishValue(txt){
           this.create.name_e = englishValue(txt);
       }
@@ -249,11 +281,11 @@ export default {
                   </b-button>
               </div>
               <div class="row">
-                  <div class="col-md-12">
+                  <div class="col-md-12" v-if="isVisible('salesman_type_id')">
                       <div class="form-group">
                           <label class="my-1 mr-2">
                               {{ getCompanyKey("sale_man_type") }}
-                              <span class="text-danger">*</span>
+                              <span v-if="isRequired('salesman_type_id')" class="text-danger">*</span>
                           </label>
                           <multiselect
                               @input="showSaleManModal"
@@ -281,11 +313,11 @@ export default {
                           </template>
                       </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-12" v-if="isVisible('name')">
                       <div class="form-group">
                           <label for="field-1" class="control-label">
                               {{ getCompanyKey("sale_man_name_ar") }}
-                              <span class="text-danger">*</span>
+                              <span v-if="isRequired('name')" class="text-danger">*</span>
                           </label>
                           <div dir="rtl">
                               <input
@@ -322,11 +354,11 @@ export default {
                           </template>
                       </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-12" v-if="isVisible('name_e')">
                       <div class="form-group">
                           <label for="field-2" class="control-label">
                               {{ getCompanyKey("sale_man_name_en") }}
-                              <span class="text-danger">*</span>
+                              <span v-if="isRequired('name_e')" class="text-danger">*</span>
                           </label>
                           <div dir="ltr">
                               <input
