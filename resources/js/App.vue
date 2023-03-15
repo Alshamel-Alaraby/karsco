@@ -40,8 +40,8 @@ export default {
             "company",
             ...name,
           ]);
-          this.$store.state.auth.work_flow_trees = ["dictionary", "company", ...name];
-          this.$store.state.auth.allWorkFlow = l.work_flow_trees;
+        //   this.$store.state.auth.work_flow_trees = ["dictionary", "company", ...name];
+        //   this.$store.state.auth.allWorkFlow = l.work_flow_trees;
           this.$store.commit("auth/allWorkFlow", l.work_flow_trees);
         })
         .catch((err) => {
