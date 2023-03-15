@@ -230,11 +230,15 @@ export default {
             field.doc_field_id.name_e
           );
         }
+          // if (field.doc_field_id.data_type.name_e == "ENUM (droplist)") {
+          //    this.getProperties();
+          // }
         return {
           ...field,
           value: "",
         };
       });
+        this.getProperties();
     },
     getCurrentTreeProps(treePropertyId) {
       let res = this.properties.filter((prop) => {
@@ -244,7 +248,7 @@ export default {
     },
     getProperties() {
       let props = [];
-      let filterRes = this.fields.filter((field) => {
+      let filterRes = this.nodeFields.filter((field) => {
         return (
           field.doc_field_id.tree_property_id &&
           field.doc_field_id.data_type.name_e == "ENUM (droplist)"

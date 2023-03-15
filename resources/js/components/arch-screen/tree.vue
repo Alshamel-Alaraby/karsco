@@ -78,7 +78,7 @@ export default {
   methods: {
     getAppropriateNodes(node){
       if(node.arch_documents && node.arch_documents.length){
-        return node.arch_documents; 
+        return node.arch_documents;
       }
       else if(node.key && node.key.length){
         return node.key;
@@ -96,7 +96,7 @@ export default {
       return this.expanded.indexOf(node) !== -1;
     },
     onDoubleClicked(node) {
-      if (this.depth > 1 && node.parent_id===null) {
+      if (this.depth >= 1 && node.parent_id===null) {
         this.$emit("onDoubleClicked", node);
       }
     },

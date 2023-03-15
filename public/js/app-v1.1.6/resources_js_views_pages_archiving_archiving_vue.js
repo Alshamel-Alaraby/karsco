@@ -1762,7 +1762,7 @@ __webpack_require__.r(__webpack_exports__);
       return this.expanded.indexOf(node) !== -1;
     },
     onDoubleClicked: function onDoubleClicked(node) {
-      if (this.depth > 1 && node.parent_id === null) {
+      if (this.depth >= 1 && node.parent_id === null) {
         this.$emit("onDoubleClicked", node);
       }
     },
@@ -8477,10 +8477,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         if (field.doc_field_id.data_type.name_e == "Lookup (table)") {
           _this5.getLookup(field.doc_field_id.lookup_table, field.doc_field_id.lookup_table_column, field.doc_field_id.name_e);
         }
+        // if (field.doc_field_id.data_type.name_e == "ENUM (droplist)") {
+        //    this.getProperties();
+        // }
         return _objectSpread(_objectSpread({}, field), {}, {
           value: ""
         });
       });
+      this.getProperties();
     },
     getCurrentTreeProps: function getCurrentTreeProps(treePropertyId) {
       var res = this.properties.filter(function (prop) {
@@ -8490,7 +8494,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     getProperties: function getProperties() {
       var props = [];
-      var filterRes = this.fields.filter(function (field) {
+      var filterRes = this.nodeFields.filter(function (field) {
         return field.doc_field_id.tree_property_id && field.doc_field_id.data_type.name_e == "ENUM (droplist)";
       });
       filterRes.forEach(function (element) {
@@ -11868,7 +11872,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.title-tree[data-v-364f91b5] {\r\n  font-size: 12px !important;\r\n  font-weight: 500;\n}\nspan.type i[data-v-364f91b5]{\r\n  font-size: 10px;\n}\n.type[data-v-364f91b5] {\r\n  margin-right: 10px;\n}\r\n\r\n/*ali*/\n.node[data-v-364f91b5] {\r\n  --spacing: 1.5rem;\r\n  --radius: 10px;\n}\n.node .node[data-v-364f91b5] {\r\n  display: block;\r\n  position: relative;\r\n  padding-left: calc(1.5 * var(--spacing) - var(--radius) - 2px);\n}\n.node .dragArea[data-v-364f91b5] {\r\n  margin-left: calc(var(--radius) - var(--spacing));\r\n  padding-left: 0;\n}\n.node .dragArea .node[data-v-364f91b5] {\r\n  border-left: 2px solid #ddd;\n}\n.node .dragArea .node.dir-node[data-v-364f91b5] {\r\n  border-right: 2px solid #ddd;\r\n  border-left: unset;\n}\n.node .dragArea .node[data-v-364f91b5]:last-child {\r\n  border-color: transparent;\n}\n.node .dragArea .node[data-v-364f91b5]::before {\r\n  content: \"\";\r\n  display: block;\r\n  position: absolute;\r\n  top: calc(var(--spacing) / -2);\r\n  left: -2px;\r\n  width: calc(var(--spacing) + 2px);\r\n  height: calc(var(--spacing) + 5px);\r\n  border: solid #ddd;\r\n  border-width: 0 0 2px 2px;\n}\n.node .dragArea .node.dir-node[data-v-364f91b5]::before {\r\n  content: \"\";\r\n  display: block;\r\n  position: absolute;\r\n  top: calc(var(--spacing) / -2);\r\n  right: -2px;\r\n  width: 12px;\r\n  height: calc(var(--spacing) + 5px);\r\n  border: solid #ddd;\r\n  border-width: 0 2px 2px 0;\r\n  left: unset;\n}\ni[data-v-364f91b5] {\r\n  background-color: #3bafda;\r\n  color: snow;\r\n  border-radius: 50%;\r\n  padding: 3px;\r\n  font-size: 12px;\r\n  margin: 0px;\r\n  position: relative;\r\n  z-index: 1;\n}\n.active[data-v-364f91b5] {\r\n  color: #159a80 !important;\n}\nspan[data-v-364f91b5],.tree-container[data-v-364f91b5]{\r\n      white-space: nowrap;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.title-tree[data-v-364f91b5] {\n  font-size: 12px !important;\n  font-weight: 500;\n}\nspan.type i[data-v-364f91b5]{\n  font-size: 10px;\n}\n.type[data-v-364f91b5] {\n  margin-right: 10px;\n}\n\n/*ali*/\n.node[data-v-364f91b5] {\n  --spacing: 1.5rem;\n  --radius: 10px;\n}\n.node .node[data-v-364f91b5] {\n  display: block;\n  position: relative;\n  padding-left: calc(1.5 * var(--spacing) - var(--radius) - 2px);\n}\n.node .dragArea[data-v-364f91b5] {\n  margin-left: calc(var(--radius) - var(--spacing));\n  padding-left: 0;\n}\n.node .dragArea .node[data-v-364f91b5] {\n  border-left: 2px solid #ddd;\n}\n.node .dragArea .node.dir-node[data-v-364f91b5] {\n  border-right: 2px solid #ddd;\n  border-left: unset;\n}\n.node .dragArea .node[data-v-364f91b5]:last-child {\n  border-color: transparent;\n}\n.node .dragArea .node[data-v-364f91b5]::before {\n  content: \"\";\n  display: block;\n  position: absolute;\n  top: calc(var(--spacing) / -2);\n  left: -2px;\n  width: calc(var(--spacing) + 2px);\n  height: calc(var(--spacing) + 5px);\n  border: solid #ddd;\n  border-width: 0 0 2px 2px;\n}\n.node .dragArea .node.dir-node[data-v-364f91b5]::before {\n  content: \"\";\n  display: block;\n  position: absolute;\n  top: calc(var(--spacing) / -2);\n  right: -2px;\n  width: 12px;\n  height: calc(var(--spacing) + 5px);\n  border: solid #ddd;\n  border-width: 0 2px 2px 0;\n  left: unset;\n}\ni[data-v-364f91b5] {\n  background-color: #3bafda;\n  color: snow;\n  border-radius: 50%;\n  padding: 3px;\n  font-size: 12px;\n  margin: 0px;\n  position: relative;\n  z-index: 1;\n}\n.active[data-v-364f91b5] {\n  color: #159a80 !important;\n}\nspan[data-v-364f91b5],.tree-container[data-v-364f91b5]{\n      white-space: nowrap;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

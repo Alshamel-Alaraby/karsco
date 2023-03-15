@@ -285,17 +285,13 @@ class ArchiveFileController extends Controller
     {
         $model = $this->model->
         where('arch_department_id',$request->department_id)->
-        where('data_type_value','like','%"value":'.$request->value.'%')
+        where('data_type_value','like','%"value":"'.$request->value.'"%')
         ->where(function ($q) use ($request){
             $q->when($request->arch_doc_type_id,function ($q) use ($request){
                 $q->where('arch_doc_type_id',$request->arch_doc_type_id);
             });
         })->get();
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> dev-test
         if (!$model) {
             return responseJson(404, 'not found');
         }
