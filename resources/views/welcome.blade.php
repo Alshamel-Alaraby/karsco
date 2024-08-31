@@ -17,7 +17,7 @@
         <!-- script -->
         <script src="http://www.geoplugin.net/javascript.gp" type="text/javascript"></script>
         <script src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
-        <script src="{{ mix('js/app-'. env('MIX_VERSION') . '.js') }}"></script>
+        <script src="{{ mix('js/app.js') }}"></script>
 
     </body>
 </html>

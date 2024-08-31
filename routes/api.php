@@ -26,6 +26,8 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::controller(\App\Http\Controllers\MainController::class)->group(function () {
+    Route::get("/remove-media/{id}", "removeMedia");
+    Route::post("/get-s3-url", "getS3SignedUrl");
     Route::post("/media", "media");
     Route::get("statices", "statices");
     Route::get("data-types", 'dataTypes');
