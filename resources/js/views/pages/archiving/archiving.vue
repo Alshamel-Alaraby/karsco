@@ -255,7 +255,11 @@ export default {
             })
         },
         dropzoneRemovedFile(file, error, xhr) {
+            const modal = this.$refs.uploadModal;
+            if (modal.isShow) {
             adminApi.get(`/remove-media/${file.media.id}`)
+            }
+
         },
         setChildNodes(result) {
             adminApi.get(`/arch-archive-files/getKeys?doc_type_id=${result.node.doc_type_id}
@@ -1633,7 +1637,7 @@ export default {
                         </div>
 
                         <!--  create   -->
-                        <b-modal dialog-class="modal-full-width" id="create" :title="$t('general.FileUploads')"
+                        <b-modal dialog-class="modal-full-width" ref="uploadModal" id="create" :title="$t('general.FileUploads')"
                                  title-class="font-18"
                                  size="lg" body-class="p-4 " :hide-footer="true" @show="resetModal"
                                  @hidden="resetModalHidden">
